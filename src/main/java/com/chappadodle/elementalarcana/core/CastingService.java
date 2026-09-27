@@ -1,0 +1,163 @@
+package com.chappadodle.elementalarcana.core;
+
+import com.chappadodle.elementalarcana.api.CastContext;
+import com.chappadodle.elementalarcana.api.CastResult;
+import com.chappadodle.elementalarcana.api.Spell;
+import com.chappadodle.elementalarcana.api.SpellRegistries;
+import com.chappadodle.elementalarcana.api.event.SpellCastEvent;
+import com.chappadodle.elementalarcana.content.ModContent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.common.NeoForge;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+/** The single casting pipeline every spell goes through. */
+public final class CastingService {
+    /** Health paid per point of missing mana when overcasting (1 heart per 20 mana). */
+    private static final float HEALTH_PER_MISSING_MANA = 0.1f;
+    private static final int MANA_SICKNESS_TICKS = 15 * 20;
+    private static final long FIZZLE_SOUND_INTERVAL = 20;
+    private static final Map<UUID, Long> LAST_FIZZLE = new HashMap<>();
+
+    private CastingService() {
+    }
+
+    /**
+     * Why the selected spell can't be cast right now, or null if it can. Mana is not checked -
+     * a shortfall is paid with health (see {@link #healthCost}). Runs on both sides.
+     */
+    @Nullable
+    public static Component whyNotCastable(Player player, MagicData data, @Nullable Spell spell) {
+        if (!data.isAwakened()) {
+            return Component.translatable("message.elementalarcana.not_awakened");
+        }
+        if (spell == null) {
+            return Component.translatable("message.elementalarcana.no_spell");
+        }
+        if (player.isCreative() || data.freeCast()) {
+            return null;
+        }
+        long remaining = data.cooldownRemaining(spell.id(), player.level().getGameTime());
+        if (remaining > 0) {
+            return Component.translatable("message.elementalarcana.cooldown", spell.displayName(), String.format("%.1f", remaining / 20f));
+        }
+        return null;
+    }
+
+    /** Health an overcast of {@code manaCost} would take right now (0 when mana suffices). */
+    public static float healthCost(MagicData data, int manaCost) {
+        return Math.max(0f, manaCost - data.mana()) * HEALTH_PER_MISSING_MANA;
+    }
+
+    public static void tryCast(ServerPlayer player) {
+        MagicData data = MagicAttachments.get(player);
+        Spell spell = data.selectedSpell();
+        Component problem = whyNotCastable(player, data, spell);
+        if (problem != null) {
+            fizzle(player, problem);
+            return;
+        }
+
+        SpellCastEvent.Pre pre = NeoForge.EVENT_BUS.post(new SpellCastEvent.Pre(player, spell, spell.manaCost()));
+        if (pre.isCanceled()) {
+            return;
+        }
+        boolean free = player.isCreative() || data.freeCast();
+        int cost = pre.manaCost();
+        float healthCost = free ? 0f : healthCost(data, cost);
+        if (healthCost > 0 && player.getHealth() - healthCost < 1f) {
+            fizzle(player, Component.translatable("message.elementalarcana.too_exhausted"));
+            return;
+        }
+
+        CastResult result = spell.cast(new CastContext(player, player.serverLevel(), InteractionHand.MAIN_HAND, data.power()));
+        if (!result.success()) {
+            if (result.failReason() != null) {
+                fizzle(player, result.failReason());
+            }
+            return;
+        }
+
+        data.interruptMeditation();
+        if (!free) {
+            data.setMana(data.mana() - cost);
+            data.startCooldown(spell.id(), player.level().getGameTime(), spell.cooldownTicks());
+            if (healthCost > 0) {
+                overcast(player, healthCost);
+            }
+            if (healthCost > 0 || data.mana() <= 0f) {
+                player.addEffect(new MobEffectInstance(ModContent.MANA_SICKNESS, MANA_SICKNESS_TICKS));
+            }
+            int oldLevel = data.level();
+            if (data.addXp(cost) > 0) {
+                onLevelUp(player, data, oldLevel);
+            }
+        }
+
+        player.swing(InteractionHand.MAIN_HAND, true);
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), spell.school().castSound(),
+                SoundSource.PLAYERS, 1f, 0.9f + player.getRandom().nextFloat() * 0.2f);
+        MagicAttachments.sync(player);
+        NeoForge.EVENT_BUS.post(new SpellCastEvent.Post(player, spell));
+    }
+
+    private static void overcast(ServerPlayer player, float healthCost) {
+        player.setHealth(player.getHealth() - healthCost);
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_HURT, SoundSource.PLAYERS, 0.8f, 0.8f);
+        player.serverLevel().sendParticles(ParticleTypes.DAMAGE_INDICATOR, player.getX(), player.getY(1.0), player.getZ(), 4, 0.3, 0.2, 0.3, 0.1);
+        player.displayClientMessage(Component.translatable("message.elementalarcana.overcast").withStyle(ChatFormatting.DARK_RED), true);
+    }
+
+    private static void onLevelUp(ServerPlayer player, MagicData data, int oldLevel) {
+        int newLevel = data.level();
+        player.connection.send(new ClientboundSetTitlesAnimationPacket(10, 50, 20));
+        player.connection.send(new ClientboundSetTitleTextPacket(
+                Component.translatable("title.elementalarcana.level_up", newLevel).withStyle(ChatFormatting.LIGHT_PURPLE)));
+        player.connection.send(new ClientboundSetSubtitleTextPacket(
+                Component.translatable("title.elementalarcana.level_up.sub", (int) data.maxMana()).withStyle(ChatFormatting.GRAY)));
+        player.playNotifySound(ModContent.LEVEL_UP_SOUND.get(), SoundSource.PLAYERS, 1f, 1f);
+        player.serverLevel().sendParticles(ParticleTypes.END_ROD, player.getX(), player.getY(1.0), player.getZ(), 30, 0.5, 0.8, 0.5, 0.05);
+
+        for (Spell spell : SpellRegistries.SPELLS) {
+            if (data.hasAffinity(spell.school()) && spell.requiredLevel() > oldLevel && spell.requiredLevel() <= newLevel) {
+                player.sendSystemMessage(Component.translatable("message.elementalarcana.new_spell", spell.displayName())
+                        .withStyle(style -> style.withColor(spell.school().color())));
+            }
+        }
+        for (int slotLevel : MagicData.AFFINITY_SLOT_LEVELS) {
+            if (slotLevel > oldLevel && slotLevel <= newLevel && data.hasFreeAffinitySlot()) {
+                player.sendSystemMessage(Component.translatable("message.elementalarcana.new_affinity_slot",
+                        Component.keybind("key.elementalarcana.status")).withStyle(ChatFormatting.LIGHT_PURPLE));
+            }
+        }
+    }
+
+    private static void fizzle(ServerPlayer player, Component reason) {
+        player.displayClientMessage(reason.copy().withStyle(ChatFormatting.RED), true);
+        // Holding the cast key retries quickly; don't turn that into a stream of fizzles.
+        long now = player.level().getGameTime();
+        Long last = LAST_FIZZLE.get(player.getUUID());
+        if (last == null || now - last >= FIZZLE_SOUND_INTERVAL) {
+            LAST_FIZZLE.put(player.getUUID(), now);
+            player.playNotifySound(ModContent.FIZZLE_SOUND.get(), SoundSource.PLAYERS, 0.6f, 1f);
+        }
+    }
+
+    static void forget(UUID player) {
+        LAST_FIZZLE.remove(player);
+    }
+}
