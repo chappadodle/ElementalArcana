@@ -2,8 +2,10 @@ package com.chappadodle.elementalarcana.client;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.ProjectileSpell;
+import com.chappadodle.elementalarcana.api.ShieldSpell;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
+import com.chappadodle.elementalarcana.api.SpellShield;
 import com.chappadodle.elementalarcana.client.particle.FrostMistParticle;
 import com.chappadodle.elementalarcana.client.particle.FrostSparkleParticle;
 import com.chappadodle.elementalarcana.client.particle.IceShardParticle;
@@ -18,6 +20,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -25,12 +29,16 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.client.event.RenderLivingEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @EventBusSubscriber(modid = ElementalArcana.MODID, value = Dist.CLIENT)
 public final class ArcanaClient {
@@ -105,6 +113,16 @@ public final class ArcanaClient {
             }
         }
 
+        if (!minecraft.isPaused() && minecraft.level != null) {
+            for (Player shielded : minecraft.level.players()) {
+                SpellShield shield = SpellShield.of(shielded);
+                ShieldSpell spell = shield.shieldSpell();
+                if (shield.isActive() && spell != null) {
+                    spell.shieldParticles(shielded, shield);
+                }
+            }
+        }
+
         // Wait a moment after joining so the synced magic data has arrived before deciding.
         if (awakeningOfferedTo != player && player.tickCount > 40 && minecraft.screen == null) {
             awakeningOfferedTo = player;
@@ -126,6 +144,7 @@ public final class ArcanaClient {
     @SubscribeEvent
     public static void registerGuiLayers(RegisterGuiLayersEvent event) {
         event.registerAbove(VanillaGuiLayers.HOTBAR, ElementalArcana.id("magic_hud"), new SpellHudLayer());
+        event.registerAbove(VanillaGuiLayers.PLAYER_HEALTH, ElementalArcana.id("shield_hearts"), new ShieldHeartsLayer());
     }
 
     @SubscribeEvent
@@ -143,10 +162,22 @@ public final class ArcanaClient {
     // Load every projectile spell's 3D model, including models from addon spells.
     @SubscribeEvent
     public static void registerModels(ModelEvent.RegisterAdditional event) {
+        Set<ResourceLocation> models = new HashSet<>();
         for (Spell spell : SpellRegistries.SPELLS) {
             if (spell instanceof ProjectileSpell projectile && projectile.model() != null) {
-                event.register(ModelResourceLocation.standalone(projectile.model()));
+                models.add(projectile.model());
             }
+            if (spell instanceof ShieldSpell shield && shield.shardModel() != null) {
+                models.add(shield.shardModel());
+            }
+        }
+        models.forEach(model -> event.register(ModelResourceLocation.standalone(model)));
+    }
+
+    @SubscribeEvent
+    public static void onRenderLiving(RenderLivingEvent.Post<?, ?> event) {
+        if (event.getEntity() instanceof Player player) {
+            ShieldRenderer.renderShards(player, event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource());
         }
     }
 }

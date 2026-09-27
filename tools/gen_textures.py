@@ -177,6 +177,26 @@ SPRITES = {
         "................",
     ]),
     # Texture for the icicle's 3D model (models/spell/icicle.json), so it lives in the block atlas.
+    "spell/frost_shield": ({
+        "k": 0x1E4F7A, "d": 0x2F86C8, "b": 0x5FB8F0, "l": 0xA8E6FF, "w": 0xFFFFFF,
+    }, [
+        "................",
+        "......kkkk......",
+        "....kkllllkk....",
+        "...kllbbbbllk...",
+        "..klbbblbbbblk..",
+        "..klbblwlbbblk..",
+        ".klbbbbwbbbbblk.",
+        ".klblwwwwwlbblk.",
+        ".klbbbbwbbbbblk.",
+        ".klbblwlbbbbdlk.",
+        "..klbblbbbbdlk..",
+        "..kldbbbbbddlk..",
+        "...kldddddddk...",
+        "....kkddddkk....",
+        "......kkkk......",
+        "................",
+    ]),
     "block/icicle": ({
         "w": 0xF2FFFFFF, "l": 0xE6D2F6FF, "b": 0xDCA8E4FF, "d": 0xD27CC8F2, "k": 0xD8508CD2,
     }, [

@@ -1,6 +1,7 @@
 package com.chappadodle.elementalarcana.core;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
+import com.chappadodle.elementalarcana.api.SpellShield;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.attachment.AttachmentType;
@@ -19,6 +20,12 @@ public final class MagicAttachments {
                     .serialize(MagicData.CODEC)
                     .copyOnDeath()
                     .sync((holder, to) -> holder == to, MagicData.STREAM_CODEC)
+                    .build());
+
+    // Synced to everyone who can see the player (so their shield's visuals show), never saved.
+    public static final Supplier<AttachmentType<SpellShield>> SHIELD = ATTACHMENT_TYPES.register("shield",
+            () -> AttachmentType.builder(SpellShield::new)
+                    .sync(SpellShield.STREAM_CODEC)
                     .build());
 
     private MagicAttachments() {

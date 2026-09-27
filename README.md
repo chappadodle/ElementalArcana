@@ -29,6 +29,10 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 | Ice | Icicle: hold R to charge an icicle, release to launch it; a full charge freezes | Frost Nova: freezes everything around you |
 | Wind | Gale Dash: launch forward, no fall damage | Updraft: throw yourself and nearby mobs skyward |
 
+**Frost Shield** (Ice, Magic Level 3): tap R to raise orbiting ice shards that absorb damage (shown as ice hearts) and shatter outward when broken.
+
+Icicle and Frost Shield level from 1 to 10. Casting a spell fills its mastery bar, and each level-up costs one skill point (you earn one per Magic Level). Both spells offer permanent path choices at Lv 5 and 10. Open a spell's skill tree from the Status window.
+
 Operators can use `/arcana level set <n>`, `/arcana xp add <n>`, `/arcana affinity add <element>`, `/arcana affinity reset`, `/arcana mana fill|set <n>` and `/arcana cooldowns reset`.
 
 ## Adding a spell
@@ -64,6 +68,8 @@ The eight built-in spells are registered this same way, so anything they do, you
 That's all it takes. Players who have awakened the spell's element and reached its level will see it in the wheel, Status window and HUD, with mana, cooldowns, XP and syncing handled for them.
 
 **New element:** register a `SpellSchool` (color + cast sound) on `SpellRegistries.SCHOOL_KEY` and add the lang keys `school.yourmod.<name>` and `school.yourmod.<name>.desc`. It shows up on the Awakening screen automatically.
+
+**Shields:** implement `ShieldSpell` and raise a `SpellShield` in `cast`. Absorbing damage, ice hearts, orbiting shards and syncing are handled for you, and the hooks cover parries, reflections, breaking and death-saves.
 
 **Multi-hit spells:** deal damage with `SpellDamage.hurtMultiHit(...)`. Minecraft otherwise ignores hits that land within half a second of each other, so a volley would only count once.
 

@@ -6,6 +6,7 @@ import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.content.spell.FireballSpell;
 import com.chappadodle.elementalarcana.content.spell.FlameBurstSpell;
 import com.chappadodle.elementalarcana.content.spell.FrostNovaSpell;
+import com.chappadodle.elementalarcana.content.spell.FrostShieldSpell;
 import com.chappadodle.elementalarcana.content.spell.GaleDashSpell;
 import com.chappadodle.elementalarcana.content.spell.HealingRainSpell;
 import com.chappadodle.elementalarcana.content.spell.IcicleSpell;
@@ -24,6 +25,7 @@ public final class ModSpells {
     public static final DeferredHolder<Spell, HealingRainSpell> HEALING_RAIN = SPELLS.register("healing_rain", HealingRainSpell::new);
     public static final DeferredHolder<Spell, IcicleSpell> ICICLE = SPELLS.register("icicle", IcicleSpell::new);
     public static final DeferredHolder<Spell, FrostNovaSpell> FROST_NOVA = SPELLS.register("frost_nova", FrostNovaSpell::new);
+    public static final DeferredHolder<Spell, FrostShieldSpell> FROST_SHIELD = SPELLS.register("frost_shield", FrostShieldSpell::new);
     public static final DeferredHolder<Spell, GaleDashSpell> GALE_DASH = SPELLS.register("gale_dash", GaleDashSpell::new);
     public static final DeferredHolder<Spell, UpdraftSpell> UPDRAFT = SPELLS.register("updraft", UpdraftSpell::new);
 
