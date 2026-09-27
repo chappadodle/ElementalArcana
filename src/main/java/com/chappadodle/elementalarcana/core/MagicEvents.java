@@ -8,6 +8,7 @@ import net.minecraft.util.Mth;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerWakeUpEvent;
@@ -27,6 +28,7 @@ public final class MagicEvents {
         if (!(event.getEntity() instanceof ServerPlayer player) || player.isSpectator()) {
             return;
         }
+        CastingService.tickHold(player);
         MagicData data = MagicAttachments.get(player);
         boolean changed = data.updateMeditation(player.getX(), player.getZ(), player.isShiftKeyDown(), player.onGround(), TICKS_TO_MEDITATE);
 
@@ -88,12 +90,24 @@ public final class MagicEvents {
 
     @SubscribeEvent
     public static void onChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            CastingService.cancelHold(player);
+        }
         syncIfServer(event);
     }
 
     @SubscribeEvent
+    public static void onDeath(LivingDeathEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            CastingService.cancelHold(player);
+        }
+    }
+
+    @SubscribeEvent
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
-        CastingService.forget(event.getEntity().getUUID());
+        if (event.getEntity() instanceof ServerPlayer player) {
+            CastingService.forget(player);
+        }
     }
 
     private static void syncIfServer(PlayerEvent event) {

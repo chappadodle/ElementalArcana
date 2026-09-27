@@ -1,14 +1,34 @@
 {
   "magic.awaken": {
-    "sounds": ["elementalarcana:magic/awaken"],
+    "sounds": [
+      "elementalarcana:magic/awaken"
+    ],
     "subtitle": "subtitles.elementalarcana.magic.awaken"
   },
   "magic.level_up": {
-    "sounds": ["elementalarcana:magic/level_up"],
+    "sounds": [
+      "elementalarcana:magic/level_up"
+    ],
     "subtitle": "subtitles.elementalarcana.magic.level_up"
   },
   "spell.fizzle": {
-    "sounds": ["elementalarcana:spell/fizzle"],
+    "sounds": [
+      "elementalarcana:spell/fizzle"
+    ],
     "subtitle": "subtitles.elementalarcana.spell.fizzle"
+  },
+  "spell.icicle.impact": {
+    "sounds": [
+      {
+        "name": "elementalarcana:spell/icicle/impact1"
+      },
+      {
+        "name": "elementalarcana:spell/icicle/impact2"
+      },
+      {
+        "name": "elementalarcana:spell/icicle/impact3"
+      }
+    ],
+    "subtitle": "subtitles.elementalarcana.spell.icicle.impact"
   }
 }

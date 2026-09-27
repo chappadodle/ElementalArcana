@@ -17,8 +17,8 @@
   "spell.elementalarcana.tidal_wave.desc": "A wave that pushes enemies back and puts out fires.",
   "spell.elementalarcana.healing_rain": "Healing Rain",
   "spell.elementalarcana.healing_rain.desc": "A soothing shower that regenerates you and nearby players.",
-  "spell.elementalarcana.frost_shard": "Frost Shard",
-  "spell.elementalarcana.frost_shard.desc": "A fast shard that slows and freezes; turns water to ice.",
+  "spell.elementalarcana.icicle": "Icicle",
+  "spell.elementalarcana.icicle.desc": "Hold to form an icicle that grows sharper, release to launch it. Full charge freezes the target.",
   "spell.elementalarcana.frost_nova": "Frost Nova",
   "spell.elementalarcana.frost_nova.desc": "Flash-freezes everything around you in place.",
   "spell.elementalarcana.gale_dash": "Gale Dash",
@@ -99,5 +99,6 @@
   "screen.elementalarcana.dev.cooldowns": "Cooldowns",
   "screen.elementalarcana.dev.heal": "Heal",
   "screen.elementalarcana.dev.free_cast_on": "Free cast: ON",
-  "screen.elementalarcana.dev.free_cast_off": "Free cast: OFF"
+  "screen.elementalarcana.dev.free_cast_off": "Free cast: OFF",
+  "subtitles.elementalarcana.spell.icicle.impact": "Icicle shatters"
 }

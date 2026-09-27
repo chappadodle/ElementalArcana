@@ -1,6 +1,12 @@
 package com.chappadodle.elementalarcana.client;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
+import com.chappadodle.elementalarcana.api.ProjectileSpell;
+import com.chappadodle.elementalarcana.api.Spell;
+import com.chappadodle.elementalarcana.api.SpellRegistries;
+import com.chappadodle.elementalarcana.client.particle.FrostMistParticle;
+import com.chappadodle.elementalarcana.client.particle.FrostSparkleParticle;
+import com.chappadodle.elementalarcana.client.particle.IceShardParticle;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.core.MagicData;
@@ -10,13 +16,15 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.entity.NoopRenderer;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
@@ -34,6 +42,8 @@ public final class ArcanaClient {
 
     // The awakening screen is offered once per player instance (i.e. per join/respawn).
     private static LocalPlayer awakeningOfferedTo;
+    // Whether the server currently thinks the cast key is down (for hold-to-cast spells).
+    private static boolean castKeyHeld;
 
     private ArcanaClient() {
     }
@@ -59,8 +69,19 @@ public final class ArcanaClient {
         }
         MagicData data = MagicAttachments.get(player);
 
+        // Send the key going down and coming back up; a tap within one tick sends both.
+        boolean clicked = false;
         while (CAST.consumeClick()) {
-            PacketDistributor.sendToServer(CastSpellPayload.INSTANCE);
+            clicked = true;
+        }
+        boolean down = CAST.isDown();
+        if (!castKeyHeld && (down || clicked)) {
+            PacketDistributor.sendToServer(CastSpellPayload.PRESS);
+            castKeyHeld = true;
+        }
+        if (castKeyHeld && !down) {
+            PacketDistributor.sendToServer(CastSpellPayload.RELEASE);
+            castKeyHeld = false;
         }
         while (SPELL_WHEEL.consumeClick()) {
             if (minecraft.screen != null) {
@@ -108,8 +129,24 @@ public final class ArcanaClient {
     }
 
     @SubscribeEvent
+    public static void registerParticles(RegisterParticleProvidersEvent event) {
+        event.registerSpriteSet(ModContent.FROST_SPARKLE.get(), FrostSparkleParticle.Provider::new);
+        event.registerSpriteSet(ModContent.ICE_SHARD.get(), IceShardParticle.Provider::new);
+        event.registerSpriteSet(ModContent.FROST_MIST.get(), FrostMistParticle.Provider::new);
+    }
+
+    @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        // Spell projectiles are drawn entirely by their particle trail.
-        event.registerEntityRenderer(ModContent.SPELL_PROJECTILE.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModContent.SPELL_PROJECTILE.get(), SpellProjectileRenderer::new);
+    }
+
+    // Load every projectile spell's 3D model, including models from addon spells.
+    @SubscribeEvent
+    public static void registerModels(ModelEvent.RegisterAdditional event) {
+        for (Spell spell : SpellRegistries.SPELLS) {
+            if (spell instanceof ProjectileSpell projectile && projectile.model() != null) {
+                event.register(ModelResourceLocation.standalone(projectile.model()));
+            }
+        }
     }
 }

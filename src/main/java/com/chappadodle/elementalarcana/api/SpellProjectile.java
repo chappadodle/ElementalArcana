@@ -1,14 +1,19 @@
 package com.chappadodle.elementalarcana.api;
 
 import com.chappadodle.elementalarcana.content.ModContent;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -18,28 +23,115 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * One projectile entity for every {@link ProjectileSpell}: it stores which spell fired it
- * (synced, so clients can draw that spell's trail) and hands hits back to the spell.
+ * (synced, so clients can draw that spell's model and trail) and hands hits back to the spell.
+ *
+ * <p>It can also be <em>held</em>: floating beside its caster and charging until
+ * {@link #release} throws it. A held projectile positions itself from its owner on both
+ * sides every tick, so it stays glued to the caster instead of trailing behind over the network.
  */
 public class SpellProjectile extends ThrowableProjectile {
     private static final EntityDataAccessor<String> SPELL_ID = SynchedEntityData.defineId(SpellProjectile.class, EntityDataSerializers.STRING);
+    private static final EntityDataAccessor<Boolean> HELD = SynchedEntityData.defineId(SpellProjectile.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Float> CHARGE = SynchedEntityData.defineId(SpellProjectile.class, EntityDataSerializers.FLOAT);
+    private static final double AIM_RANGE = 64.0;
 
     private float power = 1f;
+    private int releasedAt;
 
     public SpellProjectile(EntityType<? extends SpellProjectile> type, Level level) {
         super(type, level);
     }
 
+    /** Fires straight away along the caster's look direction. */
     public static <S extends Spell & ProjectileSpell> SpellProjectile launch(CastContext context, S spell) {
-        ServerPlayer caster = context.caster();
-        SpellProjectile projectile = new SpellProjectile(ModContent.SPELL_PROJECTILE.get(), context.level());
-        projectile.setOwner(caster);
+        SpellProjectile projectile = create(context, spell);
         Vec3 eye = context.eyePosition();
         projectile.setPos(eye.x, eye.y - 0.1, eye.z);
-        projectile.entityData.set(SPELL_ID, spell.id().toString());
-        projectile.power = context.power();
+        projectile.entityData.set(CHARGE, 1f);
+        ServerPlayer caster = context.caster();
         projectile.shootFromRotation(caster, caster.getXRot(), caster.getYRot(), 0f, spell.projectileSpeed(), 0f);
         context.level().addFreshEntity(projectile);
         return projectile;
+    }
+
+    /** Summons the projectile floating beside the caster, charging until {@link #release}. */
+    public static <S extends Spell & ProjectileSpell> SpellProjectile summonHeld(CastContext context, S spell) {
+        SpellProjectile projectile = create(context, spell);
+        projectile.entityData.set(HELD, true);
+        projectile.setPos(holdPosition(context.caster(), spell, 1f));
+        context.level().addFreshEntity(projectile);
+        return projectile;
+    }
+
+    private static SpellProjectile create(CastContext context, Spell spell) {
+        SpellProjectile projectile = new SpellProjectile(ModContent.SPELL_PROJECTILE.get(), context.level());
+        projectile.setOwner(context.caster());
+        projectile.entityData.set(SPELL_ID, spell.id().toString());
+        projectile.power = context.power();
+        return projectile;
+    }
+
+    /** Throws a held projectile at {@code target}, locking in its current charge. */
+    public void release(Vec3 target) {
+        ProjectileSpell spell = spell();
+        if (!isHeld() || spell == null) {
+            return;
+        }
+        float charge = charge(0f);
+        entityData.set(CHARGE, charge);
+        entityData.set(HELD, false);
+        releasedAt = tickCount;
+        Vec3 direction = target.subtract(position());
+        shoot(direction.x, direction.y, direction.z, spell.releaseSpeed(charge), 0f);
+        hasImpulse = true;
+    }
+
+    /**
+     * What the caster is aiming at: the first entity or block under their crosshair, up to 64
+     * blocks away. Held projectiles float off to the side, so they aim at this point rather than
+     * flying parallel to the caster's view.
+     */
+    public static Vec3 crosshairTarget(ServerPlayer caster) {
+        Vec3 eye = caster.getEyePosition();
+        Vec3 look = caster.getLookAngle();
+        Vec3 end = eye.add(look.scale(AIM_RANGE));
+        BlockHitResult block = caster.level().clip(new ClipContext(eye, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, caster));
+        Vec3 blockHit = block.getLocation();
+        EntityHitResult entity = ProjectileUtil.getEntityHitResult(caster, eye, blockHit,
+                caster.getBoundingBox().expandTowards(look.scale(AIM_RANGE)).inflate(1.0),
+                target -> !target.isSpectator() && target.isPickable(), eye.distanceToSqr(blockHit));
+        return entity != null ? entity.getEntity().getBoundingBox().getCenter() : blockHit;
+    }
+
+    /** Where a held projectile of {@code spell} floats for {@code owner} at the given partial tick. */
+    public static Vec3 holdPosition(Entity owner, ProjectileSpell spell, float partialTick) {
+        Vec3 forward = owner.getViewVector(partialTick);
+        Vec3 right = new Vec3(-forward.z, 0, forward.x);
+        if (right.lengthSqr() < 1.0e-4) {
+            float yaw = owner.getViewYRot(partialTick) * Mth.DEG_TO_RAD;
+            right = new Vec3(-Mth.cos(yaw), 0, -Mth.sin(yaw));
+        }
+        right = right.normalize();
+        Vec3 up = right.cross(forward);
+        Vec3 offset = spell.holdOffset();
+        return owner.getEyePosition(partialTick)
+                .add(right.scale(offset.x))
+                .add(up.scale(offset.y))
+                .add(forward.scale(offset.z));
+    }
+
+    public boolean isHeld() {
+        return entityData.get(HELD);
+    }
+
+    /** 0..1: grows while held, then fixed at the value it was released with. */
+    public float charge(float partialTick) {
+        if (!isHeld()) {
+            return entityData.get(CHARGE);
+        }
+        ProjectileSpell spell = spell();
+        int chargeTicks = spell == null ? 0 : spell.chargeTicks();
+        return chargeTicks <= 0 ? 1f : Math.min(1f, (tickCount + partialTick) / chargeTicks);
     }
 
     public float power() {
@@ -55,6 +147,8 @@ public class SpellProjectile extends ThrowableProjectile {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(SPELL_ID, "");
+        builder.define(HELD, false);
+        builder.define(CHARGE, 1f);
     }
 
     @Override
@@ -64,22 +158,52 @@ public class SpellProjectile extends ThrowableProjectile {
 
     @Override
     public void tick() {
-        super.tick();
         ProjectileSpell spell = spell();
+        if (isHeld()) {
+            tickHeld(spell);
+            return;
+        }
+        super.tick();
         if (level().isClientSide()) {
             if (spell != null) {
-                for (int i = 0; i < 3; i++) {
-                    level().addParticle(spell.trailParticle(),
-                            getX() + (random.nextDouble() - 0.5) * 0.2,
-                            getY() + (random.nextDouble() - 0.5) * 0.2,
-                            getZ() + (random.nextDouble() - 0.5) * 0.2,
-                            0, 0, 0);
-                }
+                spell.flightParticles(this);
             }
-        } else if (spell == null || tickCount > spell.lifetimeTicks()) {
+        } else if (spell == null || tickCount - releasedAt > spell.lifetimeTicks()) {
             discard();
         } else if (!isRemoved()) {
             spell.onTick(this);
+        }
+    }
+
+    private void tickHeld(@Nullable ProjectileSpell spell) {
+        Entity owner = getOwner();
+        if (spell == null || owner == null || !owner.isAlive()) {
+            if (!level().isClientSide()) {
+                discard();
+            }
+            return;
+        }
+        setPos(holdPosition(owner, spell, 1f));
+        setDeltaMovement(Vec3.ZERO);
+        if (level().isClientSide()) {
+            spell.heldParticles(this, charge(0f));
+        }
+    }
+
+    /** Client-side helper for spell visuals: one particle at a random point within {@code spread}. */
+    public void spawnParticleAround(ParticleOptions particle, double spread, Vec3 velocity) {
+        level().addParticle(particle,
+                getX() + (random.nextDouble() - 0.5) * 2 * spread,
+                getY() + (random.nextDouble() - 0.5) * 2 * spread,
+                getZ() + (random.nextDouble() - 0.5) * 2 * spread,
+                velocity.x, velocity.y, velocity.z);
+    }
+
+    // While held, both sides position the projectile themselves; ignore the server's position updates.
+    @Override
+    public void lerpTo(double x, double y, double z, float yRot, float xRot, int steps) {
+        if (!isHeld()) {
+            super.lerpTo(x, y, z, yRot, xRot, steps);
         }
     }
 
@@ -109,11 +233,13 @@ public class SpellProjectile extends ThrowableProjectile {
         }
     }
 
+    // A held projectile never saves as held: after a reload it has no caster, so it just expires.
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putString("Spell", entityData.get(SPELL_ID));
         tag.putFloat("Power", power);
+        tag.putFloat("Charge", entityData.get(CHARGE));
     }
 
     @Override
@@ -121,5 +247,6 @@ public class SpellProjectile extends ThrowableProjectile {
         super.readAdditionalSaveData(tag);
         entityData.set(SPELL_ID, tag.getString("Spell"));
         power = tag.contains("Power") ? tag.getFloat("Power") : 1f;
+        entityData.set(CHARGE, tag.contains("Charge") ? tag.getFloat("Charge") : 1f);
     }
 }

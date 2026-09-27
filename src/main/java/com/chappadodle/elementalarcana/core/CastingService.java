@@ -3,6 +3,7 @@ package com.chappadodle.elementalarcana.core;
 import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.CastResult;
 import com.chappadodle.elementalarcana.api.Spell;
+import com.chappadodle.elementalarcana.api.SpellHold;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.event.SpellCastEvent;
 import com.chappadodle.elementalarcana.content.ModContent;
@@ -32,6 +33,10 @@ public final class CastingService {
     private static final int MANA_SICKNESS_TICKS = 15 * 20;
     private static final long FIZZLE_SOUND_INTERVAL = 20;
     private static final Map<UUID, Long> LAST_FIZZLE = new HashMap<>();
+    private static final Map<UUID, ActiveHold> HOLDS = new HashMap<>();
+
+    private record ActiveHold(Spell spell, SpellHold hold, long startTick) {
+    }
 
     private CastingService() {
     }
@@ -63,7 +68,11 @@ public final class CastingService {
         return Math.max(0f, manaCost - data.mana()) * HEALTH_PER_MISSING_MANA;
     }
 
+    /** The cast key went down. */
     public static void tryCast(ServerPlayer player) {
+        if (HOLDS.containsKey(player.getUUID())) {
+            return;
+        }
         MagicData data = MagicAttachments.get(player);
         Spell spell = data.selectedSpell();
         Component problem = whyNotCastable(player, data, spell);
@@ -84,7 +93,8 @@ public final class CastingService {
             return;
         }
 
-        CastResult result = spell.cast(new CastContext(player, player.serverLevel(), InteractionHand.MAIN_HAND, data.power()));
+        CastContext context = new CastContext(player, player.serverLevel(), InteractionHand.MAIN_HAND, data.power());
+        CastResult result = spell.cast(context);
         if (!result.success()) {
             if (result.failReason() != null) {
                 fizzle(player, result.failReason());
@@ -95,7 +105,9 @@ public final class CastingService {
         data.interruptMeditation();
         if (!free) {
             data.setMana(data.mana() - cost);
-            data.startCooldown(spell.id(), player.level().getGameTime(), spell.cooldownTicks());
+            if (context.hold() == null) {
+                data.startCooldown(spell.id(), player.level().getGameTime(), spell.cooldownTicks());
+            }
             if (healthCost > 0) {
                 overcast(player, healthCost);
             }
@@ -108,11 +120,57 @@ public final class CastingService {
             }
         }
 
+        if (context.hold() != null) {
+            HOLDS.put(player.getUUID(), new ActiveHold(spell, context.hold(), player.level().getGameTime()));
+        }
         player.swing(InteractionHand.MAIN_HAND, true);
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), spell.school().castSound(),
                 SoundSource.PLAYERS, 1f, 0.9f + player.getRandom().nextFloat() * 0.2f);
         MagicAttachments.sync(player);
         NeoForge.EVENT_BUS.post(new SpellCastEvent.Post(player, spell));
+    }
+
+    /** The cast key came back up: finish any hold-to-cast spell. */
+    public static void release(ServerPlayer player) {
+        ActiveHold active = HOLDS.remove(player.getUUID());
+        if (active == null) {
+            return;
+        }
+        active.hold().release(heldTicks(player, active));
+        endHold(player, active);
+    }
+
+    /** Server tick for a player's active hold: ends it when the spell says so or time runs out. */
+    public static void tickHold(ServerPlayer player) {
+        ActiveHold active = HOLDS.get(player.getUUID());
+        if (active == null) {
+            return;
+        }
+        int held = heldTicks(player, active);
+        if (!active.hold().tick(held) || held >= active.hold().maxHoldTicks()) {
+            release(player);
+        }
+    }
+
+    /** The hold broke (death, logout, dimension change): cancel it but still start the cooldown. */
+    public static void cancelHold(ServerPlayer player) {
+        ActiveHold active = HOLDS.remove(player.getUUID());
+        if (active != null) {
+            active.hold().cancel();
+            endHold(player, active);
+        }
+    }
+
+    private static int heldTicks(ServerPlayer player, ActiveHold active) {
+        return (int) (player.level().getGameTime() - active.startTick());
+    }
+
+    private static void endHold(ServerPlayer player, ActiveHold active) {
+        MagicData data = MagicAttachments.get(player);
+        if (!player.isCreative() && !data.freeCast()) {
+            data.startCooldown(active.spell().id(), player.level().getGameTime(), active.spell().cooldownTicks());
+            MagicAttachments.sync(player);
+        }
     }
 
     private static void overcast(ServerPlayer player, float healthCost) {
@@ -157,7 +215,8 @@ public final class CastingService {
         }
     }
 
-    static void forget(UUID player) {
-        LAST_FIZZLE.remove(player);
+    static void forget(ServerPlayer player) {
+        cancelHold(player);
+        LAST_FIZZLE.remove(player.getUUID());
     }
 }

@@ -2,6 +2,8 @@ package com.chappadodle.elementalarcana.content;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffect;
@@ -14,11 +16,12 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-/** The shared spell projectile, custom sounds and the Mana Sickness effect. */
+/** The shared spell projectile, custom sounds and particles, and the Mana Sickness effect. */
 public final class ModContent {
     private static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(Registries.ENTITY_TYPE, ElementalArcana.MODID);
     private static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(Registries.SOUND_EVENT, ElementalArcana.MODID);
     private static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(Registries.MOB_EFFECT, ElementalArcana.MODID);
+    private static final DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister.create(Registries.PARTICLE_TYPE, ElementalArcana.MODID);
 
     public static final DeferredHolder<EntityType<?>, EntityType<SpellProjectile>> SPELL_PROJECTILE =
             ENTITY_TYPES.register("spell_projectile", () -> EntityType.Builder.<SpellProjectile>of(SpellProjectile::new, MobCategory.MISC)
@@ -30,6 +33,17 @@ public final class ModContent {
     public static final DeferredHolder<SoundEvent, SoundEvent> AWAKEN_SOUND = sound("magic.awaken");
     public static final DeferredHolder<SoundEvent, SoundEvent> LEVEL_UP_SOUND = sound("magic.level_up");
     public static final DeferredHolder<SoundEvent, SoundEvent> FIZZLE_SOUND = sound("spell.fizzle");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ICICLE_IMPACT = sound("spell.icicle.impact");
+
+    /** A glowing 4-point frost glint that twinkles out. */
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> FROST_SPARKLE =
+            PARTICLES.register("frost_sparkle", () -> new SimpleParticleType(false));
+    /** A small ice fragment that tumbles and falls. */
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> ICE_SHARD =
+            PARTICLES.register("ice_shard", () -> new SimpleParticleType(false));
+    /** A soft cold puff that spreads and fades. */
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> FROST_MIST =
+            PARTICLES.register("frost_mist", () -> new SimpleParticleType(false));
 
     /** Moderate exhaustion from emptying your mana: slower, weaker, and slower mana regen. */
     public static final DeferredHolder<MobEffect, MobEffect> MANA_SICKNESS = EFFECTS.register("mana_sickness",
@@ -49,5 +63,6 @@ public final class ModContent {
         ENTITY_TYPES.register(modEventBus);
         SOUNDS.register(modEventBus);
         EFFECTS.register(modEventBus);
+        PARTICLES.register(modEventBus);
     }
 }
