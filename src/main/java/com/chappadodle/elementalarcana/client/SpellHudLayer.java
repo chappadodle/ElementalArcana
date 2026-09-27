@@ -67,8 +67,12 @@ public class SpellHudLayer implements LayeredDraw.Layer {
                 String seconds = String.valueOf((int) Math.ceil(cooldown / 20.0));
                 graphics.drawString(font, seconds, x + 8 - font.width(seconds) / 2, y + 4, ArcanaDraw.withAlpha(0xFFFFFFFF, alpha));
             }
-            graphics.drawString(font, spell.displayName(), x + 22, y - 1,
+            int nameEnd = graphics.drawString(font, spell.displayName(), x + 22, y - 1,
                     ArcanaDraw.withAlpha(FastColor.ARGB32.opaque(spell.school().color()), alpha));
+            if (spell.maxLevel() > 1) {
+                graphics.drawString(font, Component.translatable("hud.elementalarcana.level", data.spellLevel(spell)), nameEnd + 3, y - 1,
+                        ArcanaDraw.withAlpha(0xFF9A8FB8, alpha));
+            }
         } else {
             graphics.drawString(font, Component.translatable("hud.elementalarcana.no_spell"), x + 22, y - 1, ArcanaDraw.withAlpha(0xFFAAAAAA, alpha));
         }
@@ -76,7 +80,7 @@ public class SpellHudLayer implements LayeredDraw.Layer {
         int barX = x + 22;
         int barY = y + 9;
         int manaColor = sick ? ArcanaDraw.MANA_SICK_COLOR : ArcanaDraw.MANA_COLOR;
-        if (spell != null && CastingService.healthCost(data, spell.manaCost()) > 0) {
+        if (spell != null && CastingService.healthCost(data, spell.manaCost(data.spellLevel(spell))) > 0) {
             float pulse = (Mth.sin((player.tickCount + deltaTracker.getGameTimeDeltaPartialTick(true)) * 0.3f) + 1f) / 2f;
             manaColor = FastColor.ARGB32.lerp(pulse, manaColor, ArcanaDraw.OVERCAST_COLOR);
         }

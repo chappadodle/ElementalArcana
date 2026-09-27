@@ -21,6 +21,9 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * One projectile entity for every {@link ProjectileSpell}: it stores which spell fired it
  * (synced, so clients can draw that spell's model and trail) and hands hits back to the spell.
@@ -33,10 +36,20 @@ public class SpellProjectile extends ThrowableProjectile {
     private static final EntityDataAccessor<String> SPELL_ID = SynchedEntityData.defineId(SpellProjectile.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Boolean> HELD = SynchedEntityData.defineId(SpellProjectile.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Float> CHARGE = SynchedEntityData.defineId(SpellProjectile.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Integer> CHARGE_TICKS = SynchedEntityData.defineId(SpellProjectile.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> SLOT = SynchedEntityData.defineId(SpellProjectile.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> SLOT_COUNT = SynchedEntityData.defineId(SpellProjectile.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Float> SCALE = SynchedEntityData.defineId(SpellProjectile.class, EntityDataSerializers.FLOAT);
     private static final double AIM_RANGE = 64.0;
 
     private float power = 1f;
     private int releasedAt;
+    // Server-side: piercing, and a release scheduled a few ticks ahead (for rippling volleys).
+    private int pierceLeft;
+    private final Set<Integer> piercedIds = new HashSet<>();
+    private int releaseCountdown = -1;
+    @Nullable
+    private Vec3 pendingTarget;
 
     public SpellProjectile(EntityType<? extends SpellProjectile> type, Level level) {
         super(type, level);
@@ -54,11 +67,22 @@ public class SpellProjectile extends ThrowableProjectile {
         return projectile;
     }
 
-    /** Summons the projectile floating beside the caster, charging until {@link #release}. */
+    /** Summons one projectile floating beside the caster, charging until {@link #release}. */
     public static <S extends Spell & ProjectileSpell> SpellProjectile summonHeld(CastContext context, S spell) {
+        return summonHeld(context, spell, 0, 1, spell.chargeTicks());
+    }
+
+    /**
+     * Summons a held projectile in formation slot {@code slot} of {@code count} (see
+     * {@link ProjectileSpell#holdOffset}), taking {@code chargeTicks} to fully charge.
+     */
+    public static <S extends Spell & ProjectileSpell> SpellProjectile summonHeld(CastContext context, S spell, int slot, int count, int chargeTicks) {
         SpellProjectile projectile = create(context, spell);
         projectile.entityData.set(HELD, true);
-        projectile.setPos(holdPosition(context.caster(), spell, 1f));
+        projectile.entityData.set(SLOT, slot);
+        projectile.entityData.set(SLOT_COUNT, count);
+        projectile.entityData.set(CHARGE_TICKS, chargeTicks);
+        projectile.setPos(holdPosition(context.caster(), spell, slot, count, 1f));
         context.level().addFreshEntity(projectile);
         return projectile;
     }
@@ -69,6 +93,16 @@ public class SpellProjectile extends ThrowableProjectile {
         projectile.entityData.set(SPELL_ID, spell.id().toString());
         projectile.power = context.power();
         return projectile;
+    }
+
+    /** Throws a held projectile at {@code target} after {@code delayTicks} (it keeps floating until then). */
+    public void release(Vec3 target, int delayTicks) {
+        if (delayTicks <= 0) {
+            release(target);
+        } else {
+            pendingTarget = target;
+            releaseCountdown = delayTicks;
+        }
     }
 
     /** Throws a held projectile at {@code target}, locking in its current charge. */
@@ -84,6 +118,7 @@ public class SpellProjectile extends ThrowableProjectile {
         Vec3 direction = target.subtract(position());
         shoot(direction.x, direction.y, direction.z, spell.releaseSpeed(charge), 0f);
         hasImpulse = true;
+        spell.onRelease(this);
     }
 
     /**
@@ -103,8 +138,13 @@ public class SpellProjectile extends ThrowableProjectile {
         return entity != null ? entity.getEntity().getBoundingBox().getCenter() : blockHit;
     }
 
-    /** Where a held projectile of {@code spell} floats for {@code owner} at the given partial tick. */
-    public static Vec3 holdPosition(Entity owner, ProjectileSpell spell, float partialTick) {
+    /** Where this held projectile floats for {@code owner} at the given partial tick. */
+    public Vec3 holdPosition(Entity owner, ProjectileSpell spell, float partialTick) {
+        return holdPosition(owner, spell, entityData.get(SLOT), entityData.get(SLOT_COUNT), partialTick);
+    }
+
+    /** Where a held projectile in formation slot {@code slot} of {@code count} floats for {@code owner}. */
+    public static Vec3 holdPosition(Entity owner, ProjectileSpell spell, int slot, int count, float partialTick) {
         Vec3 forward = owner.getViewVector(partialTick);
         Vec3 right = new Vec3(-forward.z, 0, forward.x);
         if (right.lengthSqr() < 1.0e-4) {
@@ -113,7 +153,7 @@ public class SpellProjectile extends ThrowableProjectile {
         }
         right = right.normalize();
         Vec3 up = right.cross(forward);
-        Vec3 offset = spell.holdOffset();
+        Vec3 offset = spell.holdOffset(slot, count);
         return owner.getEyePosition(partialTick)
                 .add(right.scale(offset.x))
                 .add(up.scale(offset.y))
@@ -129,9 +169,33 @@ public class SpellProjectile extends ThrowableProjectile {
         if (!isHeld()) {
             return entityData.get(CHARGE);
         }
-        ProjectileSpell spell = spell();
-        int chargeTicks = spell == null ? 0 : spell.chargeTicks();
+        int chargeTicks = entityData.get(CHARGE_TICKS);
         return chargeTicks <= 0 ? 1f : Math.min(1f, (tickCount + partialTick) / chargeTicks);
+    }
+
+    /** How many projectiles are held together in this one's formation. */
+    public int formationCount() {
+        return entityData.get(SLOT_COUNT);
+    }
+
+    /** Moves a held projectile to another formation slot. */
+    public void setFormation(int slot, int count) {
+        entityData.set(SLOT, slot);
+        entityData.set(SLOT_COUNT, count);
+    }
+
+    /** Size multiplier for the projectile's model (synced). */
+    public float visualScale() {
+        return entityData.get(SCALE);
+    }
+
+    public void setVisualScale(float scale) {
+        entityData.set(SCALE, scale);
+    }
+
+    /** Lets the projectile pass through this many more entities (each is hit only once). */
+    public void setPierce(int targets) {
+        pierceLeft = targets;
     }
 
     public float power() {
@@ -149,6 +213,10 @@ public class SpellProjectile extends ThrowableProjectile {
         builder.define(SPELL_ID, "");
         builder.define(HELD, false);
         builder.define(CHARGE, 1f);
+        builder.define(CHARGE_TICKS, 0);
+        builder.define(SLOT, 0);
+        builder.define(SLOT_COUNT, 1);
+        builder.define(SCALE, 1f);
     }
 
     @Override
@@ -185,6 +253,10 @@ public class SpellProjectile extends ThrowableProjectile {
         }
         setPos(holdPosition(owner, spell, 1f));
         setDeltaMovement(Vec3.ZERO);
+        if (!level().isClientSide() && releaseCountdown > 0 && --releaseCountdown == 0 && pendingTarget != null) {
+            release(pendingTarget);
+            return;
+        }
         if (level().isClientSide()) {
             spell.heldParticles(this, charge(0f));
         }
@@ -208,6 +280,11 @@ public class SpellProjectile extends ThrowableProjectile {
     }
 
     @Override
+    protected boolean canHitEntity(Entity target) {
+        return super.canHitEntity(target) && !piercedIds.contains(target.getId());
+    }
+
+    @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
         ProjectileSpell spell = spell();
@@ -228,7 +305,13 @@ public class SpellProjectile extends ThrowableProjectile {
     @Override
     protected void onHit(HitResult result) {
         super.onHit(result);
-        if (!level().isClientSide()) {
+        if (level().isClientSide()) {
+            return;
+        }
+        if (result instanceof EntityHitResult entityHit && pierceLeft > 0) {
+            pierceLeft--;
+            piercedIds.add(entityHit.getEntity().getId());
+        } else {
             discard();
         }
     }

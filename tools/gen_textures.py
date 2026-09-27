@@ -270,6 +270,28 @@ SPRITES = {
         "........",
         "........",
     ]),
+    "mob_effect/frozen": ({
+        "k": 0x1E4F7A, "d": 0x3C80C0, "b": 0x7CC4F0, "l": 0xC8F0FF, "w": 0xFFFFFF,
+    }, [
+        "..................",
+        "..................",
+        "....kkkkkkkkkk....",
+        "...kwwllllllbbk...",
+        "...kwlllllllbdk...",
+        "...klllwwllbbdk...",
+        "...kllwlllbbbdk...",
+        "...kllllllbbbdk...",
+        "...kllllbbbbbdk...",
+        "...klllbbbbbddk...",
+        "...kllbbbbbbddk...",
+        "...klbbbbbbdddk...",
+        "...kbbbbbbddddk...",
+        "...kbbbbbdddddk...",
+        "...kddddddddddk...",
+        "....kkkkkkkkkk....",
+        "..................",
+        "..................",
+    ]),
     "mob_effect/mana_sickness": ({
         "k": 0x2A1540, "d": 0x5A2A80, "p": 0x8A4FC0, "l": 0xC9A0F0,
     }, [

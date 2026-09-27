@@ -126,7 +126,7 @@ public class SpellWheelScreen extends Screen {
         if (focus != null) {
             int nameColor = FastColor.ARGB32.opaque(focus.school().color());
             graphics.drawCenteredString(font, focus.displayName(), centerX, centerY - 10, nameColor);
-            Component cost = Component.translatable("screen.elementalarcana.cost", focus.manaCost());
+            Component cost = Component.translatable("screen.elementalarcana.cost", focus.manaCost(data.spellLevel(focus)));
             graphics.drawCenteredString(font, cost, centerX, centerY + 2, 0xFF7FB2FF);
         }
         graphics.drawCenteredString(font, Component.translatable("screen.elementalarcana.wheel.hint",

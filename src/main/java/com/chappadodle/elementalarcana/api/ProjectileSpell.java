@@ -46,8 +46,11 @@ public interface ProjectileSpell {
         return projectileSpeed();
     }
 
-    /** Where a held projectile floats, relative to the caster's eyes: x = right, y = up, z = forward. */
-    default Vec3 holdOffset() {
+    /**
+     * Where a held projectile floats, relative to the caster's eyes (x = right, y = up,
+     * z = forward). {@code slot} is its index among the {@code count} projectiles held together.
+     */
+    default Vec3 holdOffset(int slot, int count) {
         return new Vec3(0.55, 0.15, 0.9);
     }
 
@@ -68,6 +71,10 @@ public interface ProjectileSpell {
     }
 
     // ---- server-side hooks ----
+
+    /** A held projectile has just been thrown (after any release delay). */
+    default void onRelease(SpellProjectile projectile) {
+    }
 
     /** Every tick in flight (not while held). Discard the projectile here to end it early. */
     default void onTick(SpellProjectile projectile) {

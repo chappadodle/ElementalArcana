@@ -42,9 +42,11 @@ public final class MagicData {
             ResourceLocation.CODEC.optionalFieldOf("selected").forGetter(data -> Optional.ofNullable(data.selected)),
             Codec.unboundedMap(ResourceLocation.CODEC, Codec.LONG).optionalFieldOf("cooldowns", Map.of()).forGetter(data -> data.cooldownEnds),
             Codec.BOOL.optionalFieldOf("fall_immune", false).forGetter(data -> data.fallImmune),
-            Codec.BOOL.optionalFieldOf("free_cast", false).forGetter(data -> data.freeCast)
-    ).apply(instance, (mana, level, xp, affinities, selected, cooldowns, fallImmune, freeCast) ->
-            new MagicData(mana, level, xp, affinities, selected.orElse(null), cooldowns, fallImmune, freeCast, false)));
+            Codec.BOOL.optionalFieldOf("free_cast", false).forGetter(data -> data.freeCast),
+            Codec.unboundedMap(ResourceLocation.CODEC, SpellProgress.CODEC).optionalFieldOf("spells", Map.of()).forGetter(data -> data.spells),
+            Codec.LONG.optionalFieldOf("respec_ready_at", 0L).forGetter(data -> data.respecReadyAt)
+    ).apply(instance, (mana, level, xp, affinities, selected, cooldowns, fallImmune, freeCast, spells, respecReadyAt) ->
+            new MagicData(mana, level, xp, affinities, selected.orElse(null), cooldowns, fallImmune, freeCast, spells, respecReadyAt, false)));
 
     // What the owning client needs: no fall flag, plus the live meditation state for the HUD.
     public static final StreamCodec<RegistryFriendlyByteBuf, MagicData> STREAM_CODEC = StreamCodec.of(
@@ -56,6 +58,8 @@ public final class MagicData {
                 buf.writeNullable(data.selected, FriendlyByteBuf::writeResourceLocation);
                 buf.writeMap(data.cooldownEnds, FriendlyByteBuf::writeResourceLocation, FriendlyByteBuf::writeVarLong);
                 buf.writeBoolean(data.freeCast);
+                buf.writeMap(data.spells, FriendlyByteBuf::writeResourceLocation, SpellProgress::write);
+                buf.writeVarLong(data.respecReadyAt);
                 buf.writeBoolean(data.meditating);
             },
             buf -> new MagicData(
@@ -67,6 +71,8 @@ public final class MagicData {
                     buf.readMap(FriendlyByteBuf::readResourceLocation, FriendlyByteBuf::readVarLong),
                     false,
                     buf.readBoolean(),
+                    buf.readMap(FriendlyByteBuf::readResourceLocation, SpellProgress::read),
+                    buf.readVarLong(),
                     buf.readBoolean()));
 
     private float mana;
@@ -79,6 +85,8 @@ public final class MagicData {
     private boolean fallImmune;
     // Dev-menu toggle: casting costs no mana and triggers no cooldowns.
     private boolean freeCast;
+    private final HashMap<ResourceLocation, SpellProgress> spells;
+    private long respecReadyAt;
 
     // Server-side meditation tracking; only `meditating` is synced.
     private boolean meditating;
@@ -87,11 +95,12 @@ public final class MagicData {
     private double lastZ;
 
     public MagicData() {
-        this(BASE_MAX_MANA, 1, 0, List.of(), null, Map.of(), false, false, false);
+        this(BASE_MAX_MANA, 1, 0, List.of(), null, Map.of(), false, false, Map.of(), 0L, false);
     }
 
     private MagicData(float mana, int level, int xp, List<ResourceLocation> affinities, @Nullable ResourceLocation selected,
-                      Map<ResourceLocation, Long> cooldownEnds, boolean fallImmune, boolean freeCast, boolean meditating) {
+                      Map<ResourceLocation, Long> cooldownEnds, boolean fallImmune, boolean freeCast,
+                      Map<ResourceLocation, SpellProgress> spells, long respecReadyAt, boolean meditating) {
         this.level = Mth.clamp(level, 1, MAX_LEVEL);
         this.xp = xp;
         this.affinities = new ArrayList<>(affinities);
@@ -99,6 +108,8 @@ public final class MagicData {
         this.cooldownEnds = new HashMap<>(cooldownEnds);
         this.fallImmune = fallImmune;
         this.freeCast = freeCast;
+        this.spells = new HashMap<>(spells);
+        this.respecReadyAt = respecReadyAt;
         this.meditating = meditating;
         this.mana = Mth.clamp(mana, 0f, maxMana());
     }
@@ -265,6 +276,113 @@ public final class MagicData {
         return true;
     }
 
+    // ---- spell levels & skill points ----
+    // Every Magic Level after the first earns a skill point; every spell level after the first
+    // costs one. Points are derived from those, so they can never drift out of sync.
+
+    private static final SpellProgress NO_PROGRESS = new SpellProgress();
+
+    public SpellProgress progress(Spell spell) {
+        return spells.getOrDefault(spell.id(), NO_PROGRESS);
+    }
+
+    private SpellProgress editProgress(Spell spell) {
+        return spells.computeIfAbsent(spell.id(), id -> new SpellProgress());
+    }
+
+    public int spellLevel(Spell spell) {
+        return Math.min(progress(spell).level(), spell.maxLevel());
+    }
+
+    public int skillPoints() {
+        int spent = 0;
+        for (SpellProgress progress : spells.values()) {
+            spent += progress.level() - 1;
+        }
+        return Math.max(0, (level - 1) - spent);
+    }
+
+    /** Mastery needed for the next level of {@code spell}; 0 at max level. */
+    public int masteryToNextLevel(Spell spell) {
+        int spellLevel = spellLevel(spell);
+        return spellLevel >= spell.maxLevel() ? 0 : spell.masteryToNextLevel(spellLevel);
+    }
+
+    /** Mastery fills up to the next level's requirement, then waits for a skill point. */
+    public void addMastery(Spell spell, int amount) {
+        int needed = masteryToNextLevel(spell);
+        if (needed > 0 && amount > 0) {
+            SpellProgress progress = editProgress(spell);
+            progress.setMastery(Math.min(needed, progress.mastery() + amount));
+        }
+    }
+
+    public boolean isMasteryFull(Spell spell) {
+        int needed = masteryToNextLevel(spell);
+        return needed > 0 && progress(spell).mastery() >= needed;
+    }
+
+    public boolean canLevelUp(Spell spell) {
+        return canCast(spell) && isMasteryFull(spell) && skillPoints() > 0;
+    }
+
+    public boolean levelUp(Spell spell) {
+        if (!canLevelUp(spell)) {
+            return false;
+        }
+        SpellProgress progress = editProgress(spell);
+        progress.setLevel(progress.level() + 1);
+        progress.setMastery(0);
+        return true;
+    }
+
+    /** The lowest reached level whose branch choice hasn't been made yet, or -1. */
+    public int pendingBranchLevel(Spell spell) {
+        int spellLevel = spellLevel(spell);
+        for (int level = 1; level <= spellLevel; level++) {
+            if (!spell.branchOptions(level).isEmpty() && !progress(spell).branches().containsKey(level)) {
+                return level;
+            }
+        }
+        return -1;
+    }
+
+    public boolean chooseBranch(Spell spell, int level, String branch) {
+        if (level > spellLevel(spell) || !spell.branchOptions(level).contains(branch) || progress(spell).branches().containsKey(level)) {
+            return false;
+        }
+        editProgress(spell).setBranch(level, branch);
+        return true;
+    }
+
+    public long respecReadyAt() {
+        return respecReadyAt;
+    }
+
+    /** Clears this spell's branch choices so they can be picked again; starts the respec cooldown. */
+    public void respec(Spell spell, long gameTime, long cooldownTicks) {
+        editProgress(spell).clearBranches();
+        respecReadyAt = gameTime + cooldownTicks;
+    }
+
+    /** Dev/admin: set a spell's level directly (no skill points), dropping choices above it. */
+    public void setSpellLevel(Spell spell, int spellLevel) {
+        SpellProgress progress = editProgress(spell);
+        progress.setLevel(Mth.clamp(spellLevel, 1, spell.maxLevel()));
+        progress.setMastery(0);
+        progress.clearBranchesAbove(progress.level());
+    }
+
+    /** Dev/admin: fill the mastery bar toward the next level. */
+    public void fillMastery(Spell spell) {
+        addMastery(spell, masteryToNextLevel(spell));
+    }
+
+    /** Dev/admin: clear branch choices without the respec cost. */
+    public void clearBranches(Spell spell) {
+        editProgress(spell).clearBranches();
+    }
+
     // ---- cooldowns ----
 
     public long cooldownRemaining(ResourceLocation spell, long gameTime) {
@@ -280,6 +398,14 @@ public final class MagicData {
 
     public void clearCooldowns() {
         cooldownEnds.clear();
+    }
+
+    /** Takes {@code fraction} off the remaining cooldown of {@code spell}. */
+    public void reduceCooldown(ResourceLocation spell, long gameTime, float fraction) {
+        Long end = cooldownEnds.get(spell);
+        if (end != null && end > gameTime) {
+            cooldownEnds.put(spell, end - (long) ((end - gameTime) * fraction));
+        }
     }
 
     // ---- movement-related state ----

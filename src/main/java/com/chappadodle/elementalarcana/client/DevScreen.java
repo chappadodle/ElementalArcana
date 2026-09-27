@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.client;
 
+import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.SpellSchool;
 import com.chappadodle.elementalarcana.content.ModContent;
@@ -23,7 +24,7 @@ public class DevScreen extends Screen {
     private static final int ROW_HEIGHT = 24;
     private static final int LABEL_WIDTH = 62;
     private static final int BUTTON_HEIGHT = 18;
-    private static final int ROWS = 5;
+    private static final int ROWS = 6;
 
     private final Map<SpellSchool, Button> affinityButtons = new LinkedHashMap<>();
     private Button freeCastButton;
@@ -41,7 +42,7 @@ public class DevScreen extends Screen {
     protected void init() {
         affinityButtons.clear();
         left = (width - WIDTH) / 2;
-        top = (height - (40 + ROWS * ROW_HEIGHT)) / 2;
+        top = (height - (52 + ROWS * ROW_HEIGHT)) / 2;
 
         row(0);
         button("-1", 26, Action.ADD_LEVELS, -1);
@@ -77,6 +78,14 @@ public class DevScreen extends Screen {
         addRenderableWidget(Button.builder(Component.translatable("screen.elementalarcana.status"), b -> minecraft.setScreen(new StatusScreen()))
                 .bounds(cursorX, cursorY, 50, BUTTON_HEIGHT).build());
 
+        // Acts on the selected spell.
+        row(5);
+        spellButton("-1", 26, Action.ADD_SPELL_LEVELS, -1);
+        spellButton("+1", 26, Action.ADD_SPELL_LEVELS, 1);
+        spellButton("+10", 32, Action.ADD_SPELL_LEVELS, 10);
+        spellButtonKey("screen.elementalarcana.dev.fill_mastery", 76, Action.FILL_MASTERY);
+        spellButtonKey("screen.elementalarcana.dev.clear_paths", 70, Action.CLEAR_BRANCHES);
+
         updateLabels();
     }
 
@@ -87,6 +96,24 @@ public class DevScreen extends Screen {
     private void row(int row) {
         cursorX = left + 10 + LABEL_WIDTH;
         cursorY = rowY(row);
+    }
+
+    private void spellButton(String label, int width, Action action, int value) {
+        addSpellButton(Component.literal(label), width, action, value);
+    }
+
+    private void spellButtonKey(String key, int width, Action action) {
+        addSpellButton(Component.translatable(key), width, action, 0);
+    }
+
+    private void addSpellButton(Component label, int width, Action action, int value) {
+        addRenderableWidget(Button.builder(label, b -> {
+            Spell spell = MagicAttachments.get(minecraft.player).selectedSpell();
+            if (spell != null) {
+                PacketDistributor.sendToServer(DevActionPayload.forSpell(action, spell, value));
+            }
+        }).bounds(cursorX, cursorY, width, BUTTON_HEIGHT).build());
+        cursorX += width + 3;
     }
 
     private void button(String label, int width, Action action, int value) {
@@ -120,16 +147,23 @@ public class DevScreen extends Screen {
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         renderBackground(graphics, mouseX, mouseY, partialTick);
         MagicData data = MagicAttachments.get(minecraft.player);
-        ArcanaDraw.panel(graphics, left, top, left + WIDTH, top + 40 + ROWS * ROW_HEIGHT);
+        ArcanaDraw.panel(graphics, left, top, left + WIDTH, top + 52 + ROWS * ROW_HEIGHT);
         graphics.drawCenteredString(font, title, width / 2, top + 7, 0xFFFFB060);
 
         String status = "Lv " + data.level()
                 + "   XP " + data.xp() + "/" + data.xpToNextLevel()
                 + "   Mana " + (int) data.mana() + "/" + (int) data.maxMana()
-                + (minecraft.player.hasEffect(ModContent.MANA_SICKNESS) ? "   [Sick]" : "");
+                + (minecraft.player.hasEffect(ModContent.MANA_SICKNESS) ? "   [Sick]" : "")
+                + "   Points " + data.skillPoints();
+        Spell selected = data.selectedSpell();
+        if (selected != null) {
+            graphics.drawString(font, Component.translatable("screen.elementalarcana.dev.selected", selected.displayName(),
+                            data.spellLevel(selected), data.progress(selected).mastery(), data.masteryToNextLevel(selected)),
+                    left + 10, rowY(5) + ROW_HEIGHT, 0xFF8A8A9A, false);
+        }
         graphics.drawCenteredString(font, status, width / 2, top + 20, 0xFFB0A8C8);
 
-        String[] labels = {"level", "xp", "mana", "elements", "other"};
+        String[] labels = {"level", "xp", "mana", "elements", "other", "spell"};
         for (int i = 0; i < labels.length; i++) {
             graphics.drawString(font, Component.translatable("screen.elementalarcana.dev.row." + labels[i]),
                     left + 10, rowY(i) + 5, FastColor.ARGB32.opaque(0xC9A8FF), false);

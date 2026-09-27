@@ -4,6 +4,7 @@ import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -65,6 +66,50 @@ public abstract class Spell {
     /** One short line for tooltips and the spellbook: lang key {@code spell.<namespace>.<path>.desc}. */
     public Component description() {
         return Component.translatable(Util.makeDescriptionId("spell", id()) + ".desc");
+    }
+
+    // ---- spell levels ----
+    // A spell levels up when its mastery bar is full (mastery = mana spent casting it) and the
+    // player spends a skill point. Some levels offer a permanent branch choice.
+
+    /** Highest level this spell can reach. 1 = the spell doesn't level. */
+    public int maxLevel() {
+        return 1;
+    }
+
+    /** Mastery needed to go from {@code level} to {@code level + 1}. */
+    public int masteryToNextLevel(int level) {
+        return 60 * level;
+    }
+
+    /** The branch choices offered on reaching {@code level}, or empty when that level has no choice. */
+    public List<String> branchOptions(int level) {
+        return List.of();
+    }
+
+    /** Mana cost at a given spell level. */
+    public int manaCost(int spellLevel) {
+        return manaCost();
+    }
+
+    /** Lang key {@code spell.<namespace>.<path>.tier.<level>}. */
+    public Component tierName(int level) {
+        return Component.translatable(Util.makeDescriptionId("spell", id()) + ".tier." + level);
+    }
+
+    /** Lang key {@code spell.<namespace>.<path>.tier.<level>.desc}. */
+    public Component tierDescription(int level) {
+        return Component.translatable(Util.makeDescriptionId("spell", id()) + ".tier." + level + ".desc");
+    }
+
+    /** Lang key {@code spell.<namespace>.<path>.branch.<branch>}. */
+    public Component branchName(String branch) {
+        return Component.translatable(Util.makeDescriptionId("spell", id()) + ".branch." + branch);
+    }
+
+    /** Lang key {@code spell.<namespace>.<path>.branch.<branch>.desc}. */
+    public Component branchDescription(String branch) {
+        return Component.translatable(Util.makeDescriptionId("spell", id()) + ".branch." + branch + ".desc");
     }
 
     public ResourceLocation iconTexture() {

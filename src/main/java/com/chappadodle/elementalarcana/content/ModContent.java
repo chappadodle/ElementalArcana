@@ -52,6 +52,9 @@ public final class ModContent {
                     .addAttributeModifier(Attributes.MOVEMENT_SPEED, ElementalArcana.id("mana_sickness_speed"), -0.15, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
                     .addAttributeModifier(Attributes.ATTACK_DAMAGE, ElementalArcana.id("mana_sickness_damage"), -0.2, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
 
+    /** Frozen solid (Icicle's Deep Freeze): rooted in place, no jumping or melee damage. */
+    public static final DeferredHolder<MobEffect, FrozenEffect> FROZEN = EFFECTS.register("frozen", FrozenEffect::new);
+
     private ModContent() {
     }
 

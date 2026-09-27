@@ -44,7 +44,7 @@ public class SpellProjectileRenderer extends EntityRenderer<SpellProjectile> {
         Entity owner = projectile.getOwner();
         if (projectile.isHeld() && owner != null) {
             // Draw exactly at the hand position for this frame, not where the entity was last tick.
-            shift = SpellProjectile.holdPosition(owner, spell, partialTick).subtract(projectile.getPosition(partialTick));
+            shift = projectile.holdPosition(owner, spell, partialTick).subtract(projectile.getPosition(partialTick));
             direction = owner.getViewVector(partialTick);
         } else {
             direction = projectile.getDeltaMovement();
@@ -55,7 +55,7 @@ public class SpellProjectileRenderer extends EntityRenderer<SpellProjectile> {
         direction = direction.normalize();
         float yaw = (float) Mth.atan2(direction.x, direction.z);
         float pitch = (float) -Mth.atan2(direction.y, Math.sqrt(direction.x * direction.x + direction.z * direction.z));
-        float scale = Mth.lerp(projectile.charge(partialTick), MIN_SCALE, 1f);
+        float scale = Mth.lerp(projectile.charge(partialTick), MIN_SCALE, 1f) * projectile.visualScale();
 
         poseStack.pushPose();
         poseStack.translate(shift.x, shift.y, shift.z);

@@ -6,7 +6,6 @@ import com.chappadodle.elementalarcana.api.SpellSchool;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.core.MagicData;
-import com.chappadodle.elementalarcana.network.SelectSpellPayload;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -17,21 +16,21 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The isekai "Status" window: level and XP, mana stats, affinities (with the Awaken button
- * when a slot opens), and every spell grouped by element, clickable to select.
+ * The isekai "Status" window: level, XP and skill points, mana stats, affinities (with the Awaken
+ * button when a slot opens), and every spell grouped by element; click one for its skill tree.
  */
 public class StatusScreen extends Screen {
     private static final int WIDTH = 290;
     private static final int HEADER_HEIGHT = 118;
     private static final int SCHOOL_ROW = 14;
     private static final int SPELL_ROW = 20;
+    private static final int GOLD = 0xFFFFC857;
 
     /** A school header (spell == null) or a spell row. */
     private record Row(SpellSchool school, @Nullable Spell spell, int height) {
@@ -114,6 +113,9 @@ public class StatusScreen extends Screen {
                 ? Component.translatable("screen.elementalarcana.status.max_level")
                 : Component.translatable("screen.elementalarcana.status.xp", data.xp(), data.xpToNextLevel());
         graphics.drawString(font, xpText, left + WIDTH - 10 - font.width(xpText), top + 40, 0xFF9A8FB8, false);
+        int points = data.skillPoints();
+        graphics.drawString(font, Component.translatable("screen.elementalarcana.status.skill_points", points),
+                left + 10, top + 40, points > 0 ? GOLD : 0xFF6A6480, false);
 
         // Stats
         MobEffectInstance sickness = minecraft.player.getEffect(ModContent.MANA_SICKNESS);
@@ -214,16 +216,33 @@ public class StatusScreen extends Screen {
         if (selected) {
             graphics.fill(left + 6, y, left + WIDTH - 6, y + SPELL_ROW - 2, FastColor.ARGB32.color(70, spell.school().color()));
             graphics.fill(left + 6, y, left + 8, y + SPELL_ROW - 2, color);
-        } else if (hovered && castable) {
+        } else if (hovered) {
             graphics.fill(left + 6, y, left + WIDTH - 6, y + SPELL_ROW - 2, 0x30FFFFFF);
         }
         ArcanaDraw.icon(graphics, spell, left + 14, y + 1, 16, castable ? 1f : 0.3f, 1f);
-        graphics.drawString(font, spell.displayName(), left + 36, y + 5, castable ? color : 0xFF6A6480, false);
+        boolean levels = spell.maxLevel() > 1;
+        int nameEnd = graphics.drawString(font, spell.displayName(), left + 36, levels ? y + 1 : y + 5, castable ? color : 0xFF6A6480, false);
+        if (levels) {
+            int spellLevel = data.spellLevel(spell);
+            graphics.drawString(font, Component.translatable("screen.elementalarcana.status.spell_level", spellLevel),
+                    nameEnd + 4, y + 1, castable ? 0xFFC9A8FF : 0xFF4A4460, false);
+            if (castable) {
+                int needed = data.masteryToNextLevel(spell);
+                float fraction = needed == 0 ? 1f : data.progress(spell).mastery() / (float) needed;
+                ArcanaDraw.bar(graphics, left + 36, y + 12, 90, 2, fraction, data.isMasteryFull(spell) ? GOLD : 0xFF4FB0E0, 1f);
+            }
+        }
 
         Component right;
         int rightColor;
-        if (castable) {
-            right = Component.translatable("screen.elementalarcana.cost", spell.manaCost());
+        if (castable && data.pendingBranchLevel(spell) > 0) {
+            right = Component.translatable("screen.elementalarcana.status.choose_path");
+            rightColor = GOLD;
+        } else if (castable && data.canLevelUp(spell)) {
+            right = Component.translatable("screen.elementalarcana.status.level_up_ready");
+            rightColor = GOLD;
+        } else if (castable) {
+            right = Component.translatable("screen.elementalarcana.cost", spell.manaCost(data.spellLevel(spell)));
             rightColor = 0xFF7FB2FF;
         } else if (!data.hasAffinity(spell.school())) {
             right = Component.literal("—");
@@ -240,15 +259,19 @@ public class StatusScreen extends Screen {
         int color = spell.school().color();
         lines.add(spell.displayName().copy().withStyle(style -> style.withColor(color)));
         lines.add(spell.description().copy().withStyle(ChatFormatting.GRAY));
-        lines.add(Component.translatable("tooltip.elementalarcana.mana_cost", spell.manaCost()).withStyle(ChatFormatting.BLUE));
+        if (spell.maxLevel() > 1) {
+            int spellLevel = data.spellLevel(spell);
+            lines.add(Component.translatable("tooltip.elementalarcana.tier", spellLevel, spell.maxLevel(), spell.tierName(spellLevel))
+                    .withStyle(ChatFormatting.LIGHT_PURPLE));
+        }
+        lines.add(Component.translatable("tooltip.elementalarcana.mana_cost", spell.manaCost(data.spellLevel(spell))).withStyle(ChatFormatting.BLUE));
         lines.add(Component.translatable("tooltip.elementalarcana.cooldown", String.format("%.1f", spell.cooldownTicks() / 20f)).withStyle(ChatFormatting.BLUE));
         if (!data.hasAffinity(spell.school())) {
             lines.add(Component.translatable("tooltip.elementalarcana.requires_affinity", spell.school().displayName()).withStyle(ChatFormatting.RED));
         } else if (data.level() < spell.requiredLevel()) {
             lines.add(Component.translatable("tooltip.elementalarcana.requires_level", spell.requiredLevel()).withStyle(ChatFormatting.GOLD));
-        } else {
-            lines.add(Component.translatable("tooltip.elementalarcana.click_to_select").withStyle(ChatFormatting.DARK_GRAY));
         }
+        lines.add(Component.translatable("tooltip.elementalarcana.click_for_details").withStyle(ChatFormatting.DARK_GRAY));
         return lines;
     }
 
@@ -258,11 +281,9 @@ public class StatusScreen extends Screen {
             int rowY = listTop - scroll;
             for (Row row : rows) {
                 if (mouseY >= rowY && mouseY < rowY + row.height()) {
-                    MagicData data = MagicAttachments.get(minecraft.player);
-                    if (row.spell() != null && data.canCast(row.spell())) {
-                        data.select(row.spell().id());
-                        PacketDistributor.sendToServer(new SelectSpellPayload(row.spell().id()));
+                    if (row.spell() != null) {
                         minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1f));
+                        minecraft.setScreen(new SpellDetailScreen(row.spell(), this));
                         return true;
                     }
                     break;

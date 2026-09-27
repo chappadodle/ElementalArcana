@@ -81,7 +81,8 @@ public final class CastingService {
             return;
         }
 
-        SpellCastEvent.Pre pre = NeoForge.EVENT_BUS.post(new SpellCastEvent.Pre(player, spell, spell.manaCost()));
+        int spellLevel = data.spellLevel(spell);
+        SpellCastEvent.Pre pre = NeoForge.EVENT_BUS.post(new SpellCastEvent.Pre(player, spell, spell.manaCost(spellLevel)));
         if (pre.isCanceled()) {
             return;
         }
@@ -93,7 +94,8 @@ public final class CastingService {
             return;
         }
 
-        CastContext context = new CastContext(player, player.serverLevel(), InteractionHand.MAIN_HAND, data.power());
+        CastContext context = new CastContext(player, player.serverLevel(), InteractionHand.MAIN_HAND, data.power(),
+                spellLevel, data.progress(spell).branches());
         CastResult result = spell.cast(context);
         if (!result.success()) {
             if (result.failReason() != null) {
@@ -117,6 +119,12 @@ public final class CastingService {
             int oldLevel = data.level();
             if (data.addXp(cost) > 0) {
                 onLevelUp(player, data, oldLevel);
+            }
+            boolean wasFull = data.isMasteryFull(spell);
+            data.addMastery(spell, cost);
+            if (!wasFull && data.isMasteryFull(spell)) {
+                player.sendSystemMessage(Component.translatable("message.elementalarcana.mastery_full", spell.displayName(),
+                        Component.keybind("key.elementalarcana.status")).withStyle(style -> style.withColor(spell.school().color())));
             }
         }
 
