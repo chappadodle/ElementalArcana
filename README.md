@@ -65,6 +65,8 @@ That's all it takes. Players who have awakened the spell's element and reached i
 
 **New element:** register a `SpellSchool` (color + cast sound) on `SpellRegistries.SCHOOL_KEY` and add the lang keys `school.yourmod.<name>` and `school.yourmod.<name>.desc`. It shows up on the Awakening screen automatically.
 
+**Multi-hit spells:** deal damage with `SpellDamage.hurtMultiHit(...)`. Minecraft otherwise ignores hits that land within half a second of each other, so a volley would only count once.
+
 **Hooks:** `SpellCastEvent.Pre` (cancel a cast or change its mana cost) and `SpellCastEvent.Post`, both on `NeoForge.EVENT_BUS`.
 
 ## Assets

@@ -5,6 +5,7 @@ import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.CastResult;
 import com.chappadodle.elementalarcana.api.ProjectileSpell;
 import com.chappadodle.elementalarcana.api.Spell;
+import com.chappadodle.elementalarcana.api.SpellDamage;
 import com.chappadodle.elementalarcana.api.SpellHold;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
 import com.chappadodle.elementalarcana.content.ModContent;
@@ -297,7 +298,7 @@ public class IcicleSpell extends Spell implements ProjectileSpell {
         CompoundTag tag = icicle.getPersistentData();
         int level = tag.getInt(TAG_LEVEL);
         float charge = icicle.charge(0f);
-        target.hurt(icicle.damageSources().indirectMagic(icicle, icicle.getOwner()), damage(icicle, tag));
+        SpellDamage.hurtMultiHit(target, icicle.damageSources().indirectMagic(icicle, icicle.getOwner()), damage(icicle, tag));
         if (target instanceof LivingEntity living) {
             living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, Math.round(40 + 40 * charge), 1));
             if (level >= 9) {
@@ -356,7 +357,7 @@ public class IcicleSpell extends Spell implements ProjectileSpell {
         float damage = damage(icicle, icicle.getPersistentData()) * 0.5f;
         for (LivingEntity nearby : level.getEntitiesOfClass(LivingEntity.class, icicle.getBoundingBox().inflate(2.0),
                 e -> e != alreadyHit && e != icicle.getOwner() && e.isAlive() && e.distanceTo(icicle) <= 2.0)) {
-            nearby.hurt(icicle.damageSources().indirectMagic(icicle, icicle.getOwner()), damage);
+            SpellDamage.hurtMultiHit(nearby, icicle.damageSources().indirectMagic(icicle, icicle.getOwner()), damage);
             nearby.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 0));
         }
         level.sendParticles(ModContent.ICE_SHARD.get(), icicle.getX(), icicle.getY(), icicle.getZ(), 24, 0.15, 0.15, 0.15, 0.3);
