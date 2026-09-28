@@ -265,7 +265,7 @@ public class StatusScreen extends Screen {
                     .withStyle(ChatFormatting.LIGHT_PURPLE));
         }
         lines.add(Component.translatable("tooltip.elementalarcana.mana_cost", spell.manaCost(data.spellLevel(spell))).withStyle(ChatFormatting.BLUE));
-        lines.add(Component.translatable("tooltip.elementalarcana.cooldown", String.format("%.1f", spell.cooldownTicks() / 20f)).withStyle(ChatFormatting.BLUE));
+        lines.add(Component.translatable("tooltip.elementalarcana.cooldown", String.format("%.1f", spell.cooldownTicks(data.spellLevel(spell)) / 20f)).withStyle(ChatFormatting.BLUE));
         if (!data.hasAffinity(spell.school())) {
             lines.add(Component.translatable("tooltip.elementalarcana.requires_affinity", spell.school().displayName()).withStyle(ChatFormatting.RED));
         } else if (data.level() < spell.requiredLevel()) {

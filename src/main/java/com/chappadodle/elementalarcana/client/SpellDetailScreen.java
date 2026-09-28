@@ -159,7 +159,7 @@ public class SpellDetailScreen extends Screen {
                 ? Component.translatable("screen.elementalarcana.detail.mastery_max")
                 : Component.translatable("screen.elementalarcana.detail.mastery", mastery, needed);
         graphics.drawString(font, masteryText, left + 50, top + 42, full ? GOLD : 0xFF9A8FB8, false);
-        Component stats = Component.translatable("screen.elementalarcana.detail.stats", spell.manaCost(level), String.format("%.1f", spell.cooldownTicks() / 20f));
+        Component stats = Component.translatable("screen.elementalarcana.detail.stats", spell.manaCost(level), String.format("%.1f", spell.cooldownTicks(level) / 20f));
         graphics.drawString(font, stats, left + WIDTH - 10 - font.width(stats), top + 42, 0xFF7FB2FF, false);
         graphics.fill(left + 8, listTop - 6, left + WIDTH - 8, listTop - 5, 0xFF3A3050);
 

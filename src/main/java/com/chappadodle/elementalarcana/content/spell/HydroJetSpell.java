@@ -85,7 +85,7 @@ public class HydroJetSpell extends Spell implements ProjectileSpell {
     private static boolean dealingJetDamage;
 
     public HydroJetSpell() {
-        super(ModSchools.WATER, 20, 30);
+        super(ModSchools.WATER, 20, 80);
     }
 
     // ---- levels ----

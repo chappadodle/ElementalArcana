@@ -72,7 +72,7 @@ public class FireballSpell extends Spell implements ProjectileSpell {
     private static final String TAG_REFLOWN = "ea_fire_reflown";
 
     public FireballSpell() {
-        super(ModSchools.FIRE, 15, 16);
+        super(ModSchools.FIRE, 15, 60);
     }
 
     // ---- levels ----

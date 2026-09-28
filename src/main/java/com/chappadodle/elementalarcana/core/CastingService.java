@@ -108,7 +108,7 @@ public final class CastingService {
         if (!free) {
             data.setMana(data.mana() - cost);
             if (context.hold() == null) {
-                data.startCooldown(spell.id(), player.level().getGameTime(), spell.cooldownTicks());
+                data.startCooldown(spell.id(), player.level().getGameTime(), spell.cooldownTicks(data.spellLevel(spell)));
             }
             if (healthCost > 0) {
                 overcast(player, healthCost);
@@ -176,7 +176,7 @@ public final class CastingService {
     private static void endHold(ServerPlayer player, ActiveHold active) {
         MagicData data = MagicAttachments.get(player);
         if (!player.isCreative() && !data.freeCast()) {
-            data.startCooldown(active.spell().id(), player.level().getGameTime(), active.spell().cooldownTicks());
+            data.startCooldown(active.spell().id(), player.level().getGameTime(), active.spell().cooldownTicks(data.spellLevel(active.spell())));
             MagicAttachments.sync(player);
         }
     }

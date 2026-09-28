@@ -15,7 +15,7 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 | **K** | Status window: level, XP, mana stats, affinities and every spell |
 
 **Mana and growth**
-- Every point of mana you spend gives Magic XP. Each level adds +10 max mana, faster regen and +2% spell power (max level 30).
+- Every point of mana you spend gives Magic XP. Each level adds +10 max mana, +0.25 mana/s regen (2.5/s at level 1) and +2% spell power (max level 30).
 - Mana regenerates over time. To meditate, sneak and stand still for 2 seconds; regen is tripled while you do. A full night's sleep refills your mana.
 - Emptying your mana gives you *Mana Sickness* for 15s: slower movement, weaker attacks and half regen.
 - If you cast without enough mana, the missing amount is paid in health (1 heart per 20 mana). This is called overcasting. It never kills you and always causes Mana Sickness. The HUD mana bar pulses red when your next cast would overcast.
@@ -41,7 +41,7 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 
 **Wind** has two signature mechanics. **Swirl**: a wind hit on a frozen, frosted, burning or wet enemy spreads that element to every creature within 4 blocks. **Airborne**: enemies launched by wind take 25% more damage until they land.
 
-Fireball, Hydro Jet, Icicle, Frost Shield and Wind Blade level from 1 to 10. Casting a spell fills its mastery bar, and each level-up costs one skill point (you earn one per Magic Level). Each offers permanent path choices at Lv 5 and 10. Open a spell's skill tree from the Status window.
+Fireball, Hydro Jet, Icicle, Frost Shield and Wind Blade level from 1 to 10. Each level also shortens the spell's cooldown (Lv 10: under half of Lv 1). Casting a spell fills its mastery bar, and each level-up costs one skill point (you earn one per Magic Level). Each offers permanent path choices at Lv 5 and 10. Open a spell's skill tree from the Status window.
 
 Operators can use `/arcana level set <n>`, `/arcana xp add <n>`, `/arcana affinity add <element>`, `/arcana affinity reset`, `/arcana mana fill|set <n>`, `/arcana attune <targets> <element> <rank>|none` and `/arcana cooldowns reset`.
 

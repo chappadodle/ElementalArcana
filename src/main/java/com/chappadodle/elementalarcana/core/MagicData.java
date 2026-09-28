@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.core;
 
+import com.chappadodle.elementalarcana.api.Progression;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.SpellSchool;
@@ -30,8 +31,6 @@ public final class MagicData {
     public static final int[] AFFINITY_SLOT_LEVELS = {1, 10, 20, 30};
     private static final float BASE_MAX_MANA = 100f;
     private static final float MAX_MANA_PER_LEVEL = 10f;
-    private static final float BASE_REGEN_PER_SECOND = 1f;
-    private static final float REGEN_PER_SECOND_PER_LEVEL = 0.1f;
     private static final float POWER_PER_LEVEL = 0.02f;
 
     public static final Codec<MagicData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -157,7 +156,7 @@ public final class MagicData {
     }
 
     public float regenPerSecond() {
-        return BASE_REGEN_PER_SECOND + REGEN_PER_SECOND_PER_LEVEL * (level - 1);
+        return Progression.regenPerSecond(level);
     }
 
     /** Multiplier spells apply to damage, knockback and durations. */

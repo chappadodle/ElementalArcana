@@ -69,7 +69,7 @@ public class WindBladeSpell extends Spell implements ProjectileSpell {
     private static final String TAG_RETURNING = "ea_wind_returning";
 
     public WindBladeSpell() {
-        super(ModSchools.WIND, 10, 10);
+        super(ModSchools.WIND, 10, 40);
     }
 
     // ---- levels ----

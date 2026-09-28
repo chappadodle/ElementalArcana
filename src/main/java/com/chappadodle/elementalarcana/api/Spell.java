@@ -51,8 +51,14 @@ public abstract class Spell {
         return manaCost;
     }
 
+    /** Cooldown at Lv 1, in ticks. */
     public int cooldownTicks() {
         return cooldownTicks;
+    }
+
+    /** Cooldown at a given spell level: 6% of the Lv 1 cooldown shorter per level (Lv 10 = 46%). */
+    public int cooldownTicks(int spellLevel) {
+        return Progression.cooldownTicks(cooldownTicks(), spellLevel);
     }
 
     public ResourceLocation id() {

@@ -73,7 +73,7 @@ public class IcicleSpell extends Spell implements ProjectileSpell {
     private static final String TAG_TARGET_HITS = "ea_icicle_hit_count";
 
     public IcicleSpell() {
-        super(ModSchools.ICE, 12, 12);
+        super(ModSchools.ICE, 12, 50);
     }
 
     // ---- levels ----
