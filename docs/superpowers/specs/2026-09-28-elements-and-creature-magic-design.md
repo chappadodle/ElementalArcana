@@ -147,16 +147,16 @@ Biome elements come from biome tags, so they are data-driven:
 
 ### What an Attuned creature is like
 
-- **Stored data:** a saved (not client-synced) data attachment on the mob:
-  `CreatureMagic { element, rank }`. Jade reads innate elements client-side from tags; for
-  Attuned creatures the Jade integration needs the element from the server (a Jade server data
-  provider), added in this step.
+- **Stored data:** a saved data attachment on the mob, `CreatureMagic { element, rank }`, synced to
+  everyone who can see the mob (the same mechanism as the Frost Shield). Synced, `CreatureElements`
+  knows Attuned elements on both sides, so the Jade tooltip needs no server data provider.
+  (Changed during planning of step 2.)
 - **Health:** the rank's max-health bonus is applied as an attribute modifier when it spawns.
 - **Faint hints:** Adepts and Magi occasionally (about every 2 seconds) give off one particle of
   their element: an ember, a drip, a snowflake or a wisp. There is no name and no label.
 - **Archmage:**
-  - A boss bar named "<Mob> Archmage" (for example "Zombie Archmage"), shown to players within 32
-    blocks, like the Wither's.
+  - A purple boss bar (the same color for every element) named "<Mob> Archmage" (for example
+    "Zombie Archmage"), shown to players within 32 blocks, like the Wither's.
   - It is marked persistent, so it never despawns.
   - It gets knockback resistance.
 - **Keeps its normal attacks:** an Attuned skeleton still shoots arrows.

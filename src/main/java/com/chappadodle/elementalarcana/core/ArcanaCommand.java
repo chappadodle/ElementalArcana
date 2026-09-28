@@ -1,23 +1,34 @@
 package com.chappadodle.elementalarcana.core;
 
+import com.chappadodle.elementalarcana.api.AttunementRank;
+import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.SpellSchool;
+import com.chappadodle.elementalarcana.content.Attunement;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.commands.arguments.selector.EntitySelector;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
 
+import java.util.Collection;
+import java.util.Locale;
 import java.util.function.Consumer;
 
-/** /arcana: testing and admin shortcuts, applied to the command's player. Op level 2. */
+/** /arcana: testing and admin shortcuts. Op level 2. */
 public final class ArcanaCommand {
     private static final DynamicCommandExceptionType UNKNOWN_SCHOOL =
             new DynamicCommandExceptionType(id -> Component.translatable("commands.elementalarcana.unknown_school", String.valueOf(id)));
@@ -62,7 +73,56 @@ public final class ArcanaCommand {
                                     return modify(ctx.getSource(), data -> data.setMana(amount), "commands.elementalarcana.mana_set");
                                 }))))
                 .then(Commands.literal("cooldowns").then(Commands.literal("reset")
-                        .executes(ctx -> modify(ctx.getSource(), MagicData::clearCooldowns, "commands.elementalarcana.cooldowns_reset")))));
+                        .executes(ctx -> modify(ctx.getSource(), MagicData::clearCooldowns, "commands.elementalarcana.cooldowns_reset"))))
+                .then(Commands.literal("attune").then(attuneTargets())));
+    }
+
+    /** /arcana attune <targets> <element> <rank>, or /arcana attune <targets> none. Mobs only. */
+    private static RequiredArgumentBuilder<CommandSourceStack, EntitySelector> attuneTargets() {
+        RequiredArgumentBuilder<CommandSourceStack, EntitySelector> targets = Commands.argument("targets", EntityArgument.entities());
+        targets.then(Commands.literal("none")
+                .executes(ctx -> clearAttunement(ctx.getSource(), EntityArgument.getEntities(ctx, "targets"))));
+        for (Element element : Element.values()) {
+            LiteralArgumentBuilder<CommandSourceStack> elementNode = Commands.literal(element.name().toLowerCase(Locale.ROOT));
+            for (AttunementRank rank : AttunementRank.values()) {
+                elementNode.then(Commands.literal(rank.name().toLowerCase(Locale.ROOT))
+                        .executes(ctx -> attune(ctx.getSource(), EntityArgument.getEntities(ctx, "targets"), element, rank)));
+            }
+            targets.then(elementNode);
+        }
+        return targets;
+    }
+
+    private static int attune(CommandSourceStack source, Collection<? extends Entity> targets, Element element, AttunementRank rank) {
+        int attuned = 0;
+        int refused = 0;
+        for (Entity entity : targets) {
+            if (entity instanceof Mob mob) {
+                if (Attunement.attune(mob, element, rank)) {
+                    attuned++;
+                } else {
+                    refused++;
+                }
+            }
+        }
+        int done = attuned;
+        source.sendSuccess(() -> Component.translatable("commands.elementalarcana.attuned", done), true);
+        if (refused > 0) {
+            source.sendFailure(Component.translatable("commands.elementalarcana.attune_innate", refused));
+        }
+        return done;
+    }
+
+    private static int clearAttunement(CommandSourceStack source, Collection<? extends Entity> targets) {
+        int cleared = 0;
+        for (Entity entity : targets) {
+            if (entity instanceof Mob mob && Attunement.clear(mob)) {
+                cleared++;
+            }
+        }
+        int done = cleared;
+        source.sendSuccess(() -> Component.translatable("commands.elementalarcana.attune_cleared", done), true);
+        return done;
     }
 
     private static int modify(CommandSourceStack source, Consumer<MagicData> change, String messageKey) throws CommandSyntaxException {

@@ -1,6 +1,9 @@
 package com.chappadodle.elementalarcana.core;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
+import com.chappadodle.elementalarcana.api.AttunementRank;
+import com.chappadodle.elementalarcana.api.CreatureMagic;
+import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.SpellShield;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -26,6 +29,15 @@ public final class MagicAttachments {
     public static final Supplier<AttachmentType<SpellShield>> SHIELD = ATTACHMENT_TYPES.register("shield",
             () -> AttachmentType.builder(SpellShield::new)
                     .sync(SpellShield.STREAM_CODEC)
+                    .build());
+
+    // An Attuned creature's element and rank. Only Attuned creatures have it (check hasData; the
+    // default below is never read). Saved, and synced to everyone who can see the creature, so the
+    // Jade tooltip can show its element.
+    public static final Supplier<AttachmentType<CreatureMagic>> CREATURE_MAGIC = ATTACHMENT_TYPES.register("creature_magic",
+            () -> AttachmentType.builder(() -> new CreatureMagic(Element.FIRE, AttunementRank.ADEPT))
+                    .serialize(CreatureMagic.CODEC)
+                    .sync(CreatureMagic.STREAM_CODEC)
                     .build());
 
     private MagicAttachments() {

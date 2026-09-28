@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.client;
 
+import com.chappadodle.elementalarcana.api.AttunementRank;
+import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.SpellSchool;
@@ -16,6 +18,7 @@ import net.minecraft.util.FastColor;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /** Op-only testing panel: jump levels, set mana, toggle elements and free casting. */
@@ -24,10 +27,14 @@ public class DevScreen extends Screen {
     private static final int ROW_HEIGHT = 24;
     private static final int LABEL_WIDTH = 62;
     private static final int BUTTON_HEIGHT = 18;
-    private static final int ROWS = 6;
+    private static final int ROWS = 7;
 
     private final Map<SpellSchool, Button> affinityButtons = new LinkedHashMap<>();
     private Button freeCastButton;
+    private Element devElement = Element.FIRE;
+    private AttunementRank devRank = AttunementRank.ADEPT;
+    private Button elementButton;
+    private Button rankButton;
     private int left;
     private int top;
     // Where the next button goes while init() lays out a row.
@@ -86,6 +93,14 @@ public class DevScreen extends Screen {
         spellButtonKey("screen.elementalarcana.dev.fill_mastery", 76, Action.FILL_MASTERY);
         spellButtonKey("screen.elementalarcana.dev.clear_paths", 70, Action.CLEAR_BRANCHES);
 
+        // Spawn an Attuned zombie: pick the element and rank, then spawn.
+        row(6);
+        elementButton = cycleButton(56, () -> devElement = Element.values()[(devElement.ordinal() + 1) % Element.values().length]);
+        rankButton = cycleButton(64, () -> devRank = AttunementRank.values()[(devRank.ordinal() + 1) % AttunementRank.values().length]);
+        addRenderableWidget(Button.builder(Component.translatable("screen.elementalarcana.dev.spawn_zombie"),
+                        b -> PacketDistributor.sendToServer(DevActionPayload.spawnAttuned(devElement, devRank)))
+                .bounds(cursorX, cursorY, 86, BUTTON_HEIGHT).build());
+
         updateLabels();
     }
 
@@ -127,6 +142,15 @@ public class DevScreen extends Screen {
         return button;
     }
 
+    private Button cycleButton(int width, Runnable onPress) {
+        Button button = addRenderableWidget(Button.builder(Component.empty(), b -> {
+            onPress.run();
+            updateLabels();
+        }).bounds(cursorX, cursorY, width, BUTTON_HEIGHT).build());
+        cursorX += width + 3;
+        return button;
+    }
+
     private void updateLabels() {
         MagicData data = MagicAttachments.get(minecraft.player);
         affinityButtons.forEach((school, button) -> {
@@ -136,6 +160,9 @@ public class DevScreen extends Screen {
         });
         freeCastButton.setMessage(Component.translatable(data.freeCast()
                 ? "screen.elementalarcana.dev.free_cast_on" : "screen.elementalarcana.dev.free_cast_off"));
+        elementButton.setMessage(Component.translatable("school.elementalarcana." + devElement.name().toLowerCase(Locale.ROOT))
+                .withColor(devElement.color()));
+        rankButton.setMessage(Component.translatable("rank.elementalarcana." + devRank.name().toLowerCase(Locale.ROOT)));
     }
 
     @Override
@@ -159,11 +186,11 @@ public class DevScreen extends Screen {
         if (selected != null) {
             graphics.drawString(font, Component.translatable("screen.elementalarcana.dev.selected", selected.displayName(),
                             data.spellLevel(selected), data.progress(selected).mastery(), data.masteryToNextLevel(selected)),
-                    left + 10, rowY(5) + ROW_HEIGHT, 0xFF8A8A9A, false);
+                    left + 10, rowY(ROWS - 1) + ROW_HEIGHT, 0xFF8A8A9A, false);
         }
         graphics.drawCenteredString(font, status, width / 2, top + 20, 0xFFB0A8C8);
 
-        String[] labels = {"level", "xp", "mana", "elements", "other", "spell"};
+        String[] labels = {"level", "xp", "mana", "elements", "other", "spell", "creature"};
         for (int i = 0; i < labels.length; i++) {
             graphics.drawString(font, Component.translatable("screen.elementalarcana.dev.row." + labels[i]),
                     left + 10, rowY(i) + 5, FastColor.ARGB32.opaque(0xC9A8FF), false);

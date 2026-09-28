@@ -1,9 +1,12 @@
 package com.chappadodle.elementalarcana.network;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
+import com.chappadodle.elementalarcana.api.AttunementRank;
+import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.SpellSchool;
+import com.chappadodle.elementalarcana.content.Attunement;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.core.MagicData;
@@ -15,6 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Client -> server: one dev-menu button press. The server re-checks op permission (level 2),
@@ -31,7 +35,7 @@ public record DevActionPayload(Action action, int value, String target) implemen
     public enum Action {
         ADD_LEVELS, SET_LEVEL, ADD_XP, SET_MANA_PERCENT, GIVE_SICKNESS, CURE_SICKNESS,
         TOGGLE_AFFINITY, RESET_AFFINITIES, RESET_COOLDOWNS, TOGGLE_FREE_CAST, HEAL,
-        ADD_SPELL_LEVELS, FILL_MASTERY, CLEAR_BRANCHES
+        ADD_SPELL_LEVELS, FILL_MASTERY, CLEAR_BRANCHES, SPAWN_ATTUNED
     }
 
     public static DevActionPayload of(Action action, int value) {
@@ -45,6 +49,11 @@ public record DevActionPayload(Action action, int value, String target) implemen
     /** An action on one spell (level, mastery, branches). */
     public static DevActionPayload forSpell(Action action, Spell spell, int value) {
         return new DevActionPayload(action, value, spell.id().toString());
+    }
+
+    /** Spawn a zombie Attuned to {@code element} at {@code rank}. */
+    public static DevActionPayload spawnAttuned(Element element, AttunementRank rank) {
+        return new DevActionPayload(Action.SPAWN_ATTUNED, rank.ordinal(), element.name());
     }
 
     @Override
@@ -90,7 +99,23 @@ public record DevActionPayload(Action action, int value, String target) implemen
                     }
                 }
             }
+            case SPAWN_ATTUNED -> {
+                Element element = parseElement(payload.target());
+                int rank = payload.value();
+                if (element != null && rank >= 0 && rank < AttunementRank.values().length) {
+                    Attunement.spawnForTesting(player, element, AttunementRank.values()[rank]);
+                }
+            }
         }
         MagicAttachments.sync(player);
+    }
+
+    @Nullable
+    private static Element parseElement(String name) {
+        try {
+            return Element.valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 }

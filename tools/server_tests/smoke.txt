@@ -1,0 +1,2 @@
+# The harness can type a command and read the answer.
+time query daytime

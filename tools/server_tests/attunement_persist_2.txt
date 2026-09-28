@@ -1,0 +1,5 @@
+sleep 3
+data get entity @e[tag=eapersist,limit=1] Health
+data get entity @e[tag=eapersist,limit=1] "neoforge:attachments"
+kill @e[tag=eapersist]
+forceload remove 0 0

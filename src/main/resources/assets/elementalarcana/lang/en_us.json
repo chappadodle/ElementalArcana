@@ -304,5 +304,14 @@
   "death.attack.elementalarcana.wind_spell.player": "%1$s was cut down by the wind while fighting %2$s",
   "death.attack.elementalarcana.wind_spell.item": "%1$s was cut down by %2$s's winds using %3$s",
   "jade.elementalarcana.element": "Element: %s",
-  "config.jade.plugin_elementalarcana.creature_element": "Creature element"
+  "config.jade.plugin_elementalarcana.creature_element": "Creature element",
+  "commands.elementalarcana.attuned": "Attuned %s creature(s)",
+  "commands.elementalarcana.attune_cleared": "Cleared the attunement of %s creature(s)",
+  "commands.elementalarcana.attune_innate": "%s creature(s) skipped: innate creatures keep their own element",
+  "rank.elementalarcana.adept": "Adept",
+  "rank.elementalarcana.magus": "Magus",
+  "rank.elementalarcana.archmage": "Archmage",
+  "bossbar.elementalarcana.archmage": "%s Archmage",
+  "screen.elementalarcana.dev.row.creature": "Creature",
+  "screen.elementalarcana.dev.spawn_zombie": "Spawn zombie"
 }

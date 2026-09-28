@@ -1,0 +1,17 @@
+# Attuning, health bonuses, innate refusal and clearing (zombie base health 20).
+time set midnight
+forceload add 0 0
+summon zombie 0.5 100 0.5 {NoAI:1b,Tags:["eatest"]}
+summon blaze 3.5 100 0.5 {NoAI:1b,Tags:["eatest"]}
+arcana attune @e[type=zombie,tag=eatest] fire magus
+data get entity @e[type=zombie,tag=eatest,limit=1] Health
+arcana attune @e[type=zombie,tag=eatest] ice archmage
+data get entity @e[type=zombie,tag=eatest,limit=1] Health
+data get entity @e[type=zombie,tag=eatest,limit=1] PersistenceRequired
+data get entity @e[type=zombie,tag=eatest,limit=1] "neoforge:attachments"
+arcana attune @e[type=blaze,tag=eatest] water adept
+arcana attune @e[type=blaze,tag=eatest] fire adept
+arcana attune @e[type=zombie,tag=eatest] none
+data get entity @e[type=zombie,tag=eatest,limit=1] Health
+kill @e[tag=eatest]
+forceload remove 0 0

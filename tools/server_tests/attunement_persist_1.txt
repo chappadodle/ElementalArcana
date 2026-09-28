@@ -1,0 +1,5 @@
+time set midnight
+forceload add 0 0
+summon zombie 0.5 100 0.5 {NoAI:1b,Tags:["eapersist"]}
+arcana attune @e[tag=eapersist] wind archmage
+save-all flush
