@@ -236,7 +236,7 @@ public class FireballSpell extends Spell implements ProjectileSpell {
     public void onHitEntity(SpellProjectile fireball, EntityHitResult hit) {
         CompoundTag tag = fireball.getPersistentData();
         Entity target = hit.getEntity();
-        explode(fireball, target, fireball.position());
+        explode(fireball, target, fireball.impactPoint(hit));
         if (isMain(tag) && CLUSTER.equals(tag.getString(TAG_BRANCH_5))) {
             scatterBomblets(fireball);
         }
@@ -306,9 +306,11 @@ public class FireballSpell extends Spell implements ProjectileSpell {
         double knockback = sun || meteor ? 1.2 : 0.4;
 
         for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, new AABB(at, at).inflate(radius),
-                e -> e != owner && e.isAlive() && (e == directHit || !(e instanceof Player))
-                        && e.getBoundingBox().getCenter().distanceTo(at) <= radius + e.getBbWidth() / 2)) {
-            double falloff = 1.0 - 0.5 * Math.min(1.0, target.getBoundingBox().getCenter().distanceTo(at) / radius);
+                e -> e != owner && e.isAlive() && (e == directHit || !(e instanceof Player)
+                        && e.getBoundingBox().getCenter().distanceTo(at) <= radius + e.getBbWidth() / 2))) {
+            // The creature it hit takes the full blast; falloff is for the splash around it.
+            double falloff = target == directHit ? 1.0
+                    : 1.0 - 0.5 * Math.min(1.0, target.getBoundingBox().getCenter().distanceTo(at) / radius);
             float hit = (float) (damage * falloff);
             if (spellLevel >= 6 && target.isOnFire()) {
                 hit *= 1.25f;

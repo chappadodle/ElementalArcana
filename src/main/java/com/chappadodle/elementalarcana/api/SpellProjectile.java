@@ -15,6 +15,7 @@ import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -239,6 +240,18 @@ public class SpellProjectile extends ThrowableProjectile {
     /** Ticks since it was thrown (or since it was spawned, if it was never held). */
     public int ticksInFlight() {
         return tickCount - releasedAt;
+    }
+
+    /**
+     * Where this projectile actually touched the entity it hit. Use it instead of position() or
+     * hit.getLocation() in onHitEntity: vanilla reports a hit before the projectile moves (so
+     * position() is up to a full tick of travel short), and an entity hit's location is the entity's
+     * feet, not the point of contact.
+     */
+    public Vec3 impactPoint(EntityHitResult hit) {
+        AABB box = hit.getEntity().getBoundingBox();
+        // Vanilla detects entity hits against the hitbox grown by 0.3 (ProjectileUtil).
+        return box.inflate(0.3).clip(position(), position().add(getDeltaMovement())).orElse(box.getCenter());
     }
 
     public float power() {
