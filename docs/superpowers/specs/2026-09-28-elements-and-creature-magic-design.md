@@ -188,6 +188,16 @@ A new AI goal, `CastMobSpellGoal`, is added to Attuned mobs when they join the l
 - **Reactions work on players:** a Water Adept makes you Wet, and then an Ice Adept freezes you.
   A Freeze on a player lasts **20 ticks (1s)**; on creatures it stays 2.5s.
 
+Decided while planning step 3:
+- **Who area magic hurts** (`SpellTargets`): a player's area effects spare other players (as
+  before), a monster's spare other monsters. Direct projectile hits can still hit anything.
+- **The Archmage's Frost Shield is an ice ward** (`IceWards`): the player shield system only
+  works on players, so mobs get their own version: it absorbs 10 damage for 10 s, is drawn with
+  frost particles instead of the 3D shards, and shatters (slowing nearby enemies) when broken.
+- **Water Magi heal only other monsters**, and a healed creature can't be healed again by anyone for
+  10 s (at most 4 health per 10 s each). Found in play-testing: self-healing plus several Magi
+  healing each other made them unkillable.
+
 ### Rewards
 
 On death, if the killer is a player:

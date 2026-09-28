@@ -1,0 +1,15 @@
+# An Attuned Wind zombie that can't walk slashes wind blades at a villager 8 blocks away.
+time set midnight
+gamerule doMobSpawning false
+forceload add -16 -16 16 16
+fill -12 99 -12 12 99 12 minecraft:stone
+fill -12 100 -12 12 106 12 minecraft:air
+summon villager 8.5 100 0.5 {NoAI:1b,Tags:["eatest"]}
+summon zombie 0.5 100 0.5 {Tags:["eatest","eacaster"],attributes:[{id:"minecraft:generic.movement_speed",base:0.0}]}
+arcana attune @e[tag=eacaster] wind adept
+sleep 8
+data get entity @e[type=villager,tag=eatest,limit=1] Health
+kill @e[tag=eatest]
+kill @e[type=elementalarcana:spell_projectile]
+gamerule doMobSpawning true
+forceload remove all
