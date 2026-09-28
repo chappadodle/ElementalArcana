@@ -30,7 +30,9 @@ public class HydroStreamEmitter extends NoRenderParticle {
         Player self = Minecraft.getInstance().player;
         if (self != null) {
             Vec3 hand = HydroJetSpell.streamOrigin(self);
-            if (hand.distanceTo(start) < 1.2) {
+            // Only your own jet: it starts at your hand and points where you look (a mob next to
+            // you, spraying at you, points the other way).
+            if (hand.distanceTo(start) < 1.2 && line.lengthSqr() > 0 && self.getLookAngle().dot(line.normalize()) > 0.8) {
                 start = hand;
                 line = self.getLookAngle().scale(line.length());
             }

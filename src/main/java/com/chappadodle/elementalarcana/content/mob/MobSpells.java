@@ -15,7 +15,7 @@ public final class MobSpells {
 
     static {
         BY_ELEMENT.put(Element.FIRE, FireMobSpells.ALL);
-        BY_ELEMENT.put(Element.WATER, List.of());
+        BY_ELEMENT.put(Element.WATER, WaterMobSpells.ALL);
         BY_ELEMENT.put(Element.ICE, List.of());
         BY_ELEMENT.put(Element.WIND, List.of());
     }
