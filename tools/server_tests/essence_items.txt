@@ -1,0 +1,9 @@
+# The four Essence items exist.
+forceload add 0 0
+summon item 0.5 100 0.5 {Item:{id:"elementalarcana:fire_essence",count:1},Tags:["eatest"],NoGravity:1b}
+summon item 0.5 100 0.5 {Item:{id:"elementalarcana:water_essence",count:1},Tags:["eatest"],NoGravity:1b}
+summon item 0.5 100 0.5 {Item:{id:"elementalarcana:ice_essence",count:1},Tags:["eatest"],NoGravity:1b}
+summon item 0.5 100 0.5 {Item:{id:"elementalarcana:wind_essence",count:1},Tags:["eatest"],NoGravity:1b}
+execute if entity @e[type=item,tag=eatest]
+kill @e[tag=eatest]
+forceload remove 0 0

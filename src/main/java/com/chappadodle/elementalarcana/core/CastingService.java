@@ -188,6 +188,19 @@ public final class CastingService {
         player.displayClientMessage(Component.translatable("message.elementalarcana.overcast").withStyle(ChatFormatting.DARK_RED), true);
     }
 
+    /**
+     * Gives Magic XP from anything other than casting (e.g. defeating Attuned creatures), with the
+     * same level-up title, sound and messages as casting XP, and syncs.
+     */
+    public static void grantXp(ServerPlayer player, int amount) {
+        MagicData data = MagicAttachments.get(player);
+        int oldLevel = data.level();
+        if (data.addXp(amount) > 0) {
+            onLevelUp(player, data, oldLevel);
+        }
+        MagicAttachments.sync(player);
+    }
+
     private static void onLevelUp(ServerPlayer player, MagicData data, int oldLevel) {
         int newLevel = data.level();
         player.connection.send(new ClientboundSetTitlesAnimationPacket(10, 50, 20));

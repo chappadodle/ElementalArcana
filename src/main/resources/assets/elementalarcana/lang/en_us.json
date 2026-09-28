@@ -313,5 +313,11 @@
   "rank.elementalarcana.archmage": "Archmage",
   "bossbar.elementalarcana.archmage": "%s Archmage",
   "screen.elementalarcana.dev.row.creature": "Creature",
-  "screen.elementalarcana.dev.spawn_zombie": "Spawn zombie"
+  "screen.elementalarcana.dev.spawn_zombie": "Spawn zombie",
+  "item.elementalarcana.fire_essence": "Fire Essence",
+  "item.elementalarcana.water_essence": "Water Essence",
+  "item.elementalarcana.ice_essence": "Ice Essence",
+  "item.elementalarcana.wind_essence": "Wind Essence",
+  "item.elementalarcana.essence.tooltip": "A fragment of elemental magic. What it's for is still a mystery...",
+  "message.elementalarcana.magic_xp": "+%s Magic XP"
 }

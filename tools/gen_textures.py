@@ -597,6 +597,28 @@ def water_lance(size=16):
     return Image.fromarray((np.clip(rgba, 0, 1) * 255).astype(np.uint8), "RGBA")
 
 
+def essence(core, glow, edge, size=16):
+    """A glowing crystal shard: a bright core fading to the element's color, a darker rim and a
+    couple of sparkle pixels. core/glow/edge are (r, g, b)."""
+    y, x = np.mgrid[0:size, 0:size] + 0.5
+    cx, cy = size / 2, size / 2
+    # Diamond (crystal) shape, a little taller than wide.
+    shape = np.abs(x - cx) / (size * 0.34) + np.abs(y - cy) / (size * 0.46)
+    inside = shape <= 1.0
+    t = np.clip(shape, 0, 1)
+    rgba = np.zeros((size, size, 4))
+    for c in range(3):
+        channel = core[c] * (1 - t) ** 1.5 + glow[c] * (1 - (1 - t) ** 1.5)
+        channel = np.where(t > 0.8, edge[c], channel)
+        rgba[..., c] = channel / 255
+    rgba[..., 3] = np.where(inside, 1.0, 0.0)
+    # Highlight streak and sparkles.
+    for px, py in ((6, 5), (7, 4), (5, 7), (11, 3), (3, 12)):
+        rgba[py, px, :3] = 1.0
+        rgba[py, px, 3] = 1.0 if inside[py, px] else 0.85
+    return Image.fromarray((np.clip(rgba, 0, 1) * 255).astype(np.uint8), "RGBA")
+
+
 def main():
     for name, (palette, grid) in SPRITES.items():
         path = ASSETS / f"{name}.png"
@@ -614,6 +636,17 @@ def main():
     path = ASSETS / "block/water_lance.png"
     water_lance().save(path)
     print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
+    essences = {
+        "fire": ((255, 250, 200), (255, 140, 30), (170, 40, 10)),
+        "water": ((225, 245, 255), (60, 150, 240), (20, 60, 150)),
+        "ice": ((255, 255, 255), (160, 225, 255), (70, 140, 200)),
+        "wind": ((245, 255, 250), (150, 225, 195), (60, 140, 110)),
+    }
+    for name, colors in essences.items():
+        path = ASSETS / f"item/{name}_essence.png"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        essence(*colors).save(path)
+        print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
 
 
 if __name__ == "__main__":
