@@ -2,6 +2,7 @@ package com.chappadodle.elementalarcana.content.spell;
 
 import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.CastResult;
+import com.chappadodle.elementalarcana.api.ElementalReactions;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.content.ModSchools;
 import net.minecraft.core.particles.ParticleTypes;
@@ -29,6 +30,7 @@ public class FrostNovaSpell extends Spell {
 
         for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, caster.getBoundingBox().inflate(RADIUS),
                 entity -> entity != caster && entity.isAlive() && entity.distanceTo(caster) <= RADIUS)) {
+            ElementalReactions.iceHit(target);
             target.hurt(level.damageSources().indirectMagic(caster, caster), 3f * context.power());
             target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, Math.round(100 * context.power()), 2));
             if (target.canFreeze()) {

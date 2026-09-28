@@ -41,7 +41,7 @@ import java.util.List;
 /**
  * Fire's basic spell, levels 1-10. Hold the cast key: a fireball grows in your palm; release to
  * throw it. It explodes where it lands, igniting everything in the blast (no block damage).
- * Hitting frozen or frosted enemies Melts them for extra damage.
+ * Hitting frozen or frosted enemies Melts them, and wet ones Vaporize, for extra damage.
  *
  * <pre>
  * Lv1 Fireball      1.5-block burst        Lv6  Scorch        +25% dmg, +25% more vs burning
@@ -312,7 +312,7 @@ public class FireballSpell extends Spell implements ProjectileSpell {
             if (spellLevel >= 6 && target.isOnFire()) {
                 hit *= 1.25f;
             }
-            hit *= ElementalReactions.melt(target);
+            hit *= ElementalReactions.fireHit(target);
             SpellDamage.hurtMultiHit(target, fireball.damageSources().indirectMagic(fireball, owner), hit);
             target.igniteForTicks(burnTicks);
             if (spellLevel >= 7) {

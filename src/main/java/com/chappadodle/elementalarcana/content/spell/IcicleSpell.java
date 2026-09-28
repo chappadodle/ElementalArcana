@@ -3,6 +3,7 @@ package com.chappadodle.elementalarcana.content.spell;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.CastResult;
+import com.chappadodle.elementalarcana.api.ElementalReactions;
 import com.chappadodle.elementalarcana.api.ProjectileSpell;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellDamage;
@@ -300,6 +301,7 @@ public class IcicleSpell extends Spell implements ProjectileSpell {
         float charge = icicle.charge(0f);
         SpellDamage.hurtMultiHit(target, icicle.damageSources().indirectMagic(icicle, icicle.getOwner()), damage(icicle, tag));
         if (target instanceof LivingEntity living) {
+            ElementalReactions.iceHit(living);
             living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, Math.round(40 + 40 * charge), 1));
             if (level >= 9) {
                 countVolleyHit(living, tag.getInt(TAG_VOLLEY));

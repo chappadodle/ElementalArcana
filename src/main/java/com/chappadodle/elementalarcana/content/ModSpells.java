@@ -9,6 +9,7 @@ import com.chappadodle.elementalarcana.content.spell.FrostNovaSpell;
 import com.chappadodle.elementalarcana.content.spell.FrostShieldSpell;
 import com.chappadodle.elementalarcana.content.spell.GaleDashSpell;
 import com.chappadodle.elementalarcana.content.spell.HealingRainSpell;
+import com.chappadodle.elementalarcana.content.spell.HydroJetSpell;
 import com.chappadodle.elementalarcana.content.spell.IcicleSpell;
 import com.chappadodle.elementalarcana.content.spell.TidalWaveSpell;
 import com.chappadodle.elementalarcana.content.spell.UpdraftSpell;
@@ -22,6 +23,8 @@ public final class ModSpells {
 
     public static final DeferredHolder<Spell, FireballSpell> FIREBALL = SPELLS.register("fireball", FireballSpell::new);
     public static final DeferredHolder<Spell, FlameBurstSpell> FLAME_BURST = SPELLS.register("flame_burst", FlameBurstSpell::new);
+    // Hydro Jet is registered first so it's water's starter spell on the Awakening screen.
+    public static final DeferredHolder<Spell, HydroJetSpell> HYDRO_JET = SPELLS.register("hydro_jet", HydroJetSpell::new);
     public static final DeferredHolder<Spell, TidalWaveSpell> TIDAL_WAVE = SPELLS.register("tidal_wave", TidalWaveSpell::new);
     public static final DeferredHolder<Spell, HealingRainSpell> HEALING_RAIN = SPELLS.register("healing_rain", HealingRainSpell::new);
     public static final DeferredHolder<Spell, IcicleSpell> ICICLE = SPELLS.register("icicle", IcicleSpell::new);

@@ -16,17 +16,33 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Cross-element reactions. An entity's "aura" is the element it currently carries (frosted over
- * or frozen = cryo, burning = pyro); reactions read and spread those auras.
+ * or frozen = cryo, burning = pyro, wet or standing in water or rain = hydro); reactions read and
+ * spread those auras.
+ *
+ * <pre>
+ * Melt      fire on cryo         x1.75, thaws it
+ * Vaporize  water on pyro        x1.5, puts the fire out
+ *           fire on hydro        x1.5, dries it off
+ * Freeze    ice on hydro,        frozen solid for 2.5s
+ *           water on cryo
+ * Swirl     wind on any aura     spreads it around
+ * </pre>
  */
 public final class ElementalReactions {
     private static final double SWIRL_RADIUS = 4.0;
     private static final float SWIRL_DAMAGE = 2f;
     private static final float MELT_MULTIPLIER = 1.75f;
+    private static final float VAPORIZE_MULTIPLIER = 1.5f;
+    private static final int FREEZE_TICKS = 50;
+    // After a Freeze wears off, the target can't be re-frozen by a reaction for a few seconds.
+    private static final int FREEZE_IMMUNITY_TICKS = 60;
+    private static final String TAG_FREEZE_IMMUNE_UNTIL = "ea_freeze_immune_until";
 
     /** Elements an entity can carry, with the color their reactions show in. */
     public enum Aura {
         CRYO(0x9EE6FF),
-        PYRO(0xFF7A1F);
+        PYRO(0xFF7A1F),
+        HYDRO(0x3F9CFF);
 
         private final int color;
 
@@ -49,6 +65,9 @@ public final class ElementalReactions {
         }
         if (entity.isOnFire()) {
             return Aura.PYRO;
+        }
+        if (entity.hasEffect(ModContent.WET) || entity.isInWaterRainOrBubble()) {
+            return Aura.HYDRO;
         }
         return null;
     }
@@ -76,6 +95,10 @@ public final class ElementalReactions {
                 case PYRO -> {
                     nearby.igniteForTicks(80);
                     SpellDamage.hurtMultiHit(nearby, level.damageSources().inFire(), SWIRL_DAMAGE * power);
+                }
+                case HYDRO -> {
+                    nearby.addEffect(new MobEffectInstance(ModContent.WET, 100));
+                    SpellDamage.hurtMultiHit(nearby, level.damageSources().magic(), SWIRL_DAMAGE * power);
                 }
             }
         }
@@ -106,6 +129,78 @@ public final class ElementalReactions {
         level.sendParticles(ParticleTypes.POOF, target.getX(), target.getY(0.6), target.getZ(), 6, 0.3, 0.3, 0.3, 0.02);
         level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 1f, 1.1f);
         return MELT_MULTIPLIER;
+    }
+
+    /**
+     * A fire hit's reaction: Melt on a frozen or frosted target, Vaporize on a wet one. Returns the
+     * damage multiplier (1 when there was nothing to react with).
+     */
+    public static float fireHit(LivingEntity target) {
+        return switch (auraOf(target)) {
+            case CRYO -> melt(target);
+            case HYDRO -> vaporize(target);
+            case null, default -> 1f;
+        };
+    }
+
+    /**
+     * A water hit: puts out a burning target (Vaporize), freezes a frosted one (Freeze), and
+     * otherwise soaks it for {@code wetTicks}. Returns the damage multiplier for the hit.
+     */
+    public static float waterHit(LivingEntity target, int wetTicks) {
+        if (!(target.level() instanceof ServerLevel)) {
+            return 1f;
+        }
+        Aura aura = auraOf(target);
+        if (aura == Aura.PYRO) {
+            target.clearFire();
+            return vaporize(target);
+        }
+        if (aura == Aura.CRYO) {
+            freeze(target);
+        }
+        if (!target.hasEffect(ModContent.FROZEN)) {
+            MobEffectInstance wet = target.getEffect(ModContent.WET);
+            if (wet == null || wet.getDuration() < wetTicks) {
+                target.addEffect(new MobEffectInstance(ModContent.WET, wetTicks));
+            }
+        }
+        return 1f;
+    }
+
+    /** An ice hit: a wet target freezes solid. Returns whether it froze. */
+    public static boolean iceHit(LivingEntity target) {
+        return auraOf(target) == Aura.HYDRO && freeze(target);
+    }
+
+    /** Vaporize: a hiss and a burst of steam; the target dries off. Returns the damage multiplier. */
+    public static float vaporize(LivingEntity target) {
+        if (!(target.level() instanceof ServerLevel level)) {
+            return 1f;
+        }
+        target.removeEffect(ModContent.WET);
+        level.sendParticles(ParticleTypes.CLOUD, target.getX(), target.getY(0.6), target.getZ(), 18, 0.45, 0.5, 0.45, 0.08);
+        level.sendParticles(ParticleTypes.WHITE_SMOKE, target.getX(), target.getY(0.8), target.getZ(), 8, 0.3, 0.3, 0.3, 0.05);
+        level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.LAVA_EXTINGUISH, SoundSource.PLAYERS, 0.9f, 1.2f);
+        return VAPORIZE_MULTIPLIER;
+    }
+
+    /**
+     * Freeze: the target is frozen solid for 2.5s and dries off. Doesn't stack: a target that is
+     * frozen, or was just thawed, can't be frozen again by a reaction for a few seconds.
+     */
+    public static boolean freeze(LivingEntity target) {
+        if (!(target.level() instanceof ServerLevel level) || target.hasEffect(ModContent.FROZEN)
+                || level.getGameTime() < target.getPersistentData().getLong(TAG_FREEZE_IMMUNE_UNTIL)) {
+            return false;
+        }
+        target.removeEffect(ModContent.WET);
+        target.addEffect(new MobEffectInstance(ModContent.FROZEN, FREEZE_TICKS));
+        target.getPersistentData().putLong(TAG_FREEZE_IMMUNE_UNTIL, level.getGameTime() + FREEZE_TICKS + FREEZE_IMMUNITY_TICKS);
+        level.sendParticles(ModContent.ICE_SHARD.get(), target.getX(), target.getY(0.5), target.getZ(), 16, 0.3, 0.4, 0.3, 0.08);
+        level.sendParticles(ModContent.FROST_MIST.get(), target.getX(), target.getY(0.3), target.getZ(), 4, 0.4, 0.3, 0.4, 0.01);
+        level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.GLASS_PLACE, SoundSource.PLAYERS, 1f, 0.6f);
+        return true;
     }
 
     /** Launches {@code target} into the air as Airborne: +25% damage from everything until it lands (see AirborneEvents). */

@@ -20,7 +20,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-/** The shared spell projectile, custom sounds and particles, and the Mana Sickness effect. */
+/** The shared spell projectile, custom sounds and particles, and the mod's mob effects. */
 public final class ModContent {
     private static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(Registries.ENTITY_TYPE, ElementalArcana.MODID);
     private static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(Registries.SOUND_EVENT, ElementalArcana.MODID);
@@ -51,6 +51,19 @@ public final class ModContent {
     /** A glowing spark that drifts up and cools as it fades. */
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> EMBER =
             PARTICLES.register("ember", () -> new SimpleParticleType(false));
+    /** A water droplet that flies along its velocity, sags a little and fades. */
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> HYDRO_DROP =
+            PARTICLES.register("hydro_drop", () -> new SimpleParticleType(false));
+    /**
+     * Hydro Jet's stream, drawn client-side in one packet: sent with count 0, its "velocity" is
+     * the vector from the hand to where the stream lands. Normal, thin (Tidecutter) and wide (Torrent).
+     */
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> HYDRO_STREAM =
+            PARTICLES.register("hydro_stream", () -> new SimpleParticleType(true));
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> HYDRO_STREAM_THIN =
+            PARTICLES.register("hydro_stream_thin", () -> new SimpleParticleType(true));
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> HYDRO_STREAM_WIDE =
+            PARTICLES.register("hydro_stream_wide", () -> new SimpleParticleType(true));
     /** A pale curl of wind that glides along its velocity and fades. */
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> WIND_STREAK =
             PARTICLES.register("wind_streak", () -> new SimpleParticleType(false));
@@ -82,6 +95,12 @@ public final class ModContent {
     public static final DeferredHolder<MobEffect, MobEffect> AIRBORNE = EFFECTS.register("airborne",
             () -> new MobEffect(MobEffectCategory.HARMFUL, 0xCFEFE0) {
             });
+
+    /** Soaked by water (the Hydro aura): drips, can't stay on fire, and sets up Vaporize and Freeze. */
+    public static final DeferredHolder<MobEffect, WetEffect> WET = EFFECTS.register("wet", WetEffect::new);
+
+    /** Hydro Jet's Riptide mark: the next hit from a player bursts for bonus damage (see WaterEvents). */
+    public static final DeferredHolder<MobEffect, RiptideEffect> RIPTIDE = EFFECTS.register("riptide", RiptideEffect::new);
 
     private ModContent() {
     }

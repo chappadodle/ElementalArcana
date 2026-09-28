@@ -238,6 +238,52 @@ SPRITES = {
         "................",
         "................",
     ]),
+    # Wet: a single fat water drop with a highlight.
+    "mob_effect/wet": ({
+        "k": 0x1A3F8C, "d": 0x2A6FD0, "b": 0x4FA8F0, "l": 0xB8E4FF, "w": 0xFFFFFF,
+    }, [
+        "..................",
+        "........kk........",
+        "........kk........",
+        ".......kbbk.......",
+        ".......kbbk.......",
+        "......kbbbbk......",
+        "......kwbbbk......",
+        ".....kwlbbbbk.....",
+        ".....klbbbbbk.....",
+        "....kbbbbbbbdk....",
+        "....kbbbbbbbdk....",
+        "....kbbbbbbddk....",
+        "....kbbbbbbddk....",
+        ".....kbbbbddk.....",
+        ".....kdbbdddk.....",
+        "......kkddkk......",
+        "........kk........",
+        "..................",
+    ]),
+    # Riptide: a ring of water curling around itself.
+    "mob_effect/riptide": ({
+        "k": 0x1A3F8C, "d": 0x2A6FD0, "b": 0x4FA8F0, "l": 0xB8E4FF, "w": 0xFFFFFF,
+    }, [
+        "..................",
+        "......lllll.......",
+        "....lbbbbbbbl.....",
+        "...lbbd...dbbw....",
+        "..lbd.......dbw...",
+        "..bd.........db...",
+        ".lb...kddd....bl..",
+        ".bd..kd..dk...db..",
+        ".bd..d..l.d...db..",
+        ".bd..d..bbd...db..",
+        ".bd...kdd.....db..",
+        ".lb...........bl..",
+        "..bd.........db...",
+        "..wbd.......dbl...",
+        "...wbbd...dbbl....",
+        ".....lbbbbbbl.....",
+        ".......lllll......",
+        "..................",
+    ]),
     "mob_effect/airborne": ({
         "k": 0x3C6B5A, "g": 0x9FE0C8, "p": 0xD8F5EA, "w": 0xFFFFFF,
     }, [
@@ -259,6 +305,27 @@ SPRITES = {
         "..................",
         "..................",
         "..................",
+    ]),
+    # Hydro Jet: a pressurized stream shooting from bottom-left to top-right, bursting into spray.
+    "spell/hydro_jet": ({
+        "w": 0xFFFFFFFF, "l": 0xFFB8E4FF, "b": 0xFF4FA8F0, "d": 0xFF2A6FD0, "k": 0xFF1A3F8C,
+    }, [
+        "..........l.w.l.",
+        "............lw.w",
+        ".........w.lbbl.",
+        "...........bbwbl",
+        "..........bwlbw.",
+        ".........bwlbd.l",
+        "........bwlbd...",
+        ".......bwlbd..w.",
+        "......bwlbd.....",
+        ".....bwlbd......",
+        "....bwlbd.......",
+        "...bwlbd........",
+        "..kblbd.........",
+        ".kdbbd..........",
+        "kddkd...........",
+        "kkk.............",
     ]),
     # Texture for the fireball's model (models/spell/fireball.json): swirling flame, slightly translucent.
     "block/fireball": ({
@@ -500,6 +567,36 @@ def wind_streak(frame, frames=4, size=16):
     return Image.fromarray((np.clip(image, 0, 1) * 255).astype(np.uint8), "RGBA")
 
 
+def hydro_drop(frame, frames=4, size=8):
+    """A water droplet: a soft blue blob with a bright highlight; later frames shrink and fade."""
+    y, x = np.mgrid[0:size, 0:size] + 0.5
+    radius = np.hypot(x - size / 2, y - size / 2) / (size / 2)
+    scale = 1.0 - 0.18 * frame
+    alpha = np.clip(1.2 - (radius / scale) ** 2, 0, 1) * (0.9 - 0.12 * frame)
+    highlight = np.exp(-((x - size * 0.38) ** 2 + (y - size * 0.35) ** 2) / (size * 0.12) ** 2)
+    rgba = np.zeros((size, size, 4))
+    rgba[..., 0] = 0.35 + 0.65 * highlight
+    rgba[..., 1] = 0.7 + 0.3 * highlight
+    rgba[..., 2] = 1.0
+    rgba[..., 3] = np.clip(alpha + 0.3 * highlight * (alpha > 0), 0, 1)
+    return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA")
+
+
+def water_lance(size=16):
+    """Flowing water for the Tsunami Lance model: translucent blue with bright streaks running
+    along its length (the model's long axis maps to the texture's vertical)."""
+    rng = np.random.default_rng(7)
+    y, x = np.mgrid[0:size, 0:size]
+    wave = np.sin(x * 1.3 + np.sin(y * 0.8) * 1.5) * 0.5 + 0.5
+    streak = (wave > 0.82).astype(float) + 0.15 * rng.random((size, size))
+    rgba = np.zeros((size, size, 4))
+    rgba[..., 0] = 0.2 + 0.75 * streak
+    rgba[..., 1] = 0.55 + 0.45 * streak
+    rgba[..., 2] = 0.95 + 0.05 * streak
+    rgba[..., 3] = np.clip(0.72 + 0.25 * streak, 0, 1)
+    return Image.fromarray((np.clip(rgba, 0, 1) * 255).astype(np.uint8), "RGBA")
+
+
 def main():
     for name, (palette, grid) in SPRITES.items():
         path = ASSETS / f"{name}.png"
@@ -511,6 +608,12 @@ def main():
             path = ASSETS / f"particle/{name}_{frame}.png"
             make(frame).save(path)
             print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
+        path = ASSETS / f"particle/hydro_drop_{frame}.png"
+        hydro_drop(frame).save(path)
+        print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
+    path = ASSETS / "block/water_lance.png"
+    water_lance().save(path)
+    print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
 
 
 if __name__ == "__main__":
