@@ -3,6 +3,7 @@ package com.chappadodle.elementalarcana.content.spell;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.CastResult;
+import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.ShieldSpell;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellDamage;
@@ -167,7 +168,7 @@ public class FrostShieldSpell extends Spell implements ShieldSpell {
                 e -> e != player && !(e instanceof Player) && e.isAlive() && e.distanceTo(player) <= radius)) {
             nearby.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 1));
             if (damage > 0) {
-                SpellDamage.hurtMultiHit(nearby, player.damageSources().indirectMagic(player, player), damage);
+                SpellDamage.hurtMultiHit(nearby, SpellDamage.source(player.level(), Element.ICE, player, player), damage);
             }
         }
         level.sendParticles(ModContent.ICE_SHARD.get(), player.getX(), player.getY(0.6), player.getZ(), damage > 0 ? 40 : 24, 0.4, 0.4, 0.4, 0.35);

@@ -2,7 +2,9 @@ package com.chappadodle.elementalarcana.content.spell;
 
 import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.CastResult;
+import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.Spell;
+import com.chappadodle.elementalarcana.api.SpellDamage;
 import com.chappadodle.elementalarcana.content.ModSchools;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -28,7 +30,7 @@ public class FlameBurstSpell extends Spell {
 
         for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, caster.getBoundingBox().inflate(RADIUS),
                 entity -> entity != caster && entity.isAlive() && entity.distanceTo(caster) <= RADIUS)) {
-            target.hurt(level.damageSources().indirectMagic(caster, caster), 5f * context.power());
+            target.hurt(SpellDamage.source(level, Element.FIRE, caster, caster), 5f * context.power());
             target.igniteForTicks(80);
             Vec3 away = target.position().subtract(caster.position()).normalize();
             target.knockback(0.6 * context.power(), -away.x, -away.z);

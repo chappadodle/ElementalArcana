@@ -1,6 +1,7 @@
 package com.chappadodle.elementalarcana.content;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
+import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.ElementalReactions;
 import com.chappadodle.elementalarcana.api.SpellDamage;
 import net.minecraft.core.particles.ParticleTypes;
@@ -84,8 +85,8 @@ public final class Whirlpool {
             }
             if (age % 10 == 0) {
                 ElementalReactions.waterHit(entity, 100);
-                SpellDamage.hurtMultiHit(entity, owner == null ? level.damageSources().magic()
-                        : level.damageSources().indirectMagic(owner, owner), damage);
+                Entity source = owner != null ? owner : entity;
+                SpellDamage.hurtMultiHit(entity, SpellDamage.source(level, Element.WATER, source, source), damage);
             }
         }
         for (int arm = 0; arm < 3; arm++) {

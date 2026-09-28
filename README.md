@@ -35,6 +35,8 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 
 **Water** makes enemies **Wet** (so does standing in rain or water). **Vaporize**: water on a burning enemy, or fire on a wet one, deals 50% more damage in a burst of steam. **Freeze**: ice on a wet enemy, or water on a frosted one, freezes it solid.
 
+**Elements matter.** Every spell deals damage of its element, and some creatures are born with an element of their own. Water is strong against Fire, Fire against Ice and Ice against Water (×1.5), and every element resists itself (×0.5). Wind is neutral. The game never tells you a creature's element: watch and listen to how your hits land.
+
 **Wind** has two signature mechanics. **Swirl**: a wind hit on a frozen, frosted, burning or wet enemy spreads that element to every creature within 4 blocks. **Airborne**: enemies launched by wind take 25% more damage until they land.
 
 Fireball, Hydro Jet, Icicle, Frost Shield and Wind Blade level from 1 to 10. Casting a spell fills its mastery bar, and each level-up costs one skill point (you earn one per Magic Level). Each offers permanent path choices at Lv 5 and 10. Open a spell's skill tree from the Status window.

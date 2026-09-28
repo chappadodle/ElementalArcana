@@ -3,6 +3,7 @@ package com.chappadodle.elementalarcana.content.spell;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.CastResult;
+import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.ElementalReactions;
 import com.chappadodle.elementalarcana.api.ProjectileSpell;
 import com.chappadodle.elementalarcana.api.Spell;
@@ -265,7 +266,7 @@ public class WindBladeSpell extends Spell implements ProjectileSpell {
         float charge = blade.charge(0f);
         Entity owner = blade.getOwner();
 
-        SpellDamage.hurtMultiHit(target, blade.damageSources().indirectMagic(blade, owner), damage(blade, tag, target));
+        SpellDamage.hurtMultiHit(target, SpellDamage.source(blade.level(), Element.WIND, blade, owner), damage(blade, tag, target));
         Vec3 direction = blade.getDeltaMovement().normalize();
         double knockback = (0.3 + 0.9 * charge) * (tag.getBoolean(TAG_SCYTHE) ? 2 : 1);
         target.knockback(knockback, -direction.x, -direction.z);

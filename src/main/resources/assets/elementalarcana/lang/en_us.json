@@ -290,5 +290,17 @@
   "spell.elementalarcana.hydro_jet.branch.lance": "Tsunami Lance",
   "spell.elementalarcana.hydro_jet.branch.lance.desc": "When you let go, the stream compresses into a giant water spear that pierces everything. The longer you sprayed, the stronger it is.",
   "effect.elementalarcana.wet": "Wet",
-  "effect.elementalarcana.riptide": "Riptide"
+  "effect.elementalarcana.riptide": "Riptide",
+  "death.attack.elementalarcana.fire_spell": "%1$s was burned to ash by %2$s",
+  "death.attack.elementalarcana.fire_spell.player": "%1$s was burned to ash while fighting %2$s",
+  "death.attack.elementalarcana.fire_spell.item": "%1$s was burned to ash by %2$s using %3$s",
+  "death.attack.elementalarcana.water_spell": "%1$s was swept away by %2$s",
+  "death.attack.elementalarcana.water_spell.player": "%1$s was swept away while fighting %2$s",
+  "death.attack.elementalarcana.water_spell.item": "%1$s was swept away by %2$s using %3$s",
+  "death.attack.elementalarcana.ice_spell": "%1$s was frozen solid by %2$s",
+  "death.attack.elementalarcana.ice_spell.player": "%1$s was frozen solid while fighting %2$s",
+  "death.attack.elementalarcana.ice_spell.item": "%1$s was frozen solid by %2$s using %3$s",
+  "death.attack.elementalarcana.wind_spell": "%1$s was cut down by %2$s's winds",
+  "death.attack.elementalarcana.wind_spell.player": "%1$s was cut down by the wind while fighting %2$s",
+  "death.attack.elementalarcana.wind_spell.item": "%1$s was cut down by %2$s's winds using %3$s"
 }

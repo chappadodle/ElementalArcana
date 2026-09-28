@@ -3,6 +3,8 @@ package com.chappadodle.elementalarcana.content.spell;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.CastResult;
+import com.chappadodle.elementalarcana.api.CreatureElements;
+import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.ElementalReactions;
 import com.chappadodle.elementalarcana.api.ProjectileSpell;
 import com.chappadodle.elementalarcana.api.Spell;
@@ -250,7 +252,9 @@ public class HydroJetSpell extends Spell implements ProjectileSpell {
             if (tidecutter) {
                 damage *= 1.6f;
             }
-            if (target.isSensitiveToWater()) {
+            // Water-sensitive creatures without an element (endermen) take double. Elemental ones
+            // (blazes) are handled by the matchup chart instead.
+            if (target.isSensitiveToWater() && CreatureElements.elementOf(target) == null) {
                 damage *= 2f;
             }
             damage *= ElementalReactions.waterHit(target, wetTicks(spellLevel));
@@ -259,7 +263,7 @@ public class HydroJetSpell extends Spell implements ProjectileSpell {
             Vec3 motion = target.getDeltaMovement();
             dealingJetDamage = true;
             try {
-                SpellDamage.hurtMultiHit(target, caster.damageSources().indirectMagic(caster, caster), damage);
+                SpellDamage.hurtMultiHit(target, SpellDamage.source(level, Element.WATER, caster, caster), damage);
             } finally {
                 dealingJetDamage = false;
             }
@@ -298,7 +302,7 @@ public class HydroJetSpell extends Spell implements ProjectileSpell {
                 float damage = HIT_DAMAGE * power * 0.5f * ElementalReactions.waterHit(nearby, wetTicks(spellLevel));
                 dealingJetDamage = true;
                 try {
-                    SpellDamage.hurtMultiHit(nearby, caster.damageSources().indirectMagic(caster, caster), damage);
+                    SpellDamage.hurtMultiHit(nearby, SpellDamage.source(level, Element.WATER, caster, caster), damage);
                 } finally {
                     dealingJetDamage = false;
                 }
@@ -410,7 +414,7 @@ public class HydroJetSpell extends Spell implements ProjectileSpell {
         CompoundTag tag = lance.getPersistentData();
         float damage = tag.getFloat(TAG_LANCE_DAMAGE) * ElementalReactions.waterHit(target, wetTicks(tag.getInt(TAG_LEVEL)));
         Entity owner = lance.getOwner();
-        SpellDamage.hurtMultiHit(target, lance.damageSources().indirectMagic(lance, owner), damage);
+        SpellDamage.hurtMultiHit(target, SpellDamage.source(lance.level(), Element.WATER, lance, owner), damage);
         Vec3 push = lance.getDeltaMovement().normalize().scale(0.6);
         target.setDeltaMovement(target.getDeltaMovement().add(push.x, 0.2, push.z));
         target.hurtMarked = true;

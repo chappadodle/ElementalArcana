@@ -3,6 +3,7 @@ package com.chappadodle.elementalarcana.content.spell;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.CastResult;
+import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.ElementalReactions;
 import com.chappadodle.elementalarcana.api.ProjectileSpell;
 import com.chappadodle.elementalarcana.api.Spell;
@@ -313,7 +314,7 @@ public class FireballSpell extends Spell implements ProjectileSpell {
                 hit *= 1.25f;
             }
             hit *= ElementalReactions.fireHit(target);
-            SpellDamage.hurtMultiHit(target, fireball.damageSources().indirectMagic(fireball, owner), hit);
+            SpellDamage.hurtMultiHit(target, SpellDamage.source(level, Element.FIRE, fireball, owner), hit);
             target.igniteForTicks(burnTicks);
             if (spellLevel >= 7) {
                 FireEvents.markForCombustion(target);

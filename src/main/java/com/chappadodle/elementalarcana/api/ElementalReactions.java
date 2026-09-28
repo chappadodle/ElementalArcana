@@ -82,6 +82,7 @@ public final class ElementalReactions {
         if (aura == null || !(target.level() instanceof ServerLevel level)) {
             return false;
         }
+        Entity source = attacker != null ? attacker : target;
         for (LivingEntity nearby : level.getEntitiesOfClass(LivingEntity.class, target.getBoundingBox().inflate(SWIRL_RADIUS),
                 e -> e != target && e != attacker && !(e instanceof Player) && e.isAlive() && e.distanceTo(target) <= SWIRL_RADIUS)) {
             switch (aura) {
@@ -90,15 +91,15 @@ public final class ElementalReactions {
                     if (nearby.canFreeze()) {
                         nearby.setTicksFrozen(Math.max(nearby.getTicksFrozen(), nearby.getTicksRequiredToFreeze() + 40));
                     }
-                    SpellDamage.hurtMultiHit(nearby, level.damageSources().freeze(), SWIRL_DAMAGE * power);
+                    SpellDamage.hurtMultiHit(nearby, SpellDamage.source(level, Element.ICE, source, source), SWIRL_DAMAGE * power);
                 }
                 case PYRO -> {
                     nearby.igniteForTicks(80);
-                    SpellDamage.hurtMultiHit(nearby, level.damageSources().inFire(), SWIRL_DAMAGE * power);
+                    SpellDamage.hurtMultiHit(nearby, SpellDamage.source(level, Element.FIRE, source, source), SWIRL_DAMAGE * power);
                 }
                 case HYDRO -> {
                     nearby.addEffect(new MobEffectInstance(ModContent.WET, 100));
-                    SpellDamage.hurtMultiHit(nearby, level.damageSources().magic(), SWIRL_DAMAGE * power);
+                    SpellDamage.hurtMultiHit(nearby, SpellDamage.source(level, Element.WATER, source, source), SWIRL_DAMAGE * power);
                 }
             }
         }

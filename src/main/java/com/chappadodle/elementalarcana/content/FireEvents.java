@@ -1,6 +1,7 @@
 package com.chappadodle.elementalarcana.content;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
+import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.SpellDamage;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -43,7 +44,7 @@ public final class FireEvents {
                 e -> e != dead && !(e instanceof Player) && e.isAlive() && e.distanceTo(dead) <= RADIUS)) {
             markForCombustion(nearby);
             nearby.igniteForTicks(100);
-            SpellDamage.hurtMultiHit(nearby, level.damageSources().onFire(), DAMAGE);
+            SpellDamage.hurtMultiHit(nearby, SpellDamage.source(level, Element.FIRE, dead, dead), DAMAGE);
         }
         level.sendParticles(ParticleTypes.EXPLOSION, dead.getX(), dead.getY(0.5), dead.getZ(), 1, 0, 0, 0, 0);
         level.sendParticles(ParticleTypes.FLAME, dead.getX(), dead.getY(0.5), dead.getZ(), 25, 0.4, 0.4, 0.4, 0.12);

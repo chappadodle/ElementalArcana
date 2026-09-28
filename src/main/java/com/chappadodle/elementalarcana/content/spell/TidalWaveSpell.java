@@ -2,7 +2,9 @@ package com.chappadodle.elementalarcana.content.spell;
 
 import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.CastResult;
+import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.Spell;
+import com.chappadodle.elementalarcana.api.SpellDamage;
 import com.chappadodle.elementalarcana.content.ModSchools;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -46,7 +48,7 @@ public class TidalWaveSpell extends Spell {
                 target.clearFire();
             }
             if (target.isSensitiveToWater()) {
-                target.hurt(level.damageSources().drown(), 5f * context.power());
+                target.hurt(SpellDamage.source(level, Element.WATER, caster, caster), 5f * context.power());
             }
         }
 

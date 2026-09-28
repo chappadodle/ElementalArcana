@@ -1,0 +1,74 @@
+package com.chappadodle.elementalarcana.content;
+
+import com.chappadodle.elementalarcana.ElementalArcana;
+import com.chappadodle.elementalarcana.api.CreatureElements;
+import com.chappadodle.elementalarcana.api.Element;
+import com.chappadodle.elementalarcana.api.SpellDamage;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import org.joml.Vector3f;
+
+/**
+ * The matchup chart (see Element#multiplierAgainst): spell damage is scaled by the target
+ * creature's element. Strong and resisted hits sound and look different, which is the only way a
+ * player learns a creature's element.
+ */
+@EventBusSubscriber(modid = ElementalArcana.MODID)
+public final class ElementalMatchups {
+    private static final String TAG_FEEDBACK_UNTIL = "ea_matchup_fx_until";
+    // Rapid hits (Hydro Jet) show the feedback at most this often per target.
+    private static final int FEEDBACK_GAP_TICKS = 10;
+
+    private ElementalMatchups() {
+    }
+
+    @SubscribeEvent
+    public static void onIncomingDamage(LivingIncomingDamageEvent event) {
+        Element spell = SpellDamage.elementOf(event.getSource());
+        if (spell == null) {
+            return;
+        }
+        LivingEntity target = event.getEntity();
+        float multiplier = spell.multiplierAgainst(CreatureElements.elementOf(target));
+        if (multiplier == 1f) {
+            return;
+        }
+        event.setAmount(event.getAmount() * multiplier);
+        if (target.level() instanceof ServerLevel level) {
+            feedback(level, target, spell, multiplier > 1f);
+        }
+    }
+
+    private static void feedback(ServerLevel level, LivingEntity target, Element spell, boolean strong) {
+        CompoundTag data = target.getPersistentData();
+        long now = level.getGameTime();
+        if (now < data.getLong(TAG_FEEDBACK_UNTIL)) {
+            return;
+        }
+        data.putLong(TAG_FEEDBACK_UNTIL, now + FEEDBACK_GAP_TICKS);
+        double x = target.getX();
+        double y = target.getY(0.6);
+        double z = target.getZ();
+        if (strong) {
+            // A bright crack and a burst in the spell's color.
+            int color = spell.color();
+            DustParticleOptions dust = new DustParticleOptions(
+                    new Vector3f((color >> 16 & 0xFF) / 255f, (color >> 8 & 0xFF) / 255f, (color & 0xFF) / 255f), 1.2f);
+            level.sendParticles(dust, x, y, z, 14, 0.35, 0.4, 0.35, 0.1);
+            level.sendParticles(ParticleTypes.CRIT, x, y, z, 10, 0.3, 0.4, 0.3, 0.3);
+            level.playSound(null, x, y, z, SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.PLAYERS, 1f, 1.5f);
+        } else {
+            // A dull thud and a grey puff.
+            level.sendParticles(ParticleTypes.SMOKE, x, y, z, 8, 0.25, 0.3, 0.25, 0.02);
+            level.playSound(null, x, y, z, SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 0.5f, 0.6f);
+        }
+    }
+}
