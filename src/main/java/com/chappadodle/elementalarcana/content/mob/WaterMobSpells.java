@@ -11,21 +11,29 @@ import net.minecraft.world.entity.monster.Enemy;
 
 import java.util.List;
 
-/** Water: Adepts spray a jet, Magi heal the monsters around them, Archmages open a whirlpool under you. */
+/** Water: Adepts spray a jet, Magi heal the other monsters around them, Archmages open a whirlpool under you. */
 public final class WaterMobSpells {
     public static final List<MobSpell> ALL = List.of(new JetBurst(), new HealAllies(), new Maelstrom());
 
     private static final double HEAL_RADIUS = 8;
     private static final float HEAL_AMOUNT = 4f;
-    // Heal only when some monster nearby (or the caster) is below this share of its health.
+    // Heal only when some other monster nearby is below this share of its health.
     private static final float HEAL_BELOW = 0.7f;
+    // A healed creature can't be healed again (by any healer) for this long, so several Magi
+    // together still give each monster at most 4 health per 10 seconds.
+    private static final int HEAL_LOCK_TICKS = 200;
+    private static final String TAG_HEALED_UNTIL = "ea_mob_healed_until";
 
     private WaterMobSpells() {
     }
 
-    private static List<LivingEntity> alliesAround(Mob caster) {
+    /** Other monsters nearby that are hurt and haven't been healed recently. Never the caster itself. */
+    private static List<LivingEntity> alliesToHeal(Mob caster) {
+        long now = caster.level().getGameTime();
         return caster.level().getEntitiesOfClass(LivingEntity.class, caster.getBoundingBox().inflate(HEAL_RADIUS),
-                entity -> entity instanceof Enemy && entity.isAlive() && entity.distanceTo(caster) <= HEAL_RADIUS);
+                entity -> entity != caster && entity instanceof Enemy && entity.isAlive() && entity.distanceTo(caster) <= HEAL_RADIUS
+                        && entity.getHealth() < entity.getMaxHealth() * HEAL_BELOW
+                        && now >= entity.getPersistentData().getLong(TAG_HEALED_UNTIL));
     }
 
     private static final class JetBurst implements MobSpell {
@@ -63,14 +71,16 @@ public final class WaterMobSpells {
 
         @Override
         public boolean canCast(Mob caster, LivingEntity target) {
-            return alliesAround(caster).stream().anyMatch(ally -> ally.getHealth() < ally.getMaxHealth() * HEAL_BELOW);
+            return !alliesToHeal(caster).isEmpty();
         }
 
         @Override
         public void cast(Mob caster, LivingEntity target) {
             ServerLevel level = (ServerLevel) caster.level();
-            for (LivingEntity ally : alliesAround(caster)) {
+            long lockUntil = level.getGameTime() + HEAL_LOCK_TICKS;
+            for (LivingEntity ally : alliesToHeal(caster)) {
                 ally.heal(HEAL_AMOUNT);
+                ally.getPersistentData().putLong(TAG_HEALED_UNTIL, lockUntil);
                 level.sendParticles(ParticleTypes.SPLASH, ally.getX(), ally.getY(0.8), ally.getZ(), 12, 0.3, 0.3, 0.3, 0.1);
                 level.sendParticles(ParticleTypes.HEART, ally.getX(), ally.getY(1.0) + 0.3, ally.getZ(), 2, 0.3, 0.1, 0.3, 0);
             }
