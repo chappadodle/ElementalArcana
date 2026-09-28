@@ -40,12 +40,14 @@ public class SpellProjectile extends ThrowableProjectile {
     private static final EntityDataAccessor<Integer> SLOT = SynchedEntityData.defineId(SpellProjectile.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> SLOT_COUNT = SynchedEntityData.defineId(SpellProjectile.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> SCALE = SynchedEntityData.defineId(SpellProjectile.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> GRAVITY = SynchedEntityData.defineId(SpellProjectile.class, EntityDataSerializers.FLOAT);
     private static final double AIM_RANGE = 64.0;
 
     private float power = 1f;
     private int releasedAt;
     // Server-side: piercing, and a release scheduled a few ticks ahead (for rippling volleys).
     private int pierceLeft;
+    private int bouncesLeft;
     private final Set<Integer> piercedIds = new HashSet<>();
     private int releaseCountdown = -1;
     @Nullable
@@ -214,6 +216,16 @@ public class SpellProjectile extends ThrowableProjectile {
         pierceLeft = targets;
     }
 
+    /** Downward pull per tick (synced, so clients predict the arc). 0 = flies straight. */
+    public void setGravity(float gravity) {
+        entityData.set(GRAVITY, gravity);
+    }
+
+    /** Bounces off this many blocks before a block hit counts as an impact. */
+    public void setBounces(int bounces) {
+        bouncesLeft = bounces;
+    }
+
     /** Makes the projectile pass through {@code entity} without hitting it. */
     public void ignoreEntity(Entity entity) {
         piercedIds.add(entity.getId());
@@ -248,11 +260,12 @@ public class SpellProjectile extends ThrowableProjectile {
         builder.define(SLOT, 0);
         builder.define(SLOT_COUNT, 1);
         builder.define(SCALE, 1f);
+        builder.define(GRAVITY, 0f);
     }
 
     @Override
     protected double getDefaultGravity() {
-        return 0.0;
+        return entityData.get(GRAVITY);
     }
 
     @Override
@@ -310,6 +323,17 @@ public class SpellProjectile extends ThrowableProjectile {
         }
     }
 
+    /** Reflects off the block face that was hit, losing some speed. */
+    private void bounce(BlockHitResult hit) {
+        bouncesLeft--;
+        Vec3 normal = Vec3.atLowerCornerOf(hit.getDirection().getNormal());
+        Vec3 velocity = getDeltaMovement();
+        Vec3 reflected = velocity.subtract(normal.scale(2 * velocity.dot(normal))).scale(0.55);
+        setDeltaMovement(reflected);
+        setPos(hit.getLocation().add(normal.scale(0.05)));
+        hasImpulse = true;
+    }
+
     // Vanilla lets a projectile hit its own shooter once it has flown clear of them (arrows shot
     // straight up, returning boomerangs...). A spell never hits its own caster.
     @Override
@@ -337,6 +361,10 @@ public class SpellProjectile extends ThrowableProjectile {
 
     @Override
     protected void onHit(HitResult result) {
+        if (result instanceof BlockHitResult blockHit && bouncesLeft > 0 && !level().isClientSide()) {
+            bounce(blockHit);
+            return;
+        }
         super.onHit(result);
         if (level().isClientSide()) {
             return;

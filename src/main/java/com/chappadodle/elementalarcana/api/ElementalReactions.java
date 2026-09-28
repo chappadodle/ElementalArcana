@@ -2,6 +2,7 @@ package com.chappadodle.elementalarcana.api;
 
 import com.chappadodle.elementalarcana.content.ModContent;
 import net.minecraft.core.particles.ColorParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -20,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 public final class ElementalReactions {
     private static final double SWIRL_RADIUS = 4.0;
     private static final float SWIRL_DAMAGE = 2f;
+    private static final float MELT_MULTIPLIER = 1.75f;
 
     /** Elements an entity can carry, with the color their reactions show in. */
     public enum Aura {
@@ -88,6 +90,22 @@ public final class ElementalReactions {
         }
         level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.BREEZE_WIND_CHARGE_BURST.value(), SoundSource.PLAYERS, 0.8f, 1.3f);
         return true;
+    }
+
+    /**
+     * Melt: fire hitting a frozen or frosted target thaws it in a burst of steam. Returns the
+     * damage multiplier for the hit (1.75, or 1 when there was no ice to melt).
+     */
+    public static float melt(LivingEntity target) {
+        if (auraOf(target) != Aura.CRYO || !(target.level() instanceof ServerLevel level)) {
+            return 1f;
+        }
+        target.removeEffect(ModContent.FROZEN);
+        target.setTicksFrozen(0);
+        level.sendParticles(ParticleTypes.CLOUD, target.getX(), target.getY(0.6), target.getZ(), 14, 0.4, 0.4, 0.4, 0.06);
+        level.sendParticles(ParticleTypes.POOF, target.getX(), target.getY(0.6), target.getZ(), 6, 0.3, 0.3, 0.3, 0.02);
+        level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 1f, 1.1f);
+        return MELT_MULTIPLIER;
     }
 
     /** Launches {@code target} into the air as Airborne: +25% damage from everything until it lands (see AirborneEvents). */

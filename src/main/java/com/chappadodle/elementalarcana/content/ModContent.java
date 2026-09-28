@@ -48,6 +48,9 @@ public final class ModContent {
     /** A soft cold puff that spreads and fades. */
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> FROST_MIST =
             PARTICLES.register("frost_mist", () -> new SimpleParticleType(false));
+    /** A glowing spark that drifts up and cools as it fades. */
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> EMBER =
+            PARTICLES.register("ember", () -> new SimpleParticleType(false));
     /** A pale curl of wind that glides along its velocity and fades. */
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> WIND_STREAK =
             PARTICLES.register("wind_streak", () -> new SimpleParticleType(false));
