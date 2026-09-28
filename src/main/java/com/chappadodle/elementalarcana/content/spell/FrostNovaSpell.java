@@ -9,13 +9,14 @@ import com.chappadodle.elementalarcana.api.SpellDamage;
 import com.chappadodle.elementalarcana.content.ModSchools;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
+
+import java.util.function.Predicate;
 
 /** Flash-freezes everything around the caster and the water they stand near. */
 public class FrostNovaSpell extends Spell {
@@ -27,14 +28,21 @@ public class FrostNovaSpell extends Spell {
 
     @Override
     public CastResult cast(CastContext context) {
-        ServerPlayer caster = context.caster();
-        ServerLevel level = context.level();
+        burst(context.level(), context.caster(), context.power(), target -> true);
+        return CastResult.SUCCESS;
+    }
 
+    /**
+     * The nova itself: damages, slows and frosts everything around {@code caster} that
+     * {@code affects} allows (never the caster), freezes nearby water, and plays the burst. Attuned
+     * creatures cast it too.
+     */
+    public static void burst(ServerLevel level, LivingEntity caster, float power, Predicate<LivingEntity> affects) {
         for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, caster.getBoundingBox().inflate(RADIUS),
-                entity -> entity != caster && entity.isAlive() && entity.distanceTo(caster) <= RADIUS)) {
+                entity -> entity != caster && entity.isAlive() && entity.distanceTo(caster) <= RADIUS && affects.test(entity))) {
             ElementalReactions.iceHit(target);
-            target.hurt(SpellDamage.source(level, Element.ICE, caster, caster), 3f * context.power());
-            target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, Math.round(100 * context.power()), 2));
+            target.hurt(SpellDamage.source(level, Element.ICE, caster, caster), 3f * power);
+            target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, Math.round(100 * power), 2));
             if (target.canFreeze()) {
                 target.setTicksFrozen(Math.max(target.getTicksFrozen(), target.getTicksRequiredToFreeze() + 120));
             }
@@ -51,6 +59,5 @@ public class FrostNovaSpell extends Spell {
         level.sendParticles(ParticleTypes.ITEM_SNOWBALL, caster.getX(), caster.getY() + 0.5, caster.getZ(), 30, RADIUS * 0.4, 0.3, RADIUS * 0.4, 0.1);
         level.playSound(null, caster.getX(), caster.getY(), caster.getZ(), SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 1f, 0.6f);
         level.playSound(null, caster.getX(), caster.getY(), caster.getZ(), SoundEvents.POWDER_SNOW_BREAK, SoundSource.PLAYERS, 1f, 0.8f);
-        return CastResult.SUCCESS;
     }
 }
