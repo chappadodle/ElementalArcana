@@ -1,14 +1,18 @@
 package com.chappadodle.elementalarcana.client;
 
+import com.chappadodle.elementalarcana.api.Progression;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.SpellSchool;
+import com.chappadodle.elementalarcana.content.EssenceService;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.core.MagicData;
+import com.chappadodle.elementalarcana.network.EssencePayload;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -16,6 +20,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -43,6 +48,7 @@ public class StatusScreen extends Screen {
     private int listTop;
     private int scroll;
     private Button awakenButton;
+    private Button condenseButton;
 
     public StatusScreen() {
         super(Component.translatable("screen.elementalarcana.status"));
@@ -72,6 +78,12 @@ public class StatusScreen extends Screen {
                 .build());
         updateAwakenButton();
 
+        // Under the affinities, above the spell list.
+        condenseButton = addRenderableWidget(Button.builder(Component.empty(),
+                        button -> PacketDistributor.sendToServer(EssencePayload.condense()))
+                .bounds(left + 10, top + 101, 190, 14).build());
+        updateCondenseButton();
+
         if (minecraft.player.hasPermissions(2)) {
             addRenderableWidget(Button.builder(Component.translatable("screen.elementalarcana.status.dev"), button -> ArcanaClient.openDevMenu(minecraft))
                     .bounds(left + WIDTH - 36, top + 4, 30, 14)
@@ -91,9 +103,20 @@ public class StatusScreen extends Screen {
         awakenButton.visible = MagicAttachments.get(minecraft.player).hasFreeAffinitySlot();
     }
 
+    private void updateCondenseButton() {
+        MagicData data = MagicAttachments.get(minecraft.player);
+        int cost = Progression.condenseCost(data.bonusSkillPoints());
+        int have = EssenceService.total(minecraft.player);
+        condenseButton.setMessage(Component.translatable("screen.elementalarcana.status.condense", cost));
+        condenseButton.active = have >= cost;
+        condenseButton.setTooltip(Tooltip.create(Component.translatable("screen.elementalarcana.status.condense.hint",
+                have, data.bonusSkillPoints())));
+    }
+
     @Override
     public void tick() {
         updateAwakenButton();
+        updateCondenseButton();
     }
 
     @Override

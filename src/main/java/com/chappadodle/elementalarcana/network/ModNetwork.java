@@ -8,11 +8,12 @@ public final class ModNetwork {
     }
 
     public static void register(RegisterPayloadHandlersEvent event) {
-        event.registrar("2")
+        event.registrar("3")
                 .playToServer(CastSpellPayload.TYPE, CastSpellPayload.STREAM_CODEC, CastSpellPayload::handle)
                 .playToServer(SelectSpellPayload.TYPE, SelectSpellPayload.STREAM_CODEC, SelectSpellPayload::handle)
                 .playToServer(AwakenPayload.TYPE, AwakenPayload.STREAM_CODEC, AwakenPayload::handle)
                 .playToServer(DevActionPayload.TYPE, DevActionPayload.STREAM_CODEC, DevActionPayload::handle)
-                .playToServer(SpellProgressPayload.TYPE, SpellProgressPayload.STREAM_CODEC, SpellProgressPayload::handle);
+                .playToServer(SpellProgressPayload.TYPE, SpellProgressPayload.STREAM_CODEC, SpellProgressPayload::handle)
+                .playToServer(EssencePayload.TYPE, EssencePayload.STREAM_CODEC, EssencePayload::handle);
     }
 }

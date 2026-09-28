@@ -43,9 +43,11 @@ public final class MagicData {
             Codec.BOOL.optionalFieldOf("fall_immune", false).forGetter(data -> data.fallImmune),
             Codec.BOOL.optionalFieldOf("free_cast", false).forGetter(data -> data.freeCast),
             Codec.unboundedMap(ResourceLocation.CODEC, SpellProgress.CODEC).optionalFieldOf("spells", Map.of()).forGetter(data -> data.spells),
-            Codec.LONG.optionalFieldOf("respec_ready_at", 0L).forGetter(data -> data.respecReadyAt)
-    ).apply(instance, (mana, level, xp, affinities, selected, cooldowns, fallImmune, freeCast, spells, respecReadyAt) ->
-            new MagicData(mana, level, xp, affinities, selected.orElse(null), cooldowns, fallImmune, freeCast, spells, respecReadyAt, false)));
+            Codec.LONG.optionalFieldOf("respec_ready_at", 0L).forGetter(data -> data.respecReadyAt),
+            Codec.INT.optionalFieldOf("bonus_skill_points", 0).forGetter(data -> data.bonusSkillPoints)
+    ).apply(instance, (mana, level, xp, affinities, selected, cooldowns, fallImmune, freeCast, spells, respecReadyAt, bonusSkillPoints) ->
+            new MagicData(mana, level, xp, affinities, selected.orElse(null), cooldowns, fallImmune, freeCast, spells, respecReadyAt,
+                    bonusSkillPoints, false)));
 
     // What the owning client needs: no fall flag, plus the live meditation state for the HUD.
     public static final StreamCodec<RegistryFriendlyByteBuf, MagicData> STREAM_CODEC = StreamCodec.of(
@@ -59,6 +61,7 @@ public final class MagicData {
                 buf.writeBoolean(data.freeCast);
                 buf.writeMap(data.spells, FriendlyByteBuf::writeResourceLocation, SpellProgress::write);
                 buf.writeVarLong(data.respecReadyAt);
+                buf.writeVarInt(data.bonusSkillPoints);
                 buf.writeBoolean(data.meditating);
             },
             buf -> new MagicData(
@@ -72,6 +75,7 @@ public final class MagicData {
                     buf.readBoolean(),
                     buf.readMap(FriendlyByteBuf::readResourceLocation, SpellProgress::read),
                     buf.readVarLong(),
+                    buf.readVarInt(),
                     buf.readBoolean()));
 
     private float mana;
@@ -86,6 +90,8 @@ public final class MagicData {
     private boolean freeCast;
     private final HashMap<ResourceLocation, SpellProgress> spells;
     private long respecReadyAt;
+    // Skill points condensed from Elemental Essence, on top of those from Magic Level.
+    private int bonusSkillPoints;
 
     // Server-side meditation tracking; only `meditating` is synced.
     private boolean meditating;
@@ -94,12 +100,12 @@ public final class MagicData {
     private double lastZ;
 
     public MagicData() {
-        this(BASE_MAX_MANA, 1, 0, List.of(), null, Map.of(), false, false, Map.of(), 0L, false);
+        this(BASE_MAX_MANA, 1, 0, List.of(), null, Map.of(), false, false, Map.of(), 0L, 0, false);
     }
 
     private MagicData(float mana, int level, int xp, List<ResourceLocation> affinities, @Nullable ResourceLocation selected,
                       Map<ResourceLocation, Long> cooldownEnds, boolean fallImmune, boolean freeCast,
-                      Map<ResourceLocation, SpellProgress> spells, long respecReadyAt, boolean meditating) {
+                      Map<ResourceLocation, SpellProgress> spells, long respecReadyAt, int bonusSkillPoints, boolean meditating) {
         this.level = Mth.clamp(level, 1, MAX_LEVEL);
         this.xp = xp;
         this.affinities = new ArrayList<>(affinities);
@@ -109,6 +115,7 @@ public final class MagicData {
         this.freeCast = freeCast;
         this.spells = new HashMap<>(spells);
         this.respecReadyAt = respecReadyAt;
+        this.bonusSkillPoints = Math.max(0, bonusSkillPoints);
         this.meditating = meditating;
         this.mana = Mth.clamp(mana, 0f, maxMana());
     }
@@ -298,7 +305,16 @@ public final class MagicData {
         for (SpellProgress progress : spells.values()) {
             spent += progress.level() - 1;
         }
-        return Math.max(0, (level - 1) - spent);
+        return Math.max(0, (level - 1) + bonusSkillPoints - spent);
+    }
+
+    /** Skill points condensed from Elemental Essence, on top of those from Magic Level. */
+    public int bonusSkillPoints() {
+        return bonusSkillPoints;
+    }
+
+    public void addBonusSkillPoint() {
+        bonusSkillPoints++;
     }
 
     /** Mastery needed for the next level of {@code spell}; 0 at max level. */

@@ -318,6 +318,14 @@
   "item.elementalarcana.water_essence": "Water Essence",
   "item.elementalarcana.ice_essence": "Ice Essence",
   "item.elementalarcana.wind_essence": "Wind Essence",
-  "item.elementalarcana.essence.tooltip": "A fragment of elemental magic. What it's for is still a mystery...",
-  "message.elementalarcana.magic_xp": "+%s Magic XP"
+  "item.elementalarcana.essence.tooltip": "Infuse it into a spell of its element (spell screen), or condense it into skill points (Status screen).",
+  "message.elementalarcana.magic_xp": "+%s Magic XP",
+  "message.elementalarcana.condensed": "Condensed %s Essence into a skill point",
+  "screen.elementalarcana.detail.infuse": "Infuse 1 %s (+%s%%)",
+  "screen.elementalarcana.detail.infuse_fill": "Infuse %s %s (fill)",
+  "screen.elementalarcana.detail.infuse.full": "The mastery bar is already full: level the spell up first.",
+  "screen.elementalarcana.detail.infuse.none": "You have no %s.",
+  "screen.elementalarcana.detail.infuse.hint": "You have %s %s. Each fills less of the bar the higher the spell's level. Hold Shift to fill the bar.",
+  "screen.elementalarcana.status.condense": "Condense %s Essence → +1 skill point",
+  "screen.elementalarcana.status.condense.hint": "You carry %s Essence (any element counts). Bonus points so far: %s. Each costs 4 more than the last."
 }

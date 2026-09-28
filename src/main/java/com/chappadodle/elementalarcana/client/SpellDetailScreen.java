@@ -1,8 +1,13 @@
 package com.chappadodle.elementalarcana.client;
 
+import com.chappadodle.elementalarcana.api.Element;
+import com.chappadodle.elementalarcana.api.Progression;
 import com.chappadodle.elementalarcana.api.Spell;
+import com.chappadodle.elementalarcana.content.EssenceService;
+import com.chappadodle.elementalarcana.content.ModItems;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.core.MagicData;
+import com.chappadodle.elementalarcana.network.EssencePayload;
 import com.chappadodle.elementalarcana.network.SelectSpellPayload;
 import com.chappadodle.elementalarcana.network.SpellProgressPayload;
 import net.minecraft.client.gui.GuiGraphics;
@@ -42,6 +47,7 @@ public class SpellDetailScreen extends Screen {
     private int scroll;
     private int contentHeight;
     private Button levelUpButton;
+    private Button infuseButton;
     private Button selectButton;
     private Button respecButton;
 
@@ -78,6 +84,10 @@ public class SpellDetailScreen extends Screen {
                 .bounds(left + 168, buttonY, 64, 18).build());
         addRenderableWidget(Button.builder(Component.translatable("screen.elementalarcana.detail.back"), button -> onClose())
                 .bounds(left + WIDTH - 62, buttonY, 54, 18).build());
+        // Under the mastery bar (the header has room between the bar text and the list).
+        infuseButton = addRenderableWidget(Button.builder(Component.empty(),
+                        button -> PacketDistributor.sendToServer(EssencePayload.infuse(spell, Screen.hasShiftDown())))
+                .bounds(left + 50, top + 51, 170, 13).build());
         updateButtons();
     }
 
@@ -95,6 +105,37 @@ public class SpellDetailScreen extends Screen {
         respecButton.visible = !data.progress(spell).branches().isEmpty();
         respecButton.active = noRespec == null;
         respecButton.setTooltip(Tooltip.create(noRespec != null ? noRespec : Component.translatable("screen.elementalarcana.detail.respec.hint")));
+        updateInfuseButton(data);
+    }
+
+    /** "Infuse 1 Fire Essence (+32%)", or with Shift "Infuse 3 Fire Essence (fill)"; disabled with a reason. */
+    private void updateInfuseButton(MagicData data) {
+        Element element = EssenceService.elementOf(spell);
+        infuseButton.visible = element != null && spell.maxLevel() > 1;
+        if (!infuseButton.visible) {
+            return;
+        }
+        Component essenceName = ModItems.essence(element).getDescription();
+        int have = EssenceService.count(minecraft.player, element);
+        boolean fill = Screen.hasShiftDown();
+        int count = EssenceService.infuseCount(data, spell, fill, have);
+        int percent = Math.round(Progression.essenceBarFraction(data.spellLevel(spell)) * 100);
+        infuseButton.setMessage(fill
+                ? Component.translatable("screen.elementalarcana.detail.infuse_fill", Math.max(count, 1), essenceName)
+                : Component.translatable("screen.elementalarcana.detail.infuse", essenceName, percent));
+        Component reason = null;
+        if (!data.canCast(spell)) {
+            reason = Component.translatable("screen.elementalarcana.detail.locked");
+        } else if (data.masteryToNextLevel(spell) <= 0) {
+            reason = Component.translatable("screen.elementalarcana.detail.max_level");
+        } else if (data.isMasteryFull(spell)) {
+            reason = Component.translatable("screen.elementalarcana.detail.infuse.full");
+        } else if (have <= 0) {
+            reason = Component.translatable("screen.elementalarcana.detail.infuse.none", essenceName);
+        }
+        infuseButton.active = reason == null;
+        infuseButton.setTooltip(Tooltip.create(reason != null ? reason
+                : Component.translatable("screen.elementalarcana.detail.infuse.hint", have, essenceName)));
     }
 
     private Component levelUpHint(MagicData data) {
