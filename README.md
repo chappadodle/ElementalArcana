@@ -27,11 +27,13 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 | Fire | Fireball: fire bolt, ignites (blocks too, with `mobGriefing`) | Flame Burst: ring of fire around you |
 | Water | Tidal Wave: cone that pushes, extinguishes, hurts endermen/blazes | Healing Rain: Regeneration II for you and nearby players |
 | Ice | Icicle: hold R to charge an icicle, release to launch it; a full charge freezes | Frost Nova: freezes everything around you |
-| Wind | Gale Dash: launch forward, no fall damage | Updraft: throw yourself and nearby mobs skyward |
+| Wind | Wind Blade: hold R to charge crescents of wind, release to slash; Gale Dash: launch forward, no fall damage | Updraft: throw yourself and nearby mobs skyward |
 
 **Frost Shield** (Ice, Magic Level 3): tap R to raise orbiting ice shards that absorb damage (shown as ice hearts) and shatter outward when broken.
 
-Icicle and Frost Shield level from 1 to 10. Casting a spell fills its mastery bar, and each level-up costs one skill point (you earn one per Magic Level). Both spells offer permanent path choices at Lv 5 and 10. Open a spell's skill tree from the Status window.
+**Wind** has two signature mechanics. **Swirl**: a wind hit on a frozen, frosted or burning enemy spreads that element to every creature within 4 blocks. **Airborne**: enemies launched by wind take 25% more damage until they land.
+
+Icicle, Frost Shield and Wind Blade level from 1 to 10. Casting a spell fills its mastery bar, and each level-up costs one skill point (you earn one per Magic Level). Each offers permanent path choices at Lv 5 and 10. Open a spell's skill tree from the Status window.
 
 Operators can use `/arcana level set <n>`, `/arcana xp add <n>`, `/arcana affinity add <element>`, `/arcana affinity reset`, `/arcana mana fill|set <n>` and `/arcana cooldowns reset`.
 

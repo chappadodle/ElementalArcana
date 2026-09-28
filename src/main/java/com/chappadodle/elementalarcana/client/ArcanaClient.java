@@ -9,6 +9,7 @@ import com.chappadodle.elementalarcana.api.SpellShield;
 import com.chappadodle.elementalarcana.client.particle.FrostMistParticle;
 import com.chappadodle.elementalarcana.client.particle.FrostSparkleParticle;
 import com.chappadodle.elementalarcana.client.particle.IceShardParticle;
+import com.chappadodle.elementalarcana.client.particle.WindStreakParticle;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.core.MagicData;
@@ -152,6 +153,8 @@ public final class ArcanaClient {
         event.registerSpriteSet(ModContent.FROST_SPARKLE.get(), FrostSparkleParticle.Provider::new);
         event.registerSpriteSet(ModContent.ICE_SHARD.get(), IceShardParticle.Provider::new);
         event.registerSpriteSet(ModContent.FROST_MIST.get(), FrostMistParticle.Provider::new);
+        event.registerSpriteSet(ModContent.WIND_STREAK.get(), WindStreakParticle.Provider::new);
+        event.registerSpriteSet(ModContent.SWIRL.get(), WindStreakParticle.SwirlProvider::new);
     }
 
     @SubscribeEvent

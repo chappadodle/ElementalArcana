@@ -12,6 +12,7 @@ import com.chappadodle.elementalarcana.content.spell.HealingRainSpell;
 import com.chappadodle.elementalarcana.content.spell.IcicleSpell;
 import com.chappadodle.elementalarcana.content.spell.TidalWaveSpell;
 import com.chappadodle.elementalarcana.content.spell.UpdraftSpell;
+import com.chappadodle.elementalarcana.content.spell.WindBladeSpell;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -26,6 +27,8 @@ public final class ModSpells {
     public static final DeferredHolder<Spell, IcicleSpell> ICICLE = SPELLS.register("icicle", IcicleSpell::new);
     public static final DeferredHolder<Spell, FrostNovaSpell> FROST_NOVA = SPELLS.register("frost_nova", FrostNovaSpell::new);
     public static final DeferredHolder<Spell, FrostShieldSpell> FROST_SHIELD = SPELLS.register("frost_shield", FrostShieldSpell::new);
+    // Wind Blade is registered first so it's wind's starter spell on the Awakening screen.
+    public static final DeferredHolder<Spell, WindBladeSpell> WIND_BLADE = SPELLS.register("wind_blade", WindBladeSpell::new);
     public static final DeferredHolder<Spell, GaleDashSpell> GALE_DASH = SPELLS.register("gale_dash", GaleDashSpell::new);
     public static final DeferredHolder<Spell, UpdraftSpell> UPDRAFT = SPELLS.register("updraft", UpdraftSpell::new);
 

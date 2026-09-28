@@ -2,9 +2,13 @@ package com.chappadodle.elementalarcana.content;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -44,6 +48,22 @@ public final class ModContent {
     /** A soft cold puff that spreads and fades. */
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> FROST_MIST =
             PARTICLES.register("frost_mist", () -> new SimpleParticleType(false));
+    /** A pale curl of wind that glides along its velocity and fades. */
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> WIND_STREAK =
+            PARTICLES.register("wind_streak", () -> new SimpleParticleType(false));
+    /** A wind curl tinted with an element's color, for Swirl rings. */
+    public static final DeferredHolder<ParticleType<?>, ParticleType<ColorParticleOption>> SWIRL =
+            PARTICLES.register("swirl", () -> new ParticleType<ColorParticleOption>(false) {
+                @Override
+                public MapCodec<ColorParticleOption> codec() {
+                    return ColorParticleOption.codec(this);
+                }
+
+                @Override
+                public StreamCodec<? super RegistryFriendlyByteBuf, ColorParticleOption> streamCodec() {
+                    return ColorParticleOption.streamCodec(this);
+                }
+            });
 
     /** Moderate exhaustion from emptying your mana: slower, weaker, and slower mana regen. */
     public static final DeferredHolder<MobEffect, MobEffect> MANA_SICKNESS = EFFECTS.register("mana_sickness",
@@ -54,6 +74,11 @@ public final class ModContent {
 
     /** Frozen solid (Icicle's Deep Freeze): rooted in place, no jumping or melee damage. */
     public static final DeferredHolder<MobEffect, FrozenEffect> FROZEN = EFFECTS.register("frozen", FrozenEffect::new);
+
+    /** Launched by wind: takes 25% more damage while off the ground (see ElementalReactions). */
+    public static final DeferredHolder<MobEffect, MobEffect> AIRBORNE = EFFECTS.register("airborne",
+            () -> new MobEffect(MobEffectCategory.HARMFUL, 0xCFEFE0) {
+            });
 
     private ModContent() {
     }

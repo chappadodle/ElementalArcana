@@ -87,6 +87,22 @@ public class SpellProjectile extends ThrowableProjectile {
         return projectile;
     }
 
+    /**
+     * Fires a projectile of {@code spell} from any point with a given velocity, outside of a cast
+     * (e.g. a projectile splitting into smaller ones on impact).
+     */
+    public static <S extends Spell & ProjectileSpell> SpellProjectile shootFrom(Entity owner, S spell, Vec3 position, Vec3 velocity, float power) {
+        SpellProjectile projectile = new SpellProjectile(ModContent.SPELL_PROJECTILE.get(), owner.level());
+        projectile.setOwner(owner);
+        projectile.entityData.set(SPELL_ID, spell.id().toString());
+        projectile.entityData.set(CHARGE, 1f);
+        projectile.power = power;
+        projectile.setPos(position);
+        projectile.setDeltaMovement(velocity);
+        owner.level().addFreshEntity(projectile);
+        return projectile;
+    }
+
     private static SpellProjectile create(CastContext context, Spell spell) {
         SpellProjectile projectile = new SpellProjectile(ModContent.SPELL_PROJECTILE.get(), context.level());
         projectile.setOwner(context.caster());
@@ -198,6 +214,21 @@ public class SpellProjectile extends ThrowableProjectile {
         pierceLeft = targets;
     }
 
+    /** Makes the projectile pass through {@code entity} without hitting it. */
+    public void ignoreEntity(Entity entity) {
+        piercedIds.add(entity.getId());
+    }
+
+    /** Forgets which entities it already passed through, so it can hit them again (e.g. on the way back). */
+    public void resetPierced() {
+        piercedIds.clear();
+    }
+
+    /** Ticks since it was thrown (or since it was spawned, if it was never held). */
+    public int ticksInFlight() {
+        return tickCount - releasedAt;
+    }
+
     public float power() {
         return power;
     }
@@ -279,9 +310,11 @@ public class SpellProjectile extends ThrowableProjectile {
         }
     }
 
+    // Vanilla lets a projectile hit its own shooter once it has flown clear of them (arrows shot
+    // straight up, returning boomerangs...). A spell never hits its own caster.
     @Override
     protected boolean canHitEntity(Entity target) {
-        return super.canHitEntity(target) && !piercedIds.contains(target.getId());
+        return super.canHitEntity(target) && target != getOwner() && !piercedIds.contains(target.getId());
     }
 
     @Override

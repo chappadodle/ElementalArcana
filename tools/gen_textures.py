@@ -197,6 +197,69 @@ SPRITES = {
         "......kkkk......",
         "................",
     ]),
+    # Texture for the wind blade's crescent model (models/spell/wind_blade.json).
+    "block/wind_blade": ({
+        "w": 0xE0FFFFFF, "p": 0xC8E6FFF2, "g": 0xB0B8F0D8, "d": 0x9890D8C0,
+    }, [
+        "wwppwwppwwppwwpp",
+        "wppgwppgwppgwppg",
+        "ppggppggppggppgg",
+        "pggdpggdpggdpggd",
+        "wwppwwppwwppwwpp",
+        "wppgwppgwppgwppg",
+        "ppggppggppggppgg",
+        "pggdpggdpggdpggd",
+        "wwppwwppwwppwwpp",
+        "wppgwppgwppgwppg",
+        "ppggppggppggppgg",
+        "pggdpggdpggdpggd",
+        "wwppwwppwwppwwpp",
+        "wppgwppgwppgwppg",
+        "ppggppggppggppgg",
+        "pggdpggdpggdpggd",
+    ]),
+    "spell/wind_blade": ({
+        "k": 0x3C6B5A, "g": 0x9FE0C8, "p": 0xD8F5EA, "w": 0xFFFFFF,
+    }, [
+        "................",
+        "..........kk....",
+        "...........wk...",
+        "............wk..",
+        "............pwk.",
+        ".............pk.",
+        ".............pk.",
+        "......g......gk.",
+        ".....gp.....gpk.",
+        "....gpw....gpk..",
+        "...gpw....gpk...",
+        "..kpw...kgpk....",
+        "..kkwwwwppk.....",
+        "....kkkkkk......",
+        "................",
+        "................",
+    ]),
+    "mob_effect/airborne": ({
+        "k": 0x3C6B5A, "g": 0x9FE0C8, "p": 0xD8F5EA, "w": 0xFFFFFF,
+    }, [
+        "..................",
+        "........ww........",
+        ".......wwww.......",
+        "......ww..ww......",
+        "........ww........",
+        "........ww........",
+        "..................",
+        "...ppppppppppp....",
+        ".....gggggggggg...",
+        "..................",
+        "....pppppppppp....",
+        "......gggggggg....",
+        "..................",
+        ".....pppppppp.....",
+        ".......gggggg.....",
+        "..................",
+        "..................",
+        "..................",
+    ]),
     "block/icicle": ({
         "w": 0xF2FFFFFF, "l": 0xE6D2F6FF, "b": 0xDCA8E4FF, "d": 0xD27CC8F2, "k": 0xD8508CD2,
     }, [
@@ -364,6 +427,28 @@ def frost_mist(frame, frames=4, size=16):
     return Image.fromarray(rgba, "RGBA")
 
 
+def wind_streak(frame, frames=4, size=16):
+    """A curved stroke of wind: a thin arc that is bright at its head and fades along its tail.
+    Later frames are shorter and fainter. Procedural, since it needs smooth alpha."""
+    image = np.zeros((size, size, 4), dtype=np.float64)
+    center = np.array([size * 0.5, size * 0.95])
+    radius = size * 0.6
+    length = np.pi * (0.55 - 0.1 * frame)
+    for step in range(200):
+        t = step / 199
+        angle = -np.pi / 2 - length / 2 + length * t
+        point = center + radius * np.array([np.cos(angle), np.sin(angle)])
+        strength = t ** 1.5 * (1 - 0.22 * frame)
+        for dy in (-1, 0, 1):
+            for dx in (-1, 0, 1):
+                x, y = int(point[0]) + dx, int(point[1]) + dy
+                if 0 <= x < size and 0 <= y < size:
+                    falloff = 1.0 if dx == 0 and dy == 0 else 0.25
+                    image[y, x, 3] = max(image[y, x, 3], strength * falloff)
+    image[..., 0:3] = 1.0
+    return Image.fromarray((np.clip(image, 0, 1) * 255).astype(np.uint8), "RGBA")
+
+
 def main():
     for name, (palette, grid) in SPRITES.items():
         path = ASSETS / f"{name}.png"
@@ -371,9 +456,10 @@ def main():
         render(palette, grid).save(path)
         print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
     for frame in range(4):
-        path = ASSETS / f"particle/frost_mist_{frame}.png"
-        frost_mist(frame).save(path)
-        print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
+        for name, make in (("frost_mist", frost_mist), ("wind_streak", wind_streak)):
+            path = ASSETS / f"particle/{name}_{frame}.png"
+            make(frame).save(path)
+            print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
 
 
 if __name__ == "__main__":
