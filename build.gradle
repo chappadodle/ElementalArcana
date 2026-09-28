@@ -149,7 +149,9 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-    // Jade (entity health/info tooltips) in the dev game only, for play-testing. Not a dependency of the mod.
+    // Jade: compiled against for the optional integration (compat/jade), and loaded in the dev game.
+    // Not a required dependency: the mod runs without it.
+    compileOnly "maven.modrinth:jade:15.10.6+neoforge"
     localRuntime "maven.modrinth:jade:15.10.6+neoforge"
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'

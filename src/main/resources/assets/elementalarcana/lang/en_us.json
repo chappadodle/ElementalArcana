@@ -302,5 +302,7 @@
   "death.attack.elementalarcana.ice_spell.item": "%1$s was frozen solid by %2$s using %3$s",
   "death.attack.elementalarcana.wind_spell": "%1$s was cut down by %2$s's winds",
   "death.attack.elementalarcana.wind_spell.player": "%1$s was cut down by the wind while fighting %2$s",
-  "death.attack.elementalarcana.wind_spell.item": "%1$s was cut down by %2$s's winds using %3$s"
+  "death.attack.elementalarcana.wind_spell.item": "%1$s was cut down by %2$s's winds using %3$s",
+  "jade.elementalarcana.element": "Element: %s",
+  "config.jade.plugin_elementalarcana.creature_element": "Creature element"
 }

@@ -13,8 +13,9 @@ Give the four elements (Fire, Water, Ice, Wind) real meaning outside the player'
    hostile mobs are normal, but occasionally one spawns **Attuned**: it has an element, a rank, and
    casts spells.
 
-The game never tells the player a creature's element. Players learn it by fighting: hits feel
-different when they are strong or weak against the target.
+The game never tells the player a creature's element (except through the optional Jade mod, see
+below). Players learn it by fighting: hits feel different when they are strong or weak against the
+target.
 
 ## Part 1: Elements, damage and matchups
 
@@ -92,6 +93,10 @@ target (so Hydro Jet's rapid hits don't spam):
 Sounds are vanilla and are chosen during playtesting (for example amethyst chimes for strong hits,
 a low shield block for resisted ones). Nothing else ever reveals a creature's element.
 
+**Exception: Jade.** When the optional Jade mod is installed, its tooltip shows "Element: <name>"
+in the element's color for elemental creatures (toggle: Jade config, "Creature element"). Players
+without Jade still have to work elements out. (Added after step 1, at the user's request.)
+
 ## Part 2: Creature magic
 
 ### Which creatures can be Attuned
@@ -143,7 +148,9 @@ Biome elements come from biome tags, so they are data-driven:
 ### What an Attuned creature is like
 
 - **Stored data:** a saved (not client-synced) data attachment on the mob:
-  `CreatureMagic { element, rank }`.
+  `CreatureMagic { element, rank }`. Jade reads innate elements client-side from tags; for
+  Attuned creatures the Jade integration needs the element from the server (a Jade server data
+  provider), added in this step.
 - **Health:** the rank's max-health bonus is applied as an attribute modifier when it spawns.
 - **Faint hints:** Adepts and Magi occasionally (about every 2 seconds) give off one particle of
   their element: an ember, a drip, a snowflake or a wisp. There is no name and no label.
