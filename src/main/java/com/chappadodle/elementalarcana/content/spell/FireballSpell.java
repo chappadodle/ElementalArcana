@@ -10,6 +10,7 @@ import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellDamage;
 import com.chappadodle.elementalarcana.api.SpellHold;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
+import com.chappadodle.elementalarcana.api.SpellTargets;
 import com.chappadodle.elementalarcana.content.FireEvents;
 import com.chappadodle.elementalarcana.content.FireField;
 import com.chappadodle.elementalarcana.content.ModContent;
@@ -26,6 +27,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.BaseFireBlock;
@@ -306,7 +308,7 @@ public class FireballSpell extends Spell implements ProjectileSpell {
         double knockback = sun || meteor ? 1.2 : 0.4;
 
         for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, new AABB(at, at).inflate(radius),
-                e -> e != owner && e.isAlive() && (e == directHit || !(e instanceof Player)
+                e -> e != owner && e.isAlive() && (e == directHit || SpellTargets.canAffect(owner, e)
                         && e.getBoundingBox().getCenter().distanceTo(at) <= radius + e.getBbWidth() / 2))) {
             // The creature it hit takes the full blast; falloff is for the splash around it.
             double falloff = target == directHit ? 1.0
@@ -392,6 +394,34 @@ public class FireballSpell extends Spell implements ProjectileSpell {
         at.level().playSound(null, at.getX(), at.getY(), at.getZ(), sound, SoundSource.PLAYERS, volume, pitch);
     }
 
+    /** Meteor: lob it in a high arc that comes down on the target. */
+    private static void launchInArc(SpellProjectile fireball, Vec3 target) {
+        Vec3 delta = target.subtract(fireball.position());
+        double horizontal = Math.sqrt(delta.x * delta.x + delta.z * delta.z);
+        double ticks = Math.max(12, horizontal / 0.9);
+        double vertical = (delta.y + 0.5 * METEOR_GRAVITY * ticks * ticks) / ticks;
+        fireball.setGravity(METEOR_GRAVITY);
+        fireball.setVisualScale(1.3f);
+        fireball.setDeltaMovement(delta.x / ticks, vertical, delta.z / ticks);
+        fireball.hasImpulse = true;
+    }
+
+    /**
+     * Mob magic (Attuned creatures): throws a plain Lv 1 fireball at {@code target}, or, with
+     * {@code meteor}, lobs a Meteor that comes down on it. {@code power} scales it like a player's
+     * spell power.
+     */
+    public SpellProjectile shootForMob(Mob caster, Vec3 target, float power, boolean meteor) {
+        Vec3 eye = caster.getEyePosition();
+        Vec3 from = eye.add(target.subtract(eye).normalize().scale(0.6));
+        SpellProjectile fireball = SpellProjectile.shootFrom(caster, this, from, target.subtract(from).normalize().scale(releaseSpeed(1f)), power);
+        if (meteor) {
+            fireball.getPersistentData().putString(TAG_BRANCH_5, METEOR);
+            launchInArc(fireball, target);
+        }
+        return fireball;
+    }
+
     // ---- the hold ----
 
     private static final class Hold implements SpellHold {
@@ -455,18 +485,6 @@ public class FireballSpell extends Spell implements ProjectileSpell {
                 }
             }
             playAt(caster, SoundEvents.BLAZE_SHOOT, 1f, 1.1f);
-        }
-
-        /** Meteor: lob it in a high arc that comes down on the target. */
-        private static void launchInArc(SpellProjectile fireball, Vec3 target) {
-            Vec3 delta = target.subtract(fireball.position());
-            double horizontal = Math.sqrt(delta.x * delta.x + delta.z * delta.z);
-            double ticks = Math.max(12, horizontal / 0.9);
-            double vertical = (delta.y + 0.5 * METEOR_GRAVITY * ticks * ticks) / ticks;
-            fireball.setGravity(METEOR_GRAVITY);
-            fireball.setVisualScale(1.3f);
-            fireball.setDeltaMovement(delta.x / ticks, vertical, delta.z / ticks);
-            fireball.hasImpulse = true;
         }
 
         @Override

@@ -6,6 +6,7 @@ import com.chappadodle.elementalarcana.api.AttunementRules;
 import com.chappadodle.elementalarcana.api.CreatureElements;
 import com.chappadodle.elementalarcana.api.CreatureMagic;
 import com.chappadodle.elementalarcana.api.Element;
+import com.chappadodle.elementalarcana.content.mob.CastMobSpellGoal;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -31,6 +32,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import org.jetbrains.annotations.Nullable;
@@ -44,8 +46,8 @@ import java.util.Set;
 /**
  * Creature magic (design spec, Part 2): now and then a hostile mob spawns Attuned, with an element
  * and a rank. This class owns the attunement data and its health and knockback bonuses. It also
- * rolls attunement when creatures spawn, and plays the faint element hints; spells come in a later
- * step.
+ * rolls attunement when creatures spawn, and plays the faint element hints; their spells are cast by
+ * CastMobSpellGoal.
  */
 @EventBusSubscriber(modid = ElementalArcana.MODID)
 public final class Attunement {
@@ -95,6 +97,9 @@ public final class Attunement {
         if (archmage) {
             mob.setPersistenceRequired();
         }
+        if (!mob.level().isClientSide()) {
+            ensureCastGoal(mob);
+        }
         return true;
     }
 
@@ -108,6 +113,14 @@ public final class Attunement {
         setBonus(mob, Attributes.KNOCKBACK_RESISTANCE, ARCHMAGE_KNOCKBACK, 0, AttributeModifier.Operation.ADD_VALUE);
         mob.setHealth(Math.min(mob.getHealth(), mob.getMaxHealth()));
         return true;
+    }
+
+    /** Gives an Attuned mob its spellcasting goal, once. The goal does nothing if it isn't Attuned. */
+    public static void ensureCastGoal(Mob mob) {
+        boolean hasGoal = mob.goalSelector.getAvailableGoals().stream().anyMatch(wrapped -> wrapped.getGoal() instanceof CastMobSpellGoal);
+        if (!hasGoal) {
+            mob.goalSelector.addGoal(1, new CastMobSpellGoal(mob));
+        }
     }
 
     /** Dev menu: summons a zombie 3 blocks in front of the player and attunes it. */
@@ -143,6 +156,14 @@ public final class Attunement {
         Element element = innate != null ? innate : AttunementRules.pickElement(
                 biomeElements(event.getLevel(), BlockPos.containing(event.getX(), event.getY(), event.getZ())), mob.getRandom()::nextDouble);
         attune(mob, element, rank);
+    }
+
+    /** Attuned mobs loaded from disk get their spellcasting goal back. */
+    @SubscribeEvent
+    public static void onJoinLevel(EntityJoinLevelEvent event) {
+        if (!event.getLevel().isClientSide() && event.getEntity() instanceof Mob mob && get(mob) != null) {
+            ensureCastGoal(mob);
+        }
     }
 
     /** The elements of the biome at {@code pos} (the attunes/<element> biome tags). */

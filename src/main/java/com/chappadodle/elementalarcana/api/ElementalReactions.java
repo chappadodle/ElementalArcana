@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
  * Vaporize  water on pyro        x1.5, puts the fire out
  *           fire on hydro        x1.5, dries it off
  * Freeze    ice on hydro,        frozen solid for 2.5s
- *           water on cryo
+ *           water on cryo        (1s for players)
  * Swirl     wind on any aura     spreads it around
  * </pre>
  */
@@ -34,6 +34,7 @@ public final class ElementalReactions {
     private static final float MELT_MULTIPLIER = 1.75f;
     private static final float VAPORIZE_MULTIPLIER = 1.5f;
     private static final int FREEZE_TICKS = 50;
+    private static final int PLAYER_FREEZE_TICKS = 20;
     // After a Freeze wears off, the target can't be re-frozen by a reaction for a few seconds.
     private static final int FREEZE_IMMUNITY_TICKS = 60;
     private static final String TAG_FREEZE_IMMUNE_UNTIL = "ea_freeze_immune_until";
@@ -187,8 +188,8 @@ public final class ElementalReactions {
     }
 
     /**
-     * Freeze: the target is frozen solid for 2.5s and dries off. Doesn't stack: a target that is
-     * frozen, or was just thawed, can't be frozen again by a reaction for a few seconds.
+     * Freeze: the target is frozen solid for 2.5s (1s for players) and dries off. Doesn't stack: a
+     * target that is frozen, or was just thawed, can't be frozen again by a reaction for a few seconds.
      */
     public static boolean freeze(LivingEntity target) {
         if (!(target.level() instanceof ServerLevel level) || target.hasEffect(ModContent.FROZEN)
@@ -196,8 +197,10 @@ public final class ElementalReactions {
             return false;
         }
         target.removeEffect(ModContent.WET);
-        target.addEffect(new MobEffectInstance(ModContent.FROZEN, FREEZE_TICKS));
-        target.getPersistentData().putLong(TAG_FREEZE_IMMUNE_UNTIL, level.getGameTime() + FREEZE_TICKS + FREEZE_IMMUNITY_TICKS);
+        // Frozen solid is harsh on a player, so it's short for them.
+        int ticks = target instanceof Player ? PLAYER_FREEZE_TICKS : FREEZE_TICKS;
+        target.addEffect(new MobEffectInstance(ModContent.FROZEN, ticks));
+        target.getPersistentData().putLong(TAG_FREEZE_IMMUNE_UNTIL, level.getGameTime() + ticks + FREEZE_IMMUNITY_TICKS);
         level.sendParticles(ModContent.ICE_SHARD.get(), target.getX(), target.getY(0.5), target.getZ(), 16, 0.3, 0.4, 0.3, 0.08);
         level.sendParticles(ModContent.FROST_MIST.get(), target.getX(), target.getY(0.3), target.getZ(), 4, 0.4, 0.3, 0.4, 0.01);
         level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.GLASS_PLACE, SoundSource.PLAYERS, 1f, 0.6f);

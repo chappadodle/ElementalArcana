@@ -1,0 +1,29 @@
+package com.chappadodle.elementalarcana.content.mob;
+
+import com.chappadodle.elementalarcana.api.Element;
+
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+
+/** The spells each element's Attuned creatures know, lowest rank first. */
+public final class MobSpells {
+    /** Mob spell power: 60% of what a player's Lv 1 spell does. */
+    public static final float POWER = 0.6f;
+
+    private static final Map<Element, List<MobSpell>> BY_ELEMENT = new EnumMap<>(Element.class);
+
+    static {
+        BY_ELEMENT.put(Element.FIRE, FireMobSpells.ALL);
+        BY_ELEMENT.put(Element.WATER, List.of());
+        BY_ELEMENT.put(Element.ICE, List.of());
+        BY_ELEMENT.put(Element.WIND, List.of());
+    }
+
+    private MobSpells() {
+    }
+
+    public static List<MobSpell> of(Element element) {
+        return BY_ELEMENT.get(element);
+    }
+}

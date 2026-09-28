@@ -1,11 +1,11 @@
 package com.chappadodle.elementalarcana.content;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
+import com.chappadodle.elementalarcana.api.SpellTargets;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -16,11 +16,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 /**
- * A short-lived patch of burning ground: sets creatures that stand in it alight (never players,
- * never its caster) and flickers with flames. It doesn't place real fire blocks. Server-side only.
+ * A short-lived patch of burning ground: sets creatures that stand in it alight (whoever its
+ * caster's magic may hurt, see SpellTargets) and flickers with flames. It doesn't place real fire
+ * blocks. Server-side only.
  */
 @EventBusSubscriber(modid = ElementalArcana.MODID)
 public final class FireField {
@@ -30,10 +30,10 @@ public final class FireField {
     private final Vec3 center;
     private final double radius;
     @Nullable
-    private final UUID owner;
+    private final Entity owner;
     private int ticksLeft;
 
-    private FireField(ServerLevel level, Vec3 center, double radius, int ticks, @Nullable UUID owner) {
+    private FireField(ServerLevel level, Vec3 center, double radius, int ticks, @Nullable Entity owner) {
         this.level = level;
         this.center = center;
         this.radius = radius;
@@ -42,7 +42,7 @@ public final class FireField {
     }
 
     public static void spawn(ServerLevel level, Vec3 center, double radius, int ticks, @Nullable Entity owner) {
-        ACTIVE.add(new FireField(level, center, radius, ticks, owner == null ? null : owner.getUUID()));
+        ACTIVE.add(new FireField(level, center, radius, ticks, owner));
     }
 
     @SubscribeEvent
@@ -59,7 +59,7 @@ public final class FireField {
     private void tick() {
         if (ticksLeft % 10 == 0) {
             for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, new AABB(center, center).inflate(radius, 1.5, radius),
-                    e -> !(e instanceof Player) && !e.getUUID().equals(owner) && e.isAlive()
+                    e -> SpellTargets.canAffect(owner, e)
                             && Math.hypot(e.getX() - center.x, e.getZ() - center.z) <= radius)) {
                 entity.igniteForTicks(60);
             }
