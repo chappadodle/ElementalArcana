@@ -1,0 +1,19 @@
+# An Attuned Fire zombie that can't walk, with a villager right next to it (1.5 blocks: melee
+# range). Punches never set anything on fire, so the villager's Fire value is only positive if the
+# zombie cast a spell up close. The villager has full resistance so it survives.
+time set midnight
+gamerule doMobSpawning false
+forceload add -16 -16 16 16
+fill -12 99 -12 12 99 12 minecraft:stone
+fill -12 100 -12 12 106 12 minecraft:air
+summon villager 2.0 100 0.5 {NoAI:1b,Tags:["eatest"],active_effects:[{id:"minecraft:resistance",amplifier:4,duration:2000,show_particles:0b}]}
+summon zombie 0.5 100 0.5 {Tags:["eatest","eacaster"],attributes:[{id:"minecraft:generic.movement_speed",base:0.0}]}
+arcana attune @e[tag=eacaster] fire adept
+sleep 3
+data get entity @e[type=villager,tag=eatest,limit=1] Fire
+sleep 2
+data get entity @e[type=villager,tag=eatest,limit=1] Fire
+kill @e[tag=eatest]
+kill @e[type=elementalarcana:spell_projectile]
+gamerule doMobSpawning true
+forceload remove all

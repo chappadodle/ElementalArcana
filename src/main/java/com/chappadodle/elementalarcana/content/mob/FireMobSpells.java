@@ -1,6 +1,7 @@
 package com.chappadodle.elementalarcana.content.mob;
 
 import com.chappadodle.elementalarcana.api.AttunementRank;
+import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.content.FireField;
 import com.chappadodle.elementalarcana.content.ModSpells;
 import net.minecraft.core.particles.ParticleTypes;
@@ -13,7 +14,7 @@ import java.util.List;
 
 /** Fire: Adepts throw fireballs, Magi set the ground under you alight, Archmages call down Meteors. */
 public final class FireMobSpells {
-    public static final List<MobSpell> ALL = List.of(new Fireball(), new BurningGround(), new Meteor());
+    public static final List<MobSpell> ALL = List.of(new Fireball(), new CloseBurst(Element.FIRE), new BurningGround(), new Meteor());
 
     private FireMobSpells() {
     }
@@ -32,7 +33,7 @@ public final class FireMobSpells {
         @Override
         public boolean canCast(Mob caster, LivingEntity target) {
             double distance = MobCasting.distance(caster, target);
-            return distance >= 2.5 && distance <= 24;
+            return distance <= 24;
         }
 
         @Override

@@ -197,6 +197,11 @@ Decided while planning step 3:
 - **Water Magi heal only other monsters**, and a healed creature can't be healed again by anyone for
   10 s (at most 4 health per 10 s each). Found in play-testing: self-healing plus several Magi
   healing each other made them unkillable.
+- **Up close** (found in play-testing: mobs in melee range never cast, because the projectile spells
+  had a 2.5-block minimum): projectile spells now work at any range, except Meteor, which still needs 6
+  blocks to arc. Every Attuned creature also knows a **close burst** (Adept rank, within 2.5 blocks,
+  5 s cooldown). It deals a little damage of its element, shoves the target back and adds an element
+  effect: fire ignites, water soaks, ice frosts and slows, wind pushes further.
 
 ### Rewards
 

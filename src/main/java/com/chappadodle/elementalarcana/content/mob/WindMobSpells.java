@@ -16,7 +16,7 @@ import java.util.List;
 
 /** Wind: Adepts slash wind blades, Magi dash away or in, Archmages throw you into the air. */
 public final class WindMobSpells {
-    public static final List<MobSpell> ALL = List.of(new Blade(), new GaleDash(), new Updraft());
+    public static final List<MobSpell> ALL = List.of(new Blade(), new CloseBurst(Element.WIND), new GaleDash(), new Updraft());
 
     private WindMobSpells() {
     }
@@ -35,7 +35,7 @@ public final class WindMobSpells {
         @Override
         public boolean canCast(Mob caster, LivingEntity target) {
             double distance = MobCasting.distance(caster, target);
-            return distance >= 2.5 && distance <= 24;
+            return distance <= 24;
         }
 
         @Override

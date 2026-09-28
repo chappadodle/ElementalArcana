@@ -1,6 +1,7 @@
 package com.chappadodle.elementalarcana.content.mob;
 
 import com.chappadodle.elementalarcana.api.AttunementRank;
+import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.SpellTargets;
 import com.chappadodle.elementalarcana.content.ModSpells;
 import com.chappadodle.elementalarcana.content.spell.FrostNovaSpell;
@@ -13,7 +14,7 @@ import java.util.List;
 
 /** Ice: Adepts throw icicles, Magi burst a Frost Nova when you're close, Archmages ward themselves in ice. */
 public final class IceMobSpells {
-    public static final List<MobSpell> ALL = List.of(new Icicle(), new Nova(), new Ward());
+    public static final List<MobSpell> ALL = List.of(new Icicle(), new CloseBurst(Element.ICE), new Nova(), new Ward());
 
     private IceMobSpells() {
     }
@@ -32,7 +33,7 @@ public final class IceMobSpells {
         @Override
         public boolean canCast(Mob caster, LivingEntity target) {
             double distance = MobCasting.distance(caster, target);
-            return distance >= 2.5 && distance <= 24;
+            return distance <= 24;
         }
 
         @Override

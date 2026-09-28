@@ -1,6 +1,7 @@
 package com.chappadodle.elementalarcana.content.mob;
 
 import com.chappadodle.elementalarcana.api.AttunementRank;
+import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.content.Whirlpool;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -13,7 +14,7 @@ import java.util.List;
 
 /** Water: Adepts spray a jet, Magi heal the other monsters around them, Archmages open a whirlpool under you. */
 public final class WaterMobSpells {
-    public static final List<MobSpell> ALL = List.of(new JetBurst(), new HealAllies(), new Maelstrom());
+    public static final List<MobSpell> ALL = List.of(new JetBurst(), new CloseBurst(Element.WATER), new HealAllies(), new Maelstrom());
 
     private static final double HEAL_RADIUS = 8;
     private static final float HEAL_AMOUNT = 4f;
