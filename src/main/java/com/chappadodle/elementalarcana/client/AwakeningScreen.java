@@ -26,7 +26,10 @@ import java.util.Locale;
 /** Choose the element your magic awakens to: first on joining, then for each new affinity slot. */
 public class AwakeningScreen extends Screen {
     private static final int GAP = 8;
-    private static final int CARD_HEIGHT = 136;
+    // Cards grow taller when their text needs it (see init), but never shorter than this.
+    private static final int MIN_cardHeight = 136;
+    private static final int DESCRIPTION_TOP = 62;
+    private static final int LINE_HEIGHT = 10;
 
     private final List<SpellSchool> choices = new ArrayList<>();
     @Nullable
@@ -35,6 +38,7 @@ public class AwakeningScreen extends Screen {
     private int cardWidth;
     private int cardsLeft;
     private int cardsTop;
+    private int cardHeight;
 
     public AwakeningScreen() {
         super(Component.translatable("screen.elementalarcana.awakening"));
@@ -56,10 +60,19 @@ public class AwakeningScreen extends Screen {
         int count = choices.size();
         cardWidth = Math.min(96, (width - 20 - (count - 1) * GAP) / count);
         cardsLeft = (width - (count * cardWidth + (count - 1) * GAP)) / 2;
-        cardsTop = height / 2 - CARD_HEIGHT / 2 - 6;
+        // Tall enough for the longest description plus footer, measured with the real font, so
+        // the text never spills out of the card at any GUI scale or language.
+        cardHeight = MIN_cardHeight;
+        for (SpellSchool school : choices) {
+            int descriptionLines = font.split(school.description(), cardWidth - 10).size();
+            Component footer = footer(data, school);
+            int footerLines = footer == null ? 0 : font.split(footer, cardWidth - 10).size();
+            cardHeight = Math.max(cardHeight, DESCRIPTION_TOP + (descriptionLines + footerLines) * LINE_HEIGHT + 12);
+        }
+        cardsTop = height / 2 - cardHeight / 2 - 6;
 
         awakenButton = addRenderableWidget(Button.builder(Component.translatable("screen.elementalarcana.awakening.confirm"), button -> confirm())
-                .bounds(width / 2 - 60, cardsTop + CARD_HEIGHT + 12, 120, 20)
+                .bounds(width / 2 - 60, cardsTop + cardHeight + 12, 120, 20)
                 .build());
         awakenButton.active = picked != null;
     }
@@ -86,14 +99,13 @@ public class AwakeningScreen extends Screen {
             SpellSchool school = choices.get(i);
             int x = cardsLeft + i * (cardWidth + GAP);
             // Opposed to an element you hold: shown, but locked until Magic Level 30.
-            Element blocker = data.opposedBy(school);
-            boolean locked = blocker != null;
+            boolean locked = data.opposedBy(school) != null;
             int color = locked ? 0xFF5A5468 : FastColor.ARGB32.opaque(school.color());
             boolean hovered = !locked && isOverCard(i, mouseX, mouseY);
             boolean isPicked = school == picked;
 
-            graphics.fill(x - 1, cardsTop - 1, x + cardWidth + 1, cardsTop + CARD_HEIGHT + 1, isPicked || hovered ? color : 0xFF3A3050);
-            graphics.fill(x, cardsTop, x + cardWidth, cardsTop + CARD_HEIGHT,
+            graphics.fill(x - 1, cardsTop - 1, x + cardWidth + 1, cardsTop + cardHeight + 1, isPicked || hovered ? color : 0xFF3A3050);
+            graphics.fill(x, cardsTop, x + cardWidth, cardsTop + cardHeight,
                     isPicked ? FastColor.ARGB32.color(90, school.color()) : hovered ? 0xF0201830 : ArcanaDraw.PANEL_BG);
 
             Spell starter = starterSpell(school);
@@ -102,30 +114,39 @@ public class AwakeningScreen extends Screen {
             }
             graphics.drawCenteredString(font, school.displayName(), x + cardWidth / 2, cardsTop + 48, color);
 
-            int lineY = cardsTop + 62;
+            int lineY = cardsTop + DESCRIPTION_TOP;
             for (FormattedCharSequence line : font.split(school.description(), cardWidth - 10)) {
                 graphics.drawString(font, line, x + 5, lineY, locked ? 0xFF6A6480 : 0xFFC8C0D8, false);
-                lineY += 10;
+                lineY += LINE_HEIGHT;
             }
-            Component footer = locked
-                    ? Component.translatable("screen.elementalarcana.awakening.opposed",
-                            Component.translatable("school.elementalarcana." + blocker.name().toLowerCase(Locale.ROOT)),
-                            AffinityRules.OPPOSITES_UNLOCK_LEVEL)
-                    : starter != null ? Component.translatable("screen.elementalarcana.awakening.starts_with", starter.displayName()) : null;
+            Component footer = footer(data, school);
             if (footer != null) {
                 List<FormattedCharSequence> lines = font.split(footer, cardWidth - 10);
-                int footerY = cardsTop + CARD_HEIGHT - 6 - lines.size() * 10;
+                int footerY = cardsTop + cardHeight - 6 - lines.size() * LINE_HEIGHT;
                 for (FormattedCharSequence line : lines) {
                     graphics.drawString(font, line, x + 5, footerY, locked ? 0xFFD07070 : 0xFF8A8A9A, false);
-                    footerY += 10;
+                    footerY += LINE_HEIGHT;
                 }
             }
         }
     }
 
+    /** The card's bottom line: why it's locked, or the spell it starts with. */
+    @Nullable
+    private static Component footer(MagicData data, SpellSchool school) {
+        Element blocker = data.opposedBy(school);
+        if (blocker != null) {
+            return Component.translatable("screen.elementalarcana.awakening.opposed",
+                    Component.translatable("school.elementalarcana." + blocker.name().toLowerCase(Locale.ROOT)),
+                    AffinityRules.OPPOSITES_UNLOCK_LEVEL);
+        }
+        Spell starter = starterSpell(school);
+        return starter == null ? null : Component.translatable("screen.elementalarcana.awakening.starts_with", starter.displayName());
+    }
+
     private boolean isOverCard(int index, double mouseX, double mouseY) {
         int x = cardsLeft + index * (cardWidth + GAP);
-        return mouseX >= x && mouseX < x + cardWidth && mouseY >= cardsTop && mouseY < cardsTop + CARD_HEIGHT;
+        return mouseX >= x && mouseX < x + cardWidth && mouseY >= cardsTop && mouseY < cardsTop + cardHeight;
     }
 
     @Override
