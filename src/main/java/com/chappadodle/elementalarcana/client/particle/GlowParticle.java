@@ -2,6 +2,7 @@ package com.chappadodle.elementalarcana.client.particle;
 
 import com.chappadodle.elementalarcana.api.ProjectileSpell;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
+import com.chappadodle.elementalarcana.client.Bloom;
 import com.chappadodle.elementalarcana.content.GlowParticleOptions;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
@@ -107,6 +108,9 @@ public class GlowParticle extends TextureSheetParticle {
         }
         this.quadSize = baseSize;
         updateLook();
+        if (kind != Kind.SCORCH) {
+            Bloom.track(this, level, lifetime);
+        }
     }
 
     @Override

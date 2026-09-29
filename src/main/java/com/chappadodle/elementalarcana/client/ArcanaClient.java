@@ -242,6 +242,7 @@ public final class ArcanaClient {
     public static void afterParticles(RenderLevelStageEvent event) {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
             RenderSystem.defaultBlendFunc();
+            Bloom.renderParticles(event.getCamera(), event.getPartialTick().getGameTimeDeltaPartialTick(false));
         }
     }
 

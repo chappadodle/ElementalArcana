@@ -144,6 +144,20 @@ separate experiment with an on/off switch.
   A client config option, `screenEffects` (default on, editable in the mod's config screen),
   turns them off.
 
+## Bloom experiment (Veil)
+
+- **The dependency:** Veil 4.5.1 is an **optional** dependency: `compileOnly` plus `localRuntime` in
+  Gradle, and `optional` on the client in `mods.toml`. Without Veil there's simply no bloom.
+- **`client/Bloom`** is safe to load without Veil:
+  - Glowing particles (Flare, Spark, Feather, Ring, Corona, Cracks, Ember) register themselves as
+    they're made.
+  - At `AFTER_PARTICLES`, it draws them a second time into Veil's bloom buffer.
+  - Projectile glow halos also draw into it through a bloom version of the eyes render type.
+- **`compat/veil/VeilBloom`** is the only class that touches Veil. It uses
+  `VeilRenderSystem.BLOOM_SHARD`, and turns bloom off while an Iris shader pack is on.
+- **The switch:** client config `bloom` (default on), for the A/B comparison. It takes effect
+  immediately.
+
 ## Noted for later (from play-testing step 1)
 
 - **Screen space with several held fireballs:** a full set, especially the Lv 8+ heat looks, can

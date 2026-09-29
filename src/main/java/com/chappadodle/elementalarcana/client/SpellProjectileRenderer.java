@@ -99,12 +99,20 @@ public class SpellProjectileRenderer extends EntityRenderer<SpellProjectile> {
         poseStack.mulPose(entityRenderDispatcher.cameraOrientation());
         poseStack.scale(size, size, size);
         PoseStack.Pose pose = poseStack.last();
-        VertexConsumer consumer = buffers.getBuffer(RenderType.eyes(GLOW_TEXTURE));
+        glowQuad(buffers.getBuffer(RenderType.eyes(GLOW_TEXTURE)), pose, red, green, blue);
+        RenderType bloom = Bloom.glowType(GLOW_TEXTURE);
+        if (bloom != null) {
+            // Again into the bloom buffer, so the light spills around it.
+            glowQuad(buffers.getBuffer(bloom), pose, red, green, blue);
+        }
+        poseStack.popPose();
+    }
+
+    private static void glowQuad(VertexConsumer consumer, PoseStack.Pose pose, int red, int green, int blue) {
         glowVertex(consumer, pose, -0.5f, -0.5f, 0f, 1f, red, green, blue);
         glowVertex(consumer, pose, 0.5f, -0.5f, 1f, 1f, red, green, blue);
         glowVertex(consumer, pose, 0.5f, 0.5f, 1f, 0f, red, green, blue);
         glowVertex(consumer, pose, -0.5f, 0.5f, 0f, 0f, red, green, blue);
-        poseStack.popPose();
     }
 
     private static void glowVertex(VertexConsumer consumer, PoseStack.Pose pose, float x, float y, float u, float v, int red, int green, int blue) {

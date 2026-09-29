@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.client.particle;
 
+import com.chappadodle.elementalarcana.client.Bloom;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
@@ -26,6 +27,7 @@ public class EmberParticle extends TextureSheetParticle {
         this.quadSize = 0.04f + random.nextFloat() * 0.04f;
         setColor(1f, 0.9f, 0.45f);
         setSpriteFromAge(sprites);
+        Bloom.track(this, level, lifetime);
     }
 
     @Override

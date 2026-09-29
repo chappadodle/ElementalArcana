@@ -11,6 +11,11 @@ public final class ArcanaClientConfig {
             .translation("elementalarcana.configuration.screenEffects")
             .define("screenEffects", true);
 
+    public static final ModConfigSpec.BooleanValue BLOOM = BUILDER
+            .comment("Light bleeding around glowing spell effects. Needs the Veil mod; off while an Iris shader pack is on.")
+            .translation("elementalarcana.configuration.bloom")
+            .define("bloom", true);
+
     public static final ModConfigSpec SPEC = BUILDER.build();
 
     private ArcanaClientConfig() {

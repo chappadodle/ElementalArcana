@@ -340,5 +340,7 @@
   "elementalarcana.configuration.section.elementalarcana.client.toml": "Client",
   "elementalarcana.configuration.section.elementalarcana.client.toml.title": "Elemental Arcana: client",
   "elementalarcana.configuration.screenEffects": "Screen effects",
-  "elementalarcana.configuration.screenEffects.tooltip": "Camera shake and screen flashes from big spells (Meteor impacts, Sunfire)."
+  "elementalarcana.configuration.screenEffects.tooltip": "Camera shake and screen flashes from big spells (Meteor impacts, Sunfire).",
+  "elementalarcana.configuration.bloom": "Bloom",
+  "elementalarcana.configuration.bloom.tooltip": "Light bleeding around glowing spell effects. Needs the Veil mod; off while an Iris shader pack is on."
 }

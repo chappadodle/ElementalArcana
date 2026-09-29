@@ -39,6 +39,19 @@ repositories {
             includeGroup "maven.modrinth"
         }
     }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "BlameJared"
+                url = "https://maven.blamejared.com"
+            }
+        }
+        filter {
+            includeGroup "foundry.veil"
+            includeGroup "gg.moonflower"
+            includeGroup "io.github.ocelot"
+        }
+    }
 }
 
 base {
@@ -153,6 +166,12 @@ dependencies {
     // Not a required dependency: the mod runs without it.
     compileOnly "maven.modrinth:jade:15.10.6+neoforge"
     localRuntime "maven.modrinth:jade:15.10.6+neoforge"
+
+    // Veil: compiled against for the optional bloom (compat/veil), and loaded in the dev game.
+    // Not a required dependency: without it there's simply no bloom.
+    compileOnly "foundry.veil:veil-neoforge-1.21.1:4.5.1"
+    // Its own libraries come bundled inside it (jar-in-jar), so don't add them a second time.
+    localRuntime("foundry.veil:veil-neoforge-1.21.1:4.5.1") { transitive = false }
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
