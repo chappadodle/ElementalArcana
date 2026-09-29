@@ -107,12 +107,6 @@ public final class ModContent {
     /** A soft round glow that swells and fades (Sunfire's corona). */
     public static final DeferredHolder<ParticleType<?>, ParticleType<GlowParticleOptions>> CORONA =
             PARTICLES.register("corona", GlowParticleOptions::newType);
-    /** Glowing lava cracks lying on the ground, pulsing as they cool (Meteor's crater). */
-    public static final DeferredHolder<ParticleType<?>, ParticleType<GlowParticleOptions>> CRACKS =
-            PARTICLES.register("cracks", GlowParticleOptions::newType);
-    /** A dark burn mark lying on the ground that slowly fades. */
-    public static final DeferredHolder<ParticleType<?>, ParticleType<GlowParticleOptions>> SCORCH =
-            PARTICLES.register("scorch", GlowParticleOptions::newType);
     /** A fireball's whole explosion in one particle (see FireBlastOptions). */
     public static final DeferredHolder<ParticleType<?>, ParticleType<FireBlastOptions>> FIRE_BLAST =
             PARTICLES.register("fire_blast", FireBlastOptions::newType);

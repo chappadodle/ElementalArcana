@@ -204,6 +204,29 @@ in its A/B. It's built in two play-tests:
 - **A/B:** a client config option, `signatureSounds` (default on), swaps each ★ sound for its
   vanilla mix, and takes effect immediately.
 
+## Marks that follow the blocks (after step 4)
+
+The scorch mark and Meteor's cracks used to be flat particles: one square hovering at the impact
+height. They hung over ledges and floated when the block under them broke.
+
+- **`client/decal/Decals`** projects each mark onto the real, exposed block faces around it,
+  every frame. Vanilla's block-breaking cracks are drawn onto blocks the same way.
+  - The mark faces the surface that was hit: the ground (found straight down), or otherwise the
+    nearest face within 0.8 blocks, so walls and ceilings get marks too.
+  - For each block column across the mark's circle, it takes the exposed face nearest the mark's
+    own surface, within 1.5 blocks. A face is exposed when the next block doesn't have a sturdy
+    face covering it.
+  - It draws the part of the mark over that face, cut to the face's bounds. It fades on faces
+    further from where it hit.
+  - The result: marks follow steps and slabs, stop at ledges, and lose their part when a block
+    breaks.
+- **Render types:**
+  - Scorch uses entity-translucent: lit by the world, with polygon offset.
+  - Cracks are additive and full bright, with polygon offset, and also draw into bloom.
+- **When:** drawn at `AFTER_CUTOUT_BLOCKS`.
+- **Textures:** 32×32 in `textures/misc/`. Marks are randomly mirrored so they don't all look
+  alike.
+
 ## Noted for later (from play-testing step 1)
 
 - **Screen space with several held fireballs:** a full set, especially the Lv 8+ heat looks, can

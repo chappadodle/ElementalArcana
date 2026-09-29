@@ -1,6 +1,7 @@
 package com.chappadodle.elementalarcana.content.spell;
 
 import com.chappadodle.elementalarcana.api.SpellProjectile;
+import com.chappadodle.elementalarcana.client.decal.Decals;
 import com.chappadodle.elementalarcana.content.GlowParticleOptions;
 import com.chappadodle.elementalarcana.content.ModContent;
 import net.minecraft.core.Direction;
@@ -356,11 +357,13 @@ public final class FireballEffects {
                                 new Vec3(0, (meteor ? 0.5 : 0.25) + 0.2 * random.nextDouble(), 0));
                     }
                 }
-                if (heat >= 4 || meteor) {
-                    add(level, glow(ModContent.SCORCH.get(), 0xFFFFFF, 0xFFFFFF, radius * 0.8f, meteor ? 100 : 60), floor.add(0, 0.02, 0), Vec3.ZERO);
-                }
+            }
+            // Marks on whatever it hit (the ground, a wall, a ceiling), painted onto the blocks.
+            @Nullable BlockHitResult surface = ground != null ? ground : surfaceNear(level, at);
+            if (surface != null && (heat >= 4 || meteor)) {
+                Decals.add(Decals.Kind.SCORCH, surface.getLocation(), surface.getDirection(), radius * 0.8f, meteor ? 100 : 60, 0xFFFFFF);
                 if (meteor) {
-                    add(level, glow(ModContent.CRACKS.get(), palette.core(), palette.fade(), radius * 0.7f, 100), floor.add(0, 0.03, 0), Vec3.ZERO);
+                    Decals.add(Decals.Kind.CRACKS, surface.getLocation(), surface.getDirection(), radius * 0.7f, 100, palette.core());
                 }
             }
             if (meteor) {
@@ -446,6 +449,23 @@ public final class FireballEffects {
         BlockHitResult hit = level.clip(new ClipContext(at.add(0, 0.3, 0), at.subtract(0, 1.5, 0),
                 ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
         return hit.getType() == HitResult.Type.BLOCK && hit.getDirection() == Direction.UP ? hit : null;
+    }
+
+    /** The closest block face within reach of a blast that isn't over ground (a wall, a ceiling), or null. */
+    @Nullable
+    private static BlockHitResult surfaceNear(Level level, Vec3 at) {
+        BlockHitResult best = null;
+        double bestDistance = Double.MAX_VALUE;
+        for (Direction direction : Direction.values()) {
+            Vec3 toward = Vec3.atLowerCornerOf(direction.getNormal());
+            BlockHitResult hit = level.clip(new ClipContext(at.subtract(toward.scale(0.2)), at.add(toward.scale(0.8)),
+                    ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
+            if (hit.getType() == HitResult.Type.BLOCK && hit.getLocation().distanceToSqr(at) < bestDistance) {
+                bestDistance = hit.getLocation().distanceToSqr(at);
+                best = hit;
+            }
+        }
+        return best;
     }
 
     private static void add(Level level, ParticleOptions particle, Vec3 at, Vec3 velocity) {

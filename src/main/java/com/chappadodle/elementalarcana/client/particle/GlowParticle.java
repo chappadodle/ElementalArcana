@@ -30,19 +30,17 @@ import org.joml.Vector3f;
  *   <li>Feather: flutters down, swaying and rocking.</li>
  *   <li>Ring: lies flat and expands to its size, fading (a shockwave).</li>
  *   <li>Corona: a round glow that swells and fades.</li>
- *   <li>Cracks: lie flat and pulse as they cool.</li>
- *   <li>Scorch: a dark mark lying flat, not glowing (blended normally, lit by the world).</li>
  * </ul>
  * An anchored particle keeps its position and motion relative to its anchor entity (for a held
  * projectile, its place in the caster's hand), and disappears with it.
  */
 public class GlowParticle extends TextureSheetParticle {
     public enum Kind {
-        FLARE, SPARK, FEATHER, RING, CORONA, CRACKS, SCORCH;
+        FLARE, SPARK, FEATHER, RING, CORONA;
 
         /** Lies flat on the ground instead of facing the camera. */
         boolean flat() {
-            return this == RING || this == CRACKS || this == SCORCH;
+            return this == RING;
         }
     }
 
@@ -99,7 +97,7 @@ public class GlowParticle extends TextureSheetParticle {
                 pickSprite(sprites);
                 roll = oRoll = (random.nextFloat() - 0.5f) * 1.2f;
             }
-            case RING, CORONA, CRACKS, SCORCH -> {
+            case RING, CORONA -> {
                 friction = 0.9f;
                 gravity = 0f;
                 pickSprite(sprites);
@@ -108,9 +106,7 @@ public class GlowParticle extends TextureSheetParticle {
         }
         this.quadSize = baseSize;
         updateLook();
-        if (kind != Kind.SCORCH) {
-            Bloom.track(this, level, lifetime);
-        }
+        Bloom.track(this, level, lifetime);
     }
 
     @Override
@@ -159,14 +155,6 @@ public class GlowParticle extends TextureSheetParticle {
                 float grown = 1f - (1f - life) * (1f - life);
                 quadSize = baseSize * (0.4f + 0.6f * grown);
                 alpha = 0.9f * (1f - life) * (1f - life);
-            }
-            case CRACKS -> {
-                quadSize = baseSize;
-                alpha = (1f - life) * (0.75f + 0.25f * Mth.sin(age * 0.4f + swayPhase));
-            }
-            case SCORCH -> {
-                quadSize = baseSize;
-                alpha = life < 0.6f ? 0.85f : 0.85f * (1f - (life - 0.6f) / 0.4f);
             }
         }
     }
@@ -232,12 +220,12 @@ public class GlowParticle extends TextureSheetParticle {
 
     @Override
     public ParticleRenderType getRenderType() {
-        return kind == Kind.SCORCH ? ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT : AdditiveParticles.RENDER_TYPE;
+        return AdditiveParticles.RENDER_TYPE;
     }
 
     @Override
     protected int getLightColor(float partialTick) {
-        return kind == Kind.SCORCH ? super.getLightColor(partialTick) : LightTexture.FULL_BRIGHT;
+        return LightTexture.FULL_BRIGHT;
     }
 
     public record Provider(Kind kind, SpriteSet sprites) implements ParticleProvider<GlowParticleOptions> {

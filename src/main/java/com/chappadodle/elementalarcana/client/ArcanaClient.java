@@ -7,6 +7,7 @@ import com.chappadodle.elementalarcana.api.ShieldSpell;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.SpellShield;
+import com.chappadodle.elementalarcana.client.decal.Decals;
 import com.chappadodle.elementalarcana.client.particle.CinderParticle;
 import com.chappadodle.elementalarcana.client.particle.EmberParticle;
 import com.chappadodle.elementalarcana.client.particle.FireBlastEmitter;
@@ -231,8 +232,6 @@ public final class ArcanaClient {
         event.registerSpriteSet(ModContent.CINDER.get(), CinderParticle.Provider::new);
         event.registerSpriteSet(ModContent.SHOCKWAVE.get(), sprites -> new GlowParticle.Provider(GlowParticle.Kind.RING, sprites));
         event.registerSpriteSet(ModContent.CORONA.get(), sprites -> new GlowParticle.Provider(GlowParticle.Kind.CORONA, sprites));
-        event.registerSpriteSet(ModContent.CRACKS.get(), sprites -> new GlowParticle.Provider(GlowParticle.Kind.CRACKS, sprites));
-        event.registerSpriteSet(ModContent.SCORCH.get(), sprites -> new GlowParticle.Provider(GlowParticle.Kind.SCORCH, sprites));
         event.registerSpecial(ModContent.FIRE_BLAST.get(), new FireBlastEmitter.Provider());
     }
 
@@ -240,6 +239,9 @@ public final class ArcanaClient {
     // before anything drawn later assumes the default.
     @SubscribeEvent
     public static void afterParticles(RenderLevelStageEvent event) {
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_CUTOUT_BLOCKS) {
+            Decals.render(event);
+        }
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
             RenderSystem.defaultBlendFunc();
             Bloom.renderParticles(event.getCamera(), event.getPartialTick().getGameTimeDeltaPartialTick(false));

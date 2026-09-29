@@ -868,9 +868,14 @@ def main():
         path = ASSETS / f"particle/spark_{frame}.png"
         spark(frame).save(path)
         print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
-    for name, make in (("shockwave", shockwave), ("corona", corona), ("cracks", cracks), ("scorch", scorch)):
+    for name, make in (("shockwave", shockwave), ("corona", corona)):
         path = ASSETS / f"particle/{name}.png"
         make().save(path)
+        print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
+    # Marks painted onto blocks (client/decal/Decals): bigger, since they span several blocks.
+    for name, make in (("cracks", cracks), ("scorch", scorch)):
+        path = ASSETS / f"misc/{name}.png"
+        make(32).save(path)
         print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
     for name, sprites, palette in (("feather", FEATHERS, FEATHER_PALETTE), ("cinder", CINDERS, CINDER_PALETTE)):
         for frame, grid in enumerate(sprites):
