@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.client;
 
+import com.chappadodle.elementalarcana.api.AffinityRules;
+import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.SpellSchool;
@@ -19,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /** Choose the element your magic awakens to: first on joining, then for each new affinity slot. */
 public class AwakeningScreen extends Screen {
@@ -71,7 +74,8 @@ public class AwakeningScreen extends Screen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.render(graphics, mouseX, mouseY, partialTick);
-        boolean first = !MagicAttachments.get(minecraft.player).isAwakened();
+        MagicData data = MagicAttachments.get(minecraft.player);
+        boolean first = !data.isAwakened();
         graphics.drawCenteredString(font, first ? title : Component.translatable("screen.elementalarcana.awakening.again"),
                 width / 2, cardsTop - 30, 0xFFE8D8FF);
         graphics.drawCenteredString(font, Component.translatable(first
@@ -81,8 +85,11 @@ public class AwakeningScreen extends Screen {
         for (int i = 0; i < choices.size(); i++) {
             SpellSchool school = choices.get(i);
             int x = cardsLeft + i * (cardWidth + GAP);
-            int color = FastColor.ARGB32.opaque(school.color());
-            boolean hovered = isOverCard(i, mouseX, mouseY);
+            // Opposed to an element you hold: shown, but locked until Magic Level 30.
+            Element blocker = data.opposedBy(school);
+            boolean locked = blocker != null;
+            int color = locked ? 0xFF5A5468 : FastColor.ARGB32.opaque(school.color());
+            boolean hovered = !locked && isOverCard(i, mouseX, mouseY);
             boolean isPicked = school == picked;
 
             graphics.fill(x - 1, cardsTop - 1, x + cardWidth + 1, cardsTop + CARD_HEIGHT + 1, isPicked || hovered ? color : 0xFF3A3050);
@@ -91,21 +98,26 @@ public class AwakeningScreen extends Screen {
 
             Spell starter = starterSpell(school);
             if (starter != null) {
-                ArcanaDraw.icon(graphics, starter, x + cardWidth / 2 - 16, cardsTop + 10, 32, 1f, 1f);
+                ArcanaDraw.icon(graphics, starter, x + cardWidth / 2 - 16, cardsTop + 10, 32, locked ? 0.35f : 1f, 1f);
             }
             graphics.drawCenteredString(font, school.displayName(), x + cardWidth / 2, cardsTop + 48, color);
 
             int lineY = cardsTop + 62;
             for (FormattedCharSequence line : font.split(school.description(), cardWidth - 10)) {
-                graphics.drawString(font, line, x + 5, lineY, 0xFFC8C0D8, false);
+                graphics.drawString(font, line, x + 5, lineY, locked ? 0xFF6A6480 : 0xFFC8C0D8, false);
                 lineY += 10;
             }
-            if (starter != null) {
-                List<FormattedCharSequence> starts = font.split(Component.translatable("screen.elementalarcana.awakening.starts_with", starter.displayName()), cardWidth - 10);
-                int startsY = cardsTop + CARD_HEIGHT - 6 - starts.size() * 10;
-                for (FormattedCharSequence line : starts) {
-                    graphics.drawString(font, line, x + 5, startsY, 0xFF8A8A9A, false);
-                    startsY += 10;
+            Component footer = locked
+                    ? Component.translatable("screen.elementalarcana.awakening.opposed",
+                            Component.translatable("school.elementalarcana." + blocker.name().toLowerCase(Locale.ROOT)),
+                            AffinityRules.OPPOSITES_UNLOCK_LEVEL)
+                    : starter != null ? Component.translatable("screen.elementalarcana.awakening.starts_with", starter.displayName()) : null;
+            if (footer != null) {
+                List<FormattedCharSequence> lines = font.split(footer, cardWidth - 10);
+                int footerY = cardsTop + CARD_HEIGHT - 6 - lines.size() * 10;
+                for (FormattedCharSequence line : lines) {
+                    graphics.drawString(font, line, x + 5, footerY, locked ? 0xFFD07070 : 0xFF8A8A9A, false);
+                    footerY += 10;
                 }
             }
         }
@@ -120,6 +132,9 @@ public class AwakeningScreen extends Screen {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         for (int i = 0; i < choices.size(); i++) {
             if (button == 0 && isOverCard(i, mouseX, mouseY)) {
+                if (MagicAttachments.get(minecraft.player).opposedBy(choices.get(i)) != null) {
+                    return true;
+                }
                 picked = choices.get(i);
                 awakenButton.active = true;
                 minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1f));

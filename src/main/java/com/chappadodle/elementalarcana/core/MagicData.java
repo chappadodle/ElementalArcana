@@ -1,6 +1,9 @@
 package com.chappadodle.elementalarcana.core;
 
+import com.chappadodle.elementalarcana.api.AffinityRules;
+import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.Progression;
+import com.chappadodle.elementalarcana.api.SchoolElements;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.SpellSchool;
@@ -15,10 +18,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Everything about a player's magic: level and XP, awakened elements (affinities), mana,
@@ -223,9 +228,34 @@ public final class MagicData {
         return affinities.contains(school.id());
     }
 
-    /** Awakens a new element if there's a free slot. Selects its first spell if nothing is selected. */
+    /** The elements of the schools you've awakened (schools that aren't one of the four are left out). */
+    public Set<Element> affinityElements() {
+        Set<Element> elements = EnumSet.noneOf(Element.class);
+        for (ResourceLocation id : affinities) {
+            Element element = SchoolElements.of(id);
+            if (element != null) {
+                elements.add(element);
+            }
+        }
+        return elements;
+    }
+
+    /**
+     * The element you hold that {@code school} opposes while opposites are still locked (below
+     * Magic Level 30), or null if {@code school} can be awakened as far as opposites go.
+     */
+    @Nullable
+    public Element opposedBy(SpellSchool school) {
+        Element element = SchoolElements.of(school);
+        return element == null ? null : AffinityRules.blockingOpposite(affinityElements(), element, level);
+    }
+
+    /**
+     * Awakens a new element if there's a free slot and no element you hold opposes it (until Magic
+     * Level 30). Selects its first spell if nothing is selected.
+     */
     public boolean awaken(SpellSchool school) {
-        if (hasAffinity(school) || !hasFreeAffinitySlot()) {
+        if (hasAffinity(school) || !hasFreeAffinitySlot() || opposedBy(school) != null) {
             return false;
         }
         affinities.add(school.id());

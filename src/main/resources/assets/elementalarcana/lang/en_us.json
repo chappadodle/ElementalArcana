@@ -327,5 +327,6 @@
   "screen.elementalarcana.detail.infuse.none": "You have no %s.",
   "screen.elementalarcana.detail.infuse.hint": "You have %s %s. Each fills less of the bar the higher the spell's level. Hold Shift to fill the bar.",
   "screen.elementalarcana.status.condense": "Condense %s Essence → +1 skill point",
-  "screen.elementalarcana.status.condense.hint": "You carry %s Essence (any element counts). Bonus points so far: %s. Each costs 4 more than the last."
+  "screen.elementalarcana.status.condense.hint": "You carry %s Essence (any element counts). Bonus points so far: %s. Each costs 4 more than the last.",
+  "screen.elementalarcana.awakening.opposed": "Opposes %s: unlocks at Magic Level %s"
 }

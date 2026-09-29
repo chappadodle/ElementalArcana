@@ -1,9 +1,11 @@
 package com.chappadodle.elementalarcana.content;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
+import com.chappadodle.elementalarcana.api.AffinityRules;
 import com.chappadodle.elementalarcana.api.CreatureElements;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.SpellDamage;
+import com.chappadodle.elementalarcana.core.MagicAttachments;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -11,6 +13,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
@@ -18,8 +21,9 @@ import org.joml.Vector3f;
 
 /**
  * The matchup chart (see Element#multiplierAgainst): spell damage is scaled by the target
- * creature's element. Strong and resisted hits sound and look different, which is the only way a
- * player learns a creature's element.
+ * creature's element, and players resist spells of the elements they've awakened (see
+ * AffinityRules). Strong and resisted hits sound and look different, which is how a player learns a
+ * creature's element.
  */
 @EventBusSubscriber(modid = ElementalArcana.MODID)
 public final class ElementalMatchups {
@@ -37,7 +41,10 @@ public final class ElementalMatchups {
             return;
         }
         LivingEntity target = event.getEntity();
-        float multiplier = spell.multiplierAgainst(CreatureElements.elementOf(target));
+        // Creatures use the chart; players resist the elements they've awakened.
+        float multiplier = target instanceof Player player
+                ? AffinityRules.spellDamageTaken(MagicAttachments.get(player).affinityElements(), spell)
+                : spell.multiplierAgainst(CreatureElements.elementOf(target));
         if (multiplier == 1f) {
             return;
         }

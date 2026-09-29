@@ -246,13 +246,12 @@ Each step is tested and committed on its own.
    element's three spells).
 4. **Rewards:** the Magic XP awards, the Essence items and their drops.
 
-## Open questions (decided later)
+## Open questions
 
-- What a player's **clashing affinity** (Fire + Water, Fire + Ice) does: blocked, allowed with a
-  cost, or something else.
-- Whether a player **resists the elements of their own affinities**. Until then, the chart applies
-  only to non-player creatures.
-- What **Elemental Essence** is used for.
+- ~~What a player's clashing affinity does~~ and ~~whether a player resists their own elements~~:
+  resolved in `2026-09-29-affinity-clash-and-resistance-design.md` (opposites unlock at Magic Level
+  30; own elements' spells hit players for 25% less).
+- ~~What Elemental Essence is used for~~: resolved in `2026-09-28-essence-progression-design.md`.
 
 ## Relationship to other work
 

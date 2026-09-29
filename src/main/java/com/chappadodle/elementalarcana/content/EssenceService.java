@@ -2,13 +2,12 @@ package com.chappadodle.elementalarcana.content;
 
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.Progression;
+import com.chappadodle.elementalarcana.api.SchoolElements;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.core.MagicData;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Locale;
 
 /**
  * Elemental Essence for spell progression, shared by the server handler and the screens:
@@ -22,11 +21,7 @@ public final class EssenceService {
     /** The element of a spell's school, or null for schools that aren't one of the four elements. */
     @Nullable
     public static Element elementOf(Spell spell) {
-        try {
-            return Element.valueOf(spell.school().id().getPath().toUpperCase(Locale.ROOT));
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
+        return SchoolElements.of(spell.school());
     }
 
     public static int count(Player player, Element element) {
