@@ -53,6 +53,9 @@ public class SpellProjectile extends ThrowableProjectile {
     private int bouncesLeft;
     private final Set<Integer> piercedIds = new HashSet<>();
     private int releaseCountdown = -1;
+    // Client-side: noticing the moments it's thrown and fully grown, for their particles.
+    private boolean wasHeld;
+    private boolean wasGrown;
     @Nullable
     private Vec3 pendingTarget;
 
@@ -308,8 +311,12 @@ public class SpellProjectile extends ThrowableProjectile {
         super.tick();
         if (level().isClientSide()) {
             if (spell != null) {
+                if (wasHeld) {
+                    spell.releaseParticles(this);
+                }
                 spell.flightParticles(this);
             }
+            wasHeld = false;
         } else if (spell == null || tickCount - releasedAt > spell.lifetimeTicks()) {
             discard();
         } else if (!isRemoved()) {
@@ -332,7 +339,13 @@ public class SpellProjectile extends ThrowableProjectile {
             return;
         }
         if (level().isClientSide()) {
-            spell.heldParticles(this, charge(0f));
+            wasHeld = true;
+            float charge = charge(0f);
+            if (charge >= 1f && !wasGrown) {
+                wasGrown = true;
+                spell.grownParticles(this);
+            }
+            spell.heldParticles(this, charge);
         }
     }
 

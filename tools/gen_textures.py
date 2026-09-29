@@ -724,6 +724,71 @@ def glow_sprite(size=64):
     return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA")
 
 
+def flare(frame, frames=4, size=8):
+    """The trail's glowing blob, in grey (the particle tints it; black adds nothing when blended
+    additively): a round pixel blob in three brightness steps. Later frames are smaller and
+    dissolve pixel by pixel."""
+    rng = np.random.default_rng(300 + frame)
+    y, x = np.mgrid[0:size, 0:size] + 0.5
+    r = np.hypot(x - size / 2, y - size / 2) / (size / 2)
+    reach = 1.0 - 0.15 * frame
+    v = np.where(r < 0.35 * reach, 1.0, np.where(r < 0.7 * reach, 0.7, np.where(r < reach, 0.4, 0.0)))
+    v[rng.random((size, size)) < 0.12 * frame] = 0.0
+    rgba = np.zeros((size, size, 4))
+    rgba[..., 0] = rgba[..., 1] = rgba[..., 2] = v
+    rgba[..., 3] = (v > 0) * 1.0
+    return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA")
+
+
+def spark(frame, size=8):
+    """A spark streak along the sprite's x axis (the particle turns it to face its motion):
+    a white-hot middle fading toward both ends, with a dim pixel above and below the middle."""
+    image = np.zeros((size, size, 4))
+    length = 7 if frame == 0 else 5
+    start = (size - length) // 2
+    mid = size // 2
+    for i in range(length):
+        t = abs((i + 0.5) / length - 0.5) * 2
+        image[mid, start + i, 0:3] = 1.0 - 0.6 * t
+        image[mid, start + i, 3] = 1.0
+    for dy in (-1, 1):
+        image[mid + dy, mid - 1:mid + 1, 0:3] = 0.35
+        image[mid + dy, mid - 1:mid + 1, 3] = 1.0
+    return Image.fromarray((image * 255).astype(np.uint8), "RGBA")
+
+
+FEATHERS = [
+    [
+        "......w.",
+        ".....wl.",
+        "....wlg.",
+        "...wlg..",
+        "..wlg...",
+        ".llg....",
+        ".gg.....",
+        "g.......",
+    ],
+    [
+        "........",
+        ".....wl.",
+        "...wwlg.",
+        "..wllg..",
+        ".wlgg...",
+        ".lg.....",
+        "g.......",
+        "........",
+    ],
+]
+FEATHER_PALETTE = {"w": 0xFFFFFF, "l": 0xB0B0B0, "g": 0x606060}
+
+CINDERS = [
+    ["........", "...ab...", "..abbc..", "..bbcy..", "...cy...", "........", "........", "........"],
+    ["........", "........", "..ab....", "..bby...", "...c....", "........", "........", "........"],
+    ["........", "...a....", "..abb...", "..bbbc..", "..acy...", "...y....", "........", "........"],
+]
+CINDER_PALETTE = {"a": 0x2A1A14, "b": 0x4A2E22, "c": 0xFF8C32, "y": 0xFFD27A}
+
+
 def main():
     for name, (palette, grid) in SPRITES.items():
         path = ASSETS / f"{name}.png"
@@ -738,6 +803,19 @@ def main():
         path = ASSETS / f"particle/hydro_drop_{frame}.png"
         hydro_drop(frame).save(path)
         print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
+    for frame in range(4):
+        path = ASSETS / f"particle/flare_{frame}.png"
+        flare(frame).save(path)
+        print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
+    for frame in range(2):
+        path = ASSETS / f"particle/spark_{frame}.png"
+        spark(frame).save(path)
+        print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
+    for name, sprites, palette in (("feather", FEATHERS, FEATHER_PALETTE), ("cinder", CINDERS, CINDER_PALETTE)):
+        for frame, grid in enumerate(sprites):
+            path = ASSETS / f"particle/{name}_{frame}.png"
+            render(palette, grid).save(path)
+            print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
     path = ASSETS / "block/water_lance.png"
     water_lance().save(path)
     print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))

@@ -7,7 +7,9 @@ import com.chappadodle.elementalarcana.api.ShieldSpell;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.SpellShield;
+import com.chappadodle.elementalarcana.client.particle.CinderParticle;
 import com.chappadodle.elementalarcana.client.particle.EmberParticle;
+import com.chappadodle.elementalarcana.client.particle.GlowParticle;
 import com.chappadodle.elementalarcana.client.particle.HydroDropParticle;
 import com.chappadodle.elementalarcana.client.particle.HydroStreamEmitter;
 import com.chappadodle.elementalarcana.client.particle.FrostMistParticle;
@@ -21,6 +23,7 @@ import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.core.MagicData;
 import com.chappadodle.elementalarcana.network.CastSpellPayload;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -40,6 +43,7 @@ import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.RenderLivingEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
@@ -212,6 +216,19 @@ public final class ArcanaClient {
         event.registerSpecial(ModContent.HYDRO_STREAM_THIN.get(), new HydroStreamEmitter.Provider(0.35f));
         event.registerSpecial(ModContent.HYDRO_STREAM_WIDE.get(), new HydroStreamEmitter.Provider(2.5f));
         event.registerSpriteSet(ModContent.SWIRL.get(), WindStreakParticle.SwirlProvider::new);
+        event.registerSpriteSet(ModContent.FLARE.get(), sprites -> new GlowParticle.Provider(GlowParticle.Kind.FLARE, sprites));
+        event.registerSpriteSet(ModContent.SPARK.get(), sprites -> new GlowParticle.Provider(GlowParticle.Kind.SPARK, sprites));
+        event.registerSpriteSet(ModContent.FEATHER.get(), sprites -> new GlowParticle.Provider(GlowParticle.Kind.FEATHER, sprites));
+        event.registerSpriteSet(ModContent.CINDER.get(), CinderParticle.Provider::new);
+    }
+
+    // Additive particles change the blend function and vanilla doesn't set it back; put it back
+    // before anything drawn later assumes the default.
+    @SubscribeEvent
+    public static void afterParticles(RenderLevelStageEvent event) {
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
+            RenderSystem.defaultBlendFunc();
+        }
     }
 
     @SubscribeEvent

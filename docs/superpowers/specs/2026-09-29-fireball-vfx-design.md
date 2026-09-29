@@ -61,6 +61,49 @@ play-tested
   - `models/spell/fireball.json` becomes the heat 1 model.
   - The other variants are one-line models, using the same model as parent with a different texture.
 
+## Step 2 structure (particles)
+
+Approved approach: our own glow particles, no dependency. Veil's bloom may get an A/B test in step 3.
+
+- **`GlowParticleOptions`:** one options record shared by three particle types, carrying:
+  - a start colour and a fade colour
+  - a size and a lifetime
+  - an optional anchor entity id
+
+  Anchored particles move relative to that entity, and to a held projectile's hand position, so
+  charge-up sparks and orbiting motes stay attached while the caster turns.
+- **New particle types:**
+
+| Type | Blend | Behaviour |
+|---|---|---|
+| **Flare** | additive | A soft pixel blob that shrinks, lerps from its colour to its fade colour, and dissolves |
+| **Spark** | additive | A streak turned to face along its motion, with drag |
+| **Feather** | additive | Flutters down, swaying and rolling |
+| **Cinder** | normal | A dark rock chip with a glowing edge, falling with gravity, full bright |
+
+- **Additive render type:** a `ParticleRenderType` with `SRC_ALPHA, ONE`, no depth writes, in the
+  translucent pass. Vanilla doesn't reset the blend function after particles, so we reset it at
+  `RenderLevelStageEvent.AFTER_PARTICLES`. The existing Ember becomes additive too.
+- **Hooks (client):**
+  - `ProjectileSpell` gains `releaseParticles`, called on the first client tick after a held
+    projectile is thrown, and `grownParticles`, called when it becomes fully grown.
+  - `SpellProjectile` detects both itself.
+- **`FireballEffects`:** holds all the fireball's client particle code, keyed by look:
+  - **Held:** anchored sparks gathering inward (the rate rises with charge) and a few embers. On
+    becoming fully grown, a ring of sparks pops outward. It stays light on purpose.
+  - **Throw:** a flare pop and a cone of sparks sprayed backwards.
+  - **Flight:** a ribbon of flares spaced along the path between ticks (no gaps), plus embers:
+    - heat 1–2: short, red and smoky
+    - heat 3–4: long, bright and clean, with sparks
+  - **Branches:**
+    - Cluster (and its bomblets): fuse sputter and grey smoke
+    - Meteor: thick smoke, falling cinders and lava drips
+    - Sun: white-gold, with motes orbiting it while held
+    - Phoenix: a gold-to-crimson trail and falling feathers
+- **Sizes** follow the projectile's rendered size, `lerp(charge, 0.35, 1) × visualScale`.
+- **The Particles setting** (All / Decreased / Minimal) applies, because everything is spawned
+  through `level.addParticle`.
+
 ## Noted for later (from play-testing step 1)
 
 - **Screen space with several held fireballs:** a full set, especially the Lv 8+ heat looks, can

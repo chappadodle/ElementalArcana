@@ -67,14 +67,14 @@ public class FireballSpell extends Spell implements ProjectileSpell, ConjureSpel
 
     // Looks (SpellProjectile#variant): the fireball burns hotter as it levels, and each branch has
     // its own look (see docs/superpowers/specs/2026-09-29-fireball-vfx-design.md).
-    private static final int LOOK_HEAT_1 = 0;
-    private static final int LOOK_HEAT_2 = 1;
-    private static final int LOOK_HEAT_3 = 2;
-    private static final int LOOK_HEAT_4 = 3;
-    private static final int LOOK_CLUSTER = 4;
-    private static final int LOOK_METEOR = 5;
-    private static final int LOOK_SUN = 6;
-    private static final int LOOK_PHOENIX = 7;
+    static final int LOOK_HEAT_1 = 0;
+    static final int LOOK_HEAT_2 = 1;
+    static final int LOOK_HEAT_3 = 2;
+    static final int LOOK_HEAT_4 = 3;
+    static final int LOOK_CLUSTER = 4;
+    static final int LOOK_METEOR = 5;
+    static final int LOOK_SUN = 6;
+    static final int LOOK_PHOENIX = 7;
     private static final List<ResourceLocation> LOOK_MODELS = List.of(MODEL,
             ElementalArcana.id("spell/fireball_heat2"), ElementalArcana.id("spell/fireball_heat3"),
             ElementalArcana.id("spell/fireball_heat4"), ElementalArcana.id("spell/fireball_cluster"),
@@ -198,11 +198,10 @@ public class FireballSpell extends Spell implements ProjectileSpell, ConjureSpel
         return sun;
     }
 
-    /** Fully grown: a crackle and a flare. */
+    /** Fully grown: a crackle (the flare and sparks are client-side, see FireballEffects#grown). */
     @Override
     public void onFullyGrown(SpellProjectile fireball) {
         playAt(fireball, SoundEvents.FIRECHARGE_USE, 0.6f, 1.3f);
-        ((ServerLevel) fireball.level()).sendParticles(ParticleTypes.FLAME, fireball.getX(), fireball.getY(), fireball.getZ(), 10, 0.05, 0.05, 0.05, 0.06);
     }
 
     @Override
@@ -280,31 +279,26 @@ public class FireballSpell extends Spell implements ProjectileSpell, ConjureSpel
         };
     }
 
-    // ---- visuals (client) ----
+    // ---- visuals (client, see FireballEffects) ----
 
     @Override
     public void heldParticles(SpellProjectile fireball, float charge) {
-        double size = 0.12 + 0.18 * charge;
-        if (fireball.tickCount % 2 == 0) {
-            fireball.spawnParticleAround(ParticleTypes.FLAME, size, new Vec3(0, 0.01, 0));
-        }
-        if (fireball.tickCount % 3 == 0) {
-            fireball.spawnParticleAround(ModContent.EMBER.get(), size, new Vec3(0, 0.03, 0));
-        }
+        FireballEffects.held(fireball, charge);
+    }
+
+    @Override
+    public void grownParticles(SpellProjectile fireball) {
+        FireballEffects.grown(fireball);
+    }
+
+    @Override
+    public void releaseParticles(SpellProjectile fireball) {
+        FireballEffects.released(fireball);
     }
 
     @Override
     public void flightParticles(SpellProjectile fireball) {
-        double size = 0.12 * fireball.visualScale();
-        Vec3 back = fireball.getDeltaMovement().scale(-0.05);
-        int flames = fireball.visualScale() > 1.5f ? 5 : 2;
-        for (int i = 0; i < flames; i++) {
-            fireball.spawnParticleAround(ParticleTypes.FLAME, size, back);
-        }
-        fireball.spawnParticleAround(ParticleTypes.SMOKE, size, back.scale(0.5));
-        if (fireball.tickCount % 2 == 0) {
-            fireball.spawnParticleAround(ModContent.EMBER.get(), size, back.add(0, 0.02, 0));
-        }
+        FireballEffects.flight(fireball);
     }
 
     // ---- flight (server) ----

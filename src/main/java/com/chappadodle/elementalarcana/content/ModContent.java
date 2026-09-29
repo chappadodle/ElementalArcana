@@ -81,6 +81,19 @@ public final class ModContent {
                 }
             });
 
+    /** A soft glowing blob that shrinks, shifts colour and dissolves: the body of fire trails. */
+    public static final DeferredHolder<ParticleType<?>, ParticleType<GlowParticleOptions>> FLARE =
+            PARTICLES.register("flare", GlowParticleOptions::newType);
+    /** A glowing streak that points along its motion and slows down. */
+    public static final DeferredHolder<ParticleType<?>, ParticleType<GlowParticleOptions>> SPARK =
+            PARTICLES.register("spark", GlowParticleOptions::newType);
+    /** A glowing feather that flutters down (Phoenix). */
+    public static final DeferredHolder<ParticleType<?>, ParticleType<GlowParticleOptions>> FEATHER =
+            PARTICLES.register("feather", GlowParticleOptions::newType);
+    /** A dark chip of rock with a glowing edge that falls and bounces (Meteor). */
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> CINDER =
+            PARTICLES.register("cinder", () -> new SimpleParticleType(false));
+
     /** Moderate exhaustion from emptying your mana: slower, weaker, and slower mana regen. */
     public static final DeferredHolder<MobEffect, MobEffect> MANA_SICKNESS = EFFECTS.register("mana_sickness",
             () -> new MobEffect(MobEffectCategory.HARMFUL, 0x7A3FA0) {

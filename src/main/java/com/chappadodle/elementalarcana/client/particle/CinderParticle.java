@@ -9,38 +9,38 @@ import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.particles.SimpleParticleType;
 
-/** A glowing spark: drifts upward, cools from yellow to deep orange, and winks out. */
-public class EmberParticle extends TextureSheetParticle {
-    private final SpriteSet sprites;
+/** A chip of dark rock with a glowing edge: falls, tumbles, bounces off the ground and fades. */
+public class CinderParticle extends TextureSheetParticle {
+    private final float spin;
 
-    protected EmberParticle(ClientLevel level, double x, double y, double z, double xd, double yd, double zd, SpriteSet sprites) {
+    protected CinderParticle(ClientLevel level, double x, double y, double z, double xd, double yd, double zd, SpriteSet sprites) {
         super(level, x, y, z);
-        this.sprites = sprites;
-        this.xd = xd + (random.nextDouble() - 0.5) * 0.02;
+        this.xd = xd;
         this.yd = yd;
-        this.zd = zd + (random.nextDouble() - 0.5) * 0.02;
-        this.friction = 0.94f;
-        this.gravity = -0.03f;
-        this.hasPhysics = false;
-        this.lifetime = 12 + random.nextInt(10);
-        this.quadSize = 0.04f + random.nextFloat() * 0.04f;
-        setColor(1f, 0.9f, 0.45f);
-        setSpriteFromAge(sprites);
+        this.zd = zd;
+        this.gravity = 0.9f;
+        this.friction = 0.97f;
+        this.lifetime = 30 + random.nextInt(20);
+        this.quadSize = 0.05f + random.nextFloat() * 0.05f;
+        this.spin = (random.nextFloat() - 0.5f) * 0.5f;
+        this.roll = oRoll = random.nextFloat() * 6.28f;
+        pickSprite(sprites);
     }
 
     @Override
     public void tick() {
         super.tick();
-        setSpriteFromAge(sprites);
+        oRoll = roll;
+        if (!onGround) {
+            roll += spin;
+        }
         float life = age / (float) lifetime;
-        // Cool from yellow-white to orange-red as it rises.
-        setColor(1f, 0.9f - 0.5f * life, 0.45f - 0.35f * life);
-        alpha = life < 0.6f ? 1f : 1f - (life - 0.6f) / 0.4f;
+        alpha = life < 0.75f ? 1f : 1f - (life - 0.75f) / 0.25f;
     }
 
     @Override
     public ParticleRenderType getRenderType() {
-        return AdditiveParticles.RENDER_TYPE;
+        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class EmberParticle extends TextureSheetParticle {
     public record Provider(SpriteSet sprites) implements ParticleProvider<SimpleParticleType> {
         @Override
         public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xd, double yd, double zd) {
-            return new EmberParticle(level, x, y, z, xd, yd, zd, sprites);
+            return new CinderParticle(level, x, y, z, xd, yd, zd, sprites);
         }
     }
 }

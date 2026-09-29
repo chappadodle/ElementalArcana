@@ -89,6 +89,14 @@ public interface ProjectileSpell {
         }
     }
 
+    /** On the client, the first tick after a held projectile is thrown (a burst at the hand). */
+    default void releaseParticles(SpellProjectile projectile) {
+    }
+
+    /** On the client, the tick a held projectile becomes fully grown. */
+    default void grownParticles(SpellProjectile projectile) {
+    }
+
     // ---- server-side hooks ----
 
     /** A held projectile has just been thrown (after any release delay). */
