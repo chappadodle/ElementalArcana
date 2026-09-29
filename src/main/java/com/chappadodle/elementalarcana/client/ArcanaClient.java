@@ -36,6 +36,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
@@ -43,6 +44,7 @@ import net.neoforged.neoforge.client.event.RenderLivingEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
+import net.neoforged.neoforge.client.settings.IKeyConflictContext;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
@@ -57,6 +59,24 @@ public final class ArcanaClient {
     public static final KeyMapping SPELL_WHEEL = key("spell_wheel", GLFW.GLFW_KEY_V);
     public static final KeyMapping STATUS = key("status", GLFW.GLFW_KEY_K);
     public static final KeyMapping DEV_MENU = key("dev_menu", GLFW.GLFW_KEY_F6);
+    // Launching conjured projectiles. They share the mouse buttons with attack/use on purpose: while
+    // something is conjured, the click launches instead (see onInteraction). Never reported as a
+    // conflict in the Controls menu.
+    private static final IKeyConflictContext SHARES_MOUSE = new IKeyConflictContext() {
+        @Override
+        public boolean isActive() {
+            return KeyConflictContext.IN_GAME.isActive();
+        }
+
+        @Override
+        public boolean conflicts(IKeyConflictContext other) {
+            return false;
+        }
+    };
+    public static final KeyMapping LAUNCH_ONE = new KeyMapping("key.elementalarcana.launch_one", SHARES_MOUSE,
+            InputConstants.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_LEFT, CATEGORY);
+    public static final KeyMapping LAUNCH_ALL = new KeyMapping("key.elementalarcana.launch_all", SHARES_MOUSE,
+            InputConstants.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_RIGHT, CATEGORY);
 
     // The awakening screen is offered once per player instance (i.e. per join/respawn).
     private static LocalPlayer awakeningOfferedTo;
@@ -76,6 +96,8 @@ public final class ArcanaClient {
         event.register(SPELL_WHEEL);
         event.register(STATUS);
         event.register(DEV_MENU);
+        event.register(LAUNCH_ONE);
+        event.register(LAUNCH_ALL);
     }
 
     @SubscribeEvent
@@ -93,6 +115,19 @@ public final class ArcanaClient {
             player.setPos(bubble.holdPoint(player.level().getGameTime()));
             player.setDeltaMovement(Vec3.ZERO);
             player.resetFallDistance();
+        }
+
+        // Launch keys only do something while projectiles are conjured; otherwise their clicks are dropped.
+        boolean conjuring = data.conjured() > 0;
+        while (LAUNCH_ONE.consumeClick()) {
+            if (conjuring) {
+                PacketDistributor.sendToServer(CastSpellPayload.LAUNCH_ONE);
+            }
+        }
+        while (LAUNCH_ALL.consumeClick()) {
+            if (conjuring) {
+                PacketDistributor.sendToServer(CastSpellPayload.LAUNCH_ALL);
+            }
         }
 
         // Send the key going down and coming back up; a tap within one tick sends both.
@@ -206,6 +241,20 @@ public final class ArcanaClient {
             ShieldRenderer.renderShards(player, event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource());
         }
         BubbleRenderer.render(event.getEntity(), event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource());
+    }
+
+    /** While projectiles are conjured, a click bound to a launch key launches instead of attacking/using. */
+    @SubscribeEvent
+    public static void onInteraction(InputEvent.InteractionKeyMappingTriggered event) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.player == null || MagicAttachments.get(minecraft.player).conjured() <= 0) {
+            return;
+        }
+        InputConstants.Key key = event.getKeyMapping().getKey();
+        if (key.equals(LAUNCH_ONE.getKey()) || key.equals(LAUNCH_ALL.getKey())) {
+            event.setCanceled(true);
+            event.setSwingHand(false);
+        }
     }
 
     /** A player trapped in a bubble can't walk, jump or sneak. */

@@ -52,7 +52,7 @@ public final class MagicData {
             Codec.INT.optionalFieldOf("bonus_skill_points", 0).forGetter(data -> data.bonusSkillPoints)
     ).apply(instance, (mana, level, xp, affinities, selected, cooldowns, fallImmune, freeCast, spells, respecReadyAt, bonusSkillPoints) ->
             new MagicData(mana, level, xp, affinities, selected.orElse(null), cooldowns, fallImmune, freeCast, spells, respecReadyAt,
-                    bonusSkillPoints, false)));
+                    bonusSkillPoints, false, 0)));
 
     // What the owning client needs: no fall flag, plus the live meditation state for the HUD.
     public static final StreamCodec<RegistryFriendlyByteBuf, MagicData> STREAM_CODEC = StreamCodec.of(
@@ -68,6 +68,7 @@ public final class MagicData {
                 buf.writeVarLong(data.respecReadyAt);
                 buf.writeVarInt(data.bonusSkillPoints);
                 buf.writeBoolean(data.meditating);
+                buf.writeVarInt(data.conjured);
             },
             buf -> new MagicData(
                     buf.readFloat(),
@@ -81,7 +82,8 @@ public final class MagicData {
                     buf.readMap(FriendlyByteBuf::readResourceLocation, SpellProgress::read),
                     buf.readVarLong(),
                     buf.readVarInt(),
-                    buf.readBoolean()));
+                    buf.readBoolean(),
+                    buf.readVarInt()));
 
     private float mana;
     private int level;
@@ -100,17 +102,21 @@ public final class MagicData {
 
     // Server-side meditation tracking; only `meditating` is synced.
     private boolean meditating;
+    // How many projectiles are conjured and held right now (see Conjuring). Synced, never saved:
+    // the client uses it to know whether the mouse launches spells.
+    private int conjured;
     private int stillTicks;
     private double lastX;
     private double lastZ;
 
     public MagicData() {
-        this(BASE_MAX_MANA, 1, 0, List.of(), null, Map.of(), false, false, Map.of(), 0L, 0, false);
+        this(BASE_MAX_MANA, 1, 0, List.of(), null, Map.of(), false, false, Map.of(), 0L, 0, false, 0);
     }
 
     private MagicData(float mana, int level, int xp, List<ResourceLocation> affinities, @Nullable ResourceLocation selected,
                       Map<ResourceLocation, Long> cooldownEnds, boolean fallImmune, boolean freeCast,
-                      Map<ResourceLocation, SpellProgress> spells, long respecReadyAt, int bonusSkillPoints, boolean meditating) {
+                      Map<ResourceLocation, SpellProgress> spells, long respecReadyAt, int bonusSkillPoints, boolean meditating,
+                      int conjured) {
         this.level = Mth.clamp(level, 1, MAX_LEVEL);
         this.xp = xp;
         this.affinities = new ArrayList<>(affinities);
@@ -122,6 +128,7 @@ public final class MagicData {
         this.respecReadyAt = respecReadyAt;
         this.bonusSkillPoints = Math.max(0, bonusSkillPoints);
         this.meditating = meditating;
+        this.conjured = conjured;
         this.mana = Mth.clamp(mana, 0f, maxMana());
     }
 
@@ -469,6 +476,15 @@ public final class MagicData {
 
     public void setFreeCast(boolean freeCast) {
         this.freeCast = freeCast;
+    }
+
+    /** How many projectiles are conjured and held right now. */
+    public int conjured() {
+        return conjured;
+    }
+
+    public void setConjured(int conjured) {
+        this.conjured = conjured;
     }
 
     public boolean meditating() {

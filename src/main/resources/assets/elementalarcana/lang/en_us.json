@@ -69,7 +69,7 @@
   "screen.elementalarcana.status.not_awakened": "(not awakened)",
   "screen.elementalarcana.status.requires_level": "Lv %s",
   "key.categories.elementalarcana": "Elemental Arcana",
-  "key.elementalarcana.cast": "Cast Spell",
+  "key.elementalarcana.cast": "Cast / Conjure Spell",
   "key.elementalarcana.spell_wheel": "Spell Wheel (hold)",
   "key.elementalarcana.status": "Status",
   "commands.elementalarcana.unknown_school": "Unknown element: %s",
@@ -115,7 +115,7 @@
   "spell.elementalarcana.icicle.tier.7": "Frostseeker",
   "spell.elementalarcana.icicle.tier.7.desc": "Icicles curve toward the enemy nearest your crosshair.",
   "spell.elementalarcana.icicle.tier.8": "Halo",
-  "spell.elementalarcana.icicle.tier.8.desc": "Five icicles form an arc and fire in a rapid ripple.",
+  "spell.elementalarcana.icicle.tier.8.desc": "Up to five icicles form an arc over your head.",
   "spell.elementalarcana.icicle.tier.9": "Deep Freeze",
   "spell.elementalarcana.icicle.tier.9.desc": "Three hits from one volley freeze an enemy solid for 2 seconds.",
   "spell.elementalarcana.icicle.tier.10": "Capstone",
@@ -333,5 +333,7 @@
   "spell.elementalarcana.bubble_prison.desc": "Trap the creature under your crosshair in a floating water bubble for 4 seconds. It's helpless and Wet; any hit pops it for bonus damage.",
   "message.elementalarcana.bubble.no_target": "No creature under your crosshair to trap",
   "message.elementalarcana.bubble.trapped": "You're trapped in a bubble!",
-  "commands.elementalarcana.bubbled": "Trapped %s creature(s) in a bubble"
+  "commands.elementalarcana.bubbled": "Trapped %s creature(s) in a bubble",
+  "key.elementalarcana.launch_one": "Launch One (while conjuring)",
+  "key.elementalarcana.launch_all": "Launch All (while conjuring)"
 }

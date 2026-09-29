@@ -3,12 +3,12 @@ package com.chappadodle.elementalarcana.content.spell;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.CastResult;
+import com.chappadodle.elementalarcana.api.ConjureSpell;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.ElementalReactions;
 import com.chappadodle.elementalarcana.api.ProjectileSpell;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellDamage;
-import com.chappadodle.elementalarcana.api.SpellHold;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.content.ModSchools;
@@ -16,6 +16,7 @@ import com.chappadodle.elementalarcana.core.MagicAttachments;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -34,23 +35,24 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Ice's basic spell, levels 1-10. Hold the cast key: frost gathers into icicles beside you that
- * grow sharper as they charge; release and they fly at your crosshair.
+ * Ice's basic spell, levels 1-10. Each press of the cast key conjures an icicle beside you (up to
+ * the level's maximum); they grow sharper while held, and "launch one" / "launch all" throws them
+ * at your crosshair (see Conjuring). Hold the cast key with a full set for Glacial Lance.
  *
  * <pre>
  * Lv1 Icicle        one icicle            Lv6  Sharpened     +25% damage, longer freeze
  * Lv2 Twin Icicles  two icicles           Lv7  Frostseeker   icicles curve toward the target
- * Lv3 Quick Frost   faster charge, taps   Lv8  Halo          five icicles, fired in a ripple
+ * Lv3 Quick Frost   faster charge, taps   Lv8  Halo          up to five icicles
  *                   hit harder            Lv9  Deep Freeze   3+ hits from one volley = Frozen
  * Lv4 Triad         three icicles         Lv10 capstone:     Glacial Lance | Endless Winter
  * Lv5 branch:       Piercing Cold | Shatterburst
  * </pre>
  */
-public class IcicleSpell extends Spell implements ProjectileSpell {
+public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell {
     public static final String PIERCING = "piercing";
     public static final String SHATTERBURST = "shatterburst";
     public static final String LANCE = "lance";
@@ -58,7 +60,7 @@ public class IcicleSpell extends Spell implements ProjectileSpell {
 
     private static final int MAX_LEVEL = 10;
     private static final int FREEZE_RADIUS = 2;
-    private static final int LANCE_EXTRA_HOLD = 20;
+    private static final int EXTRA_ICICLE_COST = 4;
     private static final ResourceLocation MODEL = ElementalArcana.id("spell/icicle");
 
     // Per-icicle data stored on the projectile, so hits resolve with the caster's progress at cast time.
@@ -100,31 +102,74 @@ public class IcicleSpell extends Spell implements ProjectileSpell {
         return level >= 3 ? 15 : 20;
     }
 
-    @Override
-    public int manaCost(int spellLevel) {
-        return 12 + 4 * (icicleCount(spellLevel) - 1);
-    }
+    // ---- conjuring ----
 
-    // ---- casting ----
-
+    /** Never called: Icicle is conjured (see ConjureSpell). */
     @Override
     public CastResult cast(CastContext context) {
+        return CastResult.fail(Component.translatable("message.elementalarcana.no_spell"));
+    }
+
+    @Override
+    public int maxConjured(int spellLevel) {
+        return icicleCount(spellLevel);
+    }
+
+    /** 12 for the first icicle of a set, 4 for each more (a full set costs what the old volley did). */
+    @Override
+    public int conjureCost(int spellLevel, int alreadyHeld) {
+        return alreadyHeld == 0 ? manaCost() : EXTRA_ICICLE_COST;
+    }
+
+    @Override
+    public SpellProjectile conjure(CastContext context, int seed) {
         int level = context.spellLevel();
-        int count = icicleCount(level);
-        int volley = context.caster().getRandom().nextInt();
-        List<SpellProjectile> icicles = new ArrayList<>();
-        for (int slot = 0; slot < count; slot++) {
-            SpellProjectile icicle = SpellProjectile.summonHeld(context, this, slot, count, chargeTicks(level));
-            CompoundTag tag = icicle.getPersistentData();
-            tag.putInt(TAG_LEVEL, level);
-            tag.putString(TAG_BRANCH_5, orEmpty(context.branch(5)));
-            tag.putString(TAG_BRANCH_10, orEmpty(context.branch(10)));
-            tag.putInt(TAG_VOLLEY, volley);
-            icicles.add(icicle);
+        SpellProjectile icicle = SpellProjectile.summonHeld(context, this, 0, 1, chargeTicks(level));
+        CompoundTag tag = icicle.getPersistentData();
+        tag.putInt(TAG_LEVEL, level);
+        tag.putString(TAG_BRANCH_5, orEmpty(context.branch(5)));
+        tag.putString(TAG_BRANCH_10, orEmpty(context.branch(10)));
+        // One "volley" is one conjured set (Deep Freeze counts hits per set).
+        tag.putInt(TAG_VOLLEY, seed);
+        playAt(icicle, SoundEvents.AMETHYST_CLUSTER_PLACE, 1f, 1.3f);
+        return icicle;
+    }
+
+    @Override
+    public boolean canFuse(int spellLevel, Map<Integer, String> branches) {
+        return LANCE.equals(branches.get(10));
+    }
+
+    /** Glacial Lance: the whole set fuses into one huge icicle in front of you. */
+    @Override
+    public SpellProjectile fuse(ServerPlayer caster, List<SpellProjectile> icicles) {
+        ServerLevel level = caster.serverLevel();
+        SpellProjectile lance = icicles.get(0);
+        for (SpellProjectile other : icicles.subList(1, icicles.size())) {
+            level.sendParticles(ModContent.FROST_SPARKLE.get(), other.getX(), other.getY(), other.getZ(), 10, 0.1, 0.1, 0.1, 0.05);
+            level.sendParticles(ModContent.FROST_MIST.get(), other.getX(), other.getY(), other.getZ(), 2, 0.1, 0.1, 0.1, 0.01);
+            other.discard();
         }
-        context.holdUntilRelease(new Hold(context.caster(), icicles, chargeTicks(level), context.hasBranch(10, LANCE)));
-        playAt(icicles.get(0), SoundEvents.AMETHYST_CLUSTER_PLACE, 1f, 1.3f);
-        return CastResult.SUCCESS;
+        lance.setVisualScale(2.2f);
+        lance.getPersistentData().putBoolean(TAG_LANCE, true);
+        playAt(lance, SoundEvents.AMETHYST_BLOCK_RESONATE, 1.5f, 0.6f);
+        playAt(lance, SoundEvents.AMETHYST_BLOCK_CHIME, 1.5f, 0.8f);
+        level.sendParticles(ModContent.FROST_SPARKLE.get(), lance.getX(), lance.getY(), lance.getZ(), 30, 0.3, 0.3, 0.3, 0.15);
+        return lance;
+    }
+
+    /** Fully grown: a bright chime and a burst of frost. */
+    @Override
+    public void onFullyGrown(SpellProjectile icicle) {
+        playAt(icicle, SoundEvents.AMETHYST_BLOCK_CHIME, 0.9f, 1.6f);
+        ((ServerLevel) icicle.level()).sendParticles(ModContent.FROST_SPARKLE.get(),
+                icicle.getX(), icicle.getY(), icicle.getZ(), 14, 0.05, 0.05, 0.05, 0.12);
+    }
+
+    @Override
+    public void fizzle(SpellProjectile icicle) {
+        shatter(icicle);
+        icicle.discard();
     }
 
     private static String orEmpty(@Nullable String value) {
@@ -412,78 +457,4 @@ public class IcicleSpell extends Spell implements ProjectileSpell {
         at.level().playSound(null, at.getX(), at.getY(), at.getZ(), sound, SoundSource.PLAYERS, volume, pitch);
     }
 
-    // ---- the hold ----
-
-    private static final class Hold implements SpellHold {
-        private final ServerPlayer caster;
-        private final List<SpellProjectile> icicles;
-        private final int chargeTicks;
-        private final boolean canForgeLance;
-        private boolean lanceForged;
-
-        Hold(ServerPlayer caster, List<SpellProjectile> icicles, int chargeTicks, boolean canForgeLance) {
-            this.caster = caster;
-            this.icicles = icicles;
-            this.chargeTicks = chargeTicks;
-            this.canForgeLance = canForgeLance && icicles.size() > 1;
-        }
-
-        @Override
-        public boolean tick(int heldTicks) {
-            icicles.removeIf(icicle -> !icicle.isAlive());
-            if (icicles.isEmpty()) {
-                return false;
-            }
-            if (heldTicks == chargeTicks) {
-                playAt(icicles.get(0), SoundEvents.AMETHYST_BLOCK_CHIME, 1.2f, 1.6f);
-                for (SpellProjectile icicle : icicles) {
-                    ((ServerLevel) icicle.level()).sendParticles(ModContent.FROST_SPARKLE.get(),
-                            icicle.getX(), icicle.getY(), icicle.getZ(), 14, 0.05, 0.05, 0.05, 0.12);
-                }
-            }
-            if (canForgeLance && !lanceForged && heldTicks == chargeTicks + LANCE_EXTRA_HOLD) {
-                forgeLance();
-            }
-            return true;
-        }
-
-        /** Glacial Lance: the whole formation fuses into one huge icicle in front of you. */
-        private void forgeLance() {
-            lanceForged = true;
-            ServerLevel level = caster.serverLevel();
-            SpellProjectile lance = icicles.get(0);
-            for (SpellProjectile other : icicles.subList(1, icicles.size())) {
-                level.sendParticles(ModContent.FROST_SPARKLE.get(), other.getX(), other.getY(), other.getZ(), 10, 0.1, 0.1, 0.1, 0.05);
-                level.sendParticles(ModContent.FROST_MIST.get(), other.getX(), other.getY(), other.getZ(), 2, 0.1, 0.1, 0.1, 0.01);
-                other.discard();
-            }
-            icicles.subList(1, icicles.size()).clear();
-            lance.setFormation(0, 1);
-            lance.setVisualScale(2.2f);
-            lance.getPersistentData().putBoolean(TAG_LANCE, true);
-            playAt(lance, SoundEvents.AMETHYST_BLOCK_RESONATE, 1.5f, 0.6f);
-            playAt(lance, SoundEvents.AMETHYST_BLOCK_CHIME, 1.5f, 0.8f);
-            level.sendParticles(ModContent.FROST_SPARKLE.get(), lance.getX(), lance.getY(), lance.getZ(), 30, 0.3, 0.3, 0.3, 0.15);
-        }
-
-        @Override
-        public void release(int heldTicks) {
-            Vec3 aim = SpellProjectile.crosshairTarget(caster);
-            boolean ripple = icicles.size() >= 5;
-            for (int i = 0; i < icicles.size(); i++) {
-                // Halo: fire in a quick ripple rather than all at once.
-                icicles.get(i).release(aim, ripple ? i * 2 : 0);
-            }
-        }
-
-        @Override
-        public void cancel() {
-            for (SpellProjectile icicle : icicles) {
-                if (icicle.isAlive()) {
-                    shatter(icicle);
-                    icicle.discard();
-                }
-            }
-        }
-    }
 }

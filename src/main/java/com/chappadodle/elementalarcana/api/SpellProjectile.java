@@ -193,6 +193,11 @@ public class SpellProjectile extends ThrowableProjectile {
     }
 
     /** How many projectiles are held together in this one's formation. */
+    /** This projectile's place in its formation (see {@link #formationCount}). */
+    public int formationSlot() {
+        return entityData.get(SLOT);
+    }
+
     public int formationCount() {
         return entityData.get(SLOT_COUNT);
     }

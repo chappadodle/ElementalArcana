@@ -2,12 +2,15 @@ package com.chappadodle.elementalarcana.api;
 
 /**
  * How getting better makes magic faster. Plain Java, no Minecraft types (unit tested). A spell's
- * own level shortens its cooldown; your Magic Level speeds up mana regeneration; Elemental Essence
- * fills mastery (less at higher levels) and condenses into skill points (costing more each time).
+ * own level shortens its cooldown; your Magic Level speeds up mana regeneration and shortens every
+ * cooldown a little more; Elemental Essence fills mastery (less at higher levels) and condenses
+ * into skill points (costing more each time).
  */
 public final class Progression {
     // Each spell level above 1 takes this share of the Lv 1 cooldown off (Lv 10 = 46%).
     private static final float COOLDOWN_CUT_PER_LEVEL = 0.06f;
+    // Each Magic Level above 1 takes this share off every cooldown (Magic Lv 30 = 71%).
+    private static final float COOLDOWN_CUT_PER_MAGIC_LEVEL = 0.01f;
     private static final float BASE_REGEN_PER_SECOND = 2.5f;
     private static final float REGEN_PER_SECOND_PER_LEVEL = 0.25f;
     private static final float ESSENCE_FIRST_FILL = 0.5f;
@@ -18,10 +21,19 @@ public final class Progression {
     private Progression() {
     }
 
-    /** A spell's cooldown at {@code spellLevel}, from its Lv 1 cooldown {@code baseTicks}. */
+    /** A spell's cooldown at {@code spellLevel}, from its Lv 1 cooldown {@code baseTicks} (at Magic Level 1). */
     public static int cooldownTicks(int baseTicks, int spellLevel) {
+        return cooldownTicks(baseTicks, spellLevel, 1);
+    }
+
+    /**
+     * A spell's cooldown at {@code spellLevel} for a caster at {@code magicLevel}: 6% of the base
+     * shorter per spell level and, on top, 1% shorter per Magic Level.
+     */
+    public static int cooldownTicks(int baseTicks, int spellLevel, int magicLevel) {
         int level = Math.max(1, spellLevel);
-        return Math.round(baseTicks * (1f - COOLDOWN_CUT_PER_LEVEL * (level - 1)));
+        int magic = Math.max(1, magicLevel);
+        return Math.round(baseTicks * (1f - COOLDOWN_CUT_PER_LEVEL * (level - 1)) * (1f - COOLDOWN_CUT_PER_MAGIC_LEVEL * (magic - 1)));
     }
 
     /** Mana regenerated per second at {@code magicLevel}. */

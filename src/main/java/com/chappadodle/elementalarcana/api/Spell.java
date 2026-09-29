@@ -56,9 +56,12 @@ public abstract class Spell {
         return cooldownTicks;
     }
 
-    /** Cooldown at a given spell level: 6% of the Lv 1 cooldown shorter per level (Lv 10 = 46%). */
-    public int cooldownTicks(int spellLevel) {
-        return Progression.cooldownTicks(cooldownTicks(), spellLevel);
+    /**
+     * Cooldown for a caster at {@code magicLevel} with this spell at {@code spellLevel}: 6% of the
+     * Lv 1 cooldown shorter per spell level, and 1% shorter per Magic Level on top.
+     */
+    public int cooldownTicks(int spellLevel, int magicLevel) {
+        return Progression.cooldownTicks(cooldownTicks(), spellLevel, magicLevel);
     }
 
     public ResourceLocation id() {

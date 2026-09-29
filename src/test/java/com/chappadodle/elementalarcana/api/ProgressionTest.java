@@ -24,6 +24,15 @@ class ProgressionTest {
     }
 
     @Test
+    void magicLevelShortensCooldownsOnePercentPerLevel() {
+        assertEquals(60, cooldownTicks(60, 1, 1));
+        assertEquals(43, cooldownTicks(60, 1, 30));   // 60 x 0.71 = 42.6
+        assertEquals(16, cooldownTicks(50, 10, 30));  // Icicle: 50 x 0.46 x 0.71 = 16.3
+        assertEquals(131, cooldownTicks(400, 10, 30)); // 400 x 0.46 x 0.71 = 130.6
+        assertEquals(23, cooldownTicks(50, 10, 1));
+    }
+
+    @Test
     void levelBelowOneCountsAsOne() {
         assertEquals(60, cooldownTicks(60, 0));
     }

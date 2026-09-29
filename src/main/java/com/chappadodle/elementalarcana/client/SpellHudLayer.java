@@ -61,7 +61,7 @@ public class SpellHudLayer implements LayeredDraw.Layer {
         graphics.fill(x - 2, y - 2, x + 18, y + 18, ArcanaDraw.withAlpha(0x90000000, alpha));
         if (spell != null) {
             ArcanaDraw.icon(graphics, spell, x, y, 16, 1f, alpha);
-            int fullCooldown = spell.cooldownTicks(data.spellLevel(spell));
+            int fullCooldown = spell.cooldownTicks(data.spellLevel(spell), data.level());
             if (cooldown > 0 && fullCooldown > 0) {
                 int covered = (int) Math.min(16, Math.ceil(16 * cooldown / (double) fullCooldown));
                 graphics.fill(x, y + 16 - covered, x + 16, y + 16, ArcanaDraw.withAlpha(0xB0000000, alpha));

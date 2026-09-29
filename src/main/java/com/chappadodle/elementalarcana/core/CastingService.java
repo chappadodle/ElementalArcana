@@ -2,6 +2,7 @@ package com.chappadodle.elementalarcana.core;
 
 import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.CastResult;
+import com.chappadodle.elementalarcana.api.ConjureSpell;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellHold;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
@@ -84,17 +85,18 @@ public final class CastingService {
             fizzle(player, problem);
             return;
         }
+        if (spell instanceof ConjureSpell) {
+            Conjuring.press(player);
+            return;
+        }
 
         int spellLevel = data.spellLevel(spell);
         SpellCastEvent.Pre pre = NeoForge.EVENT_BUS.post(new SpellCastEvent.Pre(player, spell, spell.manaCost(spellLevel)));
         if (pre.isCanceled()) {
             return;
         }
-        boolean free = player.isCreative() || data.freeCast();
         int cost = pre.manaCost();
-        float healthCost = free ? 0f : healthCost(data, cost);
-        if (healthCost > 0 && player.getHealth() - healthCost < 1f) {
-            fizzle(player, Component.translatable("message.elementalarcana.too_exhausted"));
+        if (!canAfford(player, data, cost)) {
             return;
         }
 
@@ -108,42 +110,75 @@ public final class CastingService {
             return;
         }
 
-        data.interruptMeditation();
-        if (!free) {
-            data.setMana(data.mana() - cost);
-            if (context.hold() == null) {
-                data.startCooldown(spell.id(), player.level().getGameTime(), spell.cooldownTicks(data.spellLevel(spell)));
-            }
-            if (healthCost > 0) {
-                overcast(player, healthCost);
-            }
-            if (healthCost > 0 || data.mana() <= 0f) {
-                player.addEffect(new MobEffectInstance(ModContent.MANA_SICKNESS, MANA_SICKNESS_TICKS));
-            }
-            int oldLevel = data.level();
-            if (data.addXp(cost) > 0) {
-                onLevelUp(player, data, oldLevel);
-            }
-            boolean wasFull = data.isMasteryFull(spell);
-            data.addMastery(spell, cost);
-            if (!wasFull && data.isMasteryFull(spell)) {
-                player.sendSystemMessage(Component.translatable("message.elementalarcana.mastery_full", spell.displayName(),
-                        Component.keybind("key.elementalarcana.status")).withStyle(style -> style.withColor(spell.school().color())));
-            }
+        pay(player, data, spell, cost);
+        if (context.hold() == null && !isFree(player, data)) {
+            data.startCooldown(spell.id(), player.level().getGameTime(), spell.cooldownTicks(data.spellLevel(spell), data.level()));
         }
-
         if (context.hold() != null) {
             HOLDS.put(player.getUUID(), new ActiveHold(spell, context.hold(), player.level().getGameTime()));
         }
-        player.swing(InteractionHand.MAIN_HAND, true);
-        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), spell.school().castSound(),
-                SoundSource.PLAYERS, 1f, 0.9f + player.getRandom().nextFloat() * 0.2f);
+        castFeedback(player, spell);
         MagicAttachments.sync(player);
         NeoForge.EVENT_BUS.post(new SpellCastEvent.Post(player, spell));
     }
 
+    /** Creative mode and the dev menu's free casting: no mana, no cooldowns. */
+    static boolean isFree(ServerPlayer player, MagicData data) {
+        return player.isCreative() || data.freeCast();
+    }
+
+    /**
+     * Whether {@code cost} can be paid right now: mana, with health covering a shortfall, as long as
+     * that leaves the caster at least half a heart. Fizzles with a message and returns false if not.
+     */
+    static boolean canAfford(ServerPlayer player, MagicData data, int cost) {
+        float healthCost = isFree(player, data) ? 0f : healthCost(data, cost);
+        if (healthCost > 0 && player.getHealth() - healthCost < 1f) {
+            fizzle(player, Component.translatable("message.elementalarcana.too_exhausted"));
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Pays for a cast: takes the mana (health for any shortfall, with Mana Sickness), then grants
+     * Magic XP and mastery in {@code spell} for it. Nothing for creative or free casting.
+     */
+    static void pay(ServerPlayer player, MagicData data, Spell spell, int cost) {
+        data.interruptMeditation();
+        if (isFree(player, data)) {
+            return;
+        }
+        float healthCost = healthCost(data, cost);
+        data.setMana(data.mana() - cost);
+        if (healthCost > 0) {
+            overcast(player, healthCost);
+        }
+        if (healthCost > 0 || data.mana() <= 0f) {
+            player.addEffect(new MobEffectInstance(ModContent.MANA_SICKNESS, MANA_SICKNESS_TICKS));
+        }
+        int oldLevel = data.level();
+        if (data.addXp(cost) > 0) {
+            onLevelUp(player, data, oldLevel);
+        }
+        boolean wasFull = data.isMasteryFull(spell);
+        data.addMastery(spell, cost);
+        if (!wasFull && data.isMasteryFull(spell)) {
+            player.sendSystemMessage(Component.translatable("message.elementalarcana.mastery_full", spell.displayName(),
+                    Component.keybind("key.elementalarcana.status")).withStyle(style -> style.withColor(spell.school().color())));
+        }
+    }
+
+    /** The caster swings their arm and the spell's school sound plays. */
+    static void castFeedback(ServerPlayer player, Spell spell) {
+        player.swing(InteractionHand.MAIN_HAND, true);
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), spell.school().castSound(),
+                SoundSource.PLAYERS, 1f, 0.9f + player.getRandom().nextFloat() * 0.2f);
+    }
+
     /** The cast key came back up: finish any hold-to-cast spell. */
     public static void release(ServerPlayer player) {
+        Conjuring.releaseKey(player);
         ActiveHold active = HOLDS.remove(player.getUUID());
         if (active == null) {
             return;
@@ -166,6 +201,7 @@ public final class CastingService {
 
     /** The hold broke (death, logout, dimension change): cancel it but still start the cooldown. */
     public static void cancelHold(ServerPlayer player) {
+        Conjuring.cancel(player);
         ActiveHold active = HOLDS.remove(player.getUUID());
         if (active != null) {
             active.hold().cancel();
@@ -180,7 +216,7 @@ public final class CastingService {
     private static void endHold(ServerPlayer player, ActiveHold active) {
         MagicData data = MagicAttachments.get(player);
         if (!player.isCreative() && !data.freeCast()) {
-            data.startCooldown(active.spell().id(), player.level().getGameTime(), active.spell().cooldownTicks(data.spellLevel(active.spell())));
+            data.startCooldown(active.spell().id(), player.level().getGameTime(), active.spell().cooldownTicks(data.spellLevel(active.spell()), data.level()));
             MagicAttachments.sync(player);
         }
     }
@@ -229,7 +265,7 @@ public final class CastingService {
         }
     }
 
-    private static void fizzle(ServerPlayer player, Component reason) {
+    static void fizzle(ServerPlayer player, Component reason) {
         player.displayClientMessage(reason.copy().withStyle(ChatFormatting.RED), true);
         // Holding the cast key retries quickly; don't turn that into a stream of fizzles.
         long now = player.level().getGameTime();

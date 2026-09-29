@@ -1,6 +1,8 @@
 package com.chappadodle.elementalarcana.network;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
+import com.chappadodle.elementalarcana.api.Spell;
+import com.chappadodle.elementalarcana.core.Conjuring;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -21,7 +23,15 @@ public record SelectSpellPayload(ResourceLocation spell) implements CustomPacket
     }
 
     public static void handle(SelectSpellPayload payload, IPayloadContext context) {
-        if (context.player() instanceof ServerPlayer player && MagicAttachments.get(player).select(payload.spell())) {
+        if (!(context.player() instanceof ServerPlayer player)) {
+            return;
+        }
+        Spell current = MagicAttachments.get(player).selectedSpell();
+        if (current != null && !current.id().equals(payload.spell())) {
+            // Switching spells throws whatever is conjured and held.
+            Conjuring.onSpellSwitched(player);
+        }
+        if (MagicAttachments.get(player).select(payload.spell())) {
             MagicAttachments.sync(player);
         }
     }

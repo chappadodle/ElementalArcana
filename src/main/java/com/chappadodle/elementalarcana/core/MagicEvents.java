@@ -29,6 +29,7 @@ public final class MagicEvents {
             return;
         }
         CastingService.tickHold(player);
+        Conjuring.tick(player);
         MagicData data = MagicAttachments.get(player);
         boolean changed = data.updateMeditation(player.getX(), player.getZ(), player.isShiftKeyDown(), player.onGround(), TICKS_TO_MEDITATE);
 

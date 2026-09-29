@@ -11,7 +11,9 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 | Key | |
 |---|---|
 | **V** (hold) | Spell wheel: point at a spell and release to select it |
-| **R** | Cast the selected spell (with any item in hand, or none) |
+| **R** | Cast the selected spell (with any item in hand, or none). For Icicle: each press **conjures** one more icicle, up to your spell level's maximum |
+| **Left click** (while conjuring) | Launch one conjured projectile |
+| **Right click** (while conjuring) | Launch all of them. With nothing conjured, the mouse works as normal |
 | **K** | Status window: level, XP, mana stats, affinities and every spell |
 
 **Mana and growth**
@@ -26,8 +28,10 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 |---|---|---|
 | Fire | Fireball: hold R to grow a fireball, release to throw it; explodes and ignites (sets blocks alight only with `mobGriefing`) | Flame Burst: ring of fire around you |
 | Water | Hydro Jet: hold R to spray a pressurized stream that pushes enemies back and soaks them; Tidal Wave: cone that pushes, extinguishes, hurts endermen/blazes | Healing Rain: Regeneration II for you and nearby players |
-| Ice | Icicle: hold R to charge an icicle, release to launch it; a full charge freezes | Frost Nova: freezes everything around you |
+| Ice | Icicle: press R to conjure icicles one at a time (they grow sharper while held, 1 mana/s each), click to launch one or all; a fully grown icicle freezes | Frost Nova: freezes everything around you |
 | Wind | Wind Blade: hold R to charge crescents of wind, release to slash; Gale Dash: launch forward, no fall damage | Updraft: throw yourself and nearby mobs skyward |
+
+**Conjuring** (Icicle; Fireball and Wind Blade coming): press R to conjure one projectile at a time, up to your spell level's maximum. Each costs mana when conjured (the first full price, each extra less), grows while you hold it, and costs 1 mana per second to keep; if you can't pay, everything you hold launches itself. Left click launches one, right click launches all. The cooldown starts when the last one leaves. With a full, fully grown set, hold R for a second to fuse it (Glacial Lance).
 
 **Bubble Prison** (Water, Magic Level 3): tap R to trap the creature (or player) under your crosshair in a floating water bubble for 4 seconds. It's helpless and Wet, which sets up Freeze and Vaporize combos, and any hit pops it for +4 damage. Bosses can't be trapped.
 
@@ -43,7 +47,7 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 
 **Wind** has two signature mechanics. **Swirl**: a wind hit on a frozen, frosted, burning or wet enemy spreads that element to every creature within 4 blocks. **Airborne**: enemies launched by wind take 25% more damage until they land.
 
-Fireball, Hydro Jet, Icicle, Frost Shield and Wind Blade level from 1 to 10. Each level also shortens the spell's cooldown (Lv 10: under half of Lv 1). Casting a spell fills its mastery bar, and each level-up costs one skill point (you earn one per Magic Level). Each offers permanent path choices at Lv 5 and 10. Open a spell's skill tree from the Status window. Elemental Essence speeds this up: **Infuse** it into a spell of its element from the spell's screen (one Essence fills half of a Lv 1 bar, 20% less each level after), or **Condense** it into bonus skill points from the Status screen (8 Essence for the first, 4 more for each after).
+Fireball, Hydro Jet, Icicle, Frost Shield and Wind Blade level from 1 to 10. Each level also shortens the spell's cooldown (Lv 10: under half of Lv 1), and so does every Magic Level (1% each). Casting a spell fills its mastery bar, and each level-up costs one skill point (you earn one per Magic Level). Each offers permanent path choices at Lv 5 and 10. Open a spell's skill tree from the Status window. Elemental Essence speeds this up: **Infuse** it into a spell of its element from the spell's screen (one Essence fills half of a Lv 1 bar, 20% less each level after), or **Condense** it into bonus skill points from the Status screen (8 Essence for the first, 4 more for each after).
 
 Operators can use `/arcana level set <n>`, `/arcana xp add <n>`, `/arcana affinity add <element>`, `/arcana affinity reset`, `/arcana mana fill|set <n>`, `/arcana attune <targets> <element> <rank>|none` and `/arcana cooldowns reset`.
 
