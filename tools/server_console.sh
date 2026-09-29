@@ -36,7 +36,7 @@ fi
 mapfile -d '' ARGS < "$CMDLINE"
 FIFO="$(mktemp -u)"
 mkfifo "$FIFO"
-(cd "$ROOT/run" && exec timeout 300 "${ARGS[@]}" < "$FIFO" > "$LOG" 2>&1) &
+(cd "$ROOT/run-server" && exec timeout 300 "${ARGS[@]}" < "$FIFO" > "$LOG" 2>&1) &
 SERVER=$!
 exec 3>"$FIFO"
 timeout 180 bash -c "until grep -qE 'Done \(|Failed to start' '$LOG'; do sleep 1; done"

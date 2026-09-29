@@ -39,7 +39,6 @@ public final class FireMobSpells {
         @Override
         public void cast(Mob caster, LivingEntity target) {
             ModSpells.FIREBALL.get().shootForMob(caster, MobCasting.aimPoint(target), MobSpells.POWER, false);
-            MobCasting.play(caster, SoundEvents.BLAZE_SHOOT, 1f, 1.1f);
         }
     }
 
@@ -90,7 +89,6 @@ public final class FireMobSpells {
         @Override
         public void cast(Mob caster, LivingEntity target) {
             ModSpells.FIREBALL.get().shootForMob(caster, target.position(), MobSpells.POWER, true);
-            MobCasting.play(caster, SoundEvents.BLAZE_SHOOT, 1.5f, 0.6f);
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.chappadodle.elementalarcana.client.particle;
 
 import com.chappadodle.elementalarcana.client.ScreenEffects;
+import com.chappadodle.elementalarcana.client.sound.FireballSounds;
 import com.chappadodle.elementalarcana.content.FireBlastOptions;
 import com.chappadodle.elementalarcana.content.spell.FireballEffects;
 import net.minecraft.client.Minecraft;
@@ -28,6 +29,7 @@ public class FireBlastEmitter extends NoRenderParticle {
         Vec3 eye = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         Vec3 toBlast = new Vec3(x, y, z).subtract(eye);
         this.toBlast = toBlast.lengthSqr() > 1.0e-4 ? toBlast.normalize() : new Vec3(0, 0, 1);
+        FireballSounds.blast(level, new Vec3(x, y, z), blast.look(), blast.bomblet());
         feel();
     }
 

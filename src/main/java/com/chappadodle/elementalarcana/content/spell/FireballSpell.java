@@ -12,6 +12,7 @@ import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellDamage;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
 import com.chappadodle.elementalarcana.api.SpellTargets;
+import com.chappadodle.elementalarcana.client.sound.FireballSounds;
 import com.chappadodle.elementalarcana.content.FireBlastOptions;
 import com.chappadodle.elementalarcana.content.FireEvents;
 import com.chappadodle.elementalarcana.content.FireField;
@@ -158,7 +159,6 @@ public class FireballSpell extends Spell implements ProjectileSpell, ConjureSpel
         tag.putString(TAG_BRANCH_5, orEmpty(context.branch(5)));
         tag.putString(TAG_BRANCH_10, orEmpty(context.branch(10)));
         fireball.setVariant(lookFor(level, context.branch(5), context.branch(10)));
-        playAt(context.caster(), SoundEvents.FLINTANDSTEEL_USE, 1f, 0.9f);
         return fireball;
     }
 
@@ -172,7 +172,6 @@ public class FireballSpell extends Spell implements ProjectileSpell, ConjureSpel
                 launchInArc(fireball, aim);
             }
         }
-        playAt(caster, SoundEvents.BLAZE_SHOOT, 1f, 1.1f);
     }
 
     @Override
@@ -197,12 +196,6 @@ public class FireballSpell extends Spell implements ProjectileSpell, ConjureSpel
         playAt(caster, SoundEvents.FIRECHARGE_USE, 1.5f, 0.6f);
         level.sendParticles(ModContent.EMBER.get(), sun.getX(), sun.getY(), sun.getZ(), 30, 0.4, 0.4, 0.4, 0.1);
         return sun;
-    }
-
-    /** Fully grown: a crackle (the flare and sparks are client-side, see FireballEffects#grown). */
-    @Override
-    public void onFullyGrown(SpellProjectile fireball) {
-        playAt(fireball, SoundEvents.FIRECHARGE_USE, 0.6f, 1.3f);
     }
 
     @Override
@@ -280,16 +273,18 @@ public class FireballSpell extends Spell implements ProjectileSpell, ConjureSpel
         };
     }
 
-    // ---- visuals (client, see FireballEffects) ----
+    // ---- visuals and sounds (client only, see FireballEffects and FireballSounds) ----
 
     @Override
     public void heldParticles(SpellProjectile fireball, float charge) {
         FireballEffects.held(fireball, charge);
+        FireballSounds.held(fireball);
     }
 
     @Override
     public void grownParticles(SpellProjectile fireball) {
         FireballEffects.grown(fireball);
+        FireballSounds.grown(fireball);
     }
 
     @Override
@@ -300,6 +295,7 @@ public class FireballSpell extends Spell implements ProjectileSpell, ConjureSpel
     @Override
     public void flightParticles(SpellProjectile fireball) {
         FireballEffects.flight(fireball);
+        FireballSounds.flight(fireball);
     }
 
     // ---- flight (server) ----
@@ -443,11 +439,15 @@ public class FireballSpell extends Spell implements ProjectileSpell, ConjureSpel
             FireField.spawn(level, at, 2.0, 60, owner);
         }
 
-        float size = (float) (radius / 2.0);
-        // The whole explosion goes out as one particle; each client plays it out (FireballEffects#blast).
-        level.sendParticles(new FireBlastOptions(fireball.variant(), (float) radius, bomblet), at.x, at.y, at.z, 1, 0, 0, 0, 0);
-        level.playSound(null, at.x, at.y, at.z, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS,
-                Math.min(2.5f, 0.5f * size), 1.5f / (float) Math.sqrt(Math.max(1f, size)));
+        // The whole explosion goes out as one particle; each client plays it out, with its sound
+        // (FireballEffects#blast, FireballSounds#blast). Meteor and Sunfire carry twice as far.
+        FireBlastOptions blast = new FireBlastOptions(fireball.variant(), (float) radius, bomblet);
+        double reach = sun || meteor ? 64 : 32;
+        for (ServerPlayer player : level.players()) {
+            if (player.distanceToSqr(at) < reach * reach) {
+                level.sendParticles(player, blast, true, at.x, at.y, at.z, 1, 0, 0, 0, 0);
+            }
+        }
     }
 
     /** Cluster Bomb: four bomblets bounce away from the blast and go off one after another. */

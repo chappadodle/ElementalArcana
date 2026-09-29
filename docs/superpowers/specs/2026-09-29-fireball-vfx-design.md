@@ -158,6 +158,50 @@ separate experiment with an on/off switch.
 - **The switch:** client config `bloom` (default on), for the A/B comparison. It takes effect
   immediately.
 
+## Step 4 structure (sounds)
+
+Approved: layered vanilla sounds for every tier, plus synthesized signature sounds (★) made with
+`tools/gen_spell_sounds.py`. An AI sound model is the fallback for any ★ sound that doesn't work
+in its A/B. It's built in two play-tests:
+- 4a: the engine and the vanilla mixes
+- 4b: the ★ sounds
+
+- **Played on each client.** The fireball's sounds play on each player's own machine, from the
+  same hooks as its particles, so the particles and the sounds come from the same code. The server
+  stops playing them, except for the Sunfire fuse and the fizzle in water.
+  - Conjure: the first client tick while held.
+  - Fully grown: `grownParticles`.
+  - Throw or shot: the first client tick in flight (`launchedEffects`), which covers mob and
+    bomblet shots too.
+  - Impact: `FireBlastEmitter`.
+- **Loops that follow the fireball** (`client/sound/ProjectileLoopSound`, a tickable sound):
+  - It tracks the projectile, including its hand position while held, and stops when the
+    projectile is gone or its state changes.
+  - Held: it swells with charge.
+  - In flight: a fly-by (Doppler) pitch shift, from how fast the projectile is closing in on the
+    listener.
+  - The loop's sound is picked by look, and when the look changes (a Sunfire fuse), the loop
+    switches.
+- **Long-range blasts:** Meteor and Sunfire blasts are sent to players up to 64 blocks away (a
+  long-distance particle send), and their sounds are played at a higher volume, so they carry.
+- **The vanilla mixes (4a):**
+
+| Moment | Heat 1–2 | Heat 3–4 | Cluster | Meteor | Sunfire | Phoenix |
+|---|---|---|---|---|---|---|
+| Conjure | flint + firecharge, soft | firecharge, lower | + fuse hiss (TNT prime, quiet) | + grindstone | — | + phantom flap, high |
+| Held loop | blaze burn, quiet | blaze burn, louder and lower | fuse sizzle | blaze burn, low | blaze burn, deep | blaze burn |
+| Fully grown | firecharge | firecharge + blaze shoot, soft | fuse crackle | firecharge, low | — | firecharge |
+| Throw | blaze shoot | + ghast shoot, soft | snowball-style toss | ghast shoot, low | ghast shoot + blaze shoot | blaze shoot + phantom swoop |
+| Flight loop | elytra wind, quiet | elytra wind + blaze burn | fuse sizzle | wind, low and heavy | wind + deep burn | wind + wingbeats (flaps) |
+| Impact | small explosion, high pitch | explosion + firework blast | firework blast and twinkle per bomblet | big explosion, low, + debris | huge explosion, low, + blast | explosion + phantom cry |
+
+- **★ signature sounds (4b), synthesized:**
+  - Sunfire: a solar hum (held loop), a launch surge and a detonation with a long tail
+  - Meteor: an incoming roar (flight loop) and a ground-shaking impact with a rumble
+  - Phoenix: a cry (on the throw, and fading out on impact)
+- **A/B:** a client config option, `signatureSounds` (default on), swaps each ★ sound for its
+  vanilla mix, and takes effect immediately.
+
 ## Noted for later (from play-testing step 1)
 
 - **Screen space with several held fireballs:** a full set, especially the Lv 8+ heat looks, can

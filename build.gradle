@@ -84,6 +84,8 @@ neoForge {
 
         server {
             server()
+            // Its own folder, so client-only mods dropped into run/mods (Sodium, Iris) stay out of it.
+            gameDirectory = project.file('run-server')
             programArgument '--nogui'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
