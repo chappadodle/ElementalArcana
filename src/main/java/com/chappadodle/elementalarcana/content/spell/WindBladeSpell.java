@@ -3,12 +3,12 @@ package com.chappadodle.elementalarcana.content.spell;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.CastResult;
+import com.chappadodle.elementalarcana.api.ConjureSpell;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.ElementalReactions;
 import com.chappadodle.elementalarcana.api.ProjectileSpell;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellDamage;
-import com.chappadodle.elementalarcana.api.SpellHold;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.content.ModSchools;
@@ -16,6 +16,7 @@ import com.chappadodle.elementalarcana.content.WindVortex;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,13 +34,14 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Wind's basic spell, levels 1-10. Hold the cast key: crescents of wind form in front of you;
- * release and they slice toward your crosshair, fanned out, knocking back what they cut.
+ * Wind's basic spell, levels 1-10. Each press of the cast key conjures a crescent of wind in front
+ * of you (up to the level's maximum); "launch one" / "launch all" slices them toward your crosshair,
+ * a volley fanned out, knocking back what they cut (see Conjuring).
  *
  * <pre>
  * Lv1 Wind Blade     one crescent            Lv6  Keen Wind     +25% dmg; full charge = Airborne
@@ -50,14 +52,14 @@ import java.util.List;
  * </pre>
  * Every hit Swirls (spreads the target's element to creatures nearby).
  */
-public class WindBladeSpell extends Spell implements ProjectileSpell {
+public class WindBladeSpell extends Spell implements ProjectileSpell, ConjureSpell {
     public static final String BOOMERANG = "boomerang";
     public static final String TEMPEST = "tempest";
     public static final String SCYTHE = "scythe";
     public static final String THOUSAND_CUTS = "thousand_cuts";
 
     private static final ResourceLocation MODEL = ElementalArcana.id("spell/wind_blade");
-    private static final int SCYTHE_EXTRA_HOLD = 20;
+    private static final int EXTRA_BLADE_COST = 3;
     private static final int RANGE_TICKS = 20;
     private static final int BOOMERANG_TURN_TICKS = 10;
 
@@ -96,29 +98,92 @@ public class WindBladeSpell extends Spell implements ProjectileSpell {
         return level >= 3 ? 15 : 20;
     }
 
-    @Override
-    public int manaCost(int spellLevel) {
-        return 10 + 3 * (bladeCount(spellLevel) - 1);
-    }
+    // ---- conjuring ----
 
-    // ---- casting ----
-
+    /** Never called: Wind Blade is conjured (see ConjureSpell). */
     @Override
     public CastResult cast(CastContext context) {
+        return CastResult.fail(Component.translatable("message.elementalarcana.no_spell"));
+    }
+
+    @Override
+    public int maxConjured(int spellLevel) {
+        return bladeCount(spellLevel);
+    }
+
+    /** 10 for the first blade of a set, 3 for each more (a full set costs what the old volley did). */
+    @Override
+    public int conjureCost(int spellLevel, int alreadyHeld) {
+        return alreadyHeld == 0 ? manaCost() : EXTRA_BLADE_COST;
+    }
+
+    @Override
+    public SpellProjectile conjure(CastContext context, int seed) {
         int level = context.spellLevel();
-        int count = bladeCount(level);
-        List<SpellProjectile> blades = new ArrayList<>();
-        for (int slot = 0; slot < count; slot++) {
-            SpellProjectile blade = SpellProjectile.summonHeld(context, this, slot, count, chargeTicks(level));
-            CompoundTag tag = blade.getPersistentData();
-            tag.putInt(TAG_LEVEL, level);
-            tag.putString(TAG_BRANCH_5, orEmpty(context.branch(5)));
-            tag.putString(TAG_BRANCH_10, orEmpty(context.branch(10)));
-            blades.add(blade);
-        }
-        context.holdUntilRelease(new Hold(context.caster(), blades, chargeTicks(level), level, context.hasBranch(10, SCYTHE)));
+        SpellProjectile blade = SpellProjectile.summonHeld(context, this, 0, 1, chargeTicks(level));
+        CompoundTag tag = blade.getPersistentData();
+        tag.putInt(TAG_LEVEL, level);
+        tag.putString(TAG_BRANCH_5, orEmpty(context.branch(5)));
+        tag.putString(TAG_BRANCH_10, orEmpty(context.branch(10)));
         playAt(context.caster(), SoundEvents.BREEZE_INHALE, 0.8f, 1.3f);
-        return CastResult.SUCCESS;
+        return blade;
+    }
+
+    /**
+     * A volley fans out horizontally around the aim, each blade toward its own side (by its place in
+     * the formation); a single blade flies straight at the crosshair.
+     */
+    @Override
+    public void launch(ServerPlayer caster, List<SpellProjectile> blades, Vec3 aim) {
+        for (SpellProjectile blade : blades) {
+            int count = blade.formationCount();
+            float spread = blades.size() <= 1 || count <= 1 ? 0f
+                    : (blade.formationSlot() - (count - 1) / 2f) * (count >= 5 ? 10f : 12f);
+            Vec3 toAim = aim.subtract(blade.position()).yRot(spread * Mth.DEG_TO_RAD);
+            blade.release(blade.position().add(toAim));
+        }
+        playAt(caster, SoundEvents.BREEZE_SHOOT, 0.9f, 1.2f);
+        if (blades.get(0).getPersistentData().getInt(TAG_LEVEL) >= 7) {
+            // Slipstream: a burst of speed as the wind leaves your hands.
+            caster.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, 1));
+        }
+    }
+
+    @Override
+    public boolean canFuse(int spellLevel, Map<Integer, String> branches) {
+        return SCYTHE.equals(branches.get(10));
+    }
+
+    /** Storm Scythe: the fan of blades merges into one giant crescent. */
+    @Override
+    public SpellProjectile fuse(ServerPlayer caster, List<SpellProjectile> blades) {
+        ServerLevel level = caster.serverLevel();
+        SpellProjectile scythe = blades.get(blades.size() / 2);
+        for (SpellProjectile other : blades) {
+            if (other != scythe) {
+                level.sendParticles(ModContent.WIND_STREAK.get(), other.getX(), other.getY(), other.getZ(), 6, 0.1, 0.1, 0.1, 0.1);
+                other.discard();
+            }
+        }
+        scythe.setFormation(0, 1);
+        scythe.setVisualScale(2.5f);
+        scythe.getPersistentData().putBoolean(TAG_SCYTHE, true);
+        playAt(caster, SoundEvents.BREEZE_WHIRL, 1.2f, 0.7f);
+        level.sendParticles(ParticleTypes.GUST_EMITTER_SMALL, scythe.getX(), scythe.getY(), scythe.getZ(), 1, 0, 0, 0, 0);
+        return scythe;
+    }
+
+    /** Fully grown: the wind catches with a rush. */
+    @Override
+    public void onFullyGrown(SpellProjectile blade) {
+        playAt(blade, SoundEvents.BREEZE_CHARGE, 0.6f, 1.4f);
+        ((ServerLevel) blade.level()).sendParticles(ModContent.WIND_STREAK.get(), blade.getX(), blade.getY(), blade.getZ(), 8, 0.1, 0.1, 0.1, 0.15);
+    }
+
+    @Override
+    public void fizzle(SpellProjectile blade) {
+        impact(blade);
+        blade.discard();
     }
 
     private static String orEmpty(@Nullable String value) {
@@ -328,88 +393,4 @@ public class WindBladeSpell extends Spell implements ProjectileSpell {
         at.level().playSound(null, at.getX(), at.getY(), at.getZ(), sound, SoundSource.PLAYERS, volume, pitch);
     }
 
-    // ---- the hold ----
-
-    private static final class Hold implements SpellHold {
-        private final ServerPlayer caster;
-        private final List<SpellProjectile> blades;
-        private final int chargeTicks;
-        private final int level;
-        private final boolean canForgeScythe;
-        private boolean scytheForged;
-
-        Hold(ServerPlayer caster, List<SpellProjectile> blades, int chargeTicks, int level, boolean canForgeScythe) {
-            this.caster = caster;
-            this.blades = blades;
-            this.chargeTicks = chargeTicks;
-            this.level = level;
-            this.canForgeScythe = canForgeScythe && blades.size() > 1;
-        }
-
-        @Override
-        public boolean tick(int heldTicks) {
-            blades.removeIf(blade -> !blade.isAlive());
-            if (blades.isEmpty()) {
-                return false;
-            }
-            if (heldTicks == chargeTicks) {
-                playAt(caster, SoundEvents.BREEZE_CHARGE, 0.8f, 1.4f);
-                for (SpellProjectile blade : blades) {
-                    ((ServerLevel) blade.level()).sendParticles(ModContent.WIND_STREAK.get(), blade.getX(), blade.getY(), blade.getZ(), 8, 0.1, 0.1, 0.1, 0.15);
-                }
-            }
-            if (canForgeScythe && !scytheForged && heldTicks == chargeTicks + SCYTHE_EXTRA_HOLD) {
-                forgeScythe();
-            }
-            return true;
-        }
-
-        /** Storm Scythe: the fan of blades merges into one giant crescent. */
-        private void forgeScythe() {
-            scytheForged = true;
-            ServerLevel level = caster.serverLevel();
-            SpellProjectile scythe = blades.get(blades.size() / 2);
-            for (SpellProjectile other : blades) {
-                if (other != scythe) {
-                    level.sendParticles(ModContent.WIND_STREAK.get(), other.getX(), other.getY(), other.getZ(), 6, 0.1, 0.1, 0.1, 0.1);
-                    other.discard();
-                }
-            }
-            blades.clear();
-            blades.add(scythe);
-            scythe.setFormation(0, 1);
-            scythe.setVisualScale(2.5f);
-            scythe.getPersistentData().putBoolean(TAG_SCYTHE, true);
-            playAt(caster, SoundEvents.BREEZE_WHIRL, 1.2f, 0.7f);
-            level.sendParticles(ParticleTypes.GUST_EMITTER_SMALL, scythe.getX(), scythe.getY(), scythe.getZ(), 1, 0, 0, 0, 0);
-        }
-
-        @Override
-        public void release(int heldTicks) {
-            Vec3 aim = SpellProjectile.crosshairTarget(caster);
-            int count = blades.size();
-            for (int i = 0; i < count; i++) {
-                SpellProjectile blade = blades.get(i);
-                // Fan the volley out horizontally around the aim direction.
-                float spread = count <= 1 ? 0f : (i - (count - 1) / 2f) * (count >= 5 ? 10f : 12f);
-                Vec3 toAim = aim.subtract(blade.position()).yRot(spread * Mth.DEG_TO_RAD);
-                blade.release(blade.position().add(toAim));
-            }
-            playAt(caster, SoundEvents.BREEZE_SHOOT, 0.9f, 1.2f);
-            if (level >= 7) {
-                // Slipstream: a burst of speed as the wind leaves your hands.
-                caster.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, 1));
-            }
-        }
-
-        @Override
-        public void cancel() {
-            for (SpellProjectile blade : blades) {
-                if (blade.isAlive()) {
-                    impact(blade);
-                    blade.discard();
-                }
-            }
-        }
-    }
 }

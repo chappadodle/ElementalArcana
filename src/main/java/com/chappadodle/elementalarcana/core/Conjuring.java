@@ -208,7 +208,6 @@ public final class Conjuring {
                 session.held.clear();
                 session.held.add(fused);
                 session.fused = true;
-                fused.setFormation(0, 1);
                 updateCount(player, session);
             }
         } else {

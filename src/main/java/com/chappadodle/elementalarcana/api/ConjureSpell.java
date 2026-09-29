@@ -42,7 +42,10 @@ public interface ConjureSpell {
         return false;
     }
 
-    /** Fuses the held set into one projectile, discarding the others; returns the one that's left. */
+    /**
+     * Fuses the held set into one projectile, discarding the others, and places it (its formation
+     * slot); returns the one that's left.
+     */
     default SpellProjectile fuse(ServerPlayer caster, List<SpellProjectile> projectiles) {
         throw new UnsupportedOperationException("This spell doesn't fuse");
     }

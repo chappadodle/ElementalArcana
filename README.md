@@ -11,7 +11,7 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 | Key | |
 |---|---|
 | **V** (hold) | Spell wheel: point at a spell and release to select it |
-| **R** | Cast the selected spell (with any item in hand, or none). For Icicle: each press **conjures** one more icicle, up to your spell level's maximum |
+| **R** | Cast the selected spell (with any item in hand, or none). For Icicle, Fireball and Wind Blade: each press **conjures** one more, up to your spell level's maximum |
 | **Left click** (while conjuring) | Launch one conjured projectile |
 | **Right click** (while conjuring) | Launch all of them. With nothing conjured, the mouse works as normal |
 | **K** | Status window: level, XP, mana stats, affinities and every spell |
@@ -26,12 +26,12 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 
 | Element | Lv 1 | Lv 5 |
 |---|---|---|
-| Fire | Fireball: hold R to grow a fireball, release to throw it; explodes and ignites (sets blocks alight only with `mobGriefing`) | Flame Burst: ring of fire around you |
+| Fire | Fireball: press R to conjure fireballs that grow in your palm, click to throw one or all; explodes and ignites (sets blocks alight only with `mobGriefing`) | Flame Burst: ring of fire around you |
 | Water | Hydro Jet: hold R to spray a pressurized stream that pushes enemies back and soaks them; Tidal Wave: cone that pushes, extinguishes, hurts endermen/blazes | Healing Rain: Regeneration II for you and nearby players |
 | Ice | Icicle: press R to conjure icicles one at a time (they grow sharper while held, 1 mana/s each), click to launch one or all; a fully grown icicle freezes | Frost Nova: freezes everything around you |
-| Wind | Wind Blade: hold R to charge crescents of wind, release to slash; Gale Dash: launch forward, no fall damage | Updraft: throw yourself and nearby mobs skyward |
+| Wind | Wind Blade: press R to conjure crescents of wind, click to slash with one or all; Gale Dash: launch forward, no fall damage | Updraft: throw yourself and nearby mobs skyward |
 
-**Conjuring** (Icicle; Fireball and Wind Blade coming): press R to conjure one projectile at a time, up to your spell level's maximum. Each costs mana when conjured (the first full price, each extra less), grows while you hold it, and costs 1 mana per second to keep; if you can't pay, everything you hold launches itself. Left click launches one, right click launches all. The cooldown starts when the last one leaves. With a full, fully grown set, hold R for a second to fuse it (Glacial Lance).
+**Conjuring** (Icicle, Fireball, Wind Blade): press R to conjure one projectile at a time, up to your spell level's maximum. Each costs mana when conjured (the first full price, each extra less), grows while you hold it, and costs 1 mana per second to keep; if you can't pay, everything you hold launches itself. Left click launches one, right click launches all. The cooldown starts when the last one leaves. With a full, fully grown set, hold R for a second to fuse it (Glacial Lance, Sunfire, Storm Scythe).
 
 **Bubble Prison** (Water, Magic Level 3): tap R to trap the creature (or player) under your crosshair in a floating water bubble for 4 seconds. It's helpless and Wet, which sets up Freeze and Vaporize combos, and any hit pops it for +4 damage. Bosses can't be trapped.
 

@@ -150,6 +150,7 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
             level.sendParticles(ModContent.FROST_MIST.get(), other.getX(), other.getY(), other.getZ(), 2, 0.1, 0.1, 0.1, 0.01);
             other.discard();
         }
+        lance.setFormation(0, 1);
         lance.setVisualScale(2.2f);
         lance.getPersistentData().putBoolean(TAG_LANCE, true);
         playAt(lance, SoundEvents.AMETHYST_BLOCK_RESONATE, 1.5f, 0.6f);

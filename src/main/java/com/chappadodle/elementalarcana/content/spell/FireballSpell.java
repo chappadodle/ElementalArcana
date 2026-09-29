@@ -3,12 +3,12 @@ package com.chappadodle.elementalarcana.content.spell;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.CastResult;
+import com.chappadodle.elementalarcana.api.ConjureSpell;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.ElementalReactions;
 import com.chappadodle.elementalarcana.api.ProjectileSpell;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellDamage;
-import com.chappadodle.elementalarcana.api.SpellHold;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
 import com.chappadodle.elementalarcana.api.SpellTargets;
 import com.chappadodle.elementalarcana.content.FireEvents;
@@ -19,6 +19,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -37,13 +38,14 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Fire's basic spell, levels 1-10. Hold the cast key: a fireball grows in your palm; release to
- * throw it. It explodes where it lands, igniting everything in the blast (no block damage).
+ * Fire's basic spell, levels 1-10. Each press of the cast key conjures a fireball that grows in
+ * your palm (up to the level's maximum); "launch one" / "launch all" throws them (see Conjuring).
+ * It explodes where it lands, igniting everything in the blast (no block damage).
  * Hitting frozen or frosted enemies Melts them, and wet ones Vaporize, for extra damage.
  *
  * <pre>
@@ -54,14 +56,14 @@ import java.util.List;
  * Lv5 branch:       Cluster Bomb | Meteor  Lv10 capstone:     Sunfire | Phoenix
  * </pre>
  */
-public class FireballSpell extends Spell implements ProjectileSpell {
+public class FireballSpell extends Spell implements ProjectileSpell, ConjureSpell {
     public static final String CLUSTER = "cluster";
     public static final String METEOR = "meteor";
     public static final String SUNFIRE = "sunfire";
     public static final String PHOENIX = "phoenix";
 
     private static final ResourceLocation MODEL = ElementalArcana.id("spell/fireball");
-    private static final int SUN_EXTRA_HOLD = 20;
+    private static final int EXTRA_FIREBALL_COST = 5;
     private static final float METEOR_GRAVITY = 0.05f;
 
     private static final String TAG_LEVEL = "ea_fire_level";
@@ -101,29 +103,84 @@ public class FireballSpell extends Spell implements ProjectileSpell {
         return level >= 3 ? 15 : 20;
     }
 
-    @Override
-    public int manaCost(int spellLevel) {
-        return 15 + 5 * (fireballCount(spellLevel) - 1);
-    }
+    // ---- conjuring ----
 
-    // ---- casting ----
-
+    /** Never called: Fireball is conjured (see ConjureSpell). */
     @Override
     public CastResult cast(CastContext context) {
+        return CastResult.fail(Component.translatable("message.elementalarcana.no_spell"));
+    }
+
+    @Override
+    public int maxConjured(int spellLevel) {
+        return fireballCount(spellLevel);
+    }
+
+    /** 15 for the first fireball of a set, 5 for each more (a full set costs what the old volley did). */
+    @Override
+    public int conjureCost(int spellLevel, int alreadyHeld) {
+        return alreadyHeld == 0 ? manaCost() : EXTRA_FIREBALL_COST;
+    }
+
+    @Override
+    public SpellProjectile conjure(CastContext context, int seed) {
         int level = context.spellLevel();
-        int count = fireballCount(level);
-        List<SpellProjectile> fireballs = new ArrayList<>();
-        for (int slot = 0; slot < count; slot++) {
-            SpellProjectile fireball = SpellProjectile.summonHeld(context, this, slot, count, chargeTicks(level));
-            CompoundTag tag = fireball.getPersistentData();
-            tag.putInt(TAG_LEVEL, level);
-            tag.putString(TAG_BRANCH_5, orEmpty(context.branch(5)));
-            tag.putString(TAG_BRANCH_10, orEmpty(context.branch(10)));
-            fireballs.add(fireball);
-        }
-        context.holdUntilRelease(new Hold(context.caster(), fireballs, chargeTicks(level), context.hasBranch(10, SUNFIRE)));
+        SpellProjectile fireball = SpellProjectile.summonHeld(context, this, 0, 1, chargeTicks(level));
+        CompoundTag tag = fireball.getPersistentData();
+        tag.putInt(TAG_LEVEL, level);
+        tag.putString(TAG_BRANCH_5, orEmpty(context.branch(5)));
+        tag.putString(TAG_BRANCH_10, orEmpty(context.branch(10)));
         playAt(context.caster(), SoundEvents.FLINTANDSTEEL_USE, 1f, 0.9f);
-        return CastResult.SUCCESS;
+        return fireball;
+    }
+
+    /** Meteor: each fireball is lobbed in a high arc instead of thrown straight. */
+    @Override
+    public void launch(ServerPlayer caster, List<SpellProjectile> fireballs, Vec3 aim) {
+        for (SpellProjectile fireball : fireballs) {
+            fireball.release(aim);
+            CompoundTag tag = fireball.getPersistentData();
+            if (METEOR.equals(tag.getString(TAG_BRANCH_5)) && !tag.getBoolean(TAG_SUN)) {
+                launchInArc(fireball, aim);
+            }
+        }
+        playAt(caster, SoundEvents.BLAZE_SHOOT, 1f, 1.1f);
+    }
+
+    @Override
+    public boolean canFuse(int spellLevel, Map<Integer, String> branches) {
+        return SUNFIRE.equals(branches.get(10));
+    }
+
+    /** Sunfire: the fireballs fuse into a miniature sun floating above your head. */
+    @Override
+    public SpellProjectile fuse(ServerPlayer caster, List<SpellProjectile> fireballs) {
+        ServerLevel level = caster.serverLevel();
+        SpellProjectile sun = fireballs.get(0);
+        for (SpellProjectile other : fireballs.subList(1, fireballs.size())) {
+            level.sendParticles(ParticleTypes.FLAME, other.getX(), other.getY(), other.getZ(), 12, 0.1, 0.1, 0.1, 0.05);
+            other.discard();
+        }
+        sun.setFormation(2, 3);
+        sun.setVisualScale(2.8f);
+        sun.getPersistentData().putBoolean(TAG_SUN, true);
+        playAt(caster, SoundEvents.BLAZE_AMBIENT, 1.5f, 0.6f);
+        playAt(caster, SoundEvents.FIRECHARGE_USE, 1.5f, 0.6f);
+        level.sendParticles(ModContent.EMBER.get(), sun.getX(), sun.getY(), sun.getZ(), 30, 0.4, 0.4, 0.4, 0.1);
+        return sun;
+    }
+
+    /** Fully grown: a crackle and a flare. */
+    @Override
+    public void onFullyGrown(SpellProjectile fireball) {
+        playAt(fireball, SoundEvents.FIRECHARGE_USE, 0.6f, 1.3f);
+        ((ServerLevel) fireball.level()).sendParticles(ParticleTypes.FLAME, fireball.getX(), fireball.getY(), fireball.getZ(), 10, 0.05, 0.05, 0.05, 0.06);
+    }
+
+    @Override
+    public void fizzle(SpellProjectile fireball) {
+        ((ServerLevel) fireball.level()).sendParticles(ParticleTypes.SMOKE, fireball.getX(), fireball.getY(), fireball.getZ(), 8, 0.1, 0.1, 0.1, 0.02);
+        fireball.discard();
     }
 
     private static String orEmpty(@Nullable String value) {
@@ -422,79 +479,4 @@ public class FireballSpell extends Spell implements ProjectileSpell {
         return fireball;
     }
 
-    // ---- the hold ----
-
-    private static final class Hold implements SpellHold {
-        private final ServerPlayer caster;
-        private final List<SpellProjectile> fireballs;
-        private final int chargeTicks;
-        private final boolean canForgeSun;
-        private boolean sunForged;
-
-        Hold(ServerPlayer caster, List<SpellProjectile> fireballs, int chargeTicks, boolean canForgeSun) {
-            this.caster = caster;
-            this.fireballs = fireballs;
-            this.chargeTicks = chargeTicks;
-            this.canForgeSun = canForgeSun && fireballs.size() > 1;
-        }
-
-        @Override
-        public boolean tick(int heldTicks) {
-            fireballs.removeIf(fireball -> !fireball.isAlive());
-            if (fireballs.isEmpty()) {
-                return false;
-            }
-            if (heldTicks == chargeTicks) {
-                playAt(caster, SoundEvents.FIRECHARGE_USE, 0.8f, 1.3f);
-                for (SpellProjectile fireball : fireballs) {
-                    ((ServerLevel) fireball.level()).sendParticles(ParticleTypes.FLAME, fireball.getX(), fireball.getY(), fireball.getZ(), 10, 0.05, 0.05, 0.05, 0.06);
-                }
-            }
-            if (canForgeSun && !sunForged && heldTicks == chargeTicks + SUN_EXTRA_HOLD) {
-                forgeSun();
-            }
-            return true;
-        }
-
-        /** Sunfire: the fireballs fuse into a miniature sun floating above your head. */
-        private void forgeSun() {
-            sunForged = true;
-            ServerLevel level = caster.serverLevel();
-            SpellProjectile sun = fireballs.get(0);
-            for (SpellProjectile other : fireballs.subList(1, fireballs.size())) {
-                level.sendParticles(ParticleTypes.FLAME, other.getX(), other.getY(), other.getZ(), 12, 0.1, 0.1, 0.1, 0.05);
-                other.discard();
-            }
-            fireballs.subList(1, fireballs.size()).clear();
-            sun.setFormation(2, 3);
-            sun.setVisualScale(2.8f);
-            sun.getPersistentData().putBoolean(TAG_SUN, true);
-            playAt(caster, SoundEvents.BLAZE_AMBIENT, 1.5f, 0.6f);
-            playAt(caster, SoundEvents.FIRECHARGE_USE, 1.5f, 0.6f);
-            level.sendParticles(ModContent.EMBER.get(), sun.getX(), sun.getY(), sun.getZ(), 30, 0.4, 0.4, 0.4, 0.1);
-        }
-
-        @Override
-        public void release(int heldTicks) {
-            Vec3 aim = SpellProjectile.crosshairTarget(caster);
-            for (SpellProjectile fireball : fireballs) {
-                fireball.release(aim);
-                CompoundTag tag = fireball.getPersistentData();
-                if (METEOR.equals(tag.getString(TAG_BRANCH_5)) && !tag.getBoolean(TAG_SUN)) {
-                    launchInArc(fireball, aim);
-                }
-            }
-            playAt(caster, SoundEvents.BLAZE_SHOOT, 1f, 1.1f);
-        }
-
-        @Override
-        public void cancel() {
-            for (SpellProjectile fireball : fireballs) {
-                if (fireball.isAlive()) {
-                    ((ServerLevel) fireball.level()).sendParticles(ParticleTypes.SMOKE, fireball.getX(), fireball.getY(), fireball.getZ(), 8, 0.1, 0.1, 0.1, 0.02);
-                    fireball.discard();
-                }
-            }
-        }
-    }
 }
