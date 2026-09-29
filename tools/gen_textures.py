@@ -327,27 +327,6 @@ SPRITES = {
         "kddkd...........",
         "kkk.............",
     ]),
-    # Texture for the fireball's model (models/spell/fireball.json): swirling flame, slightly translucent.
-    "block/fireball": ({
-        "w": 0xF4FFF6C8, "y": 0xF0FFD84A, "o": 0xE8FF8A1F, "r": 0xE0D83A1A,
-    }, [
-        "yoorrooyywwyoorr",
-        "ooyyoorryywwyooo",
-        "orryyooyywwyyoor",
-        "rrooyyowwyyoorrr",
-        "roowwyyowwyoorro",
-        "oyywwyyoyyoorroo",
-        "yyooyywwyooyyooy",
-        "oorryyyywwyyoorr",
-        "rroooyyyywwoorrr",
-        "rooyywwoyyoorroo",
-        "oyywwwoyyoorryyo",
-        "yyowwyyoorryywwy",
-        "oorryyoorryywwyy",
-        "rroooyyoyywwyyoo",
-        "ooyyoorryyooyyor",
-        "yyooyyrroooyyorr",
-    ]),
     "particle/ember_0": ({"w": 0xFFFFFFFF, "y": 0xFFFFE89A, "o": 0x90FFB040}, [
         "........",
         "........",
@@ -650,6 +629,101 @@ def bubble_icon(size=16):
     return Image.fromarray((np.clip(rgba, 0, 1) * 255).astype(np.uint8), "RGBA")
 
 
+# ---- Fireball looks (see docs/superpowers/specs/2026-09-29-fireball-vfx-design.md) ----
+
+def tile_noise(size, seed, periods=(4, 8, 16)):
+    """Smooth value noise that tiles seamlessly on a size x size square (fractal, 0..1)."""
+    rng = np.random.default_rng(seed)
+    out = np.zeros((size, size))
+    total, amp = 0.0, 1.0
+    for n in periods:
+        grid = rng.random((n, n))
+        xs = np.arange(size) * n / size
+        x0 = np.floor(xs).astype(int) % n
+        x1 = (x0 + 1) % n
+        t = xs - np.floor(xs)
+        t = t * t * (3 - 2 * t)
+        ty, tx = np.meshgrid(t, t, indexing="ij")
+        a = grid[np.ix_(x0, x0)]
+        b = grid[np.ix_(x0, x1)]
+        c = grid[np.ix_(x1, x0)]
+        d = grid[np.ix_(x1, x1)]
+        out += amp * ((a * (1 - tx) + b * tx) * (1 - ty) + (c * (1 - tx) + d * tx) * ty)
+        total += amp
+        amp *= 0.55
+    return out / total
+
+
+def color_ramp(stops, value):
+    """stops: [(position 0..1, (r, g, b)), ...] -> an RGB array (0..1) for each value."""
+    value = np.clip(value, 0, 1)
+    rgb = np.zeros(value.shape + (3,))
+    for c in range(3):
+        rgb[..., c] = np.interp(value, [p for p, _ in stops], [col[c] / 255 for _, col in stops])
+    return rgb
+
+
+def even_stops(*colors):
+    return [(i / (len(colors) - 1), c) for i, c in enumerate(colors)]
+
+
+def fireball_strip(stops, seed, frames=16, size=16, style="flame"):
+    """An animated fireball texture: frames stacked vertically. The noise scrolls up one pixel a
+    frame (flames rising) and tiles, so the loop is seamless; the centre of each face is hottest."""
+    noise = tile_noise(size, seed)
+    seams = tile_noise(size, seed + 1, periods=(2, 4))
+    y, x = np.mgrid[0:size, 0:size] + 0.5
+    r = np.hypot(x - size / 2, y - size / 2) / (size / 2)
+    strip = np.zeros((size * frames, size, 4))
+    for f in range(frames):
+        n = np.roll(noise, -f, axis=0)
+        heat = np.clip(1.15 - r * 0.8 + (n - 0.5) * 0.6, 0, 1)
+        rgb = color_ramp(stops, heat)
+        alpha = np.full((size, size), 0.93)
+        if style == "meteor":
+            # Dark rock with lava showing through the cracks, slowly shifting.
+            m = np.roll(seams, -(f // 2), axis=0)
+            crack = np.abs(m - 0.5) < 0.07
+            rock = color_ramp(even_stops((28, 20, 18), (62, 44, 36), (96, 70, 54)), n)
+            rgb = np.where(crack[..., None] | (r[..., None] < 0.3), rgb, rock)
+            alpha[:] = 1.0
+        elif style == "cluster":
+            # A dark bomb shell split by a glowing cross-shaped seam, pulsing like a fuse.
+            pulse = 0.7 + 0.3 * np.sin(f / frames * 2 * np.pi)
+            seam = (np.abs(x - size / 2) < 1.1) | (np.abs(y - size / 2) < 1.1)
+            core = r < 0.3
+            shell = color_ramp(even_stops((34, 25, 25), (60, 44, 42)), n)
+            glow = color_ramp(even_stops((255, 120, 30), (255, 210, 90)), n * pulse + 0.2) * pulse
+            rgb = np.where((seam | core)[..., None], glow, shell)
+            alpha[:] = 1.0
+        strip[f * size:(f + 1) * size, :, :3] = rgb
+        strip[f * size:(f + 1) * size, :, 3] = alpha
+    return Image.fromarray((np.clip(strip, 0, 1) * 255).astype(np.uint8), "RGBA")
+
+
+FIREBALL_LOOKS = {
+    "fireball_heat1": (even_stops((90, 10, 5), (200, 40, 10), (255, 110, 20), (255, 170, 60)), "flame"),
+    "fireball_heat2": (even_stops((140, 25, 5), (240, 90, 15), (255, 170, 40), (255, 230, 120)), "flame"),
+    "fireball_heat3": (even_stops((200, 60, 10), (255, 150, 30), (255, 225, 110), (255, 250, 220)), "flame"),
+    "fireball_heat4": (even_stops((230, 110, 20), (255, 200, 80), (255, 245, 200), (255, 255, 255)), "flame"),
+    "fireball_cluster": (even_stops((200, 60, 10), (255, 140, 30), (255, 220, 120), (255, 250, 220)), "cluster"),
+    "fireball_meteor": (even_stops((160, 30, 5), (240, 90, 15), (255, 170, 40), (255, 220, 120)), "meteor"),
+    "fireball_sun": (even_stops((255, 170, 40), (255, 220, 110), (255, 250, 210), (255, 255, 255)), "flame"),
+    "fireball_phoenix": (even_stops((120, 10, 30), (220, 30, 40), (255, 120, 40), (255, 215, 90)), "flame"),
+}
+
+
+def glow_sprite(size=64):
+    """A soft round glow for additive halos: white in the middle fading to black (black adds nothing)."""
+    y, x = np.mgrid[0:size, 0:size] + 0.5
+    r = np.hypot(x - size / 2, y - size / 2) / (size / 2)
+    v = np.clip(1 - r, 0, 1) ** 2.2
+    rgba = np.zeros((size, size, 4))
+    rgba[..., 0] = rgba[..., 1] = rgba[..., 2] = v
+    rgba[..., 3] = 1.0
+    return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA")
+
+
 def main():
     for name, (palette, grid) in SPRITES.items():
         path = ASSETS / f"{name}.png"
@@ -676,6 +750,15 @@ def main():
     for path, make in ((ASSETS / "block/bubble.png", bubble_skin), (ASSETS / "spell/bubble_prison.png", bubble_icon)):
         make().save(path)
         print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
+    for i, (name, (stops, style)) in enumerate(FIREBALL_LOOKS.items()):
+        path = ASSETS / f"block/{name}.png"
+        fireball_strip(stops, 60 + i, style=style).save(path)
+        path.with_suffix(".png.mcmeta").write_text('{"animation": {"frametime": 2, "interpolate": true}}\n')
+        print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
+    path = ASSETS / "misc/glow.png"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    glow_sprite().save(path)
+    print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
     for name, colors in essences.items():
         path = ASSETS / f"item/{name}_essence.png"
         path.parent.mkdir(parents=True, exist_ok=True)

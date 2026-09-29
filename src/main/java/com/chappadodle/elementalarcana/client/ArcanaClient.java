@@ -224,8 +224,8 @@ public final class ArcanaClient {
     public static void registerModels(ModelEvent.RegisterAdditional event) {
         Set<ResourceLocation> models = new HashSet<>();
         for (Spell spell : SpellRegistries.SPELLS) {
-            if (spell instanceof ProjectileSpell projectile && projectile.model() != null) {
-                models.add(projectile.model());
+            if (spell instanceof ProjectileSpell projectile) {
+                models.addAll(projectile.models());
             }
             if (spell instanceof ShieldSpell shield && shield.shardModel() != null) {
                 models.add(shield.shardModel());

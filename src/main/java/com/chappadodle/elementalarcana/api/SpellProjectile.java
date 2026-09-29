@@ -42,6 +42,8 @@ public class SpellProjectile extends ThrowableProjectile {
     private static final EntityDataAccessor<Integer> SLOT_COUNT = SynchedEntityData.defineId(SpellProjectile.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> SCALE = SynchedEntityData.defineId(SpellProjectile.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> GRAVITY = SynchedEntityData.defineId(SpellProjectile.class, EntityDataSerializers.FLOAT);
+    // Which look the spell gives this projectile (see ProjectileSpell#model(int), #glow(int)).
+    private static final EntityDataAccessor<Integer> VARIANT = SynchedEntityData.defineId(SpellProjectile.class, EntityDataSerializers.INT);
     private static final double AIM_RANGE = 64.0;
 
     private float power = 1f;
@@ -217,6 +219,15 @@ public class SpellProjectile extends ThrowableProjectile {
         entityData.set(SCALE, scale);
     }
 
+    /** Which look the spell gives this projectile (synced; 0 = the default). */
+    public int variant() {
+        return entityData.get(VARIANT);
+    }
+
+    public void setVariant(int variant) {
+        entityData.set(VARIANT, variant);
+    }
+
     /** Lets the projectile pass through this many more entities (each is hit only once). */
     public void setPierce(int targets) {
         pierceLeft = targets;
@@ -279,6 +290,7 @@ public class SpellProjectile extends ThrowableProjectile {
         builder.define(SLOT_COUNT, 1);
         builder.define(SCALE, 1f);
         builder.define(GRAVITY, 0f);
+        builder.define(VARIANT, 0);
     }
 
     @Override

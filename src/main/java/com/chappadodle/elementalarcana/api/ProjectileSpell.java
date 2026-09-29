@@ -7,6 +7,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 /**
  * Implemented by spells that fire a {@link SpellProjectile}. The projectile entity is shared
  * by every projectile spell; it calls back into these hooks, so a new projectile spell never
@@ -31,6 +33,23 @@ public interface ProjectileSpell {
      */
     @Nullable
     default ResourceLocation model() {
+        return null;
+    }
+
+    /** The model for a projectile of this look (see SpellProjectile#variant). Defaults to {@link #model()}. */
+    @Nullable
+    default ResourceLocation model(int variant) {
+        return model();
+    }
+
+    /** Every model this spell's projectiles can use, so they all get loaded. */
+    default List<ResourceLocation> models() {
+        return model() == null ? List.of() : List.of(model());
+    }
+
+    /** The glow halo around a projectile of this look, or null for none. */
+    @Nullable
+    default Glow glow(int variant) {
         return null;
     }
 

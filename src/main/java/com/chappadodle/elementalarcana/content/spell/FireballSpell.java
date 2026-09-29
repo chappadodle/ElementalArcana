@@ -6,6 +6,7 @@ import com.chappadodle.elementalarcana.api.CastResult;
 import com.chappadodle.elementalarcana.api.ConjureSpell;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.ElementalReactions;
+import com.chappadodle.elementalarcana.api.Glow;
 import com.chappadodle.elementalarcana.api.ProjectileSpell;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellDamage;
@@ -63,6 +64,31 @@ public class FireballSpell extends Spell implements ProjectileSpell, ConjureSpel
     public static final String PHOENIX = "phoenix";
 
     private static final ResourceLocation MODEL = ElementalArcana.id("spell/fireball");
+
+    // Looks (SpellProjectile#variant): the fireball burns hotter as it levels, and each branch has
+    // its own look (see docs/superpowers/specs/2026-09-29-fireball-vfx-design.md).
+    private static final int LOOK_HEAT_1 = 0;
+    private static final int LOOK_HEAT_2 = 1;
+    private static final int LOOK_HEAT_3 = 2;
+    private static final int LOOK_HEAT_4 = 3;
+    private static final int LOOK_CLUSTER = 4;
+    private static final int LOOK_METEOR = 5;
+    private static final int LOOK_SUN = 6;
+    private static final int LOOK_PHOENIX = 7;
+    private static final List<ResourceLocation> LOOK_MODELS = List.of(MODEL,
+            ElementalArcana.id("spell/fireball_heat2"), ElementalArcana.id("spell/fireball_heat3"),
+            ElementalArcana.id("spell/fireball_heat4"), ElementalArcana.id("spell/fireball_cluster"),
+            ElementalArcana.id("spell/fireball_meteor"), ElementalArcana.id("spell/fireball_sun"),
+            ElementalArcana.id("spell/fireball_phoenix"));
+    private static final List<Glow> LOOK_GLOWS = List.of(
+            new Glow(0xFF5A14, 1.1f, 0.55f),
+            new Glow(0xFF8C28, 1.25f, 0.7f),
+            new Glow(0xFFB446, 1.4f, 0.85f),
+            new Glow(0xFFD782, 1.6f, 1.0f),
+            new Glow(0xFF781E, 0.9f, 0.45f),
+            new Glow(0xFF6414, 1.2f, 0.6f),
+            new Glow(0xFFEB96, 2.0f, 1.3f),
+            new Glow(0xFF463C, 1.4f, 0.9f));
     private static final int EXTRA_FIREBALL_COST = 5;
     private static final float METEOR_GRAVITY = 0.05f;
 
@@ -130,6 +156,7 @@ public class FireballSpell extends Spell implements ProjectileSpell, ConjureSpel
         tag.putInt(TAG_LEVEL, level);
         tag.putString(TAG_BRANCH_5, orEmpty(context.branch(5)));
         tag.putString(TAG_BRANCH_10, orEmpty(context.branch(10)));
+        fireball.setVariant(lookFor(level, context.branch(5), context.branch(10)));
         playAt(context.caster(), SoundEvents.FLINTANDSTEEL_USE, 1f, 0.9f);
         return fireball;
     }
@@ -163,6 +190,7 @@ public class FireballSpell extends Spell implements ProjectileSpell, ConjureSpel
         }
         sun.setFormation(2, 3);
         sun.setVisualScale(2.8f);
+        sun.setVariant(LOOK_SUN);
         sun.getPersistentData().putBoolean(TAG_SUN, true);
         playAt(caster, SoundEvents.BLAZE_AMBIENT, 1.5f, 0.6f);
         playAt(caster, SoundEvents.FIRECHARGE_USE, 1.5f, 0.6f);
@@ -195,6 +223,35 @@ public class FireballSpell extends Spell implements ProjectileSpell, ConjureSpel
     @Override
     public ResourceLocation model() {
         return MODEL;
+    }
+
+    @Override
+    public ResourceLocation model(int variant) {
+        return LOOK_MODELS.get(Math.floorMod(variant, LOOK_MODELS.size()));
+    }
+
+    @Override
+    public List<ResourceLocation> models() {
+        return LOOK_MODELS;
+    }
+
+    @Override
+    public Glow glow(int variant) {
+        return LOOK_GLOWS.get(Math.floorMod(variant, LOOK_GLOWS.size()));
+    }
+
+    /** The look for a caster's fireballs: Phoenix, then the Lv 5 branch, then how hot it burns. */
+    private static int lookFor(int level, @Nullable String branch5, @Nullable String branch10) {
+        if (PHOENIX.equals(branch10)) {
+            return LOOK_PHOENIX;
+        }
+        if (CLUSTER.equals(branch5)) {
+            return LOOK_CLUSTER;
+        }
+        if (METEOR.equals(branch5)) {
+            return LOOK_METEOR;
+        }
+        return level >= 8 ? LOOK_HEAT_4 : level >= 5 ? LOOK_HEAT_3 : level >= 3 ? LOOK_HEAT_2 : LOOK_HEAT_1;
     }
 
     @Override
@@ -415,6 +472,7 @@ public class FireballSpell extends Spell implements ProjectileSpell, ConjureSpel
             Vec3 velocity = new Vec3(Math.cos(angle) * 0.35, 0.45 + fireball.getRandom().nextDouble() * 0.15, Math.sin(angle) * 0.35);
             SpellProjectile bomblet = SpellProjectile.shootFrom(owner, this, fireball.position().add(0, 0.3, 0), velocity, fireball.power());
             bomblet.setVisualScale(0.45f);
+            bomblet.setVariant(LOOK_CLUSTER);
             bomblet.setGravity(0.06f);
             bomblet.setBounces(2);
             CompoundTag tag = bomblet.getPersistentData();
@@ -473,6 +531,7 @@ public class FireballSpell extends Spell implements ProjectileSpell, ConjureSpel
         Vec3 from = eye.add(target.subtract(eye).normalize().scale(0.6));
         SpellProjectile fireball = SpellProjectile.shootFrom(caster, this, from, target.subtract(from).normalize().scale(releaseSpeed(1f)), power);
         if (meteor) {
+            fireball.setVariant(LOOK_METEOR);
             fireball.getPersistentData().putString(TAG_BRANCH_5, METEOR);
             launchInArc(fireball, target);
         }

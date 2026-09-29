@@ -1,0 +1,7 @@
+{
+  "parent": "elementalarcana:spell/fireball",
+  "textures": {
+    "fire": "elementalarcana:block/fireball_meteor",
+    "particle": "elementalarcana:block/fireball_meteor"
+  }
+}

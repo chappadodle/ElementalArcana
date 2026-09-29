@@ -1,8 +1,8 @@
 {
   "ambientocclusion": false,
   "textures": {
-    "fire": "elementalarcana:block/fireball",
-    "particle": "elementalarcana:block/fireball"
+    "fire": "elementalarcana:block/fireball_heat1",
+    "particle": "elementalarcana:block/fireball_heat1"
   },
   "elements": [
     {
