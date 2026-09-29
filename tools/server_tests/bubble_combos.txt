@@ -1,0 +1,26 @@
+# A burning zombie in daylight gets bubbled: the bubble should put it out and keep it out, and
+# leave it Wet. Then an icicle (no owner, so it doesn't pop the bubble) should Freeze it.
+# Expected: Fire 200 -> 0 -> 0; effects include elementalarcana:wet; then elementalarcana:frozen.
+time set noon
+gamerule doMobSpawning false
+forceload add -16 -16 16 16
+fill -12 99 -12 12 99 12 minecraft:stone
+fill -12 100 -12 12 110 12 minecraft:air
+summon zombie 0.5 100 0.5 {Tags:["eatest","eabubble"],attributes:[{id:"minecraft:generic.movement_speed",base:0.0}]}
+sleep 1
+data merge entity @e[tag=eabubble,limit=1] {Fire:200s}
+data get entity @e[tag=eabubble,limit=1] Fire
+arcana bubble @e[tag=eabubble]
+sleep 1
+data get entity @e[tag=eabubble,limit=1] Fire
+data get entity @e[tag=eabubble,limit=1] active_effects
+sleep 1.5
+data get entity @e[tag=eabubble,limit=1] Fire
+execute at @e[tag=eabubble,limit=1] run summon elementalarcana:spell_projectile ~ ~1 ~-3 {Spell:"elementalarcana:icicle",Power:1.0f,Charge:1.0f,Motion:[0.0d,0.0d,1.5d],Tags:["eatest"]}
+sleep 1
+data get entity @e[tag=eabubble,limit=1] active_effects
+kill @e[tag=eatest]
+kill @e[type=elementalarcana:spell_projectile]
+time set midnight
+gamerule doMobSpawning true
+forceload remove all

@@ -29,6 +29,8 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 | Ice | Icicle: hold R to charge an icicle, release to launch it; a full charge freezes | Frost Nova: freezes everything around you |
 | Wind | Wind Blade: hold R to charge crescents of wind, release to slash; Gale Dash: launch forward, no fall damage | Updraft: throw yourself and nearby mobs skyward |
 
+**Bubble Prison** (Water, Magic Level 3): tap R to trap the creature (or player) under your crosshair in a floating water bubble for 4 seconds. It's helpless and Wet, which sets up Freeze and Vaporize combos, and any hit pops it for +4 damage. Bosses can't be trapped.
+
 **Frost Shield** (Ice, Magic Level 3): tap R to raise orbiting ice shards that absorb damage (shown as ice hearts) and shatter outward when broken.
 
 **Fire** has **Melt**: a fire hit on a frozen or frosted enemy thaws it in a burst of steam for 75% more damage.

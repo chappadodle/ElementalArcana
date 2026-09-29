@@ -6,6 +6,7 @@ import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellHold;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.event.SpellCastEvent;
+import com.chappadodle.elementalarcana.content.BubblePrisons;
 import com.chappadodle.elementalarcana.content.ModContent;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
@@ -52,6 +53,9 @@ public final class CastingService {
         }
         if (spell == null) {
             return Component.translatable("message.elementalarcana.no_spell");
+        }
+        if (BubblePrisons.isTrapped(player)) {
+            return Component.translatable("message.elementalarcana.bubble.trapped");
         }
         if (player.isCreative() || data.freeCast()) {
             return null;

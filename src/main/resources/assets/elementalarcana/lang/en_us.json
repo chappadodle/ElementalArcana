@@ -328,5 +328,10 @@
   "screen.elementalarcana.detail.infuse.hint": "You have %s %s. Each fills less of the bar the higher the spell's level. Hold Shift to fill the bar.",
   "screen.elementalarcana.status.condense": "Condense %s Essence → +1 skill point",
   "screen.elementalarcana.status.condense.hint": "You carry %s Essence (any element counts). Bonus points so far: %s. Each costs 4 more than the last.",
-  "screen.elementalarcana.awakening.opposed": "Opposes %s: unlocks at Magic Level %s"
+  "screen.elementalarcana.awakening.opposed": "Opposes %s: unlocks at Magic Level %s",
+  "spell.elementalarcana.bubble_prison": "Bubble Prison",
+  "spell.elementalarcana.bubble_prison.desc": "Trap the creature under your crosshair in a floating water bubble for 4 seconds. It's helpless and Wet; any hit pops it for bonus damage.",
+  "message.elementalarcana.bubble.no_target": "No creature under your crosshair to trap",
+  "message.elementalarcana.bubble.trapped": "You're trapped in a bubble!",
+  "commands.elementalarcana.bubbled": "Trapped %s creature(s) in a bubble"
 }

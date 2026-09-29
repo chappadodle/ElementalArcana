@@ -1,6 +1,7 @@
 package com.chappadodle.elementalarcana.client;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
+import com.chappadodle.elementalarcana.api.Bubble;
 import com.chappadodle.elementalarcana.api.ProjectileSpell;
 import com.chappadodle.elementalarcana.api.ShieldSpell;
 import com.chappadodle.elementalarcana.api.Spell;
@@ -13,7 +14,9 @@ import com.chappadodle.elementalarcana.client.particle.FrostMistParticle;
 import com.chappadodle.elementalarcana.client.particle.FrostSparkleParticle;
 import com.chappadodle.elementalarcana.client.particle.IceShardParticle;
 import com.chappadodle.elementalarcana.client.particle.WindStreakParticle;
+import com.chappadodle.elementalarcana.content.BubblePrisons;
 import com.chappadodle.elementalarcana.content.ModContent;
+import com.chappadodle.elementalarcana.content.spell.BubblePrisonSpell;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.core.MagicData;
 import com.chappadodle.elementalarcana.network.CastSpellPayload;
@@ -21,17 +24,20 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.event.RenderLivingEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
@@ -80,6 +86,14 @@ public final class ArcanaClient {
             return;
         }
         MagicData data = MagicAttachments.get(player);
+
+        // Trapped in a Bubble Prison: players move on their own client, so this is where they're held.
+        if (BubblePrisons.isTrapped(player)) {
+            Bubble bubble = player.getData(MagicAttachments.BUBBLE);
+            player.setPos(bubble.holdPoint(player.level().getGameTime()));
+            player.setDeltaMovement(Vec3.ZERO);
+            player.resetFallDistance();
+        }
 
         // Send the key going down and coming back up; a tap within one tick sends both.
         boolean clicked = false;
@@ -182,6 +196,7 @@ public final class ArcanaClient {
                 models.add(shield.shardModel());
             }
         }
+        models.add(BubblePrisonSpell.BUBBLE_MODEL);
         models.forEach(model -> event.register(ModelResourceLocation.standalone(model)));
     }
 
@@ -189,6 +204,20 @@ public final class ArcanaClient {
     public static void onRenderLiving(RenderLivingEvent.Post<?, ?> event) {
         if (event.getEntity() instanceof Player player) {
             ShieldRenderer.renderShards(player, event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource());
+        }
+        BubbleRenderer.render(event.getEntity(), event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource());
+    }
+
+    /** A player trapped in a bubble can't walk, jump or sneak. */
+    @SubscribeEvent
+    public static void onMovementInput(MovementInputUpdateEvent event) {
+        if (BubblePrisons.isTrapped(event.getEntity())) {
+            Input input = event.getInput();
+            input.leftImpulse = 0;
+            input.forwardImpulse = 0;
+            input.up = input.down = input.left = input.right = false;
+            input.jumping = false;
+            input.shiftKeyDown = false;
         }
     }
 }

@@ -2,11 +2,13 @@ package com.chappadodle.elementalarcana.core;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.AttunementRank;
+import com.chappadodle.elementalarcana.api.Bubble;
 import com.chappadodle.elementalarcana.api.CreatureMagic;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.SpellShield;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
@@ -29,6 +31,13 @@ public final class MagicAttachments {
     public static final Supplier<AttachmentType<SpellShield>> SHIELD = ATTACHMENT_TYPES.register("shield",
             () -> AttachmentType.builder(SpellShield::new)
                     .sync(SpellShield.STREAM_CODEC)
+                    .build());
+
+    // A creature or player trapped in a Bubble Prison. Synced to everyone who can see it (they draw
+    // the bubble; a trapped player's own client holds them in it), never saved.
+    public static final Supplier<AttachmentType<Bubble>> BUBBLE = ATTACHMENT_TYPES.register("bubble",
+            () -> AttachmentType.builder(() -> new Bubble(Vec3.ZERO, 0L, 0L))
+                    .sync(Bubble.STREAM_CODEC)
                     .build());
 
     // An Attuned creature's element and rank. Only Attuned creatures have it (check hasData; the

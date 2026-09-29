@@ -619,6 +619,37 @@ def essence(core, glow, edge, size=16):
     return Image.fromarray((np.clip(rgba, 0, 1) * 255).astype(np.uint8), "RGBA")
 
 
+def bubble_skin(size=16):
+    """The Bubble Prison sphere's texture: mostly clear water with a few bright streaks, so the
+    trapped creature shows through."""
+    rng = np.random.default_rng(11)
+    y, x = np.mgrid[0:size, 0:size]
+    swirl = np.sin(x * 0.9 + np.sin(y * 0.7) * 1.8) * 0.5 + 0.5
+    streak = (swirl > 0.9).astype(float)
+    rgba = np.zeros((size, size, 4))
+    rgba[..., 0] = 0.62 + 0.38 * streak
+    rgba[..., 1] = 0.85 + 0.15 * streak
+    rgba[..., 2] = 1.0
+    rgba[..., 3] = 0.22 + 0.45 * streak + 0.06 * rng.random((size, size))
+    return Image.fromarray((np.clip(rgba, 0, 1) * 255).astype(np.uint8), "RGBA")
+
+
+def bubble_icon(size=16):
+    """Spell icon: a round water bubble with a highlight and a little creature shadow inside."""
+    y, x = np.mgrid[0:size, 0:size] + 0.5
+    r = np.hypot(x - 8, y - 8.5)
+    rgba = np.zeros((size, size, 4))
+    inside = r <= 6.6
+    rim = (r > 5.4) & inside
+    rgba[inside] = (0.55, 0.8, 1.0, 0.45)
+    rgba[rim] = (0.25, 0.55, 0.95, 1.0)
+    shadow = (np.abs(x - 8) <= 1.6) & (y >= 7.5) & (y <= 11.5)
+    rgba[shadow & inside & ~rim] = (0.12, 0.22, 0.4, 0.9)
+    for px, py in ((5, 5), (6, 4), (4, 6), (7, 4)):
+        rgba[py, px] = (1.0, 1.0, 1.0, 1.0)
+    return Image.fromarray((np.clip(rgba, 0, 1) * 255).astype(np.uint8), "RGBA")
+
+
 def main():
     for name, (palette, grid) in SPRITES.items():
         path = ASSETS / f"{name}.png"
@@ -642,6 +673,9 @@ def main():
         "ice": ((255, 255, 255), (160, 225, 255), (70, 140, 200)),
         "wind": ((245, 255, 250), (150, 225, 195), (60, 140, 110)),
     }
+    for path, make in ((ASSETS / "block/bubble.png", bubble_skin), (ASSETS / "spell/bubble_prison.png", bubble_icon)):
+        make().save(path)
+        print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
     for name, colors in essences.items():
         path = ASSETS / f"item/{name}_essence.png"
         path.parent.mkdir(parents=True, exist_ok=True)

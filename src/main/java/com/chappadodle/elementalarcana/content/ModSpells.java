@@ -3,6 +3,7 @@ package com.chappadodle.elementalarcana.content;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
+import com.chappadodle.elementalarcana.content.spell.BubblePrisonSpell;
 import com.chappadodle.elementalarcana.content.spell.FireballSpell;
 import com.chappadodle.elementalarcana.content.spell.FlameBurstSpell;
 import com.chappadodle.elementalarcana.content.spell.FrostNovaSpell;
@@ -26,6 +27,7 @@ public final class ModSpells {
     // Hydro Jet is registered first so it's water's starter spell on the Awakening screen.
     public static final DeferredHolder<Spell, HydroJetSpell> HYDRO_JET = SPELLS.register("hydro_jet", HydroJetSpell::new);
     public static final DeferredHolder<Spell, TidalWaveSpell> TIDAL_WAVE = SPELLS.register("tidal_wave", TidalWaveSpell::new);
+    public static final DeferredHolder<Spell, BubblePrisonSpell> BUBBLE_PRISON = SPELLS.register("bubble_prison", BubblePrisonSpell::new);
     public static final DeferredHolder<Spell, HealingRainSpell> HEALING_RAIN = SPELLS.register("healing_rain", HealingRainSpell::new);
     public static final DeferredHolder<Spell, IcicleSpell> ICICLE = SPELLS.register("icicle", IcicleSpell::new);
     public static final DeferredHolder<Spell, FrostNovaSpell> FROST_NOVA = SPELLS.register("frost_nova", FrostNovaSpell::new);

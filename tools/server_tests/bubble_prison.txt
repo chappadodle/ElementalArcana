@@ -1,0 +1,10 @@
+# A mob saved mid-bubble (NoAI plus the marker, but no bubble: bubbles aren't saved) gets its AI back
+# when it loads. A plain NoAI mob without the marker keeps NoAI.
+time set midnight
+forceload add 0 0
+summon zombie 0.5 100 0.5 {NoAI:1b,Tags:["eatest","bubbled"],NeoForgeData:{ea_bubble_ai_off:1b}}
+summon zombie 3.5 100 0.5 {NoAI:1b,Tags:["eatest","plain"]}
+data get entity @e[tag=bubbled,limit=1] NoAI
+data get entity @e[tag=plain,limit=1] NoAI
+kill @e[tag=eatest]
+forceload remove 0 0

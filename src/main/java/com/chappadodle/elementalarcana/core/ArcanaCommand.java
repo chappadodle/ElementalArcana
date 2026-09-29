@@ -5,6 +5,7 @@ import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.SpellSchool;
 import com.chappadodle.elementalarcana.content.Attunement;
+import com.chappadodle.elementalarcana.content.BubblePrisons;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -22,6 +23,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 
 import java.util.Collection;
@@ -74,7 +76,9 @@ public final class ArcanaCommand {
                                 }))))
                 .then(Commands.literal("cooldowns").then(Commands.literal("reset")
                         .executes(ctx -> modify(ctx.getSource(), MagicData::clearCooldowns, "commands.elementalarcana.cooldowns_reset"))))
-                .then(Commands.literal("attune").then(attuneTargets())));
+                .then(Commands.literal("attune").then(attuneTargets()))
+                .then(Commands.literal("bubble").then(Commands.argument("targets", EntityArgument.entities())
+                        .executes(ctx -> bubble(ctx.getSource(), EntityArgument.getEntities(ctx, "targets"))))));
     }
 
     /** /arcana attune <targets> <element> <rank>, or /arcana attune <targets> none. Mobs only. */
@@ -110,6 +114,20 @@ public final class ArcanaCommand {
         if (refused > 0) {
             source.sendFailure(Component.translatable("commands.elementalarcana.attune_innate", refused));
         }
+        return done;
+    }
+
+    /** /arcana bubble <targets>: traps them in a Bubble Prison, as if hit by the spell (for testing). */
+    private static int bubble(CommandSourceStack source, Collection<? extends Entity> targets) {
+        int trapped = 0;
+        for (Entity entity : targets) {
+            if (entity instanceof LivingEntity living && BubblePrisons.canTrap(living)) {
+                BubblePrisons.trap(living);
+                trapped++;
+            }
+        }
+        int done = trapped;
+        source.sendSuccess(() -> Component.translatable("commands.elementalarcana.bubbled", done), true);
         return done;
     }
 
