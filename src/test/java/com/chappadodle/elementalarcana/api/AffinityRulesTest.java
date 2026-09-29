@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Set;
 
 import static com.chappadodle.elementalarcana.api.AffinityRules.blockingOpposite;
-import static com.chappadodle.elementalarcana.api.AffinityRules.spellDamageTaken;
+import static com.chappadodle.elementalarcana.api.AffinityRules.damageTaken;
 import static com.chappadodle.elementalarcana.api.Element.FIRE;
 import static com.chappadodle.elementalarcana.api.Element.ICE;
 import static com.chappadodle.elementalarcana.api.Element.WATER;
@@ -39,9 +39,9 @@ class AffinityRulesTest {
 
     @Test
     void ownElementsHitForLess() {
-        assertEquals(0.75f, spellDamageTaken(Set.of(FIRE), FIRE), 1e-6f);
-        assertEquals(0.75f, spellDamageTaken(Set.of(FIRE, WIND), WIND), 1e-6f);
-        assertEquals(1f, spellDamageTaken(Set.of(FIRE), WATER), 1e-6f);
-        assertEquals(1f, spellDamageTaken(Set.of(), ICE), 1e-6f);
+        assertEquals(0.75f, damageTaken(Set.of(FIRE), FIRE), 1e-6f);
+        assertEquals(0.75f, damageTaken(Set.of(FIRE, WIND), WIND), 1e-6f);
+        assertEquals(1f, damageTaken(Set.of(FIRE), WATER), 1e-6f);
+        assertEquals(1f, damageTaken(Set.of(), ICE), 1e-6f);
     }
 }

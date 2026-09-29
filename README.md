@@ -4,7 +4,7 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 
 ## Playing
 
-**Awakening.** The first time you join, you choose the element your magic answers to: Fire, Water, Ice or Wind. The choice is permanent. You get another affinity slot at Magic Level 10, 20 and 30. Opposed elements (Fire vs Water, Fire vs Ice) can't be combined until Magic Level 30; from then on they fit any free slot. Spells of your own elements hurt you 25% less.
+**Awakening.** The first time you join, you choose the element your magic answers to: Fire, Water, Ice or Wind. The choice is permanent. You get another affinity slot at Magic Level 10, 20 and 30. Opposed elements (Fire vs Water, Fire vs Ice) can't be combined until Magic Level 30; from then on they fit any free slot. Your own elements hurt you 25% less: their spells, and their everyday damage too (Fire: burning and lava; Ice: freezing; Water: drowning; Wind: falling).
 
 **Controls** (rebindable under *Elemental Arcana* in Controls):
 

@@ -7,7 +7,7 @@ import java.util.Collection;
 /**
  * Rules for a player's affinities (awakened elements). Plain Java, no Minecraft types (unit
  * tested). Opposed elements (Fire vs Water, Fire vs Ice) can't be awakened together until Magic
- * Level 30, and a player takes less spell damage of the elements they've awakened.
+ * Level 30, and a player takes less damage from the elements they've awakened.
  */
 public final class AffinityRules {
     public static final int OPPOSITES_UNLOCK_LEVEL = 30;
@@ -33,8 +33,11 @@ public final class AffinityRules {
         return null;
     }
 
-    /** Damage multiplier for a player hit by a spell of {@code spell}: 25% less for their own elements. */
-    public static float spellDamageTaken(Collection<Element> owned, Element spell) {
-        return owned.contains(spell) ? OWN_ELEMENT_DAMAGE_TAKEN : 1f;
+    /**
+     * Damage multiplier for a player hurt by {@code element} (its spells, or its everyday damage:
+     * burning, freezing, drowning, falling): 25% less for the elements they've awakened.
+     */
+    public static float damageTaken(Collection<Element> owned, Element element) {
+        return owned.contains(element) ? OWN_ELEMENT_DAMAGE_TAKEN : 1f;
     }
 }

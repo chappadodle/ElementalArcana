@@ -12,18 +12,21 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 /**
  * The matchup chart (see Element#multiplierAgainst): spell damage is scaled by the target
- * creature's element, and players resist spells of the elements they've awakened (see
- * AffinityRules). Strong and resisted hits sound and look different, which is how a player learns a
- * creature's element.
+ * creature's element, and players resist the elements they've awakened, their spells and their
+ * everyday damage alike (see AffinityRules). Strong and resisted spell hits sound and look
+ * different, which is how a player learns a creature's element.
  */
 @EventBusSubscriber(modid = ElementalArcana.MODID)
 public final class ElementalMatchups {
@@ -36,14 +39,20 @@ public final class ElementalMatchups {
 
     @SubscribeEvent
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
+        LivingEntity target = event.getEntity();
         Element spell = SpellDamage.elementOf(event.getSource());
         if (spell == null) {
+            // A player's affinities also soften their elements' everyday damage. No feedback: it
+            // would play on every burning tick.
+            Element nature = natureOf(event.getSource());
+            if (nature != null && target instanceof Player player) {
+                event.setAmount(event.getAmount() * AffinityRules.damageTaken(MagicAttachments.get(player).affinityElements(), nature));
+            }
             return;
         }
-        LivingEntity target = event.getEntity();
         // Creatures use the chart; players resist the elements they've awakened.
         float multiplier = target instanceof Player player
-                ? AffinityRules.spellDamageTaken(MagicAttachments.get(player).affinityElements(), spell)
+                ? AffinityRules.damageTaken(MagicAttachments.get(player).affinityElements(), spell)
                 : spell.multiplierAgainst(CreatureElements.elementOf(target));
         if (multiplier == 1f) {
             return;
@@ -52,6 +61,24 @@ public final class ElementalMatchups {
         if (target.level() instanceof ServerLevel level) {
             feedback(level, target, spell, multiplier > 1f);
         }
+    }
+
+    /** The element of a vanilla damage source: burning and lava, freezing, drowning, falling. */
+    @Nullable
+    private static Element natureOf(DamageSource source) {
+        if (source.is(DamageTypeTags.IS_FIRE)) {
+            return Element.FIRE;
+        }
+        if (source.is(DamageTypeTags.IS_FREEZING)) {
+            return Element.ICE;
+        }
+        if (source.is(DamageTypeTags.IS_DROWNING)) {
+            return Element.WATER;
+        }
+        if (source.is(DamageTypeTags.IS_FALL)) {
+            return Element.WIND;
+        }
+        return null;
     }
 
     private static void feedback(ServerLevel level, LivingEntity target, Element spell, boolean strong) {

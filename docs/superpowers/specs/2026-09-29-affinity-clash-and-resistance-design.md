@@ -17,14 +17,28 @@ The opposed pairs are Fire vs Water and Fire vs Ice (`Element#opposes`).
 
 ## Players resist their own elements
 
-- Elemental spell damage (the `elementalarcana:<element>_spell` damage types) of an element the player has awakened hits them for **25% less**.
-- Vanilla fire, lava, freezing and drowning are unaffected.
-- The existing matchup handler applies it, and the player gets the same "resisted" feedback (a dull thud and a puff).
+- Damage of an element the player has awakened hits them for **25% less**. That covers:
+  - its spells (the `elementalarcana:<element>_spell` damage types), which get the "resisted"
+    feedback (a dull thud and a puff);
+  - its everyday damage (changed after the first play-test), with no feedback, since burning
+    ticks every second:
+
+    | Affinity | Everyday damage (vanilla damage-type tag) |
+    |---|---|
+    | Fire | `#minecraft:is_fire`: burning, fire, lava, magma, fire charges |
+    | Ice | `#minecraft:is_freezing`: powder snow and frost |
+    | Water | `#minecraft:is_drowning`: drowning |
+    | Wind | `#minecraft:is_fall`: falling |
+
+- **Why the change:** at first only spell damage counted. A measured close-range fight with a Fire
+  Adept dealt 21 punch, 10 spell and 4 burning damage, so a Fire mage took only about 7% less
+  overall. The difference was too small to notice.
+- **Where it happens:** the existing matchup handler.
 
 ## Structure
 
 - **`AffinityRules`** (pure Java, unit tested):
   - `blockingOpposite(owned, candidate, magicLevel)` returns the held element that blocks the candidate, or null.
-  - `spellDamageTaken(owned, spell)` returns 0.75 or 1.
+  - `damageTaken(owned, element)` returns 0.75 or 1.
 - **`SchoolElements`** maps a spell school to its element, or null for addon schools. The Essence code reuses it.
 - **`MagicData#affinityElements()` and `#opposedBy(school)`** are used by `awaken` and by the awakening screen.
