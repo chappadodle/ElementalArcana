@@ -335,5 +335,10 @@
   "message.elementalarcana.bubble.trapped": "You're trapped in a bubble!",
   "commands.elementalarcana.bubbled": "Trapped %s creature(s) in a bubble",
   "key.elementalarcana.launch_one": "Launch One (while conjuring)",
-  "key.elementalarcana.launch_all": "Launch All (while conjuring)"
+  "key.elementalarcana.launch_all": "Launch All (while conjuring)",
+  "elementalarcana.configuration.title": "Elemental Arcana",
+  "elementalarcana.configuration.section.elementalarcana.client.toml": "Client",
+  "elementalarcana.configuration.section.elementalarcana.client.toml.title": "Elemental Arcana: client",
+  "elementalarcana.configuration.screenEffects": "Screen effects",
+  "elementalarcana.configuration.screenEffects.tooltip": "Camera shake and screen flashes from big spells (Meteor impacts, Sunfire)."
 }

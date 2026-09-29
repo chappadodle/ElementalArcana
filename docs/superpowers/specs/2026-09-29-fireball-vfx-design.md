@@ -104,6 +104,46 @@ Approved approach: our own glow particles, no dependency. Veil's bloom may get a
 - **The Particles setting** (All / Decreased / Minimal) applies, because everything is spawned
   through `level.addParticle`.
 
+## Step 3 structure (explosions)
+
+Approved: explosions are built with our own particles. After that, Veil's bloom is tried as a
+separate experiment with an on/off switch.
+
+- **One packet per blast:** `explode()` sends a single `FIRE_BLAST` particle, with
+  `FireBlastOptions(look, radius, bomblet)`, instead of five vanilla bursts. On each client a
+  `FireBlastEmitter` plays it out over about 14 ticks by calling `FireballEffects.blast(level,
+  pos, look, radius, bomblet, age)`. Combustion's chain explosions send it too, as a small heat
+  2 blast.
+- **New particle types:**
+
+| Type | Blend | Behaviour |
+|---|---|---|
+| **Shockwave** | additive | A flat pixel ring that expands to its size with an ease-out, then fades. Drawn double-sided |
+| **Corona** | additive | A soft round glow that swells and fades (Sunfire) |
+| **Cracks** | additive | Flat, glowing lava cracks on the ground that pulse and fade (Meteor) |
+| **Scorch** | normal | A flat, dark burn mark on the ground that slowly fades |
+
+- **The ground:** the emitter looks up to 1.5 blocks below the blast for a surface. With ground,
+  the rings, scorch marks and debris sit on it; in mid-air, the rings still show as a halo and
+  there's no scorch mark.
+- **Per look:**
+  - **Heat 1–2:** a puff of flares, a few sparks, a small ring and rising smoke.
+  - **Heat 3:** a brighter core, more sparks, and debris (chunks of the ground block).
+  - **Heat 4:** a white-hot flash, two rings, a shower of sparks, debris and a scorch mark.
+  - **Cluster:** the main blast looks like heat 3; bomblets pop like firecrackers (a starburst of
+    sparks, a tiny flash, no smoke).
+  - **Meteor:** dust pillars rolling out along the ground, debris and cinders thrown high, a
+    scorch mark with glowing cracks for 5 s, and a camera shake (players within 16 blocks,
+    weaker with distance).
+  - **Sunfire:** a screen flash (within 32 blocks, stronger up close and when facing it), a
+    swelling corona, a fast ring and a slow ring, and a storm of sparks.
+  - **Phoenix:** flame wings sweep open across the viewer's screen, and feathers scatter. In
+    flight it also leaves two wing ribbons at its sides that flap up and down.
+- **Screen effects:** `client/ScreenEffects` holds the camera shake, applied in
+  `ViewportEvent.ComputeCameraAngles`, and the white flash overlay. Both decay over a few ticks.
+  A client config option, `screenEffects` (default on, editable in the mod's config screen),
+  turns them off.
+
 ## Noted for later (from play-testing step 1)
 
 - **Screen space with several held fireballs:** a full set, especially the Lv 8+ heat looks, can

@@ -9,6 +9,7 @@ import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.SpellShield;
 import com.chappadodle.elementalarcana.client.particle.CinderParticle;
 import com.chappadodle.elementalarcana.client.particle.EmberParticle;
+import com.chappadodle.elementalarcana.client.particle.FireBlastEmitter;
 import com.chappadodle.elementalarcana.client.particle.GlowParticle;
 import com.chappadodle.elementalarcana.client.particle.HydroDropParticle;
 import com.chappadodle.elementalarcana.client.particle.HydroStreamEmitter;
@@ -45,6 +46,7 @@ import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.RenderLivingEvent;
+import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
@@ -106,6 +108,7 @@ public final class ArcanaClient {
 
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
+        ScreenEffects.tick();
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;
         if (player == null) {
@@ -202,6 +205,12 @@ public final class ArcanaClient {
     public static void registerGuiLayers(RegisterGuiLayersEvent event) {
         event.registerAbove(VanillaGuiLayers.HOTBAR, ElementalArcana.id("magic_hud"), new SpellHudLayer());
         event.registerAbove(VanillaGuiLayers.PLAYER_HEALTH, ElementalArcana.id("shield_hearts"), new ShieldHeartsLayer());
+        event.registerAboveAll(ElementalArcana.id("screen_flash"), ScreenEffects.FLASH_LAYER);
+    }
+
+    @SubscribeEvent
+    public static void onCameraAngles(ViewportEvent.ComputeCameraAngles event) {
+        ScreenEffects.onCameraAngles(event);
     }
 
     @SubscribeEvent
@@ -220,6 +229,11 @@ public final class ArcanaClient {
         event.registerSpriteSet(ModContent.SPARK.get(), sprites -> new GlowParticle.Provider(GlowParticle.Kind.SPARK, sprites));
         event.registerSpriteSet(ModContent.FEATHER.get(), sprites -> new GlowParticle.Provider(GlowParticle.Kind.FEATHER, sprites));
         event.registerSpriteSet(ModContent.CINDER.get(), CinderParticle.Provider::new);
+        event.registerSpriteSet(ModContent.SHOCKWAVE.get(), sprites -> new GlowParticle.Provider(GlowParticle.Kind.RING, sprites));
+        event.registerSpriteSet(ModContent.CORONA.get(), sprites -> new GlowParticle.Provider(GlowParticle.Kind.CORONA, sprites));
+        event.registerSpriteSet(ModContent.CRACKS.get(), sprites -> new GlowParticle.Provider(GlowParticle.Kind.CRACKS, sprites));
+        event.registerSpriteSet(ModContent.SCORCH.get(), sprites -> new GlowParticle.Provider(GlowParticle.Kind.SCORCH, sprites));
+        event.registerSpecial(ModContent.FIRE_BLAST.get(), new FireBlastEmitter.Provider());
     }
 
     // Additive particles change the blend function and vanilla doesn't set it back; put it back

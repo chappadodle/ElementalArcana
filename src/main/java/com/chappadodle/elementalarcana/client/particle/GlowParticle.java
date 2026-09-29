@@ -27,12 +27,23 @@ import org.joml.Vector3f;
  *   <li>Flare: drifts up a little, shrinks and dissolves.</li>
  *   <li>Spark: a streak turned to point along its motion; it slows down and sags.</li>
  *   <li>Feather: flutters down, swaying and rocking.</li>
+ *   <li>Ring: lies flat and expands to its size, fading (a shockwave).</li>
+ *   <li>Corona: a round glow that swells and fades.</li>
+ *   <li>Cracks: lie flat and pulse as they cool.</li>
+ *   <li>Scorch: a dark mark lying flat, not glowing (blended normally, lit by the world).</li>
  * </ul>
  * An anchored particle keeps its position and motion relative to its anchor entity (for a held
  * projectile, its place in the caster's hand), and disappears with it.
  */
 public class GlowParticle extends TextureSheetParticle {
-    public enum Kind { FLARE, SPARK, FEATHER }
+    public enum Kind {
+        FLARE, SPARK, FEATHER, RING, CORONA, CRACKS, SCORCH;
+
+        /** Lies flat on the ground instead of facing the camera. */
+        boolean flat() {
+            return this == RING || this == CRACKS || this == SCORCH;
+        }
+    }
 
     private final Kind kind;
     private final SpriteSet sprites;
@@ -87,6 +98,12 @@ public class GlowParticle extends TextureSheetParticle {
                 pickSprite(sprites);
                 roll = oRoll = (random.nextFloat() - 0.5f) * 1.2f;
             }
+            case RING, CORONA, CRACKS, SCORCH -> {
+                friction = 0.9f;
+                gravity = 0f;
+                pickSprite(sprites);
+                roll = oRoll = random.nextFloat() * Mth.TWO_PI;
+            }
         }
         this.quadSize = baseSize;
         updateLook();
@@ -129,12 +146,40 @@ public class GlowParticle extends TextureSheetParticle {
                 quadSize = baseSize;
                 alpha = life < 0.7f ? 0.9f : 0.9f * (1f - (life - 0.7f) / 0.3f);
             }
+            case RING -> {
+                float grown = 1f - (1f - life) * (1f - life) * (1f - life);
+                quadSize = baseSize * Math.max(0.05f, grown);
+                alpha = 1f - life;
+            }
+            case CORONA -> {
+                float grown = 1f - (1f - life) * (1f - life);
+                quadSize = baseSize * (0.4f + 0.6f * grown);
+                alpha = 0.9f * (1f - life) * (1f - life);
+            }
+            case CRACKS -> {
+                quadSize = baseSize;
+                alpha = (1f - life) * (0.75f + 0.25f * Mth.sin(age * 0.4f + swayPhase));
+            }
+            case SCORCH -> {
+                quadSize = baseSize;
+                alpha = life < 0.6f ? 0.85f : 0.85f * (1f - (life - 0.6f) / 0.4f);
+            }
         }
     }
 
     @Override
     public void render(VertexConsumer buffer, Camera camera, float partialTicks) {
         Vec3 base = anchorPosition(partialTicks);
+        if (kind.flat()) {
+            // Lying on the ground: drawn facing up and facing down, so it shows from either side.
+            Vec3 cameraPos = camera.getPosition();
+            float x = (float) (base.x + Mth.lerp(partialTicks, xo, this.x) - cameraPos.x);
+            float y = (float) (base.y + Mth.lerp(partialTicks, yo, this.y) - cameraPos.y);
+            float z = (float) (base.z + Mth.lerp(partialTicks, zo, this.z) - cameraPos.z);
+            renderRotatedQuad(buffer, new Quaternionf().rotateX(-Mth.HALF_PI).rotateZ(roll), x, y, z, partialTicks);
+            renderRotatedQuad(buffer, new Quaternionf().rotateX(Mth.HALF_PI).rotateZ(-roll), x, y, z, partialTicks);
+            return;
+        }
         Quaternionf rotation = new Quaternionf();
         getFacingCameraMode().setRotation(rotation, camera, partialTicks);
         float angle = kind == Kind.SPARK ? streakAngle(camera) : Mth.lerp(partialTicks, oRoll, roll);
@@ -183,12 +228,12 @@ public class GlowParticle extends TextureSheetParticle {
 
     @Override
     public ParticleRenderType getRenderType() {
-        return AdditiveParticles.RENDER_TYPE;
+        return kind == Kind.SCORCH ? ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT : AdditiveParticles.RENDER_TYPE;
     }
 
     @Override
     protected int getLightColor(float partialTick) {
-        return LightTexture.FULL_BRIGHT;
+        return kind == Kind.SCORCH ? super.getLightColor(partialTick) : LightTexture.FULL_BRIGHT;
     }
 
     public record Provider(Kind kind, SpriteSet sprites) implements ParticleProvider<GlowParticleOptions> {

@@ -3,13 +3,22 @@ package com.chappadodle.elementalarcana.content.spell;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
 import com.chappadodle.elementalarcana.content.GlowParticleOptions;
 import com.chappadodle.elementalarcana.content.ModContent;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -18,9 +27,13 @@ import java.util.List;
  * docs/superpowers/specs/2026-09-29-fireball-vfx-design.md, step 2). Each look has its own palette
  * and trail: the heat stages burn longer, brighter and cleaner as they rise, and the branch looks
  * each have a signature (Cluster sputters like a fuse, Meteor sheds smoke and cinders, Sun trails
- * white-gold with a turning corona while held, Phoenix drops feathers).
+ * white-gold with a turning corona while held, Phoenix drops feathers and beats flame wings).
+ * Explosions (step 3) are played out on each client by FireBlastEmitter, a tick at a time.
  */
-final class FireballEffects {
+public final class FireballEffects {
+    /** How many ticks an explosion takes to play out. */
+    public static final int BLAST_TICKS = 14;
+
 
     /**
      * A look's particles: the trail's colour and the colour it fades to, the spark colour, the
@@ -233,6 +246,7 @@ final class FireballEffects {
                         to.x, to.y, to.z, velocity.x, velocity.y, velocity.z);
             }
             case FireballSpell.LOOK_PHOENIX -> {
+                wingTrails(fireball, palette, size, from, to);
                 if (fireball.tickCount % 3 == 0) {
                     feather(fireball, to, back.scale(0.5).add(randomDirection(random).scale(0.03)));
                 }
@@ -240,6 +254,202 @@ final class FireballEffects {
             default -> {
             }
         }
+    }
+
+    /** Phoenix in flight: two ribbons of flame at its sides that beat up and down like wings. */
+    private static void wingTrails(SpellProjectile fireball, Palette palette, float size, Vec3 from, Vec3 to) {
+        Vec3 path = to.subtract(from);
+        if (path.lengthSqr() < 1.0e-4) {
+            return;
+        }
+        Vec3 forward = path.normalize();
+        Vec3 side = forward.cross(new Vec3(0, 1, 0));
+        if (side.lengthSqr() < 1.0e-4) {
+            side = new Vec3(1, 0, 0);
+        }
+        side = side.normalize();
+        Vec3 up = side.cross(forward).normalize();
+        for (int i = 0; i < 3; i++) {
+            float t = (i + 0.5f) / 3;
+            float beat = Mth.sin((fireball.tickCount + t) * 0.7f);
+            Vec3 center = from.add(path.scale(t));
+            for (int wing = -1; wing <= 1; wing += 2) {
+                // The wingtip rises and falls; the flare nearer the body follows less.
+                Vec3 tip = center.add(side.scale(wing * 0.6 * size)).add(up.scale(beat * 0.3 * size));
+                Vec3 mid = center.add(side.scale(wing * 0.3 * size)).add(up.scale(beat * 0.12 * size));
+                for (Vec3 at : new Vec3[] {mid, tip}) {
+                    fireball.level().addParticle(glow(ModContent.FLARE.get(), palette.core(), palette.fade(), 0.16f * size, 9),
+                            at.x, at.y, at.z, 0, 0.01, 0);
+                }
+            }
+        }
+    }
+
+    // ---- explosions (client, played out by FireBlastEmitter) ----
+
+    /** Whether this look's blast shakes the camera (Meteor). */
+    public static boolean shakes(int look) {
+        return look == FireballSpell.LOOK_METEOR;
+    }
+
+    /** Whether this look's blast flashes the screen (Sunfire). */
+    public static boolean flashes(int look) {
+        return look == FireballSpell.LOOK_SUN;
+    }
+
+    /** How hot a look's blast burns, 1-4: the heat stages, and the branch looks' place among them. */
+    private static int heatOf(int look) {
+        return switch (look) {
+            case FireballSpell.LOOK_HEAT_1 -> 1;
+            case FireballSpell.LOOK_HEAT_2 -> 2;
+            case FireballSpell.LOOK_HEAT_4, FireballSpell.LOOK_SUN -> 4;
+            default -> 3;
+        };
+    }
+
+    /**
+     * One tick ({@code age}, from 0) of an explosion at {@code at}. {@code toBlast} runs from the
+     * viewer to the blast, so Phoenix's wings open across their screen.
+     */
+    public static void blast(Level level, Vec3 at, int look, float radius, boolean bomblet, int age, Vec3 toBlast) {
+        RandomSource random = level.getRandom();
+        Palette palette = PALETTES.get(Math.floorMod(look, PALETTES.size()));
+        if (bomblet) {
+            if (age == 0) {
+                firecracker(level, at, palette, radius, random);
+            }
+            return;
+        }
+        int heat = heatOf(look);
+        boolean meteor = look == FireballSpell.LOOK_METEOR;
+        boolean sun = look == FireballSpell.LOOK_SUN;
+        @Nullable BlockHitResult ground = groundBelow(level, at);
+        Vec3 floor = ground != null ? ground.getLocation() : at;
+
+        if (age == 0) {
+            // The flash, then the fireball itself billowing out, and sparks flying through it.
+            add(level, glow(ModContent.FLARE.get(), palette.spark(), palette.core(), radius * (heat >= 4 ? 0.8f : 0.6f), 3), at, Vec3.ZERO);
+            int body = Math.round(8 + 5 * radius);
+            for (int i = 0; i < body; i++) {
+                Vec3 velocity = randomDirection(random).scale(radius * (0.07 + 0.07 * random.nextDouble()));
+                add(level, glow(ModContent.FLARE.get(), palette.core(), palette.fade(), 0.3f + 0.1f * radius, 12), at, velocity);
+            }
+            int sparks = heat * 5 + (sun ? 30 : 0) + (meteor ? 10 : 0);
+            for (int i = 0; i < sparks; i++) {
+                Vec3 velocity = randomDirection(random).scale((0.25 + 0.25 * random.nextDouble()) * Math.sqrt(radius));
+                add(level, glow(ModContent.SPARK.get(), palette.spark(), palette.fade(), 0.1f, 10), at, velocity);
+            }
+            shockwave(level, floor.add(0, 0.05, 0), palette, radius, 8);
+            for (int i = 0; i < 6 + 2 * radius; i++) {
+                add(level, ModContent.EMBER.get(), at, randomDirection(random).scale(0.15).add(0, 0.05, 0));
+            }
+            if (ground != null) {
+                BlockState surface = level.getBlockState(ground.getBlockPos());
+                if ((heat >= 3 || meteor) && !surface.isAir()) {
+                    // Chunks of the ground thrown up around the blast.
+                    int chunks = meteor ? 24 : Math.round(6 + 2 * radius);
+                    for (int i = 0; i < chunks; i++) {
+                        double angle = random.nextDouble() * Mth.TWO_PI;
+                        double distance = radius * 0.6 * Math.sqrt(random.nextDouble());
+                        Vec3 spot = floor.add(Math.cos(angle) * distance, 0.1, Math.sin(angle) * distance);
+                        add(level, new BlockParticleOption(ParticleTypes.DUST_PILLAR, surface), spot,
+                                new Vec3(0, (meteor ? 0.5 : 0.25) + 0.2 * random.nextDouble(), 0));
+                    }
+                }
+                if (heat >= 4 || meteor) {
+                    add(level, glow(ModContent.SCORCH.get(), 0xFFFFFF, 0xFFFFFF, radius * 0.8f, meteor ? 100 : 60), floor.add(0, 0.02, 0), Vec3.ZERO);
+                }
+                if (meteor) {
+                    add(level, glow(ModContent.CRACKS.get(), palette.core(), palette.fade(), radius * 0.7f, 100), floor.add(0, 0.03, 0), Vec3.ZERO);
+                }
+            }
+            if (meteor) {
+                // Molten rock flung out of the crater.
+                for (int i = 0; i < 16; i++) {
+                    double angle = random.nextDouble() * Mth.TWO_PI;
+                    Vec3 velocity = new Vec3(Math.cos(angle) * 0.25, 0.35 + 0.25 * random.nextDouble(), Math.sin(angle) * 0.25);
+                    add(level, ModContent.CINDER.get(), floor.add(0, 0.2, 0), velocity);
+                }
+            }
+            if (sun) {
+                add(level, glow(ModContent.CORONA.get(), 0xFFFFFF, palette.fade(), radius * 1.4f, 16), at, Vec3.ZERO);
+            }
+        } else if (age == 2 && heat >= 2) {
+            // The core flares a second time as the fire rolls over itself.
+            add(level, glow(ModContent.FLARE.get(), palette.spark(), palette.fade(), radius * 0.35f, 5), at, new Vec3(0, 0.02, 0));
+        } else if (age == 3 && (heat >= 4)) {
+            // A second ring: a slow, wide one for Sunfire.
+            shockwave(level, floor.add(0, 0.06, 0), palette, sun ? radius * 1.5f : radius * 0.7f, sun ? 14 : 9);
+        }
+
+        if (look == FireballSpell.LOOK_PHOENIX && age < 4) {
+            phoenixWings(level, at, palette, radius, age, toBlast);
+        }
+
+        if (age >= 4 && age % 2 == 0) {
+            // Smoke rising from where it burned: heavy for cool fire and Meteor, a wisp for hot fire.
+            int puffs = meteor ? 3 : palette.smoke() > 0 ? 2 : 1;
+            for (int i = 0; i < puffs; i++) {
+                Vec3 spot = at.add((random.nextDouble() - 0.5) * radius * 0.6, random.nextDouble() * 0.3, (random.nextDouble() - 0.5) * radius * 0.6);
+                add(level, heat <= 2 || meteor ? ParticleTypes.LARGE_SMOKE : ParticleTypes.SMOKE,
+                        spot, new Vec3(0, 0.04 + 0.03 * random.nextDouble(), 0));
+            }
+            if (meteor && age == 4) {
+                add(level, ParticleTypes.CAMPFIRE_COSY_SMOKE, floor.add(0, 0.2, 0), new Vec3(0, 0.08, 0));
+            }
+            add(level, ModContent.EMBER.get(), at.add((random.nextDouble() - 0.5) * radius, 0, (random.nextDouble() - 0.5) * radius), new Vec3(0, 0.04, 0));
+        }
+    }
+
+    /** A flat ring of light racing out along the ground. */
+    private static void shockwave(Level level, Vec3 at, Palette palette, float radius, int lifetime) {
+        add(level, glow(ModContent.SHOCKWAVE.get(), palette.spark(), palette.fade(), radius, lifetime), at, Vec3.ZERO);
+    }
+
+    /** A Cluster Bomb bomblet going off: a sharp pop, a starburst of sparks and a tiny ring. */
+    private static void firecracker(Level level, Vec3 at, Palette palette, float radius, RandomSource random) {
+        add(level, glow(ModContent.FLARE.get(), 0xFFFFFF, palette.spark(), 0.8f, 2), at, Vec3.ZERO);
+        for (int i = 0; i < 18; i++) {
+            Vec3 velocity = randomDirection(random).scale(0.35 + 0.1 * random.nextDouble());
+            int color = random.nextBoolean() ? 0xFFFFFF : palette.spark();
+            add(level, glow(ModContent.SPARK.get(), color, palette.fade(), 0.09f, 7), at, velocity);
+        }
+        add(level, glow(ModContent.SHOCKWAVE.get(), palette.spark(), palette.fade(), radius * 0.7f, 5), at, Vec3.ZERO);
+    }
+
+    /** Phoenix's impact: two wings of flame sweep open across the viewer's screen, shedding feathers. */
+    private static void phoenixWings(Level level, Vec3 at, Palette palette, float radius, int age, Vec3 toBlast) {
+        Vec3 right = toBlast.cross(new Vec3(0, 1, 0));
+        if (right.lengthSqr() < 1.0e-4) {
+            right = new Vec3(1, 0, 0);
+        }
+        right = right.normalize();
+        int steps = 16;
+        int perTick = steps / 4;
+        for (int k = age * perTick; k < (age + 1) * perTick; k++) {
+            float t = (k + 0.5f) / steps;
+            for (int wing = -1; wing <= 1; wing += 2) {
+                // Out and up in an arc, drooping at the tip.
+                Vec3 point = at.add(right.scale(wing * t * 1.4 * radius)).add(0, Mth.sin(t * Mth.PI) * 0.6 * radius - t * 0.2 * radius, 0);
+                Vec3 velocity = right.scale(wing * 0.04).add(0, 0.02, 0);
+                add(level, glow(ModContent.FLARE.get(), palette.core(), palette.fade(), 0.35f + 0.35f * (1 - t), 12), point, velocity);
+                if (k % 3 == 0) {
+                    add(level, glow(ModContent.FEATHER.get(), 0xFFD25A, 0xB4142D, 0.16f, 30), point, velocity.scale(0.5));
+                }
+            }
+        }
+    }
+
+    /** The ground right below a blast (within 1.5 blocks), or null in mid-air. */
+    @Nullable
+    private static BlockHitResult groundBelow(Level level, Vec3 at) {
+        BlockHitResult hit = level.clip(new ClipContext(at.add(0, 0.3, 0), at.subtract(0, 1.5, 0),
+                ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
+        return hit.getType() == HitResult.Type.BLOCK && hit.getDirection() == Direction.UP ? hit : null;
+    }
+
+    private static void add(Level level, ParticleOptions particle, Vec3 at, Vec3 velocity) {
+        level.addParticle(particle, at.x, at.y, at.z, velocity.x, velocity.y, velocity.z);
     }
 
     // ---- pieces ----

@@ -12,6 +12,7 @@ import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellDamage;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
 import com.chappadodle.elementalarcana.api.SpellTargets;
+import com.chappadodle.elementalarcana.content.FireBlastOptions;
 import com.chappadodle.elementalarcana.content.FireEvents;
 import com.chappadodle.elementalarcana.content.FireField;
 import com.chappadodle.elementalarcana.content.ModContent;
@@ -67,14 +68,14 @@ public class FireballSpell extends Spell implements ProjectileSpell, ConjureSpel
 
     // Looks (SpellProjectile#variant): the fireball burns hotter as it levels, and each branch has
     // its own look (see docs/superpowers/specs/2026-09-29-fireball-vfx-design.md).
-    static final int LOOK_HEAT_1 = 0;
-    static final int LOOK_HEAT_2 = 1;
-    static final int LOOK_HEAT_3 = 2;
-    static final int LOOK_HEAT_4 = 3;
-    static final int LOOK_CLUSTER = 4;
-    static final int LOOK_METEOR = 5;
-    static final int LOOK_SUN = 6;
-    static final int LOOK_PHOENIX = 7;
+    public static final int LOOK_HEAT_1 = 0;
+    public static final int LOOK_HEAT_2 = 1;
+    public static final int LOOK_HEAT_3 = 2;
+    public static final int LOOK_HEAT_4 = 3;
+    public static final int LOOK_CLUSTER = 4;
+    public static final int LOOK_METEOR = 5;
+    public static final int LOOK_SUN = 6;
+    public static final int LOOK_PHOENIX = 7;
     private static final List<ResourceLocation> LOOK_MODELS = List.of(MODEL,
             ElementalArcana.id("spell/fireball_heat2"), ElementalArcana.id("spell/fireball_heat3"),
             ElementalArcana.id("spell/fireball_heat4"), ElementalArcana.id("spell/fireball_cluster"),
@@ -443,14 +444,8 @@ public class FireballSpell extends Spell implements ProjectileSpell, ConjureSpel
         }
 
         float size = (float) (radius / 2.0);
-        level.sendParticles(sun ? ParticleTypes.EXPLOSION_EMITTER : ParticleTypes.EXPLOSION, at.x, at.y, at.z, 1, 0, 0, 0, 0);
-        level.sendParticles(ParticleTypes.FLAME, at.x, at.y, at.z, Math.round(18 * size), 0.3 * size, 0.3 * size, 0.3 * size, 0.12 * size);
-        level.sendParticles(ParticleTypes.LAVA, at.x, at.y, at.z, Math.round(4 * size), 0.2, 0.2, 0.2, 0);
-        level.sendParticles(ParticleTypes.LARGE_SMOKE, at.x, at.y, at.z, Math.round(6 * size), 0.3 * size, 0.2 * size, 0.3 * size, 0.02);
-        level.sendParticles(ModContent.EMBER.get(), at.x, at.y, at.z, Math.round(14 * size), 0.3 * size, 0.3 * size, 0.3 * size, 0.1);
-        if (sun) {
-            level.sendParticles(ParticleTypes.FLASH, at.x, at.y, at.z, 1, 0, 0, 0, 0);
-        }
+        // The whole explosion goes out as one particle; each client plays it out (FireballEffects#blast).
+        level.sendParticles(new FireBlastOptions(fireball.variant(), (float) radius, bomblet), at.x, at.y, at.z, 1, 0, 0, 0, 0);
         level.playSound(null, at.x, at.y, at.z, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS,
                 Math.min(2.5f, 0.5f * size), 1.5f / (float) Math.sqrt(Math.max(1f, size)));
     }

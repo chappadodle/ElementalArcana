@@ -789,6 +789,63 @@ CINDERS = [
 CINDER_PALETTE = {"a": 0x2A1A14, "b": 0x4A2E22, "c": 0xFF8C32, "y": 0xFFD27A}
 
 
+def shockwave(size=16):
+    """A shockwave ring in grey (tinted by the particle): a bright pixel ring at the edge with a
+    dimmer inner band, empty in the middle."""
+    y, x = np.mgrid[0:size, 0:size] + 0.5
+    r = np.hypot(x - size / 2, y - size / 2) / (size / 2)
+    v = np.where((r > 0.8) & (r <= 0.97), 1.0, np.where((r > 0.62) & (r <= 0.8), 0.45, 0.0))
+    rgba = np.zeros((size, size, 4))
+    rgba[..., 0] = rgba[..., 1] = rgba[..., 2] = v
+    rgba[..., 3] = (v > 0) * 1.0
+    return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA")
+
+
+def corona(size=16):
+    """A big soft round glow in four stepped rings, brightest in the middle."""
+    y, x = np.mgrid[0:size, 0:size] + 0.5
+    r = np.hypot(x - size / 2, y - size / 2) / (size / 2)
+    v = np.select([r < 0.3, r < 0.55, r < 0.8, r < 1.0], [1.0, 0.7, 0.4, 0.2], 0.0)
+    rgba = np.zeros((size, size, 4))
+    rgba[..., 0] = rgba[..., 1] = rgba[..., 2] = v
+    rgba[..., 3] = (v > 0) * 1.0
+    return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA")
+
+
+def cracks(size=16, seed=7):
+    """Glowing cracks radiating from the middle: random jagged lines, bright where they meet."""
+    rng = np.random.default_rng(seed)
+    v = np.zeros((size, size))
+    for arm in range(7):
+        angle = arm / 7 * 2 * np.pi + rng.uniform(-0.3, 0.3)
+        pos = np.array([size / 2, size / 2], dtype=float)
+        for step in range(int(size * 0.45)):
+            angle += rng.uniform(-0.5, 0.5)
+            pos += (np.cos(angle), np.sin(angle))
+            px, py = int(pos[0]), int(pos[1])
+            if 0 <= px < size and 0 <= py < size:
+                v[py, px] = max(v[py, px], 1.0 - step / (size * 0.5))
+    v[size // 2 - 1:size // 2 + 1, size // 2 - 1:size // 2 + 1] = 1.0
+    v = np.where(v > 0, np.clip(v, 0.35, 1.0), 0.0)
+    rgba = np.zeros((size, size, 4))
+    rgba[..., 0] = rgba[..., 1] = rgba[..., 2] = v
+    rgba[..., 3] = (v > 0) * 1.0
+    return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA")
+
+
+def scorch(size=16, seed=11):
+    """A dark burn mark: sooty black in the middle, ragged and thinning toward the edge."""
+    rng = np.random.default_rng(seed)
+    y, x = np.mgrid[0:size, 0:size] + 0.5
+    r = np.hypot(x - size / 2, y - size / 2) / (size / 2) + rng.uniform(-0.12, 0.12, (size, size))
+    alpha = np.select([r < 0.45, r < 0.75, r < 0.95], [0.9, 0.65, 0.35], 0.0)
+    shade = np.select([r < 0.45, r < 0.75], [0.06, 0.12], 0.18)
+    rgba = np.zeros((size, size, 4))
+    rgba[..., 0] = rgba[..., 1] = rgba[..., 2] = shade
+    rgba[..., 3] = alpha
+    return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA")
+
+
 def main():
     for name, (palette, grid) in SPRITES.items():
         path = ASSETS / f"{name}.png"
@@ -810,6 +867,10 @@ def main():
     for frame in range(2):
         path = ASSETS / f"particle/spark_{frame}.png"
         spark(frame).save(path)
+        print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
+    for name, make in (("shockwave", shockwave), ("corona", corona), ("cracks", cracks), ("scorch", scorch)):
+        path = ASSETS / f"particle/{name}.png"
+        make().save(path)
         print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
     for name, sprites, palette in (("feather", FEATHERS, FEATHER_PALETTE), ("cinder", CINDERS, CINDER_PALETTE)):
         for frame, grid in enumerate(sprites):

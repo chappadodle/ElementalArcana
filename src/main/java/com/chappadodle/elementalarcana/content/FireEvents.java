@@ -3,7 +3,7 @@ package com.chappadodle.elementalarcana.content;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.SpellDamage;
-import net.minecraft.core.particles.ParticleTypes;
+import com.chappadodle.elementalarcana.content.spell.FireballSpell;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -46,9 +46,7 @@ public final class FireEvents {
             nearby.igniteForTicks(100);
             SpellDamage.hurtMultiHit(nearby, SpellDamage.source(level, Element.FIRE, dead, dead), DAMAGE);
         }
-        level.sendParticles(ParticleTypes.EXPLOSION, dead.getX(), dead.getY(0.5), dead.getZ(), 1, 0, 0, 0, 0);
-        level.sendParticles(ParticleTypes.FLAME, dead.getX(), dead.getY(0.5), dead.getZ(), 25, 0.4, 0.4, 0.4, 0.12);
-        level.sendParticles(ModContent.EMBER.get(), dead.getX(), dead.getY(0.5), dead.getZ(), 12, 0.3, 0.3, 0.3, 0.1);
+        level.sendParticles(new FireBlastOptions(FireballSpell.LOOK_HEAT_2, 2f, false), dead.getX(), dead.getY(0.5), dead.getZ(), 1, 0, 0, 0, 0);
         level.playSound(null, dead.getX(), dead.getY(), dead.getZ(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS, 0.6f, 1.5f);
     }
 }
