@@ -38,6 +38,13 @@ public final class ModContent {
     public static final DeferredHolder<SoundEvent, SoundEvent> LEVEL_UP_SOUND = sound("magic.level_up");
     public static final DeferredHolder<SoundEvent, SoundEvent> FIZZLE_SOUND = sound("spell.fizzle");
     public static final DeferredHolder<SoundEvent, SoundEvent> ICICLE_IMPACT = sound("spell.icicle.impact");
+    // Fireball's signature sounds (synthesized by tools/gen_spell_sounds.py).
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIREBALL_SUN_HUM = sound("spell.fireball.sun_hum");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIREBALL_SUN_LAUNCH = sound("spell.fireball.sun_launch");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIREBALL_SUN_ROAR = sound("spell.fireball.sun_roar");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIREBALL_SUN_BLAST = sound("spell.fireball.sun_blast");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIREBALL_METEOR_ROAR = sound("spell.fireball.meteor_roar");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIREBALL_METEOR_IMPACT = sound("spell.fireball.meteor_impact");
 
     /** A glowing 4-point frost glint that twinkles out. */
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> FROST_SPARKLE =

@@ -1,6 +1,8 @@
 package com.chappadodle.elementalarcana.client.sound;
 
 import com.chappadodle.elementalarcana.api.SpellProjectile;
+import com.chappadodle.elementalarcana.client.ArcanaClientConfig;
+import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.content.spell.FireballSpell;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundEvent;
@@ -83,6 +85,19 @@ public final class FireballSounds {
             List.of(layer(SoundEvents.BLAZE_SHOOT, 0.8f, 1.1f), layer(SoundEvents.PHANTOM_SWOOP, 0.6f, 1.3f)),
             List.of(layer(SoundEvents.ELYTRA_FLYING, 0.35f, 1.2f), layer(SoundEvents.PHANTOM_FLAP, 0.4f, 1.4f)),
             List.of(layer(EXPLODE, 1.0f, 1.1f), layer(SoundEvents.PHANTOM_AMBIENT, 0.8f, 1.5f)));
+    // With signature sounds on (ArcanaClientConfig#SIGNATURE_SOUNDS), the synthesized ones take over
+    // the biggest moments; the vanilla mixes above stay as the alternative.
+    private static final Mix SUN_SIGNATURE = new Mix(
+            List.of(),
+            List.of(layer(ModContent.FIREBALL_SUN_HUM.get(), 0.9f, 1.0f), layer(SoundEvents.BLAZE_BURN, 0.35f, 0.5f)),
+            List.of(),
+            List.of(layer(ModContent.FIREBALL_SUN_LAUNCH.get(), 1.5f, 1.0f), layer(SoundEvents.BLAZE_SHOOT, 0.5f, 0.7f)),
+            List.of(layer(ModContent.FIREBALL_SUN_ROAR.get(), 1.2f, 1.0f), layer(SoundEvents.ELYTRA_FLYING, 0.4f, 0.7f)),
+            List.of(layer(ModContent.FIREBALL_SUN_BLAST.get(), 4.0f, 1.0f), layer(EXPLODE, 2.0f, 0.5f)));
+    private static final Mix METEOR_SIGNATURE = new Mix(
+            METEOR.conjure(), METEOR.heldLoop(), METEOR.grown(), METEOR.thrown(),
+            List.of(layer(ModContent.FIREBALL_METEOR_ROAR.get(), 1.0f, 1.0f), layer(SoundEvents.ELYTRA_FLYING, 0.4f, 0.8f)),
+            List.of(layer(ModContent.FIREBALL_METEOR_IMPACT.get(), 3.0f, 1.0f), layer(EXPLODE, 1.5f, 0.6f)));
     /** A Cluster Bomb bomblet going off: firecracker pops. */
     private static final List<Layer> BOMBLET_BLAST = List.of(
             layer(SoundEvents.FIREWORK_ROCKET_BLAST, 0.7f, 1.2f), layer(SoundEvents.FIREWORK_ROCKET_TWINKLE, 0.5f, 1.1f));
@@ -97,11 +112,12 @@ public final class FireballSounds {
     }
 
     private static Mix mix(int look) {
+        boolean signature = ArcanaClientConfig.SIGNATURE_SOUNDS.get();
         return switch (look) {
             case FireballSpell.LOOK_HEAT_1, FireballSpell.LOOK_HEAT_2 -> HEAT_LOW;
             case FireballSpell.LOOK_CLUSTER -> CLUSTER;
-            case FireballSpell.LOOK_METEOR -> METEOR;
-            case FireballSpell.LOOK_SUN -> SUN;
+            case FireballSpell.LOOK_METEOR -> signature ? METEOR_SIGNATURE : METEOR;
+            case FireballSpell.LOOK_SUN -> signature ? SUN_SIGNATURE : SUN;
             case FireballSpell.LOOK_PHOENIX -> PHOENIX;
             default -> HEAT_HIGH;
         };

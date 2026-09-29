@@ -16,6 +16,11 @@ public final class ArcanaClientConfig {
             .translation("elementalarcana.configuration.bloom")
             .define("bloom", true);
 
+    public static final ModConfigSpec.BooleanValue SIGNATURE_SOUNDS = BUILDER
+            .comment("Custom sounds for the biggest spells (Sunfire, Meteor). Off: they use vanilla sounds instead.")
+            .translation("elementalarcana.configuration.signatureSounds")
+            .define("signatureSounds", true);
+
     public static final ModConfigSpec SPEC = BUILDER.build();
 
     private ArcanaClientConfig() {

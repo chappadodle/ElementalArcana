@@ -198,7 +198,9 @@ in its A/B. It's built in two play-tests:
 - **★ signature sounds (4b), synthesized:**
   - Sunfire: a solar hum (held loop), a launch surge and a detonation with a long tail
   - Meteor: an incoming roar (flight loop) and a ground-shaking impact with a rumble
-  - Phoenix: a cry (on the throw, and fading out on impact)
+  - Phoenix: a cry. The first synthesized version was rejected in its A/B, so Phoenix keeps its
+    vanilla mix for now. The cry is to be reworked later, and may be a case for the AI sound
+    model.
 - **A/B:** a client config option, `signatureSounds` (default on), swaps each ★ sound for its
   vanilla mix, and takes effect immediately.
 

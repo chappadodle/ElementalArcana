@@ -342,5 +342,13 @@
   "elementalarcana.configuration.screenEffects": "Screen effects",
   "elementalarcana.configuration.screenEffects.tooltip": "Camera shake and screen flashes from big spells (Meteor impacts, Sunfire).",
   "elementalarcana.configuration.bloom": "Bloom",
-  "elementalarcana.configuration.bloom.tooltip": "Light bleeding around glowing spell effects. Needs the Veil mod; off while an Iris shader pack is on."
+  "elementalarcana.configuration.bloom.tooltip": "Light bleeding around glowing spell effects. Needs the Veil mod; off while an Iris shader pack is on.",
+  "subtitles.elementalarcana.spell.fireball.sun_hum": "Miniature sun hums",
+  "subtitles.elementalarcana.spell.fireball.sun_launch": "Miniature sun surges",
+  "subtitles.elementalarcana.spell.fireball.sun_roar": "Miniature sun roars",
+  "subtitles.elementalarcana.spell.fireball.sun_blast": "Miniature sun detonates",
+  "subtitles.elementalarcana.spell.fireball.meteor_roar": "Meteor roars",
+  "subtitles.elementalarcana.spell.fireball.meteor_impact": "Meteor crashes",
+  "elementalarcana.configuration.signatureSounds": "Signature sounds",
+  "elementalarcana.configuration.signatureSounds.tooltip": "Custom sounds for the biggest spells (Sunfire, Meteor). Off: they use vanilla sounds instead."
 }

@@ -1,6 +1,6 @@
 """Synthesizes spell sound effects from scratch (numpy + scipy, converted to .ogg with sox).
 
-Run from the project root:  python3 tools/gen_spell_sounds.py
+Run from the project root:  python3 tools/gen_spell_sounds.py [icicle] [fireball]
 Each sound is layered from small building blocks (clicks, crackles, bell-like "tinkles", low
 thuds) with fixed random seeds, so re-running gives identical files. No samples are used, so
 there is nothing to license.
@@ -119,11 +119,162 @@ def icicle_impact(variant, seed):
     write(f"spell/icicle/impact{variant}", fade_out(out, 0.1), ["reverb", "35"])
 
 
-def main():
+# ---- fireball signature sounds ----
+
+def noise(rng, duration):
+    return rng.standard_normal(int(duration * SR))
+
+
+def seamless(signal, overlap):
+    """Makes a loop: the last `overlap` seconds are crossfaded into the start, then dropped."""
+    n = int(overlap * SR)
+    body = signal[:-n].copy()
+    ramp = np.linspace(0, 1, n)
+    body[:n] = body[:n] * ramp + signal[-n:] * (1 - ramp)
+    return body
+
+
+def smooth_random(rng, duration, rate, lo=0.0, hi=1.0):
+    """A slowly wandering control curve (for swells and flutter): random points joined smoothly."""
+    points = rng.uniform(lo, hi, int(duration * rate) + 3)
+    x = np.linspace(0, len(points) - 1, int(duration * SR))
+    i = np.floor(x).astype(int)
+    f = x - i
+    f = f * f * (3 - 2 * f)
+    return points[i] * (1 - f) + points[np.minimum(i + 1, len(points) - 1)] * f
+
+
+def sweep(duration, f_start, f_end, curve=1.0):
+    """A sine whose pitch glides from f_start to f_end."""
+    t = times(duration) / duration
+    freq = f_start + (f_end - f_start) * t ** curve
+    return np.sin(2 * np.pi * np.cumsum(freq) / SR)
+
+
+def sun_hum(seed=71):
+    """Sunfire held: a deep solar hum, two beating low tones with harmonics, breathing slowly,
+    over a soft plasma roar and a faint high sizzle. Loops seamlessly."""
+    rng = np.random.default_rng(seed)
+    duration = 4.5
+    t = times(duration)
+    tone = np.zeros_like(t)
+    for freq, weight in ((55, 1.0), (55.5, 0.8), (110, 0.45), (165.25, 0.25), (220, 0.15)):
+        tone += weight * np.sin(2 * np.pi * freq * t + rng.uniform(0, 6.28))
+    breathing = 0.75 + 0.25 * np.sin(2 * np.pi * 0.5 * t)
+    roar = filtered(noise(rng, duration), "lowpass", 380) * smooth_random(rng, duration, 3, 0.5, 1.0) * 1.2
+    sizzle = filtered(noise(rng, duration), "bandpass", [3500, 7000], order=2) * 0.06
+    sizzle += crackle(rng, duration, 40, amp_range=(0.02, 0.07), brightness=4000)
+    out = tone * breathing * 0.5 + roar + sizzle
+    write("spell/fireball/sun_hum", seamless(out, 0.5))
+
+
+def sun_launch(seed=72):
+    """Sunfire thrown: a rising surge that bursts into a heavy push of air."""
+    rng = np.random.default_rng(seed)
+    duration = 1.6
+    out = silence(duration)
+    rise = 0.35
+    swell = sweep(rise, 70, 240, curve=2) * np.linspace(0, 1, int(rise * SR)) ** 2
+    swell_noise = filtered(noise(rng, rise), "bandpass", [300, 2500], order=2) * np.linspace(0, 1, int(rise * SR)) ** 3
+    place(out, swell * 0.5 + swell_noise * 0.6, 0.0)
+    place(out, thud(0.6, 140, 45, 0.18, amp=1.0), rise)
+    push = filtered(noise(rng, 1.2), "lowpass", 1400) * np.exp(-times(1.2) / 0.35)
+    place(out, push * 0.9, rise)
+    place(out, crackle(rng, 0.8, 30, amp_range=(0.05, 0.2), shape=lambda x: x ** 1.5, brightness=2500), rise)
+    write("spell/fireball/sun_launch", fade_out(out, 0.3), ["reverb", "40"], peak_db=-3.0)
+
+
+def sun_roar(seed=73):
+    """Sunfire in flight: a heavy roar of fire with a low rumble and flutter. Loops seamlessly."""
+    rng = np.random.default_rng(seed)
+    duration = 3.5
+    flutter = 0.7 + 0.3 * smooth_random(rng, duration, 12)
+    roar = filtered(noise(rng, duration), "bandpass", [80, 900], order=2) * flutter
+    rumble = filtered(noise(rng, duration), "lowpass", 90) * 2.5
+    hiss = filtered(noise(rng, duration), "highpass", 2500) * 0.08 * flutter
+    out = roar + rumble + hiss + crackle(rng, duration, 50, amp_range=(0.04, 0.15), brightness=1800)
+    write("spell/fireball/sun_roar", seamless(out, 0.4))
+
+
+def sun_blast(seed=74):
+    """Sunfire exploding: a sharp crack, a huge falling boom, and a long rolling thunder tail."""
+    rng = np.random.default_rng(seed)
+    duration = 6.0
+    out = silence(duration)
+    for i in range(4):
+        place(out, click(rng, 1.0, length=0.01, brightness=1200), i * 0.004)
+    place(out, thud(1.5, 90, 28, 0.6, amp=1.3), 0.0)
+    body_len = 1.5
+    body = noise(rng, body_len)
+    # The blast's roar darkens as it rolls out: filter it in slices from bright to dark.
+    darkened = np.zeros_like(body)
+    slices = 12
+    for k in range(slices):
+        a, b = k * len(body) // slices, (k + 1) * len(body) // slices
+        cutoff = 2500 * (1 - k / slices) ** 2 + 180
+        darkened[a:b] = filtered(body, "lowpass", cutoff, order=2)[a:b]
+    place(out, darkened * np.exp(-times(body_len) / 0.45) * 1.1, 0.0)
+    tail_len = 5.5
+    swells = smooth_random(rng, tail_len, 2.5, 0.2, 1.0) ** 2
+    tail = filtered(noise(rng, tail_len), "lowpass", 160) * swells * np.exp(-times(tail_len) / 2.2) * 6.0
+    place(out, tail, 0.3)
+    place(out, crackle(rng, 2.0, 60, amp_range=(0.03, 0.15), shape=lambda x: x ** 2, brightness=1500), 0.1)
+    write("spell/fireball/sun_blast", fade_out(out, 0.8), ["reverb", "60"], peak_db=-3.0)
+
+
+def meteor_roar(seed=81):
+    """Meteor falling: a rough, rumbling roar with an airy whistle and tumbling rock. Loops seamlessly."""
+    rng = np.random.default_rng(seed)
+    duration = 3.0
+    flutter = 0.75 + 0.25 * smooth_random(rng, duration, 8)
+    roar = filtered(noise(rng, duration), "bandpass", [150, 800], order=2) * flutter
+    rumble = filtered(noise(rng, duration), "lowpass", 70) * 2.0
+    whistle = filtered(noise(rng, duration), "bandpass", [1150, 1300], order=2) * 1.2 * smooth_random(rng, duration, 2, 0.6, 1.0)
+    rocks = crackle(rng, duration, 45, amp_range=(0.05, 0.2), brightness=700)
+    out = roar + rumble + whistle + rocks
+    write("spell/fireball/meteor_roar", seamless(out, 0.4))
+
+
+def meteor_impact(seed=82):
+    """Meteor landing: a ground-shaking thump, a crunch of rock, debris raining down, and a rumble."""
+    rng = np.random.default_rng(seed)
+    duration = 4.0
+    out = silence(duration)
+    place(out, thud(1.2, 70, 24, 0.5, amp=1.4), 0.0)
+    crunch = filtered(noise(rng, 0.5), "bandpass", [250, 3000], order=2) * np.exp(-times(0.5) / 0.08)
+    place(out, crunch * 1.0, 0.0)
+    for _ in range(8):
+        place(out, click(rng, rng.uniform(0.5, 1.0), length=0.012, brightness=600), rng.uniform(0, 0.05))
+    place(out, crackle(rng, 2.2, 90, amp_range=(0.05, 0.3), shape=lambda x: x ** 1.8, brightness=900), 0.08)
+    rumble = filtered(noise(rng, 3.8), "lowpass", 110) * np.exp(-times(3.8) / 1.3) * 3.5
+    place(out, rumble, 0.05)
+    write("spell/fireball/meteor_impact", fade_out(out, 0.5), ["reverb", "45"], peak_db=-3.0)
+
+
+def icicle():
     icicle_impact(1, 41)
     icicle_impact(2, 42)
     icicle_impact(3, 43)
 
 
+def fireball():
+    sun_hum()
+    sun_launch()
+    sun_roar()
+    sun_blast()
+    meteor_roar()
+    meteor_impact()
+
+
+GROUPS = {"icicle": icicle, "fireball": fireball}
+
+
+def main(names):
+    """Writes the named groups of sounds (all of them when none are named). The .ogg encoder isn't
+    byte-for-byte repeatable, so regenerate only what changed."""
+    for name in names or GROUPS:
+        GROUPS[name]()
+
 if __name__ == "__main__":
-    main()
+    import sys
+    main(sys.argv[1:])

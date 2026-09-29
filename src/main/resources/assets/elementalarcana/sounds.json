@@ -30,5 +30,53 @@
       }
     ],
     "subtitle": "subtitles.elementalarcana.spell.icicle.impact"
+  },
+  "spell.fireball.sun_hum": {
+    "sounds": [
+      {
+        "name": "elementalarcana:spell/fireball/sun_hum"
+      }
+    ],
+    "subtitle": "subtitles.elementalarcana.spell.fireball.sun_hum"
+  },
+  "spell.fireball.sun_launch": {
+    "sounds": [
+      {
+        "name": "elementalarcana:spell/fireball/sun_launch"
+      }
+    ],
+    "subtitle": "subtitles.elementalarcana.spell.fireball.sun_launch"
+  },
+  "spell.fireball.sun_roar": {
+    "sounds": [
+      {
+        "name": "elementalarcana:spell/fireball/sun_roar"
+      }
+    ],
+    "subtitle": "subtitles.elementalarcana.spell.fireball.sun_roar"
+  },
+  "spell.fireball.sun_blast": {
+    "sounds": [
+      {
+        "name": "elementalarcana:spell/fireball/sun_blast"
+      }
+    ],
+    "subtitle": "subtitles.elementalarcana.spell.fireball.sun_blast"
+  },
+  "spell.fireball.meteor_roar": {
+    "sounds": [
+      {
+        "name": "elementalarcana:spell/fireball/meteor_roar"
+      }
+    ],
+    "subtitle": "subtitles.elementalarcana.spell.fireball.meteor_roar"
+  },
+  "spell.fireball.meteor_impact": {
+    "sounds": [
+      {
+        "name": "elementalarcana:spell/fireball/meteor_impact"
+      }
+    ],
+    "subtitle": "subtitles.elementalarcana.spell.fireball.meteor_impact"
   }
 }
