@@ -25,6 +25,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.AreaEffectCloud;
@@ -74,6 +75,8 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
     public static final int LOOK_SHATTER = 5;
     public static final int LOOK_WINTER = 6;
     public static final int LOOK_LANCE = 7;
+    /** Added to the look at Lv 8+: the ice glows brighter (see glow and luminance). */
+    public static final int BRIGHT = 8;
     private static final List<ResourceLocation> LOOK_MODELS = List.of(MODEL,
             ElementalArcana.id("spell/icicle_frost2"), ElementalArcana.id("spell/icicle_frost3"),
             ElementalArcana.id("spell/icicle_frost4"), ElementalArcana.id("spell/icicle_needle"),
@@ -96,6 +99,10 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
     private static final String TAG_VOLLEY = "ea_icicle_volley";
     private static final String TAG_HOMING = "ea_icicle_homing";
     private static final String TAG_LANCE = "ea_icicle_lance";
+    private static final String TAG_SHRAPNEL = "ea_icicle_shrapnel";
+    private static final String TAG_SHRAPNEL_DAMAGE = "ea_icicle_shrapnel_damage";
+    private static final int SHRAPNEL_COUNT = 8;
+    private static final float SHRAPNEL_DAMAGE = 0.3f;
     // Stored on targets to count hits from one volley (Deep Freeze).
     private static final String TAG_TARGET_VOLLEY = "ea_icicle_hit_volley";
     private static final String TAG_TARGET_HITS = "ea_icicle_hit_count";
@@ -157,7 +164,7 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
         tag.putString(TAG_BRANCH_10, orEmpty(context.branch(10)));
         // One "volley" is one conjured set (Deep Freeze counts hits per set).
         tag.putInt(TAG_VOLLEY, seed);
-        icicle.setVariant(lookFor(level, context.branch(5), context.branch(10)));
+        icicle.setVariant(lookFor(level, context.branch(5), context.branch(10)) | (level >= 8 ? BRIGHT : 0));
         playAt(icicle, SoundEvents.AMETHYST_CLUSTER_PLACE, 1f, 1.3f);
         return icicle;
     }
@@ -179,7 +186,7 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
         }
         lance.setFormation(0, 1);
         lance.setVisualScale(2.2f);
-        lance.setVariant(LOOK_LANCE);
+        lance.setVariant(LOOK_LANCE | BRIGHT);
         lance.getPersistentData().putBoolean(TAG_LANCE, true);
         playAt(lance, SoundEvents.AMETHYST_BLOCK_RESONATE, 1.5f, 0.6f);
         playAt(lance, SoundEvents.AMETHYST_BLOCK_CHIME, 1.5f, 0.8f);
@@ -197,7 +204,7 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
 
     @Override
     public void fizzle(SpellProjectile icicle) {
-        shatter(icicle);
+        shatter(icicle, icicle.position());
         icicle.discard();
     }
 
@@ -215,9 +222,14 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
         return MODEL;
     }
 
+    /** The look without the Lv 8+ brightness. */
+    public static int look(int variant) {
+        return variant & (BRIGHT - 1);
+    }
+
     @Override
     public ResourceLocation model(int variant) {
-        return LOOK_MODELS.get(Math.floorMod(variant, LOOK_MODELS.size()));
+        return LOOK_MODELS.get(look(variant));
     }
 
     @Override
@@ -225,9 +237,11 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
         return LOOK_MODELS;
     }
 
+    /** A pale cold halo; at Lv 8+ a clearly brighter, wider one. */
     @Override
     public Glow glow(int variant) {
-        return LOOK_GLOWS.get(Math.floorMod(variant, LOOK_GLOWS.size()));
+        Glow glow = LOOK_GLOWS.get(look(variant));
+        return (variant & BRIGHT) == 0 ? glow : new Glow(glow.color(), glow.size() * 1.3f, Math.max(0.8f, glow.intensity() * 1.6f));
     }
 
     /** The look for a caster's icicles: Endless Winter, then the Lv 5 branch, then how cold it runs. */
@@ -244,14 +258,13 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
         return level >= 8 ? LOOK_FROST_4 : level >= 5 ? LOOK_FROST_3 : level >= 3 ? LOOK_FROST_2 : LOOK_FROST_1;
     }
 
-    /** With a dynamic lights mod: ice doesn't glow, except Frost 4's cold core and the Glacial Lance. */
+    /** With a dynamic lights mod: ice doesn't glow, except at Lv 8+ (a faint cold light) and the Glacial Lance. */
     @Override
     public int luminance(SpellProjectile icicle) {
-        return switch (icicle.variant()) {
-            case LOOK_LANCE -> 7;
-            case LOOK_FROST_4 -> 5;
-            default -> 0;
-        };
+        if (look(icicle.variant()) == LOOK_LANCE) {
+            return 7;
+        }
+        return (icicle.variant() & BRIGHT) != 0 ? 5 : 0;
     }
 
     @Override
@@ -307,6 +320,13 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
     /** A shimmering trail of glints, a wisp of cold mist, and the odd snowflake. */
     @Override
     public void flightParticles(SpellProjectile icicle) {
+        if (icicle.visualScale() < 0.5f) {
+            // Shatterburst shrapnel: just a glint now and then.
+            if (icicle.tickCount % 2 == 0) {
+                icicle.spawnParticleAround(ModContent.FROST_SPARKLE.get(), 0.03, Vec3.ZERO);
+            }
+            return;
+        }
         Vec3 back = icicle.getDeltaMovement().scale(-0.05);
         int sparkles = icicle.visualScale() > 1.5f ? 5 : 2;
         for (int i = 0; i < sparkles; i++) {
@@ -374,7 +394,7 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
         // Projectiles fly straight through water surfaces, so freezing is checked in flight.
         if (icicle.isInWater()) {
             Freezing.freezeWater((ServerLevel) icicle.level(), icicle.blockPosition(), FREEZE_RADIUS);
-            shatter(icicle);
+            shatter(icicle, icicle.position());
             icicle.discard();
             return;
         }
@@ -411,6 +431,16 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
     public void onHitEntity(SpellProjectile icicle, EntityHitResult hit) {
         Entity target = hit.getEntity();
         CompoundTag tag = icicle.getPersistentData();
+        Vec3 at = icicle.impactPoint(hit);
+        if (tag.getBoolean(TAG_SHRAPNEL)) {
+            // A Shatterburst shard: a small cut and a chill.
+            SpellDamage.hurtMultiHit(target, SpellDamage.source(icicle.level(), Element.ICE, icicle, icicle.getOwner()), tag.getFloat(TAG_SHRAPNEL_DAMAGE));
+            if (target instanceof LivingEntity living) {
+                living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 0));
+            }
+            shatter(icicle, at);
+            return;
+        }
         int level = tag.getInt(TAG_LEVEL);
         float charge = icicle.charge(0f);
         SpellDamage.hurtMultiHit(target, SpellDamage.source(icicle.level(), Element.ICE, icicle, icicle.getOwner()), damage(icicle, tag));
@@ -425,7 +455,8 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
             freezeOver(target, level >= 6 ? 120 : 80);
         }
         if (SHATTERBURST.equals(tag.getString(TAG_BRANCH_5)) && !tag.getBoolean(TAG_LANCE)) {
-            shatterburst(icicle, target);
+            // The shrapnel carries on past the target, and fans out.
+            shatterburst(icicle, at, target, icicle.getDeltaMovement());
         }
         if (WINTER.equals(tag.getString(TAG_BRANCH_10))) {
             if (!target.isAlive() && icicle.getOwner() instanceof ServerPlayer owner) {
@@ -437,20 +468,26 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
                 frostPatch(icicle, target.position());
             }
         }
-        shatter(icicle);
+        shatter(icicle, at);
     }
 
     @Override
     public void onHitBlock(SpellProjectile icicle, BlockHitResult hit) {
         CompoundTag tag = icicle.getPersistentData();
+        Vec3 at = hit.getLocation();
+        if (tag.getBoolean(TAG_SHRAPNEL)) {
+            shatter(icicle, at);
+            return;
+        }
         Freezing.freezeWater((ServerLevel) icicle.level(), hit.getBlockPos(), FREEZE_RADIUS);
         if (SHATTERBURST.equals(tag.getString(TAG_BRANCH_5)) && !tag.getBoolean(TAG_LANCE)) {
-            shatterburst(icicle, null);
+            // The shrapnel bursts back off the surface it hit.
+            shatterburst(icicle, at, null, Vec3.atLowerCornerOf(hit.getDirection().getNormal()));
         }
         if (WINTER.equals(tag.getString(TAG_BRANCH_10)) && icicle.charge(0f) >= 1f) {
             frostPatch(icicle, Vec3.atBottomCenterOf(hit.getBlockPos().relative(hit.getDirection())));
         }
-        shatter(icicle);
+        shatter(icicle, at);
     }
 
     /** Deep Freeze: the third hit on one target from the same volley freezes it solid for 2 seconds. */
@@ -467,17 +504,39 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
         }
     }
 
-    /** Shatterburst: shards burst out and hit everything close by for half damage. */
-    private static void shatterburst(SpellProjectile icicle, @Nullable Entity alreadyHit) {
-        ServerLevel level = (ServerLevel) icicle.level();
-        float damage = damage(icicle, icicle.getPersistentData()) * 0.5f;
-        for (LivingEntity nearby : level.getEntitiesOfClass(LivingEntity.class, icicle.getBoundingBox().inflate(2.0),
-                e -> e != alreadyHit && e != icicle.getOwner() && e.isAlive() && e.distanceTo(icicle) <= 2.0)) {
-            SpellDamage.hurtMultiHit(nearby, SpellDamage.source(level, Element.ICE, icicle, icicle.getOwner()), damage);
-            nearby.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 0));
+    /**
+     * Shatterburst: the icicle bursts into shrapnel, real shards that fly out from where it hit
+     * (onward past a creature it hit, or back off a surface), arc down, and each cut whatever they
+     * strike for part of the damage. Skips the creature the icicle itself hit.
+     */
+    private void shatterburst(SpellProjectile icicle, Vec3 at, @Nullable Entity alreadyHit, Vec3 away) {
+        Entity owner = icicle.getOwner();
+        if (owner == null) {
+            return;
         }
-        level.sendParticles(ModContent.ICE_SHARD.get(), icicle.getX(), icicle.getY(), icicle.getZ(), 24, 0.15, 0.15, 0.15, 0.3);
-        level.sendParticles(ModContent.FROST_MIST.get(), icicle.getX(), icicle.getY(), icicle.getZ(), 6, 0.6, 0.3, 0.6, 0.02);
+        RandomSource random = icicle.getRandom();
+        Vec3 heading = away.lengthSqr() < 1.0e-6 ? new Vec3(0, 1, 0) : away.normalize();
+        float damage = damage(icicle, icicle.getPersistentData()) * SHRAPNEL_DAMAGE;
+        for (int i = 0; i < SHRAPNEL_COUNT; i++) {
+            Vec3 spread = new Vec3(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).normalize();
+            Vec3 direction = heading.scale(0.8).add(spread.scale(0.9)).normalize();
+            if (direction.dot(heading) < 0.1) {
+                direction = direction.subtract(heading.scale(direction.dot(heading) - 0.1)).normalize();
+            }
+            double speed = 0.7 + random.nextDouble() * 0.35;
+            SpellProjectile shard = SpellProjectile.shootFrom(owner, this, at.add(direction.scale(0.2)), direction.scale(speed), icicle.power());
+            shard.setVisualScale(0.3f);
+            shard.setVariant(icicle.variant());
+            shard.setGravity(0.04f);
+            if (alreadyHit != null) {
+                shard.ignoreEntity(alreadyHit);
+            }
+            CompoundTag tag = shard.getPersistentData();
+            tag.putBoolean(TAG_SHRAPNEL, true);
+            tag.putFloat(TAG_SHRAPNEL_DAMAGE, damage);
+        }
+        ServerLevel level = (ServerLevel) icicle.level();
+        level.sendParticles(ModContent.FROST_MIST.get(), at.x, at.y, at.z, 6, 0.4, 0.3, 0.4, 0.02);
     }
 
     /** Endless Winter: a lingering patch of frost that slows whatever walks through it. */
@@ -507,13 +566,13 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
     }
 
     /** Shatter: shards spray and rain down, a puff of cold mist, glints; bigger and deeper at full charge. */
-    private static void shatter(SpellProjectile icicle) {
+    private static void shatter(SpellProjectile icicle, Vec3 at) {
         ServerLevel level = (ServerLevel) icicle.level();
         float charge = icicle.charge(0f);
         float size = icicle.visualScale();
-        double x = icicle.getX();
-        double y = icicle.getY();
-        double z = icicle.getZ();
+        double x = at.x;
+        double y = at.y;
+        double z = at.z;
         level.sendParticles(ModContent.ICE_SHARD.get(), x, y, z, Math.round((8 + 12 * charge) * size), 0.1 * size, 0.1 * size, 0.1 * size, 0.12 + 0.1 * charge);
         level.sendParticles(ModContent.FROST_MIST.get(), x, y, z, Math.round((2 + 3 * charge) * size), 0.15 * size, 0.15 * size, 0.15 * size, 0.02);
         level.sendParticles(ModContent.FROST_SPARKLE.get(), x, y, z, Math.round((6 + 10 * charge) * size), 0.2 * size, 0.2 * size, 0.2 * size, 0.15);

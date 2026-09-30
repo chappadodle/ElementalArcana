@@ -123,7 +123,7 @@
   "spell.elementalarcana.icicle.branch.piercing": "Piercing Cold",
   "spell.elementalarcana.icicle.branch.piercing.desc": "Icicles pass through up to 2 enemies and fly 30% faster.",
   "spell.elementalarcana.icicle.branch.shatterburst": "Shatterburst",
-  "spell.elementalarcana.icicle.branch.shatterburst.desc": "Icicles explode on impact, hitting everything within 2 blocks for half damage.",
+  "spell.elementalarcana.icicle.branch.shatterburst.desc": "Icicles shatter on impact into a spray of shrapnel: eight shards that fly on past what they hit, each cutting whatever it strikes for 30% damage.",
   "spell.elementalarcana.icicle.branch.lance": "Glacial Lance",
   "spell.elementalarcana.icicle.branch.lance.desc": "Keep holding after full charge: your icicles fuse into one giant lance that pierces everything.",
   "spell.elementalarcana.icicle.branch.winter": "Endless Winter",

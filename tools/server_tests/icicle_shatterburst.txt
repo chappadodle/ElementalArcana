@@ -1,0 +1,26 @@
+# Shatterburst: an icicle hits the middle zombie of a tight cluster and bursts into shrapnel that
+# should cut the zombies around it. The icicle is owned by a far-off zombie (shrapnel needs an owner).
+# Expected: the hit zombie loses the most health; the neighbours lose some (shrapnel), not 0.
+time set midnight
+gamerule doMobSpawning false
+forceload add -16 -16 16 16
+fill -12 99 -12 12 99 12 minecraft:stone
+fill -12 100 -12 12 110 12 minecraft:air
+summon zombie 10.5 100 10.5 {NoAI:1b,Tags:["eatest"],UUID:[I;11,22,33,44]}
+summon zombie 0.5 100 0.5 {NoAI:1b,Tags:["eatest","eahit"],CustomName:'"hit"'}
+summon zombie 1.4 100 1.1 {NoAI:1b,Tags:["eatest","eanear"],CustomName:'"near_east"'}
+summon zombie -0.4 100 1.1 {NoAI:1b,Tags:["eatest","eanear"],CustomName:'"near_west"'}
+summon zombie 0.5 100 1.9 {NoAI:1b,Tags:["eatest","eanear"],CustomName:'"behind"'}
+sleep 1
+summon elementalarcana:spell_projectile 0.5 101 -4 {Spell:"elementalarcana:icicle",Power:1.0f,Charge:1.0f,Motion:[0.0d,0.0d,1.2d],Owner:[I;11,22,33,44],NeoForgeData:{ea_icicle_level:5,ea_icicle_branch5:"shatterburst"},Tags:["eatest"]}
+sleep 0.5
+data get entity @e[name=hit,limit=1] Health
+sleep 2
+data get entity @e[name=hit,limit=1] Health
+data get entity @e[name=near_east,limit=1] Health
+data get entity @e[name=near_west,limit=1] Health
+data get entity @e[name=behind,limit=1] Health
+kill @e[tag=eatest]
+kill @e[type=elementalarcana:spell_projectile]
+gamerule doMobSpawning true
+forceload remove all
