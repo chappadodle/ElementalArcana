@@ -110,5 +110,29 @@
       }
     ],
     "subtitle": "subtitles.elementalarcana.spell.icicle.winter_blizzard"
+  },
+  "spell.wind_blade.scythe_roar": {
+    "sounds": [
+      {
+        "name": "elementalarcana:spell/wind_blade/scythe_roar"
+      }
+    ],
+    "subtitle": "subtitles.elementalarcana.spell.wind_blade.scythe_roar"
+  },
+  "spell.wind_blade.scythe_strike": {
+    "sounds": [
+      {
+        "name": "elementalarcana:spell/wind_blade/scythe_strike"
+      }
+    ],
+    "subtitle": "subtitles.elementalarcana.spell.wind_blade.scythe_strike"
+  },
+  "spell.wind_blade.thousand_slash": {
+    "sounds": [
+      {
+        "name": "elementalarcana:spell/wind_blade/thousand_slash"
+      }
+    ],
+    "subtitle": "subtitles.elementalarcana.spell.wind_blade.thousand_slash"
   }
 }

@@ -50,6 +50,10 @@ public final class ModContent {
     public static final DeferredHolder<SoundEvent, SoundEvent> ICICLE_LANCE_LAUNCH = sound("spell.icicle.lance_launch");
     public static final DeferredHolder<SoundEvent, SoundEvent> ICICLE_LANCE_QUAKE = sound("spell.icicle.lance_quake");
     public static final DeferredHolder<SoundEvent, SoundEvent> ICICLE_WINTER_BLIZZARD = sound("spell.icicle.winter_blizzard");
+    // Wind Blade's signature sounds (synthesized by tools/gen_spell_sounds.py).
+    public static final DeferredHolder<SoundEvent, SoundEvent> WIND_SCYTHE_ROAR = sound("spell.wind_blade.scythe_roar");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WIND_SCYTHE_STRIKE = sound("spell.wind_blade.scythe_strike");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WIND_THOUSAND_SLASH = sound("spell.wind_blade.thousand_slash");
 
     /** A glowing 4-point frost glint that twinkles out. */
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> FROST_SPARKLE =

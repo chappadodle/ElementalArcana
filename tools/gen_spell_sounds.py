@@ -1,6 +1,6 @@
 """Synthesizes spell sound effects from scratch (numpy + scipy, converted to .ogg with sox).
 
-Run from the project root:  python3 tools/gen_spell_sounds.py [icicle] [fireball] [frost]
+Run from the project root:  python3 tools/gen_spell_sounds.py [icicle] [fireball] [frost] [wind]
 Each sound is layered from small building blocks (clicks, crackles, bell-like "tinkles", low
 thuds) with fixed random seeds, so re-running gives identical files. No samples are used, so
 there is nothing to license.
@@ -355,7 +355,75 @@ def frost():
     winter_blizzard()
 
 
-GROUPS = {"icicle": icicle, "fireball": fireball, "frost": frost}
+# ---- wind blade signature sounds ----
+
+def swish(rng, duration, f_start, f_end, amp=1.0):
+    """A blade cutting air: noise through a narrow band that sweeps from f_start to f_end, with a
+    sharp attack and a quick tail."""
+    base = noise(rng, duration)
+    out = np.zeros_like(base)
+    slices = 24
+    for k in range(slices):
+        a, b = k * len(base) // slices, (k + 1) * len(base) // slices
+        centre = f_start + (f_end - f_start) * (k / slices) ** 0.7
+        band = filtered(base[max(0, a - 1500):b], "bandpass", [centre * 0.75, min(centre * 1.3, 20000)], order=2)
+        out[a:b] = band[-(b - a):]
+    t = times(duration)
+    return out * np.minimum(1, t / 0.008) * np.exp(-t / (duration * 0.35)) * amp
+
+
+def scythe_roar(seed=111):
+    """Storm Scythe in flight: a dark howling storm wind with crackles of static. Loops."""
+    rng = np.random.default_rng(seed)
+    duration = 4.0
+    sweep = smooth_random(rng, duration, 2, 0, 1)
+    base = noise(rng, duration)
+    howl = np.zeros_like(base)
+    slices = 80
+    for k in range(slices):
+        a, b = k * len(base) // slices, (k + 1) * len(base) // slices
+        centre = 180 + 500 * sweep[(a + b) // 2]
+        band = filtered(base[max(0, a - 2000):b], "bandpass", [centre * 0.75, centre * 1.3], order=2)
+        howl[a:b] = band[-(b - a):]
+    rumble = filtered(noise(rng, duration), "lowpass", 90) * 1.6
+    static = crackle(rng, duration, 70, amp_range=(0.05, 0.25), brightness=5000)
+    out = howl * 1.5 + rumble + static
+    write("spell/wind_blade/scythe_roar", seamless(out, 0.5))
+
+
+def scythe_strike(seed=112):
+    """Storm Scythe striking: a thunder-crack of lightning, a heavy blast of wind, and a rolling tail."""
+    rng = np.random.default_rng(seed)
+    duration = 3.0
+    out = silence(duration)
+    for i in range(6):
+        place(out, click(rng, 1.0, length=0.008, brightness=2500), i * 0.006)
+    crack = filtered(noise(rng, 0.4), "highpass", 1500) * np.exp(-times(0.4) / 0.06)
+    place(out, crack * 0.9, 0.0)
+    place(out, swish(rng, 0.7, 2500, 250, amp=1.0), 0.01)
+    place(out, thud(0.8, 90, 35, 0.3, amp=0.9), 0.0)
+    tail = filtered(noise(rng, 2.6), "lowpass", 180) * smooth_random(rng, 2.6, 3, 0.3, 1.0) * np.exp(-times(2.6) / 0.9) * 2.0
+    place(out, tail, 0.15)
+    write("spell/wind_blade/scythe_strike", fade_out(out, 0.4), ["reverb", "45"], peak_db=-3.0)
+
+
+def thousand_slash(seed=113):
+    """Thousand Cuts: three razor-thin swishes in quick succession."""
+    rng = np.random.default_rng(seed)
+    duration = 0.6
+    out = silence(duration)
+    for k, (at, f0, f1) in enumerate(((0.0, 9000, 3000), (0.07, 10000, 3500), (0.13, 8500, 2800))):
+        place(out, swish(rng, 0.22, f0, f1, amp=1.0 - 0.15 * k), at)
+    write("spell/wind_blade/thousand_slash", fade_out(out, 0.1), ["reverb", "20"], peak_db=-3.0)
+
+
+def wind():
+    scythe_roar()
+    scythe_strike()
+    thousand_slash()
+
+
+GROUPS = {"icicle": icicle, "fireball": fireball, "frost": frost, "wind": wind}
 
 
 def main(names):

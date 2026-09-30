@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.client.particle;
 
+import com.chappadodle.elementalarcana.client.sound.WindBladeSounds;
 import com.chappadodle.elementalarcana.content.WindCutOptions;
 import com.chappadodle.elementalarcana.content.spell.WindBladeEffects;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -19,6 +20,7 @@ public class WindCutEmitter extends NoRenderParticle {
         super(level, x, y, z);
         this.cut = cut;
         this.lifetime = WindBladeEffects.IMPACT_TICKS;
+        WindBladeSounds.impact(level, new Vec3(x, y, z), cut);
     }
 
     @Override

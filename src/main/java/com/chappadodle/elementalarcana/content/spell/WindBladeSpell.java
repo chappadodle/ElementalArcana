@@ -11,6 +11,7 @@ import com.chappadodle.elementalarcana.api.SpellDamage;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.content.ModSchools;
+import com.chappadodle.elementalarcana.client.sound.WindBladeSounds;
 import com.chappadodle.elementalarcana.content.WindCutOptions;
 import com.chappadodle.elementalarcana.content.WindVortex;
 import net.minecraft.core.particles.ParticleOptions;
@@ -19,9 +20,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -138,7 +136,6 @@ public class WindBladeSpell extends Spell implements ProjectileSpell, ConjureSpe
         tag.putString(TAG_BRANCH_5, orEmpty(context.branch(5)));
         tag.putString(TAG_BRANCH_10, orEmpty(context.branch(10)));
         blade.setVariant(lookFor(level, context.branch(5), context.branch(10)) | (level >= 8 ? BRIGHT : 0));
-        playAt(context.caster(), SoundEvents.BREEZE_INHALE, 0.8f, 1.3f);
         return blade;
     }
 
@@ -155,7 +152,6 @@ public class WindBladeSpell extends Spell implements ProjectileSpell, ConjureSpe
             Vec3 toAim = aim.subtract(blade.position()).yRot(spread * Mth.DEG_TO_RAD);
             blade.release(blade.position().add(toAim));
         }
-        playAt(caster, SoundEvents.BREEZE_SHOOT, 0.9f, 1.2f);
         if (blades.get(0).getPersistentData().getInt(TAG_LEVEL) >= 7) {
             // Slipstream: a burst of speed as the wind leaves your hands.
             caster.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, 1));
@@ -182,15 +178,8 @@ public class WindBladeSpell extends Spell implements ProjectileSpell, ConjureSpe
         scythe.setVisualScale(2.5f);
         scythe.setVariant(LOOK_SCYTHE | BRIGHT);
         scythe.getPersistentData().putBoolean(TAG_SCYTHE, true);
-        playAt(caster, SoundEvents.BREEZE_WHIRL, 1.2f, 0.7f);
         level.sendParticles(ParticleTypes.GUST_EMITTER_SMALL, scythe.getX(), scythe.getY(), scythe.getZ(), 1, 0, 0, 0, 0);
         return scythe;
-    }
-
-    /** Fully grown: the wind catches with a rush. */
-    @Override
-    public void onFullyGrown(SpellProjectile blade) {
-        playAt(blade, SoundEvents.BREEZE_CHARGE, 0.6f, 1.4f);
     }
 
     @Override
@@ -262,16 +251,18 @@ public class WindBladeSpell extends Spell implements ProjectileSpell, ConjureSpe
         return new Vec3(x, -0.3, 1.15 - 0.2 * Math.abs(x));
     }
 
-    // ---- visuals (client only, see WindBladeEffects) ----
+    // ---- visuals and sounds (client only, see WindBladeEffects and WindBladeSounds) ----
 
     @Override
     public void heldParticles(SpellProjectile blade, float charge) {
         WindBladeEffects.held(blade, charge);
+        WindBladeSounds.held(blade);
     }
 
     @Override
     public void grownParticles(SpellProjectile blade) {
         WindBladeEffects.grown(blade);
+        WindBladeSounds.grown(blade);
     }
 
     @Override
@@ -282,6 +273,7 @@ public class WindBladeSpell extends Spell implements ProjectileSpell, ConjureSpe
     @Override
     public void flightParticles(SpellProjectile blade) {
         WindBladeEffects.flight(blade);
+        WindBladeSounds.flight(blade);
     }
 
     // ---- flight (server) ----
@@ -421,8 +413,8 @@ public class WindBladeSpell extends Spell implements ProjectileSpell, ConjureSpe
     }
 
     /**
-     * Where it strikes: the whole impact goes out as one particle, and each client plays it out
-     * (WindBladeEffects#impact). The Storm Scythe's reaches further.
+     * Where it strikes: the whole impact goes out as one particle, and each client plays it out with
+     * its sound (WindBladeEffects#impact, WindBladeSounds#impact). The Storm Scythe's reaches further.
      */
     private static void impact(SpellProjectile blade, Vec3 at, boolean vortex) {
         ServerLevel level = (ServerLevel) blade.level();
@@ -436,8 +428,6 @@ public class WindBladeSpell extends Spell implements ProjectileSpell, ConjureSpe
                 level.sendParticles(player, cut, true, at.x, at.y, at.z, 1, 0, 0, 0, 0);
             }
         }
-        level.playSound(null, at.x, at.y, at.z, SoundEvents.WIND_CHARGE_BURST.value(), SoundSource.PLAYERS,
-                Math.min(1.5f, 0.5f * size), 1.4f / (float) Math.sqrt(size));
     }
 
     /**
@@ -451,9 +441,4 @@ public class WindBladeSpell extends Spell implements ProjectileSpell, ConjureSpe
         float spread = count >= 5 ? 60f : count >= 3 ? 40f : 30f;
         return Mth.DEG_TO_RAD * Mth.lerp(slot / (float) (count - 1), -spread, spread);
     }
-
-    private static void playAt(Entity at, SoundEvent sound, float volume, float pitch) {
-        at.level().playSound(null, at.getX(), at.getY(), at.getZ(), sound, SoundSource.PLAYERS, volume, pitch);
-    }
-
 }

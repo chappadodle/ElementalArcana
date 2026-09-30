@@ -41,7 +41,6 @@ public final class WindMobSpells {
         @Override
         public void cast(Mob caster, LivingEntity target) {
             MobCasting.shoot(caster, ModSpells.WIND_BLADE.get(), target);
-            MobCasting.play(caster, SoundEvents.BREEZE_SHOOT, 1f, 1.1f);
         }
     }
 

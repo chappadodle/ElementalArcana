@@ -137,3 +137,22 @@ lightning (9) give light.
     `block/wind_funnel`, and it's drawn additively from both sides.
   - `WindVortex` keeps the pull and no longer draws streaks.
 - **Storm Scythe:** a lightning flash with electric sparks and bolts.
+
+## Step 4 structure (sounds)
+
+- **`WindBladeSounds`** is like `IcicleSounds`: it plays on each client from the particle hooks,
+  and the impact sound plays in `WindCutEmitter`.
+  - The server no longer plays the conjure, throw, merge, fully-grown or impact sounds, or the
+    mobs' blade shot. `WindVortex` keeps its whirl.
+  - The Storm Scythe merge is heard when a held blade's look changes to Scythe.
+- **Vanilla mixes, by look** (breeze and wind-charge sounds):
+  - A soft wind while held, and a rushing wind in flight that follows the blade (fly-by pitch).
+    The pitch runs from high and light for the low tiers to low and heavy for the Scythe, and
+    Thousand Cuts gets a thin, high whistle.
+  - Boomerang adds a whirring as it turns.
+  - Under every impact: the wind-charge burst, sized by the blade. The keener looks add a sweep,
+    and the Scythe adds lightning.
+- **★ Signature sounds** (the `signatureSounds` switch):
+  - Storm Scythe: `scythe_roar`, a dark storm-wind loop in flight with static crackles, and
+    `scythe_strike`, a thunder crack, a wind blast and a rolling tail.
+  - Thousand Cuts: `thousand_slash`, three razor swishes, on the throw and (higher) on impact.
