@@ -134,5 +134,29 @@
       }
     ],
     "subtitle": "subtitles.elementalarcana.spell.wind_blade.thousand_slash"
+  },
+  "spell.hydro_jet.lance_surge": {
+    "sounds": [
+      {
+        "name": "elementalarcana:spell/hydro_jet/lance_surge"
+      }
+    ],
+    "subtitle": "subtitles.elementalarcana.spell.hydro_jet.lance_surge"
+  },
+  "spell.hydro_jet.lance_crash": {
+    "sounds": [
+      {
+        "name": "elementalarcana:spell/hydro_jet/lance_crash"
+      }
+    ],
+    "subtitle": "subtitles.elementalarcana.spell.hydro_jet.lance_crash"
+  },
+  "spell.hydro_jet.maelstrom_swirl": {
+    "sounds": [
+      {
+        "name": "elementalarcana:spell/hydro_jet/maelstrom_swirl"
+      }
+    ],
+    "subtitle": "subtitles.elementalarcana.spell.hydro_jet.maelstrom_swirl"
   }
 }

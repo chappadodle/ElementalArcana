@@ -7,7 +7,6 @@ import com.chappadodle.elementalarcana.api.SpellDamage;
 import com.chappadodle.elementalarcana.content.HydroStreamOptions;
 import com.chappadodle.elementalarcana.content.spell.HydroJetSpell;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
@@ -49,7 +48,6 @@ public final class MobJet {
 
     public static void start(Mob caster, LivingEntity target, float power) {
         ACTIVE.add(new MobJet(caster, target, power));
-        MobCasting.play(caster, SoundEvents.BUCKET_EMPTY, 1f, 1.3f);
     }
 
     @SubscribeEvent
@@ -84,9 +82,6 @@ public final class MobJet {
             SpellDamage.hurtMultiHit(victim, SpellDamage.source(level, Element.WATER, caster, caster), damage);
             victim.setDeltaMovement(motion.add(direction.x * 0.12, 0.02, direction.z * 0.12));
             victim.hurtMarked = true;
-        }
-        if (age % 6 == 0) {
-            level.playSound(null, stop.x, stop.y, stop.z, SoundEvents.GENERIC_SPLASH, caster.getSoundSource(), 0.3f, 1.5f);
         }
         return true;
     }

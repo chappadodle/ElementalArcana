@@ -10,6 +10,7 @@ import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellDamage;
 import com.chappadodle.elementalarcana.api.SpellHold;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
+import com.chappadodle.elementalarcana.client.sound.HydroJetSounds;
 import com.chappadodle.elementalarcana.content.HydroStreamOptions;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.content.WaterBurstOptions;
@@ -169,8 +170,6 @@ public class HydroJetSpell extends Spell implements ProjectileSpell {
     public CastResult cast(CastContext context) {
         ServerPlayer caster = context.caster();
         context.holdUntilRelease(new Jet(context));
-        playAt(caster.serverLevel(), caster.position(), SoundEvents.BUCKET_EMPTY, 1f, 1.3f);
-        playAt(caster.serverLevel(), caster.position(), SoundEvents.PLAYER_SPLASH_HIGH_SPEED, 0.5f, 1.4f);
         return CastResult.SUCCESS;
     }
 
@@ -253,12 +252,6 @@ public class HydroJetSpell extends Spell implements ProjectileSpell {
             }
             if (spellLevel >= 8) {
                 recoil(look);
-            }
-            if (heldTicks % 6 == 0) {
-                playAt(level, stop, SoundEvents.GENERIC_SPLASH, 0.3f, 1.4f + level.getRandom().nextFloat() * 0.3f);
-            }
-            if (heldTicks % 10 == 0) {
-                playAt(level, caster.position(), SoundEvents.WEATHER_RAIN, 0.4f, 1.6f);
             }
             return true;
         }
@@ -404,8 +397,6 @@ public class HydroJetSpell extends Spell implements ProjectileSpell {
             CompoundTag tag = lance.getPersistentData();
             tag.putFloat(TAG_LANCE_DAMAGE, (4f + 10f * fill) * power);
             tag.putInt(TAG_LEVEL, spellLevel);
-            playAt(level, caster.position(), SoundEvents.TRIDENT_THROW.value(), 1f, 0.8f);
-            playAt(level, caster.position(), SoundEvents.TRIDENT_RIPTIDE_3.value(), 0.8f, 1.2f);
         }
 
         /** The floor under a point (up to 4 blocks down), so a whirlpool sits on the ground. */
@@ -444,6 +435,7 @@ public class HydroJetSpell extends Spell implements ProjectileSpell {
             lance.spawnParticleAround(ModContent.HYDRO_DROP.get(), 0.2 * lance.visualScale(), back);
         }
         lance.spawnParticleAround(ParticleTypes.SPLASH, 0.3, Vec3.ZERO);
+        HydroJetSounds.lanceFlight(lance);
     }
 
     @Override
@@ -475,6 +467,5 @@ public class HydroJetSpell extends Spell implements ProjectileSpell {
                 level.sendParticles(player, wave, true, at.x, at.y, at.z, 1, 0, 0, 0, 0);
             }
         }
-        playAt(level, at, SoundEvents.GENERIC_SPLASH, 1f, 0.8f);
     }
 }

@@ -58,7 +58,6 @@ public final class Whirlpool {
                 level.sendParticles(player, burst, true, center.x, center.y, center.z, 1, 0, 0, 0, 0);
             }
         }
-        level.playSound(null, center.x, center.y, center.z, SoundEvents.BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundSource.PLAYERS, 1.5f, 0.8f);
         level.sendParticles(ParticleTypes.SPLASH, center.x, center.y + 0.2, center.z, 40, 1.5, 0.2, 1.5, 0.2);
     }
 
@@ -98,9 +97,6 @@ public final class Whirlpool {
         if (age % 3 == 0) {
             level.sendParticles(ParticleTypes.SPLASH, center.x, center.y + 0.1, center.z, 6, RADIUS * 0.4, 0.05, RADIUS * 0.4, 0.1);
             level.sendParticles(ParticleTypes.BUBBLE_POP, center.x, center.y + 0.2, center.z, 2, 0.6, 0.1, 0.6, 0.02);
-        }
-        if (age % 20 == 0) {
-            level.playSound(null, center.x, center.y, center.z, SoundEvents.BUBBLE_COLUMN_WHIRLPOOL_AMBIENT, SoundSource.PLAYERS, 1.2f, 0.9f);
         }
     }
 

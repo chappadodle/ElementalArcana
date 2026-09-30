@@ -115,3 +115,29 @@ of water rushing from the palm to the impact point.
 - **The Tsunami Lance spear** (`WaterSpearRenderer`, a ProjectileVisuals visual): a shaft of water
   cubes tapering to a tip, a glowing core, and small cubes spiralling round it, sized by how long
   the stream was held. The old block model and its texture are removed.
+
+## Step 4 structure (sounds)
+
+- **`HydroJetSounds`** plays everything on each client, like the other spells.
+  - Moved off the server: the spray start, the repeated splash and rain sounds during the
+    stream, the Lance throw and landing splash, the whirlpool's opening and churn, and the mob jet's
+    copies.
+  - Kept on the server: the Riptide burst, lava hissing into obsidian, the spear hitting a
+    creature, and the whirlpool collapsing.
+- **`PointLoopSound`:** a loop that follows a point that isn't an entity. It asks for its
+  position every tick and stops once that's gone. `WaterBeams` exposes each caster's live stream
+  (`start`, `end`, `pressure`) for it.
+- **A stream** (from `HydroStreamEmitter`): its first packet plays the look's start sound (a
+  bucket pour and a splash) and starts two loops:
+  - a rushing-water loop at the hand, pitched up to +25% by Pressure Build
+  - a splashing loop where it lands
+  - Looks: light (Spring and Current), deep (Surge, Deluge and Lance), a thin high hiss for
+    Tidecutter, a heavy pour for Torrent, and whirlpool bubbles for Maelstrom.
+- **The Tsunami Lance:** a throw and a water rush in flight (through `SpellLoops`), and the wave's
+  crash in `WaterBurstParticle`.
+- **The whirlpool** (any whirlpool, from `WaterBurstParticle`): an opening, then a churning loop
+  for as long as it lasts.
+- **★ Signature sounds** (the `signatureSounds` switch):
+  - Tsunami Lance: `lance_surge` (a surging rush with bubbles) on the throw, and `lance_crash` (a
+    crashing wave, a thump, spray and a long hiss) where it lands.
+  - Maelstrom (every whirlpool): `maelstrom_swirl`, a deep churning loop with bubbles.

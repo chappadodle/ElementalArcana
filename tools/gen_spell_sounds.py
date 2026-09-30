@@ -1,6 +1,6 @@
 """Synthesizes spell sound effects from scratch (numpy + scipy, converted to .ogg with sox).
 
-Run from the project root:  python3 tools/gen_spell_sounds.py [icicle] [fireball] [frost] [wind]
+Run from the project root:  python3 tools/gen_spell_sounds.py [icicle] [fireball] [frost] [wind] [water]
 Each sound is layered from small building blocks (clicks, crackles, bell-like "tinkles", low
 thuds) with fixed random seeds, so re-running gives identical files. No samples are used, so
 there is nothing to license.
@@ -423,7 +423,76 @@ def wind():
     thousand_slash()
 
 
-GROUPS = {"icicle": icicle, "fireball": fireball, "frost": frost, "wind": wind}
+# ---- hydro jet signature sounds ----
+
+def gurgle(rng, duration, count, low=300, high=900, amp=0.25):
+    """Bubbles: short sine blips whose pitch rises as they pop, scattered through the sound."""
+    out = silence(duration + 0.1)
+    for _ in range(count):
+        length = rng.uniform(0.03, 0.08)
+        t = times(length)
+        f0 = rng.uniform(low, high)
+        freq = f0 * (1 + 1.5 * t / length)
+        blip = np.sin(2 * np.pi * np.cumsum(freq) / SR) * np.sin(np.pi * t / length) * rng.uniform(0.4, 1.0)
+        place(out, blip * amp, rng.uniform(0, duration))
+    return out[:int(duration * SR)]
+
+
+def lance_surge(seed=121):
+    """Tsunami Lance thrown: a rush of water swelling and surging forward, full of bubbles."""
+    rng = np.random.default_rng(seed)
+    duration = 1.4
+    base = noise(rng, duration)
+    out = np.zeros_like(base)
+    slices = 30
+    for k in range(slices):
+        a, b = k * len(base) // slices, (k + 1) * len(base) // slices
+        centre = 250 + 1100 * (k / slices) ** 0.6
+        band = filtered(base[max(0, a - 1500):b], "bandpass", [centre * 0.6, centre * 1.6], order=2)
+        out[a:b] = band[-(b - a):]
+    t = times(duration)
+    envelope = np.minimum(1, t / 0.25) * np.exp(-np.maximum(0, t - 0.3) / 0.35)
+    out = out * envelope * 1.3 + gurgle(rng, duration, 25) * envelope
+    place(out, thud(0.5, 110, 50, 0.15, amp=0.5), 0.2)
+    write("spell/hydro_jet/lance_surge", fade_out(out, 0.2), ["reverb", "35"], peak_db=-3.0)
+
+
+def lance_crash(seed=122):
+    """Tsunami Lance landing: a wave crashing down, a deep thump of water, a spray of droplets and
+    a long hiss as it washes out."""
+    rng = np.random.default_rng(seed)
+    duration = 3.5
+    out = silence(duration)
+    place(out, thud(0.9, 90, 35, 0.35, amp=1.0), 0.0)
+    crash = filtered(noise(rng, 1.2), "bandpass", [300, 5000], order=2) * np.exp(-times(1.2) / 0.25)
+    place(out, crash * 1.1, 0.0)
+    place(out, crackle(rng, 1.5, 120, amp_range=(0.03, 0.15), shape=lambda x: x ** 1.5, brightness=3500), 0.05)
+    wash = filtered(noise(rng, 3.2), "bandpass", [1500, 7000], order=2) * smooth_random(rng, 3.2, 3, 0.4, 1.0) * np.exp(-times(3.2) / 1.1) * 0.5
+    place(out, wash, 0.2)
+    place(out, gurgle(rng, 2.0, 30, 200, 600, amp=0.2), 0.3)
+    write("spell/hydro_jet/lance_crash", fade_out(out, 0.4), ["reverb", "50"], peak_db=-3.0)
+
+
+def maelstrom_swirl(seed=123):
+    """Maelstrom: a deep, churning whirlpool, water rushing round and round, with bubbles. Loops."""
+    rng = np.random.default_rng(seed)
+    duration = 4.0
+    t = times(duration)
+    churn = filtered(noise(rng, duration), "bandpass", [80, 600], order=2)
+    # Round and round: a slow, slightly uneven swell.
+    swirl = 0.65 + 0.35 * np.sin(2 * np.pi * 0.75 * t + 0.4 * np.sin(2 * np.pi * 0.25 * t))
+    rush = filtered(noise(rng, duration), "bandpass", [700, 2500], order=2) * 0.3
+    out = churn * swirl * 1.4 + rush * swirl + gurgle(rng, duration, 60, 150, 500, amp=0.3)
+    write("spell/hydro_jet/maelstrom_swirl", seamless(out, 0.5))
+
+
+def water():
+    lance_surge()
+    lance_crash()
+    maelstrom_swirl()
+
+
+GROUPS = {"icicle": icicle, "fireball": fireball, "frost": frost, "wind": wind, "water": water}
 
 
 def main(names):

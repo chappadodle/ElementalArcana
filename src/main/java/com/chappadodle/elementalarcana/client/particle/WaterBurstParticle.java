@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.client.particle;
 
+import com.chappadodle.elementalarcana.client.sound.HydroJetSounds;
 import com.chappadodle.elementalarcana.client.visual.WaterCubes;
 import com.chappadodle.elementalarcana.content.WaterBurstOptions;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -40,6 +41,12 @@ public class WaterBurstParticle extends Particle {
         this.hasPhysics = false;
         this.gravity = 0f;
         this.xd = this.yd = this.zd = 0;
+        Vec3 at = new Vec3(x, y, z);
+        if (burst.kind() == WaterBurstOptions.WAVE) {
+            HydroJetSounds.wave(level, at);
+        } else {
+            HydroJetSounds.whirlpool(level, at, this::isAlive);
+        }
     }
 
     @Override

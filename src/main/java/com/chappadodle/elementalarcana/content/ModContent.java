@@ -54,6 +54,10 @@ public final class ModContent {
     public static final DeferredHolder<SoundEvent, SoundEvent> WIND_SCYTHE_ROAR = sound("spell.wind_blade.scythe_roar");
     public static final DeferredHolder<SoundEvent, SoundEvent> WIND_SCYTHE_STRIKE = sound("spell.wind_blade.scythe_strike");
     public static final DeferredHolder<SoundEvent, SoundEvent> WIND_THOUSAND_SLASH = sound("spell.wind_blade.thousand_slash");
+    // Hydro Jet's signature sounds (synthesized by tools/gen_spell_sounds.py).
+    public static final DeferredHolder<SoundEvent, SoundEvent> HYDRO_LANCE_SURGE = sound("spell.hydro_jet.lance_surge");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HYDRO_LANCE_CRASH = sound("spell.hydro_jet.lance_crash");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HYDRO_MAELSTROM_SWIRL = sound("spell.hydro_jet.maelstrom_swirl");
 
     /** A glowing 4-point frost glint that twinkles out. */
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> FROST_SPARKLE =

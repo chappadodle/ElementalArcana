@@ -91,6 +91,32 @@ public final class WaterBeams {
         beam.updated = level.getGameTime();
     }
 
+    /** Where {@code caster}'s stream starts, or null if it has none going (for sounds that follow it). */
+    @Nullable
+    public static Vec3 start(int caster) {
+        Beam beam = live(caster);
+        return beam == null ? null : beam.start;
+    }
+
+    /** Where {@code caster}'s stream lands, or null if it has none going. */
+    @Nullable
+    public static Vec3 end(int caster) {
+        Beam beam = live(caster);
+        return beam == null ? null : beam.start.add(beam.line);
+    }
+
+    /** {@code caster}'s stream's Pressure Build, 0 to 1 (0 if it has none going). */
+    public static float pressure(int caster) {
+        Beam beam = live(caster);
+        return beam == null ? 0f : beam.pressure;
+    }
+
+    @Nullable
+    private static Beam live(int caster) {
+        Beam beam = BEAMS.get(caster);
+        return beam == null || beam.level.getGameTime() - beam.updated > EXPIRE_TICKS ? null : beam;
+    }
+
     /** Draws every live stream (after the see-through blocks, so water behind it still shows). */
     public static void render(RenderLevelStageEvent event) {
         Minecraft minecraft = Minecraft.getInstance();

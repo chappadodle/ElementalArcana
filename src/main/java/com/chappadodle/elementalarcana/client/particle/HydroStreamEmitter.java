@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.client.particle;
 
+import com.chappadodle.elementalarcana.client.sound.HydroJetSounds;
 import com.chappadodle.elementalarcana.client.visual.WaterBeams;
 import com.chappadodle.elementalarcana.content.HydroStreamOptions;
 import com.chappadodle.elementalarcana.content.ModContent;
@@ -33,6 +34,7 @@ public class HydroStreamEmitter extends NoRenderParticle {
         Vec3 start = new Vec3(x, y, z);
         Vec3 line = new Vec3(xd, yd, zd);
         WaterBeams.update(level, stream, start, line);
+        HydroJetSounds.stream(level, stream, start);
         Player self = Minecraft.getInstance().player;
         if (self != null && self.getId() == stream.caster()) {
             start = HydroJetSpell.streamOrigin(self);
