@@ -258,13 +258,28 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
         return level >= 8 ? LOOK_FROST_4 : level >= 5 ? LOOK_FROST_3 : level >= 3 ? LOOK_FROST_2 : LOOK_FROST_1;
     }
 
-    /** With a dynamic lights mod: ice doesn't glow, except at Lv 8+ (a faint cold light) and the Glacial Lance. */
+    /**
+     * With a dynamic lights mod: icicles light up the dark as they fly, a little dimmer than fire,
+     * brighter as the ice runs colder and brighter again at Lv 8+. Held, they brighten as they grow;
+     * Shatterburst shrapnel just glints.
+     */
     @Override
     public int luminance(SpellProjectile icicle) {
-        if (look(icicle.variant()) == LOOK_LANCE) {
-            return 7;
+        if (icicle.visualScale() < 0.5f) {
+            return 4;
         }
-        return (icicle.variant() & BRIGHT) != 0 ? 5 : 0;
+        int light = switch (look(icicle.variant())) {
+            case LOOK_FROST_1 -> 6;
+            case LOOK_FROST_2 -> 7;
+            case LOOK_LANCE -> 12;
+            case LOOK_WINTER -> 9;
+            default -> 8;
+        };
+        if ((icicle.variant() & BRIGHT) != 0) {
+            light += 2;
+        }
+        light = Math.min(15, light);
+        return icicle.isHeld() ? Math.round(light * (0.5f + 0.5f * icicle.charge(0f))) : light;
     }
 
     @Override

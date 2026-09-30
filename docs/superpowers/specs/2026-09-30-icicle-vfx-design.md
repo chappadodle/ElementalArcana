@@ -56,7 +56,12 @@ A Glacial Lance caster's icicles show their Lv 5 branch look (or Frost 4) until 
      - Glacial Lance: forging, launch, and a shattering quake
      - Endless Winter: a howling blizzard
 
-**Dynamic lights:** ice doesn't glow, so only Frost 4 (a faint 5) and Glacial Lance (7) give light.
+**Dynamic lights:** icicles light up the dark as they fly, like fireballs but a little dimmer:
+- Frost 1 gives 6 and Frost 2 gives 7. Frost 3, Frost 4, Piercing and Shatterburst give 8,
+  Winter 9, and Lance 12.
+- Lv 8+ adds 2.
+- Held icicles brighten as they grow.
+- Shatterburst shrapnel gives 4.
 
 ## Step 1 structure
 
