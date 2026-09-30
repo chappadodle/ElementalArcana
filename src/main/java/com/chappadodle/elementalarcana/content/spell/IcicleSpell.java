@@ -11,6 +11,7 @@ import com.chappadodle.elementalarcana.api.ProjectileSpell;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellDamage;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
+import com.chappadodle.elementalarcana.content.IceShatterOptions;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.content.ModSchools;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
@@ -552,9 +553,14 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
         double x = at.x;
         double y = at.y;
         double z = at.z;
-        level.sendParticles(ModContent.ICE_SHARD.get(), x, y, z, Math.round((8 + 12 * charge) * size), 0.1 * size, 0.1 * size, 0.1 * size, 0.12 + 0.1 * charge);
-        level.sendParticles(ModContent.FROST_MIST.get(), x, y, z, Math.round((2 + 3 * charge) * size), 0.15 * size, 0.15 * size, 0.15 * size, 0.02);
-        level.sendParticles(ModContent.FROST_SPARKLE.get(), x, y, z, Math.round((6 + 10 * charge) * size), 0.2 * size, 0.2 * size, 0.2 * size, 0.15);
+        // The whole shatter goes out as one particle; each client plays it out (IcicleEffects#shatter).
+        IceShatterOptions shatter = new IceShatterOptions(icicle.variant(), size, charge);
+        double reach = size > 1.5f ? 48 : 32;
+        for (ServerPlayer player : level.players()) {
+            if (player.distanceToSqr(x, y, z) < reach * reach) {
+                level.sendParticles(player, shatter, true, x, y, z, 1, 0, 0, 0, 0);
+            }
+        }
         level.playSound(null, x, y, z, ModContent.ICICLE_IMPACT.get(), SoundSource.PLAYERS,
                 Math.min(2f, (0.7f + 0.4f * charge) * size), (1.15f - 0.25f * charge) / (float) Math.sqrt(size) + (level.getRandom().nextFloat() - 0.5f) * 0.1f);
     }

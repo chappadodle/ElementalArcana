@@ -16,6 +16,9 @@ data get entity @e[tag=eabubble,limit=1] Fire
 data get entity @e[tag=eabubble,limit=1] active_effects
 sleep 1.5
 data get entity @e[tag=eabubble,limit=1] Fire
+# Night now, so the released zombie can't catch fire in the sun before the icicle lands (a burning
+# target counts as fire, not wet, and wouldn't freeze).
+time set midnight
 execute at @e[tag=eabubble,limit=1] run summon elementalarcana:spell_projectile ~ ~1 ~-3 {Spell:"elementalarcana:icicle",Power:1.0f,Charge:1.0f,Motion:[0.0d,0.0d,1.5d],Tags:["eatest"]}
 sleep 1
 data get entity @e[tag=eabubble,limit=1] active_effects

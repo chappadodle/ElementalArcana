@@ -30,7 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Marks painted onto the world: burn scorches and glowing lava cracks left by fireball blasts.
+ * Marks painted onto the world: burn scorches and glowing lava cracks left by fireball blasts, and
+ * frost left by shattering ice, which melts inward from its edges.
  * <p>
  * A mark isn't one flat square: every frame it's projected onto the real, exposed faces of the
  * blocks around where it landed (on the ground, a wall or a ceiling), cut to each face. So it
@@ -39,27 +40,20 @@ import java.util.List;
  * way.
  */
 public final class Decals {
-    public enum Kind { SCORCH, CRACKS }
+    public enum Kind { SCORCH, CRACKS, FROST }
 
     private static final ResourceLocation SCORCH_TEXTURE = ElementalArcana.id("textures/misc/scorch.png");
     private static final ResourceLocation CRACKS_TEXTURE = ElementalArcana.id("textures/misc/cracks.png");
+    private static final ResourceLocation FROST_TEXTURE = ElementalArcana.id("textures/misc/frost.png");
     /** How far off the surface a mark sits, against flicker (on top of the polygon offset). */
     private static final float LIFT = 0.004f;
     /** How far above or below the mark's own surface other surfaces can still take it. */
     private static final double REACH = 1.5;
 
     /** A burn mark: blended normally and lit by the world, like the blocks under it. */
-    private static final RenderType SCORCH = RenderType.create("elementalarcana_scorch", DefaultVertexFormat.NEW_ENTITY,
-            VertexFormat.Mode.QUADS, 1024, false, true, RenderType.CompositeState.builder()
-                    .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
-                    .setTextureState(new RenderStateShard.TextureStateShard(SCORCH_TEXTURE, false, false))
-                    .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
-                    .setCullState(RenderStateShard.NO_CULL)
-                    .setLightmapState(RenderStateShard.LIGHTMAP)
-                    .setOverlayState(RenderStateShard.OVERLAY)
-                    .setLayeringState(RenderStateShard.POLYGON_OFFSET_LAYERING)
-                    .setWriteMaskState(RenderStateShard.COLOR_WRITE)
-                    .createCompositeState(false));
+    private static final RenderType SCORCH = markType("elementalarcana_scorch", SCORCH_TEXTURE);
+    /** Frost: pale crystals, blended normally and lit by the world. */
+    private static final RenderType FROST = markType("elementalarcana_frost", FROST_TEXTURE);
     /** Glowing cracks: added on top, full bright. */
     private static final RenderType CRACKS = RenderType.create("elementalarcana_cracks", DefaultVertexFormat.NEW_ENTITY,
             VertexFormat.Mode.QUADS, 1024, false, true, RenderType.CompositeState.builder()
@@ -70,6 +64,21 @@ public final class Decals {
                     .setLayeringState(RenderStateShard.POLYGON_OFFSET_LAYERING)
                     .setWriteMaskState(RenderStateShard.COLOR_WRITE)
                     .createCompositeState(false));
+
+    /** A mark blended normally over the blocks and lit by the world, like the blocks under it. */
+    private static RenderType markType(String name, ResourceLocation texture) {
+        return RenderType.create(name, DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 1024, false, true,
+                RenderType.CompositeState.builder()
+                        .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
+                        .setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
+                        .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
+                        .setCullState(RenderStateShard.NO_CULL)
+                        .setLightmapState(RenderStateShard.LIGHTMAP)
+                        .setOverlayState(RenderStateShard.OVERLAY)
+                        .setLayeringState(RenderStateShard.POLYGON_OFFSET_LAYERING)
+                        .setWriteMaskState(RenderStateShard.COLOR_WRITE)
+                        .createCompositeState(false));
+    }
 
     /**
      * One mark: its centre on the surface it hit, which way that surface faces, its radius, when it
@@ -121,17 +130,23 @@ public final class Decals {
             }
             if (decal.kind() == Kind.SCORCH) {
                 float alpha = life < 0.6f ? 0.9f : 0.9f * (1f - (life - 0.6f) / 0.4f);
-                project(level, decal, pose, buffers.getBuffer(SCORCH), alpha, false);
+                project(level, decal, decal.radius(), pose, buffers.getBuffer(SCORCH), alpha, false);
+            } else if (decal.kind() == Kind.FROST) {
+                // Frost melts inward from its edges over the second half of its life.
+                float melt = life < 0.5f ? 1f : 1f - (life - 0.5f) / 0.5f * 0.85f;
+                float alpha = life < 0.5f ? 0.85f : 0.85f * (1f - (life - 0.5f) / 0.5f * 0.6f);
+                project(level, decal, decal.radius() * melt, pose, buffers.getBuffer(FROST), alpha, false);
             } else {
                 // Cracks cool: they pulse, dim, and fade out.
                 float heat = (1f - life) * (0.75f + 0.25f * Mth.sin((float) now * 0.4f));
-                project(level, decal, pose, buffers.getBuffer(CRACKS), heat, true);
+                project(level, decal, decal.radius(), pose, buffers.getBuffer(CRACKS), heat, true);
                 if (bloom != null) {
-                    project(level, decal, pose, buffers.getBuffer(bloom), heat, true);
+                    project(level, decal, decal.radius(), pose, buffers.getBuffer(bloom), heat, true);
                 }
             }
         }
         buffers.endBatch(SCORCH);
+        buffers.endBatch(FROST);
         buffers.endBatch(CRACKS);
         if (bloom != null) {
             buffers.endBatch(bloom);
@@ -144,12 +159,11 @@ public final class Decals {
      * takes the exposed face (facing the mark's way) nearest the mark's own surface, and draws the
      * part of the mark that lies over that face.
      */
-    private static void project(ClientLevel level, Decal decal, PoseStack.Pose pose, VertexConsumer consumer, float strength, boolean glowing) {
+    private static void project(ClientLevel level, Decal decal, double r, PoseStack.Pose pose, VertexConsumer consumer, float strength, boolean glowing) {
         Direction face = decal.face();
         Direction.Axis normalAxis = face.getAxis();
         Direction.Axis uAxis = normalAxis == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X;
         Direction.Axis vAxis = normalAxis == Direction.Axis.Y ? Direction.Axis.Z : Direction.Axis.Y;
-        double r = decal.radius();
         double cu = decal.center().get(uAxis);
         double cv = decal.center().get(vAxis);
         double plane = decal.center().get(normalAxis);

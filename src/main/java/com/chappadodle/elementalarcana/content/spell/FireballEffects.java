@@ -13,7 +13,6 @@ import net.minecraft.client.ParticleStatus;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
@@ -22,13 +21,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.CollisionContext;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -346,7 +342,7 @@ public final class FireballEffects {
         int heat = heatOf(look);
         boolean meteor = look == FireballSpell.LOOK_METEOR;
         boolean sun = look == FireballSpell.LOOK_SUN;
-        @Nullable BlockHitResult ground = groundBelow(level, at);
+        @Nullable BlockHitResult ground = ImpactSurfaces.groundBelow(level, at);
         Vec3 floor = ground != null ? ground.getLocation() : at;
 
         if (age == 0) {
@@ -396,7 +392,7 @@ public final class FireballEffects {
                 }
             }
             // Marks on whatever it hit (the ground, a wall, a ceiling), painted onto the blocks.
-            @Nullable BlockHitResult surface = ground != null ? ground : surfaceNear(level, at);
+            @Nullable BlockHitResult surface = ground != null ? ground : ImpactSurfaces.surfaceNear(level, at);
             if (surface != null && (heat >= 4 || meteor)) {
                 Decals.add(Decals.Kind.SCORCH, surface.getLocation(), surface.getDirection(), radius * 0.8f, meteor ? 100 : 60, 0xFFFFFF);
                 if (meteor) {
@@ -519,31 +515,6 @@ public final class FireballEffects {
                 }
             }
         }
-    }
-
-    /** The ground right below a blast (within 1.5 blocks), or null in mid-air. */
-    @Nullable
-    private static BlockHitResult groundBelow(Level level, Vec3 at) {
-        BlockHitResult hit = level.clip(new ClipContext(at.add(0, 0.3, 0), at.subtract(0, 1.5, 0),
-                ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
-        return hit.getType() == HitResult.Type.BLOCK && hit.getDirection() == Direction.UP ? hit : null;
-    }
-
-    /** The closest block face within reach of a blast that isn't over ground (a wall, a ceiling), or null. */
-    @Nullable
-    private static BlockHitResult surfaceNear(Level level, Vec3 at) {
-        BlockHitResult best = null;
-        double bestDistance = Double.MAX_VALUE;
-        for (Direction direction : Direction.values()) {
-            Vec3 toward = Vec3.atLowerCornerOf(direction.getNormal());
-            BlockHitResult hit = level.clip(new ClipContext(at.subtract(toward.scale(0.2)), at.add(toward.scale(0.8)),
-                    ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
-            if (hit.getType() == HitResult.Type.BLOCK && hit.getLocation().distanceToSqr(at) < bestDistance) {
-                bestDistance = hit.getLocation().distanceToSqr(at);
-                best = hit;
-            }
-        }
-        return best;
     }
 
     private static void add(Level level, ParticleOptions particle, Vec3 at, Vec3 velocity) {

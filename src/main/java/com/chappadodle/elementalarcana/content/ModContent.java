@@ -111,6 +111,10 @@ public final class ModContent {
     public static final DeferredHolder<ParticleType<?>, ParticleType<FireBlastOptions>> FIRE_BLAST =
             PARTICLES.register("fire_blast", FireBlastOptions::newType);
 
+    /** An icicle's whole shatter in one particle (see IceShatterOptions). */
+    public static final DeferredHolder<ParticleType<?>, ParticleType<IceShatterOptions>> ICE_SHATTER =
+            PARTICLES.register("ice_shatter", IceShatterOptions::newType);
+
     /** Moderate exhaustion from emptying your mana: slower, weaker, and slower mana regen. */
     public static final DeferredHolder<MobEffect, MobEffect> MANA_SICKNESS = EFFECTS.register("mana_sickness",
             () -> new MobEffect(MobEffectCategory.HARMFUL, 0x7A3FA0) {

@@ -884,6 +884,45 @@ def scorch(size=16, seed=11):
     return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA")
 
 
+def frost(size=32, seed=17):
+    """A frost mark: six-armed frost crystals branching out from the middle, with scattered
+    speckle, pale blue-white, thinning toward the edge."""
+    rng = np.random.default_rng(seed)
+    a = np.zeros((size, size))
+    c = size / 2
+
+    def stroke(x0, y0, angle, length, strength):
+        for step in range(int(length)):
+            x = int(x0 + np.cos(angle) * step)
+            y = int(y0 + np.sin(angle) * step)
+            if 0 <= x < size and 0 <= y < size:
+                a[y, x] = max(a[y, x], strength * (1 - 0.5 * step / length))
+
+    for arm in range(6):
+        angle = arm * np.pi / 3 + rng.uniform(-0.1, 0.1)
+        length = size * 0.45
+        stroke(c, c, angle, length, 1.0)
+        # Fronds branching off each arm at 60 degrees, both sides.
+        for k in range(2, int(length), 3):
+            bx = c + np.cos(angle) * k
+            by = c + np.sin(angle) * k
+            frond = (length - k) * 0.4
+            stroke(bx, by, angle + np.pi / 3, frond, 0.75)
+            stroke(bx, by, angle - np.pi / 3, frond, 0.75)
+    y, x = np.mgrid[0:size, 0:size] + 0.5
+    r = np.hypot(x - c, y - c) / c
+    speckle = (rng.random((size, size)) < 0.12) * rng.uniform(0.25, 0.6, (size, size))
+    a = np.maximum(a, speckle * (r < 0.95))
+    a *= np.clip(1.15 - r, 0, 1)
+    a = np.where(a > 0.12, a, 0)
+    rgba = np.zeros((size, size, 4))
+    rgba[..., 0] = 0.88
+    rgba[..., 1] = 0.95
+    rgba[..., 2] = 1.0
+    rgba[..., 3] = np.clip(a, 0, 1)
+    return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA")
+
+
 def main():
     for name, (palette, grid) in SPRITES.items():
         path = ASSETS / f"{name}.png"
@@ -911,7 +950,7 @@ def main():
         make().save(path)
         print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
     # Marks painted onto blocks (client/decal/Decals): bigger, since they span several blocks.
-    for name, make in (("cracks", cracks), ("scorch", scorch)):
+    for name, make in (("cracks", cracks), ("scorch", scorch), ("frost", frost)):
         path = ASSETS / f"misc/{name}.png"
         make(32).save(path)
         print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))

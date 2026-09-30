@@ -6,6 +6,7 @@ import com.chappadodle.elementalarcana.api.Bubble;
 import com.chappadodle.elementalarcana.api.CreatureMagic;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.SpellShield;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -38,6 +39,14 @@ public final class MagicAttachments {
     public static final Supplier<AttachmentType<Bubble>> BUBBLE = ATTACHMENT_TYPES.register("bubble",
             () -> AttachmentType.builder(() -> new Bubble(Vec3.ZERO, 0L, 0L))
                     .sync(Bubble.STREAM_CODEC)
+                    .build());
+
+    // When a creature's Frozen effect ends (game time). Synced to everyone who can see it, since
+    // vanilla doesn't send mobs' effects to other players, so they see it encased in ice
+    // (client/FrozenShells). Set and cleared by content/FrozenState; not saved.
+    public static final Supplier<AttachmentType<Long>> FROZEN_UNTIL = ATTACHMENT_TYPES.register("frozen_until",
+            () -> AttachmentType.builder(() -> 0L)
+                    .sync(ByteBufCodecs.VAR_LONG)
                     .build());
 
     // An Attuned creature's element and rank. Only Attuned creatures have it (check hasData; the

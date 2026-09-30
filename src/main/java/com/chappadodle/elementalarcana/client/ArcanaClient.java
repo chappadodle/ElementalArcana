@@ -13,6 +13,7 @@ import com.chappadodle.elementalarcana.client.particle.EmberParticle;
 import com.chappadodle.elementalarcana.client.particle.FireBlastEmitter;
 import com.chappadodle.elementalarcana.client.particle.GlowParticle;
 import com.chappadodle.elementalarcana.client.particle.HydroDropParticle;
+import com.chappadodle.elementalarcana.client.particle.IceShatterEmitter;
 import com.chappadodle.elementalarcana.client.particle.HydroStreamEmitter;
 import com.chappadodle.elementalarcana.client.particle.FrostMistParticle;
 import com.chappadodle.elementalarcana.client.particle.FrostSparkleParticle;
@@ -116,6 +117,7 @@ public final class ArcanaClient {
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
         ScreenEffects.tick();
+        FrozenShells.tick();
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;
         if (player == null) {
@@ -239,6 +241,7 @@ public final class ArcanaClient {
         event.registerSpriteSet(ModContent.SHOCKWAVE.get(), sprites -> new GlowParticle.Provider(GlowParticle.Kind.RING, sprites));
         event.registerSpriteSet(ModContent.CORONA.get(), sprites -> new GlowParticle.Provider(GlowParticle.Kind.CORONA, sprites));
         event.registerSpecial(ModContent.FIRE_BLAST.get(), new FireBlastEmitter.Provider());
+        event.registerSpecial(ModContent.ICE_SHATTER.get(), new IceShatterEmitter.Provider());
     }
 
     // Additive particles change the blend function and vanilla doesn't set it back; put it back
@@ -282,6 +285,7 @@ public final class ArcanaClient {
             ShieldRenderer.renderShards(player, event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource());
         }
         BubbleRenderer.render(event.getEntity(), event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource());
+        FrozenShells.render(event.getEntity(), event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource());
     }
 
     /** While projectiles are conjured, a click bound to a launch key launches instead of attacking/using. */

@@ -1,15 +1,27 @@
 package com.chappadodle.elementalarcana.content.spell;
 
+import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
+import com.chappadodle.elementalarcana.client.decal.Decals;
+import com.chappadodle.elementalarcana.client.particle.IceCrystalParticle;
+import com.chappadodle.elementalarcana.client.particle.IceSpikeParticle;
 import com.chappadodle.elementalarcana.content.GlowParticleOptions;
 import com.chappadodle.elementalarcana.content.ModContent;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
 
 import java.util.List;
 
@@ -18,9 +30,12 @@ import java.util.List;
  * docs/superpowers/specs/2026-09-30-icicle-vfx-design.md, step 2). Each look has its own cold
  * palette: the colder the ice, the longer and brighter its trail and the less it mists. Branch
  * signatures: Piercing Cold streaks, Shatterburst crackles, Endless Winter trails snow, and the
- * Glacial Lance leaves a wide trail with glints spiralling around it.
+ * Glacial Lance leaves a wide trail with glints spiralling around it. Shatters (step 3) are played
+ * out on each client by IceShatterEmitter, a tick at a time.
  */
-final class IcicleEffects {
+public final class IcicleEffects {
+    /** How many ticks a shatter takes to play out. */
+    public static final int SHATTER_TICKS = 8;
 
     /**
      * A look's particles: the trail's colour and the colour it fades to, the glint colour, the trail
@@ -244,6 +259,130 @@ final class IcicleEffects {
                         at.x, at.y, at.z, 0, 0, 0);
             }
         }
+    }
+
+    // ---- shatters (client, played out by IceShatterEmitter) ----
+
+    /** The block texture of a look, for the 3D shards and spikes. */
+    private static ResourceLocation iceTexture(int look) {
+        String name = switch (look) {
+            case IcicleSpell.LOOK_FROST_2 -> "frost2";
+            case IcicleSpell.LOOK_FROST_3 -> "frost3";
+            case IcicleSpell.LOOK_FROST_4 -> "frost4";
+            case IcicleSpell.LOOK_PIERCING -> "piercing";
+            case IcicleSpell.LOOK_SHATTER -> "shatter";
+            case IcicleSpell.LOOK_WINTER -> "winter";
+            case IcicleSpell.LOOK_LANCE -> "lance";
+            default -> "frost1";
+        };
+        return ElementalArcana.id("block/icicle_" + name);
+    }
+
+    /**
+     * One tick ({@code age}, from 0) of an icicle shattering at {@code at}: a flash, glints and
+     * 3D ice shards bursting out, cold mist, a frost ring and frost left on the surface it hit.
+     * The Glacial Lance splits the ground with ice spikes; a full-grown Endless Winter icicle leaves
+     * a wide frost patch in a snow flurry. Shrapnel only tinkles into glints.
+     */
+    public static void shatter(Level level, Vec3 at, int variant, float size, float charge, int age) {
+        RandomSource random = level.getRandom();
+        int look = IcicleSpell.look(variant);
+        Palette palette = PALETTES.get(look);
+        boolean bright = (variant & IcicleSpell.BRIGHT) != 0;
+        boolean lance = look == IcicleSpell.LOOK_LANCE;
+        boolean winter = look == IcicleSpell.LOOK_WINTER && charge >= 1f;
+        if (size < 0.5f) {
+            // Shrapnel: a few glints.
+            if (age == 0) {
+                for (int i = 0; i < 4; i++) {
+                    add(level, ModContent.FROST_SPARKLE.get(), at, randomDirection(random).scale(0.08));
+                }
+            }
+            return;
+        }
+        float scale = size * (0.6f + 0.4f * charge);
+        @Nullable BlockHitResult ground = ImpactSurfaces.groundBelow(level, at);
+        Vec3 floor = ground != null ? ground.getLocation() : at;
+
+        if (age == 0) {
+            add(level, glow(ModContent.FLARE.get(), palette.glint(), palette.core(), 0.5f * scale, 3), at, Vec3.ZERO);
+            int glints = Math.round((8 + 10 * charge) * size);
+            for (int i = 0; i < glints; i++) {
+                Vec3 velocity = randomDirection(random).scale(0.1 + 0.12 * random.nextDouble());
+                add(level, glow(ModContent.SPARK.get(), palette.glint(), palette.fade(), 0.07f, 8), at, velocity);
+            }
+            for (int i = 0; i < Math.round(3 * size); i++) {
+                add(level, ModContent.FROST_MIST.get(), at, randomDirection(random).scale(0.03).add(0, -0.01, 0));
+            }
+            // Real 3D shards of the icicle's own ice.
+            ResourceLocation texture = iceTexture(look);
+            int shards = lance ? 14 : Math.round((3 + 4 * charge) * Math.min(size, 1.5f)) + (bright ? 2 : 0);
+            float minSize = lance ? 0.2f : 0.1f;
+            float maxSize = lance ? 0.4f : 0.2f;
+            for (int i = 0; i < shards; i++) {
+                Vec3 direction = randomDirection(random);
+                Vec3 velocity = new Vec3(direction.x * 0.25, 0.15 + Math.abs(direction.y) * 0.25, direction.z * 0.25).scale(lance ? 1.4 : 1.0);
+                float shardSize = minSize + random.nextFloat() * (maxSize - minSize);
+                spawn(new IceCrystalParticle((ClientLevel) level, at, velocity, texture, shardSize));
+            }
+            // A ring of frost racing out along the ground (a halo in mid-air).
+            float ring = lance ? 3.5f : (0.8f + 0.8f * charge) * size;
+            add(level, glow(ModContent.SHOCKWAVE.get(), palette.glint(), palette.fade(), ring, lance ? 12 : 8), floor.add(0, 0.05, 0), Vec3.ZERO);
+            // Frost left on whatever it hit.
+            @Nullable BlockHitResult surface = ground != null ? ground : ImpactSurfaces.surfaceNear(level, at);
+            if (surface != null) {
+                float radius = lance ? 3f : winter ? 2.5f : (0.5f + 0.6f * charge) * size;
+                int ticks = lance ? 140 : winter ? 100 : charge >= 1f ? 100 : 60;
+                Decals.add(Decals.Kind.FROST, surface.getLocation(), surface.getDirection(), radius, ticks, 0xFFFFFF);
+            }
+            if (lance && ground != null) {
+                spikes(level, floor, texture, random);
+            }
+            if (winter) {
+                // A snow flurry over the frost patch.
+                for (int i = 0; i < 30; i++) {
+                    Vec3 velocity = new Vec3((random.nextDouble() - 0.5) * 0.3, random.nextDouble() * 0.15, (random.nextDouble() - 0.5) * 0.3);
+                    add(level, ParticleTypes.SNOWFLAKE, floor.add(0, 0.3, 0), velocity);
+                }
+                for (int i = 0; i < 8; i++) {
+                    add(level, ModContent.FROST_MIST.get(), floor.add((random.nextDouble() - 0.5) * 3, 0.2, (random.nextDouble() - 0.5) * 3), Vec3.ZERO);
+                }
+            }
+        } else if (age % 2 == 0) {
+            // Glints drifting down as the dust settles.
+            add(level, ModContent.FROST_SPARKLE.get(),
+                    at.add((random.nextDouble() - 0.5) * scale, random.nextDouble() * 0.3 * scale, (random.nextDouble() - 0.5) * scale),
+                    new Vec3(0, -0.02, 0));
+        }
+    }
+
+    /** Glacial Lance: a ring of ice spikes erupting from the ground, leaning outward. */
+    private static void spikes(Level level, Vec3 floor, ResourceLocation texture, RandomSource random) {
+        int count = 9;
+        for (int i = 0; i < count; i++) {
+            double angle = Mth.TWO_PI * i / count + random.nextDouble() * 0.5;
+            double distance = 1.2 + random.nextDouble() * 2.0;
+            Vec3 base = floor.add(Math.cos(angle) * distance, 0, Math.sin(angle) * distance);
+            // Stand them on whatever ground is there (it may step up or down).
+            @Nullable BlockHitResult ground = ImpactSurfaces.groundBelow(level, base.add(0, 1, 0));
+            if (ground == null) {
+                continue;
+            }
+            float height = 0.8f + random.nextFloat() * 1.4f;
+            // Lean away from the impact, by 10-25 degrees.
+            float tilt = (float) Math.toRadians(10 + random.nextDouble() * 15);
+            Quaternionf lean = new Quaternionf().rotateAxis(tilt, (float) Math.sin(angle), 0f, (float) -Math.cos(angle));
+            spawn(new IceSpikeParticle((ClientLevel) level, ground.getLocation(), texture, height, lean, 50 + random.nextInt(20)));
+        }
+    }
+
+    private static void add(Level level, ParticleOptions particle, Vec3 at, Vec3 velocity) {
+        level.addParticle(particle, at.x, at.y, at.z, velocity.x, velocity.y, velocity.z);
+    }
+
+    /** Adds a particle made here directly (the 3D shapes aren't sent or spawned by type). */
+    private static void spawn(Particle particle) {
+        Minecraft.getInstance().particleEngine.add(particle);
     }
 
     // ---- pieces ----

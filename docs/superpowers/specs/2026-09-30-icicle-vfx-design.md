@@ -109,3 +109,37 @@ A Glacial Lance caster's icicles show their Lv 5 branch look (or Frost 4) until 
   - Winter trails snow, and Frost 1 sheds the odd snowflake.
   - The Lance has two glints spiralling around its path.
   - Shrapnel only glints.
+
+## Step 3 structure (impacts)
+
+- **One packet per shatter:** `IcicleSpell#shatter` sends one `ICE_SHATTER` particle,
+  `IceShatterOptions(look with brightness, size, charge)`. It goes to players within 32 blocks
+  (48 for the Lance). `IceShatterEmitter` plays it out over 8 ticks through `IcicleEffects#shatter`.
+  The shatter sound stays on the server until step 4.
+- **The shatter:**
+  - A flash, glints, and sinking frost mist.
+  - **3D shards** (`IceCrystalParticle`): hexagonal crystals in the look's own ice texture. There
+    are 3–7 by charge, +2 at Lv 8+, and the Lance throws 14 big ones. They tumble and bounce, glint
+    now and then, and melt away.
+  - A frost ring: flat on the ground, or a halo in mid-air.
+  - A **frost mark** (`Decals.Kind.FROST`, a six-armed frost texture, lit by the world) on the
+    ground or the wall it hit. It melts inward over the second half of its life.
+  - Shrapnel only glints.
+- **Shared pieces:**
+  - `TumblingParticle`: the bounce-and-tumble physics, now shared by the fireball's debris and the
+    ice shards.
+  - `IceMesh`: the crystal shape, drawn from both sides.
+  - `ImpactSurfaces`: ground and wall finding, shared with the Fireball.
+- **Glacial Lance:** 9 **ice spikes** (`IceSpikeParticle`) erupt from the ground in a ring
+  1.2–3.2 blocks out, leaning 10–25° away from the impact. Each shoots up in 4 ticks, stands, then
+  crumbles into shards while sinking.
+- **Endless Winter** (full charge): a 2.5-block frost patch mark for 5 s, and a snow flurry with
+  mist.
+- **Deep Freeze ice shell** (any source of Frozen):
+  - Vanilla doesn't send mobs' effects to other players. So `MagicAttachments#FROZEN_UNTIL` (the
+    game time the freeze ends) is synced, and set and cleared from NeoForge's effect events
+    (`content/FrozenState`).
+  - `client/FrozenShells` draws a translucent block of ice around the creature, with four crystals
+    on top, in its render pass.
+  - When the freeze ends, or the creature dies in the ice, the shell shatters into shards with a
+    glass crack.
