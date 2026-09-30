@@ -6,6 +6,7 @@ import com.chappadodle.elementalarcana.api.CastResult;
 import com.chappadodle.elementalarcana.api.ConjureSpell;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.ElementalReactions;
+import com.chappadodle.elementalarcana.api.Glow;
 import com.chappadodle.elementalarcana.api.ProjectileSpell;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellDamage;
@@ -62,6 +63,31 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
     private static final int FREEZE_RADIUS = 2;
     private static final int EXTRA_ICICLE_COST = 4;
     private static final ResourceLocation MODEL = ElementalArcana.id("spell/icicle");
+
+    // Looks (SpellProjectile#variant): the ice runs colder as it levels, and each branch has its own
+    // look (see docs/superpowers/specs/2026-09-30-icicle-vfx-design.md).
+    public static final int LOOK_FROST_1 = 0;
+    public static final int LOOK_FROST_2 = 1;
+    public static final int LOOK_FROST_3 = 2;
+    public static final int LOOK_FROST_4 = 3;
+    public static final int LOOK_PIERCING = 4;
+    public static final int LOOK_SHATTER = 5;
+    public static final int LOOK_WINTER = 6;
+    public static final int LOOK_LANCE = 7;
+    private static final List<ResourceLocation> LOOK_MODELS = List.of(MODEL,
+            ElementalArcana.id("spell/icicle_frost2"), ElementalArcana.id("spell/icicle_frost3"),
+            ElementalArcana.id("spell/icicle_frost4"), ElementalArcana.id("spell/icicle_needle"),
+            ElementalArcana.id("spell/icicle_crystal"), ElementalArcana.id("spell/icicle_winter"),
+            ElementalArcana.id("spell/icicle_lance"));
+    private static final List<Glow> LOOK_GLOWS = List.of(
+            new Glow(0xBFE6FF, 0.8f, 0.25f),
+            new Glow(0x8FD3FF, 0.9f, 0.35f),
+            new Glow(0x5AA8FF, 1.0f, 0.45f),
+            new Glow(0xA8F4FF, 1.2f, 0.7f),
+            new Glow(0xC8FAFF, 0.8f, 0.45f),
+            new Glow(0x6FE0FF, 1.0f, 0.6f),
+            new Glow(0x9FB8D8, 1.1f, 0.35f),
+            new Glow(0x9FE8FF, 1.8f, 0.9f));
 
     // Per-icicle data stored on the projectile, so hits resolve with the caster's progress at cast time.
     private static final String TAG_LEVEL = "ea_icicle_level";
@@ -131,6 +157,7 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
         tag.putString(TAG_BRANCH_10, orEmpty(context.branch(10)));
         // One "volley" is one conjured set (Deep Freeze counts hits per set).
         tag.putInt(TAG_VOLLEY, seed);
+        icicle.setVariant(lookFor(level, context.branch(5), context.branch(10)));
         playAt(icicle, SoundEvents.AMETHYST_CLUSTER_PLACE, 1f, 1.3f);
         return icicle;
     }
@@ -152,6 +179,7 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
         }
         lance.setFormation(0, 1);
         lance.setVisualScale(2.2f);
+        lance.setVariant(LOOK_LANCE);
         lance.getPersistentData().putBoolean(TAG_LANCE, true);
         playAt(lance, SoundEvents.AMETHYST_BLOCK_RESONATE, 1.5f, 0.6f);
         playAt(lance, SoundEvents.AMETHYST_BLOCK_CHIME, 1.5f, 0.8f);
@@ -185,6 +213,45 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
     @Override
     public ResourceLocation model() {
         return MODEL;
+    }
+
+    @Override
+    public ResourceLocation model(int variant) {
+        return LOOK_MODELS.get(Math.floorMod(variant, LOOK_MODELS.size()));
+    }
+
+    @Override
+    public List<ResourceLocation> models() {
+        return LOOK_MODELS;
+    }
+
+    @Override
+    public Glow glow(int variant) {
+        return LOOK_GLOWS.get(Math.floorMod(variant, LOOK_GLOWS.size()));
+    }
+
+    /** The look for a caster's icicles: Endless Winter, then the Lv 5 branch, then how cold it runs. */
+    private static int lookFor(int level, @Nullable String branch5, @Nullable String branch10) {
+        if (WINTER.equals(branch10)) {
+            return LOOK_WINTER;
+        }
+        if (PIERCING.equals(branch5)) {
+            return LOOK_PIERCING;
+        }
+        if (SHATTERBURST.equals(branch5)) {
+            return LOOK_SHATTER;
+        }
+        return level >= 8 ? LOOK_FROST_4 : level >= 5 ? LOOK_FROST_3 : level >= 3 ? LOOK_FROST_2 : LOOK_FROST_1;
+    }
+
+    /** With a dynamic lights mod: ice doesn't glow, except Frost 4's cold core and the Glacial Lance. */
+    @Override
+    public int luminance(SpellProjectile icicle) {
+        return switch (icicle.variant()) {
+            case LOOK_LANCE -> 7;
+            case LOOK_FROST_4 -> 5;
+            default -> 0;
+        };
     }
 
     @Override

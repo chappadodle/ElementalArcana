@@ -176,7 +176,6 @@ SPRITES = {
         ".g...ggggg...g..",
         "................",
     ]),
-    # Texture for the icicle's 3D model (models/spell/icicle.json), so it lives in the block atlas.
     "spell/frost_shield": ({
         "k": 0x1E4F7A, "d": 0x2F86C8, "b": 0x5FB8F0, "l": 0xA8E6FF, "w": 0xFFFFFF,
     }, [
@@ -356,26 +355,6 @@ SPRITES = {
         "........",
         "........",
         "........",
-    ]),
-    "block/icicle": ({
-        "w": 0xF2FFFFFF, "l": 0xE6D2F6FF, "b": 0xDCA8E4FF, "d": 0xD27CC8F2, "k": 0xD8508CD2,
-    }, [
-        "wlbbdlwlbbdklwlb",
-        "wlbdklwlbddklwlb",
-        "lbbdklwlbdkblwlb",
-        "lbddklwlbdkblllb",
-        "lbdkbllwbdkblllb",
-        "wbdkbllwbdkbwllb",
-        "wbdkblwlbdkbwlbd",
-        "wbdkblwlbddbwlbd",
-        "lbddblwlbddbwlbd",
-        "lbbdblwllbdbwlbd",
-        "llbdblwllbdklwbd",
-        "wlbdklwllbdklwbd",
-        "wlbdklwlbbdklwbd",
-        "wlbddkwlbbdklwbb",
-        "llbbdkwlbddklwbb",
-        "llbbdkwlbddklwlb",
     ]),
     # ---- particles (textures/particle/) ----
     # Frost sparkle: a 4-point glint, shrinking frame by frame (played over the particle's life).
@@ -701,6 +680,65 @@ def fireball_strip(stops, seed, frames=16, size=16, style="flame"):
     return Image.fromarray((np.clip(strip, 0, 1) * 255).astype(np.uint8), "RGBA")
 
 
+def ice_strip(stops, seed, alpha=0.88, style="ice", frames=16, size=16):
+    """An animated icicle texture: frames stacked vertically. Ice grain streaks along the icicle, the
+    edges catch the light, and a bright glint band sweeps across once per loop (seamless). Styles
+    add a glowing core ("core"), bright length-wise streaks ("needle"), pulsing glowing cracks
+    ("crack") or dark storm ice with drifting snow ("storm")."""
+    rng = np.random.default_rng(seed)
+    noise = tile_noise(size, seed)
+    # Streaky grain: the noise smeared along one axis.
+    grain = sum(np.roll(noise, k, axis=0) for k in range(-3, 4)) / 7
+    seams = tile_noise(size, seed + 1, periods=(2, 4))
+    y, x = np.mgrid[0:size, 0:size] + 0.5
+    edge = np.abs(x - size / 2) / (size / 2)
+    specks = rng.random((size, size)) < 0.06
+    strip = np.zeros((size * frames, size, 4))
+    for f in range(frames):
+        t = f / frames
+        value = 0.45 + (grain - 0.5) * 0.9 + 0.25 * edge ** 3
+        # The glint: a bright diagonal band crossing once per loop.
+        centre = t * 3.0 - 0.5
+        band = np.exp(-(((x + y) / size - centre) / 0.12) ** 2)
+        rgb = color_ramp(stops, value)
+        a = np.full((size, size), alpha)
+        if style == "core":
+            pulse = 0.9 + 0.1 * np.sin(t * 2 * np.pi)
+            core = np.clip(1.3 * np.exp(-((x - size / 2) / 3.2) ** 2), 0, 1) * pulse
+            rgb = rgb * (1 - core[..., None]) + np.array([0.75, 1.0, 1.0]) * core[..., None]
+            a = np.maximum(a, core)
+        elif style == "needle":
+            streak = (np.abs(x - 5.5) < 0.6) | (np.abs(x - 10.5) < 0.6)
+            rgb = np.where(streak[..., None], np.array([1.0, 1.0, 1.0]), rgb)
+        elif style == "crack":
+            pulse = 0.75 + 0.25 * np.sin(t * 2 * np.pi)
+            crack = np.abs(seams - 0.5) < 0.06
+            glow = np.array([0.55, 1.0, 1.0]) * pulse
+            rgb = np.where(crack[..., None], glow, rgb)
+            a = np.where(crack, 1.0, a)
+        elif style == "storm":
+            falling = np.roll(specks, f, axis=0)
+            rgb = np.where(falling[..., None], np.array([0.95, 0.97, 1.0]), rgb)
+            a = np.where(falling, 1.0, a)
+        rgb = np.clip(rgb + band[..., None] * 0.55, 0, 1)
+        strip[f * size:(f + 1) * size, :, :3] = rgb
+        strip[f * size:(f + 1) * size, :, 3] = a
+    return Image.fromarray((np.clip(strip, 0, 1) * 255).astype(np.uint8), "RGBA")
+
+
+# Icicle looks (IcicleSpell): (colour ramp, seed, alpha, style).
+ICICLE_LOOKS = {
+    "icicle_frost1": (even_stops((150, 180, 205), (190, 215, 235), (225, 240, 250), (245, 250, 255)), 0.92, "ice"),
+    "icicle_frost2": (even_stops((70, 140, 210), (120, 190, 240), (185, 230, 255), (235, 250, 255)), 0.82, "ice"),
+    "icicle_frost3": (even_stops((20, 60, 150), (40, 110, 200), (90, 170, 240), (180, 225, 255)), 0.86, "ice"),
+    "icicle_frost4": (even_stops((120, 190, 235), (180, 230, 250), (225, 248, 255), (255, 255, 255)), 0.78, "core"),
+    "icicle_piercing": (even_stops((140, 220, 255), (190, 240, 255), (235, 252, 255), (255, 255, 255)), 0.9, "needle"),
+    "icicle_shatter": (even_stops((30, 80, 160), (60, 130, 210), (110, 180, 240), (190, 235, 255)), 0.9, "crack"),
+    "icicle_winter": (even_stops((30, 40, 60), (55, 70, 95), (85, 105, 135), (130, 150, 180)), 0.95, "storm"),
+    "icicle_lance": (even_stops((60, 150, 220), (120, 200, 245), (190, 240, 255), (255, 255, 255)), 0.85, "core"),
+}
+
+
 FIREBALL_LOOKS = {
     "fireball_heat1": (even_stops((90, 10, 5), (200, 40, 10), (255, 110, 20), (255, 170, 60)), "flame"),
     "fireball_heat2": (even_stops((140, 25, 5), (240, 90, 15), (255, 170, 40), (255, 230, 120)), "flame"),
@@ -897,6 +935,11 @@ def main():
     for i, (name, (stops, style)) in enumerate(FIREBALL_LOOKS.items()):
         path = ASSETS / f"block/{name}.png"
         fireball_strip(stops, 60 + i, style=style).save(path)
+        path.with_suffix(".png.mcmeta").write_text('{"animation": {"frametime": 2, "interpolate": true}}\n')
+        print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
+    for i, (name, (stops, alpha, style)) in enumerate(ICICLE_LOOKS.items()):
+        path = ASSETS / f"block/{name}.png"
+        ice_strip(stops, 120 + i, alpha=alpha, style=style).save(path)
         path.with_suffix(".png.mcmeta").write_text('{"animation": {"frametime": 2, "interpolate": true}}\n')
         print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
     path = ASSETS / "misc/glow.png"

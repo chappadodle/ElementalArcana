@@ -1,20 +1,20 @@
 {
   "ambientocclusion": false,
   "textures": {
-    "ice": "elementalarcana:block/icicle_frost1",
-    "particle": "elementalarcana:block/icicle_frost1"
+    "ice": "elementalarcana:block/icicle_shatter",
+    "particle": "elementalarcana:block/icicle_shatter"
   },
   "elements": [
     {
       "from": [
-        6.25,
-        6.25,
-        1
+        6,
+        6,
+        2
       ],
       "to": [
-        9.75,
-        9.75,
-        6
+        10,
+        10,
+        10
       ],
       "faces": {
         "north": {
@@ -77,79 +77,11 @@
       "from": [
         6.75,
         6.75,
-        6
+        10
       ],
       "to": [
         9.25,
         9.25,
-        10
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        },
-        "south": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        },
-        "east": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        },
-        "west": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        },
-        "up": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        },
-        "down": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        }
-      }
-    },
-    {
-      "from": [
-        7.25,
-        7.25,
-        10
-      ],
-      "to": [
-        8.75,
-        8.75,
         13
       ],
       "faces": {
@@ -211,13 +143,13 @@
     },
     {
       "from": [
-        7.6,
-        7.6,
+        7.5,
+        7.5,
         13
       ],
       "to": [
-        8.4,
-        8.4,
+        8.5,
+        8.5,
         15.5
       ],
       "faces": {
@@ -279,14 +211,14 @@
     },
     {
       "from": [
-        9.5,
+        9.6,
         7,
-        2
+        3
       ],
       "to": [
-        11,
-        8.5,
-        5
+        12.1,
+        9,
+        8
       ],
       "faces": {
         "north": {
@@ -343,18 +275,27 @@
           ],
           "texture": "#ice"
         }
+      },
+      "rotation": {
+        "origin": [
+          10,
+          8,
+          3
+        ],
+        "axis": "y",
+        "angle": 22.5
       }
     },
     {
       "from": [
-        5,
-        8,
-        2.5
+        3.9,
+        7,
+        4
       ],
       "to": [
-        6.5,
-        9.5,
-        5.5
+        6.4,
+        9,
+        9
       ],
       "faces": {
         "north": {
@@ -411,6 +352,92 @@
           ],
           "texture": "#ice"
         }
+      },
+      "rotation": {
+        "origin": [
+          6,
+          8,
+          4
+        ],
+        "axis": "y",
+        "angle": -22.5
+      }
+    },
+    {
+      "from": [
+        7,
+        9.6,
+        3.5
+      ],
+      "to": [
+        9,
+        12.1,
+        7.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#ice"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#ice"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#ice"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#ice"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#ice"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#ice"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          10,
+          3.5
+        ],
+        "axis": "x",
+        "angle": -22.5
       }
     }
   ]

@@ -1,0 +1,7 @@
+{
+  "parent": "elementalarcana:spell/icicle",
+  "textures": {
+    "ice": "elementalarcana:block/icicle_winter",
+    "particle": "elementalarcana:block/icicle_winter"
+  }
+}

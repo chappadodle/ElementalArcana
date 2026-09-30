@@ -1,20 +1,20 @@
 {
   "ambientocclusion": false,
   "textures": {
-    "ice": "elementalarcana:block/icicle_frost1",
-    "particle": "elementalarcana:block/icicle_frost1"
+    "ice": "elementalarcana:block/icicle_piercing",
+    "particle": "elementalarcana:block/icicle_piercing"
   },
   "elements": [
     {
       "from": [
-        6.25,
-        6.25,
-        1
+        6.6,
+        6.6,
+        0
       ],
       "to": [
-        9.75,
-        9.75,
-        6
+        9.4,
+        9.4,
+        1.5
       ],
       "faces": {
         "north": {
@@ -75,218 +75,14 @@
     },
     {
       "from": [
-        6.75,
-        6.75,
-        6
-      ],
-      "to": [
-        9.25,
-        9.25,
-        10
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        },
-        "south": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        },
-        "east": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        },
-        "west": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        },
-        "up": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        },
-        "down": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        }
-      }
-    },
-    {
-      "from": [
-        7.25,
-        7.25,
-        10
-      ],
-      "to": [
-        8.75,
-        8.75,
-        13
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        },
-        "south": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        },
-        "east": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        },
-        "west": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        },
-        "up": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        },
-        "down": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        }
-      }
-    },
-    {
-      "from": [
-        7.6,
-        7.6,
-        13
-      ],
-      "to": [
-        8.4,
-        8.4,
-        15.5
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        },
-        "south": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        },
-        "east": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        },
-        "west": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        },
-        "up": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        },
-        "down": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#ice"
-        }
-      }
-    },
-    {
-      "from": [
-        9.5,
         7,
-        2
+        7,
+        1.5
       ],
       "to": [
-        11,
-        8.5,
-        5
+        9,
+        9,
+        7
       ],
       "faces": {
         "north": {
@@ -347,14 +143,82 @@
     },
     {
       "from": [
-        5,
-        8,
-        2.5
+        7.35,
+        7.35,
+        7
       ],
       "to": [
-        6.5,
-        9.5,
-        5.5
+        8.65,
+        8.65,
+        12
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#ice"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#ice"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#ice"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#ice"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#ice"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#ice"
+        }
+      }
+    },
+    {
+      "from": [
+        7.65,
+        7.65,
+        12
+      ],
+      "to": [
+        8.35,
+        8.35,
+        16
       ],
       "faces": {
         "north": {
