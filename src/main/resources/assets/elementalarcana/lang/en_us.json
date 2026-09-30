@@ -125,7 +125,7 @@
   "spell.elementalarcana.icicle.branch.shatterburst": "Shatterburst",
   "spell.elementalarcana.icicle.branch.shatterburst.desc": "Icicles shatter on impact into a spray of shrapnel: eight shards that fly on past what they hit, each cutting whatever it strikes for 30% damage.",
   "spell.elementalarcana.icicle.branch.lance": "Glacial Lance",
-  "spell.elementalarcana.icicle.branch.lance.desc": "Keep holding after full charge: your icicles fuse into one giant lance that pierces everything.",
+  "spell.elementalarcana.icicle.branch.lance.desc": "Keep holding after full charge: your icicles fuse into one giant lance that pierces everything. Where it lands, ice spikes erupt, striking everything within 3.5 blocks for half damage and throwing it up.",
   "spell.elementalarcana.icicle.branch.winter": "Endless Winter",
   "spell.elementalarcana.icicle.branch.winter.desc": "Kills refund half the cooldown. Full-charge hits leave frost patches that slow enemies.",
   "effect.elementalarcana.frozen": "Frozen",

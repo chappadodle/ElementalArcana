@@ -11,6 +11,7 @@ import com.chappadodle.elementalarcana.api.ProjectileSpell;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellDamage;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
+import com.chappadodle.elementalarcana.api.SpellTargets;
 import com.chappadodle.elementalarcana.content.IceShatterOptions;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.content.ModSchools;
@@ -102,6 +103,8 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
     private static final String TAG_SHRAPNEL = "ea_icicle_shrapnel";
     private static final String TAG_SHRAPNEL_DAMAGE = "ea_icicle_shrapnel_damage";
     private static final int SHRAPNEL_COUNT = 8;
+    /** How far the Glacial Lance's ice spikes reach from where it lands (matches the spikes drawn). */
+    private static final double ERUPTION_RADIUS = 3.5;
     private static final float SHRAPNEL_DAMAGE = 0.3f;
     // Stored on targets to count hits from one volley (Deep Freeze).
     private static final String TAG_TARGET_VOLLEY = "ea_icicle_hit_volley";
@@ -467,7 +470,29 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
         if (WINTER.equals(tag.getString(TAG_BRANCH_10)) && icicle.charge(0f) >= 1f) {
             frostPatch(icicle, Vec3.atBottomCenterOf(hit.getBlockPos().relative(hit.getDirection())));
         }
+        if (tag.getBoolean(TAG_LANCE)) {
+            eruption(icicle, at);
+        }
         shatter(icicle, at);
+    }
+
+    /**
+     * Glacial Lance landing: ice spikes erupt around it, striking everything within
+     * {@link #ERUPTION_RADIUS} for half the Lance's damage, throwing it up and slowing it.
+     */
+    private static void eruption(SpellProjectile lance, Vec3 at) {
+        ServerLevel level = (ServerLevel) lance.level();
+        Entity owner = lance.getOwner();
+        float damage = damage(lance, lance.getPersistentData()) * 0.5f;
+        for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, new AABB(at, at).inflate(ERUPTION_RADIUS),
+                e -> e != owner && e.isAlive() && SpellTargets.canAffect(owner, e)
+                        && e.getBoundingBox().getCenter().distanceTo(at) <= ERUPTION_RADIUS + e.getBbWidth() / 2)) {
+            SpellDamage.hurtMultiHit(target, SpellDamage.source(level, Element.ICE, lance, owner), damage);
+            ElementalReactions.iceHit(target);
+            target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 1));
+            target.push(0, 0.55, 0);
+            target.hurtMarked = true;
+        }
     }
 
     /** Deep Freeze: the third hit on one target from the same volley freezes it solid for 2 seconds. */

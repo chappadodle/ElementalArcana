@@ -1,0 +1,24 @@
+# Glacial Lance eruption: a lance comes down next to zombies 1, 2.5, 3.3 and 5 blocks from where it
+# lands, owned by a far-off villager (a monster's spells never hurt other monsters).
+# Expected: the first three lose health (the spikes reach 3.5 blocks), the one at 5 does not.
+time set midnight
+gamerule doMobSpawning false
+forceload add -16 -16 16 16
+fill -12 99 -12 12 99 12 minecraft:stone
+fill -12 100 -12 12 110 12 minecraft:air
+summon villager 10.5 100 10.5 {NoAI:1b,Tags:["eatest"],UUID:[I;11,22,33,44]}
+summon zombie 1.5 100 0.5 {NoAI:1b,Tags:["eatest"],CustomName:'"at_1"',attributes:[{id:"minecraft:generic.max_health",base:100}],Health:100f}
+summon zombie 0.5 100 3.0 {NoAI:1b,Tags:["eatest"],CustomName:'"at_2_5"',attributes:[{id:"minecraft:generic.max_health",base:100}],Health:100f}
+summon zombie -2.8 100 0.5 {NoAI:1b,Tags:["eatest"],CustomName:'"at_3_3"',attributes:[{id:"minecraft:generic.max_health",base:100}],Health:100f}
+summon zombie 0.5 100 -4.5 {NoAI:1b,Tags:["eatest"],CustomName:'"at_5"',attributes:[{id:"minecraft:generic.max_health",base:100}],Health:100f}
+sleep 1
+summon elementalarcana:spell_projectile 0.5 104 0.5 {Spell:"elementalarcana:icicle",Power:1.0f,Charge:1.0f,Motion:[0.0d,-1.2d,0.0d],Owner:[I;11,22,33,44],NeoForgeData:{ea_icicle_level:10,ea_icicle_branch10:"lance",ea_icicle_lance:1b},Tags:["eatest"]}
+sleep 2
+data get entity @e[name=at_1,limit=1] Health
+data get entity @e[name=at_2_5,limit=1] Health
+data get entity @e[name=at_3_3,limit=1] Health
+data get entity @e[name=at_5,limit=1] Health
+kill @e[tag=eatest]
+kill @e[type=elementalarcana:spell_projectile]
+gamerule doMobSpawning true
+forceload remove all
