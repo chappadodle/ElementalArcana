@@ -6,7 +6,6 @@ import com.chappadodle.elementalarcana.api.SpellTargets;
 import com.chappadodle.elementalarcana.content.ModSpells;
 import com.chappadodle.elementalarcana.content.spell.FrostNovaSpell;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 
@@ -39,7 +38,6 @@ public final class IceMobSpells {
         @Override
         public void cast(Mob caster, LivingEntity target) {
             MobCasting.shoot(caster, ModSpells.ICICLE.get(), target);
-            MobCasting.play(caster, SoundEvents.SNOW_GOLEM_SHOOT, 1f, 0.8f);
         }
     }
 

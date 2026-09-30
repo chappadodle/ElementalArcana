@@ -143,3 +143,26 @@ A Glacial Lance caster's icicles show their Lv 5 branch look (or Frost 4) until 
     on top, in its render pass.
   - When the freeze ends, or the creature dies in the ice, the shell shatters into shards with a
     glass crack.
+
+## Step 4 structure (sounds)
+
+- **Played on each client:** `IcicleSounds` plays from the same hooks as the particles, like the
+  Fireball's sounds.
+  - Removed from the server: the conjure, fully-grown, throw, fuse and shatter sounds, and the
+    mobs' snow-golem shot.
+  - Kept on the server: Deep Freeze's glass sound.
+  - The shatter plays in `IceShatterEmitter`.
+  - The Lance forging is heard when a held icicle's look changes to Lance.
+- **Shared with the Fireball:** `SoundLayer` (a mix layer, and playing a mix) and `SpellLoops`
+  (the loops following each projectile, and its last look). `FireballSounds` now uses both.
+- **Vanilla mixes, by look:**
+  - Frost 1–2 and Frost 3–4 (the two frost mixes), Piercing (a high whistle and an arrow snap),
+    Shatterburst (glass and amethyst breaking), Winter (powder snow, low wind) and Lance
+    (a riptide, and a burst on landing).
+  - Held: a beacon hum, pitched high for crystal. In flight: an elytra whistle.
+  - Under every shatter: the synthesized icicle impact, pitched by size and charge. Shrapnel plays
+    only that.
+- **★ Signature sounds** (the `signatureSounds` switch swaps them for the vanilla mixes):
+  - Glacial Lance: `lance_forge` (chimes climbing into one ring), `lance_launch` (an icy crack and a
+    deep rush) and `lance_quake` (a splitting crack, a cascade of spikes bursting up, and a rumble).
+  - Endless Winter: `winter_blizzard`, a howling wind loop while held and in flight.

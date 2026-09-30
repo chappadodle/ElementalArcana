@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.client.particle;
 
+import com.chappadodle.elementalarcana.client.sound.IcicleSounds;
 import com.chappadodle.elementalarcana.content.IceShatterOptions;
 import com.chappadodle.elementalarcana.content.spell.IcicleEffects;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -19,6 +20,7 @@ public class IceShatterEmitter extends NoRenderParticle {
         super(level, x, y, z);
         this.shatter = shatter;
         this.lifetime = IcicleEffects.SHATTER_TICKS;
+        IcicleSounds.shatter(level, new Vec3(x, y, z), shatter.look(), shatter.size(), shatter.charge());
     }
 
     @Override

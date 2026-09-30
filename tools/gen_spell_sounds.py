@@ -1,6 +1,6 @@
 """Synthesizes spell sound effects from scratch (numpy + scipy, converted to .ogg with sox).
 
-Run from the project root:  python3 tools/gen_spell_sounds.py [icicle] [fireball]
+Run from the project root:  python3 tools/gen_spell_sounds.py [icicle] [fireball] [frost]
 Each sound is layered from small building blocks (clicks, crackles, bell-like "tinkles", low
 thuds) with fixed random seeds, so re-running gives identical files. No samples are used, so
 there is nothing to license.
@@ -266,7 +266,96 @@ def fireball():
     meteor_impact()
 
 
-GROUPS = {"icicle": icicle, "fireball": fireball}
+# ---- icicle signature sounds ----
+
+def lance_forge(seed=101):
+    """Glacial Lance forming: the icicles' chimes climb in a shimmer and fuse into one ringing tone."""
+    rng = np.random.default_rng(seed)
+    duration = 1.8
+    out = silence(duration)
+    for i in range(14):
+        at = 0.6 * (i / 14) ** 0.8
+        freq = 900 * 2 ** (i / 7) * rng.uniform(0.98, 1.02)
+        place(out, tinkle(rng, freq, 0.6, 0.18, amp=0.35 + 0.02 * i), at)
+    t = times(1.2)
+    ring = sum(w * np.sin(2 * np.pi * f * t) for f, w in ((880, 1.0), (1320, 0.5), (1760, 0.35), (2640, 0.15)))
+    ring *= np.minimum(1, t / 0.02) * np.exp(-t / 0.5) * 0.6
+    place(out, ring, 0.55)
+    place(out, thud(0.4, 180, 90, 0.12, amp=0.4), 0.55)
+    write("spell/icicle/lance_forge", fade_out(out, 0.2), ["reverb", "50"], peak_db=-3.0)
+
+
+def lance_launch(seed=102):
+    """Glacial Lance thrown: a sharp icy crack and a deep, heavy rush of air."""
+    rng = np.random.default_rng(seed)
+    duration = 1.3
+    out = silence(duration)
+    for i in range(3):
+        place(out, click(rng, 1.0, length=0.006, brightness=3500), i * 0.003)
+    crack = filtered(noise(rng, 0.25), "highpass", 3000) * np.exp(-times(0.25) / 0.04)
+    place(out, crack * 0.6, 0.0)
+    rush_len = 1.2
+    envelope = np.minimum(1, times(rush_len) / 0.08) * np.exp(-times(rush_len) / 0.35)
+    rush = filtered(noise(rng, rush_len), "bandpass", [120, 900], order=2) * envelope
+    place(out, rush * 1.2, 0.02)
+    place(out, thud(0.5, 120, 45, 0.15, amp=0.7), 0.0)
+    write("spell/icicle/lance_launch", fade_out(out, 0.2), ["reverb", "35"], peak_db=-3.0)
+
+
+def lance_quake(seed=103):
+    """Glacial Lance landing: a splitting crack, ice spikes bursting up in a cascade of breaking
+    glass-like shards, and a low rumble through the ground."""
+    rng = np.random.default_rng(seed)
+    duration = 4.0
+    out = silence(duration)
+    for i in range(5):
+        place(out, click(rng, 1.0, length=0.012, brightness=900), i * 0.004)
+    place(out, thud(1.2, 80, 26, 0.45, amp=1.2), 0.0)
+    crack = filtered(noise(rng, 0.6), "bandpass", [800, 6000], order=2) * np.exp(-times(0.6) / 0.09)
+    place(out, crack * 0.9, 0.0)
+    # The spikes erupting one after another, each a small crash with shards.
+    for k in range(9):
+        at = 0.05 + k * 0.045 + rng.uniform(0, 0.02)
+        burst = filtered(noise(rng, 0.3), "highpass", 2000) * np.exp(-times(0.3) / 0.05)
+        place(out, burst * rng.uniform(0.3, 0.5), at)
+        for _ in range(4):
+            place(out, tinkle(rng, rng.uniform(2500, 7000), 0.4, rng.uniform(0.05, 0.2), amp=rng.uniform(0.1, 0.25)),
+                  at + rng.uniform(0, 0.1))
+    place(out, crackle(rng, 1.5, 70, amp_range=(0.05, 0.2), shape=lambda x: x ** 1.6, brightness=2500), 0.4)
+    rumble = filtered(noise(rng, 3.6), "lowpass", 100) * np.exp(-times(3.6) / 1.2) * 3.0
+    place(out, rumble, 0.05)
+    write("spell/icicle/lance_quake", fade_out(out, 0.5), ["reverb", "55"], peak_db=-3.0)
+
+
+def winter_blizzard(seed=104):
+    """Endless Winter: a howling blizzard wind, its pitch rising and falling in gusts. Loops."""
+    rng = np.random.default_rng(seed)
+    duration = 4.5
+    base = noise(rng, duration)
+    # A howl: noise through a band that sweeps up and down, slice by slice.
+    sweep = smooth_random(rng, duration, 1.5, 0, 1)
+    howl = np.zeros_like(base)
+    slices = 90
+    for k in range(slices):
+        a, b = k * len(base) // slices, (k + 1) * len(base) // slices
+        centre = 350 + 900 * sweep[(a + b) // 2]
+        band = filtered(base[max(0, a - 2000):b], "bandpass", [centre * 0.8, centre * 1.25], order=2)
+        howl[a:b] = band[-(b - a):]
+    gusts = 0.5 + 0.5 * smooth_random(rng, duration, 2, 0, 1)
+    hiss = filtered(noise(rng, duration), "highpass", 3000) * 0.12
+    low = filtered(noise(rng, duration), "lowpass", 200) * 0.8
+    out = howl * gusts * 1.4 + hiss * gusts + low
+    write("spell/icicle/winter_blizzard", seamless(out, 0.5))
+
+
+def frost():
+    lance_forge()
+    lance_launch()
+    lance_quake()
+    winter_blizzard()
+
+
+GROUPS = {"icicle": icicle, "fireball": fireball, "frost": frost}
 
 
 def main(names):

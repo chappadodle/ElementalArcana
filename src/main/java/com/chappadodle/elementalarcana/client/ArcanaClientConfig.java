@@ -17,7 +17,7 @@ public final class ArcanaClientConfig {
             .define("bloom", true);
 
     public static final ModConfigSpec.BooleanValue SIGNATURE_SOUNDS = BUILDER
-            .comment("Custom sounds for the biggest spells (Sunfire, Meteor). Off: they use vanilla sounds instead.")
+            .comment("Custom sounds for the biggest spells (Sunfire, Meteor, Glacial Lance, Endless Winter). Off: they use vanilla sounds instead.")
             .translation("elementalarcana.configuration.signatureSounds")
             .define("signatureSounds", true);
 

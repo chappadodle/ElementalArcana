@@ -12,6 +12,7 @@ import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellDamage;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
 import com.chappadodle.elementalarcana.api.SpellTargets;
+import com.chappadodle.elementalarcana.client.sound.IcicleSounds;
 import com.chappadodle.elementalarcana.content.IceShatterOptions;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.content.ModSchools;
@@ -23,7 +24,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -168,7 +168,6 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
         // One "volley" is one conjured set (Deep Freeze counts hits per set).
         tag.putInt(TAG_VOLLEY, seed);
         icicle.setVariant(lookFor(level, context.branch(5), context.branch(10)) | (level >= 8 ? BRIGHT : 0));
-        playAt(icicle, SoundEvents.AMETHYST_CLUSTER_PLACE, 1f, 1.3f);
         return icicle;
     }
 
@@ -191,16 +190,8 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
         lance.setVisualScale(2.2f);
         lance.setVariant(LOOK_LANCE | BRIGHT);
         lance.getPersistentData().putBoolean(TAG_LANCE, true);
-        playAt(lance, SoundEvents.AMETHYST_BLOCK_RESONATE, 1.5f, 0.6f);
-        playAt(lance, SoundEvents.AMETHYST_BLOCK_CHIME, 1.5f, 0.8f);
         level.sendParticles(ModContent.FROST_SPARKLE.get(), lance.getX(), lance.getY(), lance.getZ(), 30, 0.3, 0.3, 0.3, 0.15);
         return lance;
-    }
-
-    /** Fully grown: a bright chime (its flash and glints are client-side, see IcicleEffects#grown). */
-    @Override
-    public void onFullyGrown(SpellProjectile icicle) {
-        playAt(icicle, SoundEvents.AMETHYST_BLOCK_CHIME, 0.9f, 1.6f);
     }
 
     @Override
@@ -308,16 +299,18 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
         return new Vec3(0.8 * Math.cos(angle), 0.1 + 0.6 * Math.sin(angle), 0.75);
     }
 
-    // ---- visuals (client only, see IcicleEffects) ----
+    // ---- visuals and sounds (client only, see IcicleEffects and IcicleSounds) ----
 
     @Override
     public void heldParticles(SpellProjectile icicle, float charge) {
         IcicleEffects.held(icicle, charge);
+        IcicleSounds.held(icicle);
     }
 
     @Override
     public void grownParticles(SpellProjectile icicle) {
         IcicleEffects.grown(icicle);
+        IcicleSounds.grown(icicle);
     }
 
     @Override
@@ -328,6 +321,7 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
     @Override
     public void flightParticles(SpellProjectile icicle) {
         IcicleEffects.flight(icicle);
+        IcicleSounds.flight(icicle);
     }
 
     // ---- flight (server) ----
@@ -350,7 +344,6 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
                 tag.putInt(TAG_HOMING, target.getId());
             }
         }
-        playAt(icicle, SoundEvents.TRIDENT_THROW.value(), icicle.formationCount() > 1 ? 0.5f : 0.8f, 1.5f);
     }
 
     /** The living thing closest to the caster's crosshair, within a narrow cone and 40 blocks. */
@@ -578,7 +571,8 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
         double x = at.x;
         double y = at.y;
         double z = at.z;
-        // The whole shatter goes out as one particle; each client plays it out (IcicleEffects#shatter).
+        // The whole shatter goes out as one particle; each client plays it out, with its sound
+        // (IcicleEffects#shatter, IcicleSounds#shatter).
         IceShatterOptions shatter = new IceShatterOptions(icicle.variant(), size, charge);
         double reach = size > 1.5f ? 48 : 32;
         for (ServerPlayer player : level.players()) {
@@ -586,12 +580,5 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
                 level.sendParticles(player, shatter, true, x, y, z, 1, 0, 0, 0, 0);
             }
         }
-        level.playSound(null, x, y, z, ModContent.ICICLE_IMPACT.get(), SoundSource.PLAYERS,
-                Math.min(2f, (0.7f + 0.4f * charge) * size), (1.15f - 0.25f * charge) / (float) Math.sqrt(size) + (level.getRandom().nextFloat() - 0.5f) * 0.1f);
     }
-
-    private static void playAt(Entity at, SoundEvent sound, float volume, float pitch) {
-        at.level().playSound(null, at.getX(), at.getY(), at.getZ(), sound, SoundSource.PLAYERS, volume, pitch);
-    }
-
 }

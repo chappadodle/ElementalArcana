@@ -45,6 +45,11 @@ public final class ModContent {
     public static final DeferredHolder<SoundEvent, SoundEvent> FIREBALL_SUN_BLAST = sound("spell.fireball.sun_blast");
     public static final DeferredHolder<SoundEvent, SoundEvent> FIREBALL_METEOR_ROAR = sound("spell.fireball.meteor_roar");
     public static final DeferredHolder<SoundEvent, SoundEvent> FIREBALL_METEOR_IMPACT = sound("spell.fireball.meteor_impact");
+    // Icicle's signature sounds (synthesized by tools/gen_spell_sounds.py).
+    public static final DeferredHolder<SoundEvent, SoundEvent> ICICLE_LANCE_FORGE = sound("spell.icicle.lance_forge");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ICICLE_LANCE_LAUNCH = sound("spell.icicle.lance_launch");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ICICLE_LANCE_QUAKE = sound("spell.icicle.lance_quake");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ICICLE_WINTER_BLIZZARD = sound("spell.icicle.winter_blizzard");
 
     /** A glowing 4-point frost glint that twinkles out. */
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> FROST_SPARKLE =

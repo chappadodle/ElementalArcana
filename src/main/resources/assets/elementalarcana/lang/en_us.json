@@ -350,5 +350,9 @@
   "subtitles.elementalarcana.spell.fireball.meteor_roar": "Meteor roars",
   "subtitles.elementalarcana.spell.fireball.meteor_impact": "Meteor crashes",
   "elementalarcana.configuration.signatureSounds": "Signature sounds",
-  "elementalarcana.configuration.signatureSounds.tooltip": "Custom sounds for the biggest spells (Sunfire, Meteor). Off: they use vanilla sounds instead."
+  "elementalarcana.configuration.signatureSounds.tooltip": "Custom sounds for the biggest spells (Sunfire, Meteor, Glacial Lance, Endless Winter). Off: they use vanilla sounds instead.",
+  "subtitles.elementalarcana.spell.icicle.lance_forge": "Glacial Lance forms",
+  "subtitles.elementalarcana.spell.icicle.lance_launch": "Glacial Lance hurled",
+  "subtitles.elementalarcana.spell.icicle.lance_quake": "Ice spikes erupt",
+  "subtitles.elementalarcana.spell.icicle.winter_blizzard": "Blizzard howls"
 }

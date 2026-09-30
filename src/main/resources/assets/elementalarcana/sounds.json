@@ -78,5 +78,37 @@
       }
     ],
     "subtitle": "subtitles.elementalarcana.spell.fireball.meteor_impact"
+  },
+  "spell.icicle.lance_forge": {
+    "sounds": [
+      {
+        "name": "elementalarcana:spell/icicle/lance_forge"
+      }
+    ],
+    "subtitle": "subtitles.elementalarcana.spell.icicle.lance_forge"
+  },
+  "spell.icicle.lance_launch": {
+    "sounds": [
+      {
+        "name": "elementalarcana:spell/icicle/lance_launch"
+      }
+    ],
+    "subtitle": "subtitles.elementalarcana.spell.icicle.lance_launch"
+  },
+  "spell.icicle.lance_quake": {
+    "sounds": [
+      {
+        "name": "elementalarcana:spell/icicle/lance_quake"
+      }
+    ],
+    "subtitle": "subtitles.elementalarcana.spell.icicle.lance_quake"
+  },
+  "spell.icicle.winter_blizzard": {
+    "sounds": [
+      {
+        "name": "elementalarcana:spell/icicle/winter_blizzard"
+      }
+    ],
+    "subtitle": "subtitles.elementalarcana.spell.icicle.winter_blizzard"
   }
 }
