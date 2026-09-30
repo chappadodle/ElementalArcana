@@ -21,6 +21,7 @@ import com.chappadodle.elementalarcana.client.particle.FrostSparkleParticle;
 import com.chappadodle.elementalarcana.client.particle.IceShardParticle;
 import com.chappadodle.elementalarcana.client.particle.WindStreakParticle;
 import com.chappadodle.elementalarcana.client.visual.ProjectileVisuals;
+import com.chappadodle.elementalarcana.client.visual.WaterBeams;
 import com.chappadodle.elementalarcana.client.visual.WindSlashRenderer;
 import com.chappadodle.elementalarcana.content.BubblePrisons;
 import com.chappadodle.elementalarcana.content.ModContent;
@@ -237,9 +238,7 @@ public final class ArcanaClient {
         event.registerSpriteSet(ModContent.WIND_STREAK.get(), WindStreakParticle.Provider::new);
         event.registerSpriteSet(ModContent.EMBER.get(), EmberParticle.Provider::new);
         event.registerSpriteSet(ModContent.HYDRO_DROP.get(), HydroDropParticle.Provider::new);
-        event.registerSpecial(ModContent.HYDRO_STREAM.get(), new HydroStreamEmitter.Provider(1f));
-        event.registerSpecial(ModContent.HYDRO_STREAM_THIN.get(), new HydroStreamEmitter.Provider(0.35f));
-        event.registerSpecial(ModContent.HYDRO_STREAM_WIDE.get(), new HydroStreamEmitter.Provider(2.5f));
+        event.registerSpecial(ModContent.HYDRO_STREAM.get(), new HydroStreamEmitter.Provider());
         event.registerSpriteSet(ModContent.SWIRL.get(), WindStreakParticle.SwirlProvider::new);
         event.registerSpriteSet(ModContent.FLARE.get(), sprites -> new GlowParticle.Provider(GlowParticle.Kind.FLARE, sprites));
         event.registerSpriteSet(ModContent.SPARK.get(), sprites -> new GlowParticle.Provider(GlowParticle.Kind.SPARK, sprites));
@@ -258,6 +257,9 @@ public final class ArcanaClient {
     public static void afterParticles(RenderLevelStageEvent event) {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_CUTOUT_BLOCKS) {
             Decals.render(event);
+        }
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
+            WaterBeams.render(event);
         }
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
             RenderSystem.defaultBlendFunc();

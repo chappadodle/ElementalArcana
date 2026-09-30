@@ -4,7 +4,8 @@ import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.ElementalReactions;
 import com.chappadodle.elementalarcana.api.SpellDamage;
-import com.chappadodle.elementalarcana.content.ModContent;
+import com.chappadodle.elementalarcana.content.HydroStreamOptions;
+import com.chappadodle.elementalarcana.content.spell.HydroJetSpell;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
@@ -75,7 +76,7 @@ public final class MobJet {
             stop = hit.getEntity().getBoundingBox().inflate(0.3).clip(origin, stop).orElse(hit.getLocation());
         }
         Vec3 line = stop.subtract(origin);
-        level.sendParticles(ModContent.HYDRO_STREAM.get(), origin.x, origin.y, origin.z, 0, line.x, line.y, line.z, 1.0);
+        level.sendParticles(new HydroStreamOptions(caster.getId(), HydroJetSpell.LOOK_SPRING, 0f), origin.x, origin.y, origin.z, 0, line.x, line.y, line.z, 1.0);
 
         if (hit != null && hit.getEntity() instanceof LivingEntity victim && age % HIT_INTERVAL == 0) {
             float damage = HIT_DAMAGE * power * ElementalReactions.waterHit(victim, 100);

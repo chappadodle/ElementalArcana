@@ -11,6 +11,7 @@ import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellDamage;
 import com.chappadodle.elementalarcana.api.SpellHold;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
+import com.chappadodle.elementalarcana.content.HydroStreamOptions;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.content.ModSchools;
 import com.chappadodle.elementalarcana.content.Whirlpool;
@@ -72,6 +73,20 @@ public class HydroJetSpell extends Spell implements ProjectileSpell {
     public static final String LANCE = "lance";
 
     private static final ResourceLocation LANCE_MODEL = ElementalArcana.id("spell/water_lance");
+
+    // Looks of the stream (HydroStreamOptions#look): the pressure rises as it levels, and each
+    // branch has its own look. Drawn as a 3D water beam by client/visual/WaterBeams
+    // (see docs/superpowers/specs/2026-09-30-hydro-jet-vfx-design.md).
+    public static final int LOOK_SPRING = 0;
+    public static final int LOOK_CURRENT = 1;
+    public static final int LOOK_SURGE = 2;
+    public static final int LOOK_DELUGE = 3;
+    public static final int LOOK_TIDECUTTER = 4;
+    public static final int LOOK_TORRENT = 5;
+    public static final int LOOK_MAELSTROM = 6;
+    public static final int LOOK_LANCE = 7;
+    /** Added to the look at Lv 8+: the core shines brighter. */
+    public static final int BRIGHT = 8;
     private static final int HIT_INTERVAL = 4;
     private static final float HIT_DAMAGE = 1f;
     private static final int RIPTIDE_HITS = 5;
@@ -122,6 +137,28 @@ public class HydroJetSpell extends Spell implements ProjectileSpell {
     }
 
     /** Where the stream leaves the caster: just in front of their right hand. Used on both sides. */
+    /** The look without the Lv 8+ brightness. */
+    public static int look(int variant) {
+        return variant & (BRIGHT - 1);
+    }
+
+    /** A caster's stream: its capstone, then its Lv 5 branch, then how hard it sprays; bright at Lv 8+. */
+    private static int lookFor(int level, @Nullable String branch5, @Nullable String branch10) {
+        int look;
+        if (MAELSTROM.equals(branch10)) {
+            look = LOOK_MAELSTROM;
+        } else if (LANCE.equals(branch10)) {
+            look = LOOK_LANCE;
+        } else if (TIDECUTTER.equals(branch5)) {
+            look = LOOK_TIDECUTTER;
+        } else if (TORRENT.equals(branch5)) {
+            look = LOOK_TORRENT;
+        } else {
+            look = level >= 8 ? LOOK_DELUGE : level >= 5 ? LOOK_SURGE : level >= 3 ? LOOK_CURRENT : LOOK_SPRING;
+        }
+        return look | (level >= 8 ? BRIGHT : 0);
+    }
+
     public static Vec3 streamOrigin(Player player) {
         float yaw = player.getYRot() * Mth.DEG_TO_RAD;
         Vec3 right = new Vec3(-Mth.cos(yaw), 0, -Mth.sin(yaw));
@@ -156,6 +193,7 @@ public class HydroJetSpell extends Spell implements ProjectileSpell {
         private final boolean torrent;
         @Nullable
         private final String capstone;
+        private final int look;
         // Riptide: per creature, {consecutive hits, tick of the last hit}.
         private final Map<Integer, int[]> soaking = new HashMap<>();
         private Vec3 lastImpact;
@@ -168,6 +206,7 @@ public class HydroJetSpell extends Spell implements ProjectileSpell {
             this.tidecutter = context.hasBranch(5, TIDECUTTER);
             this.torrent = context.hasBranch(5, TORRENT);
             this.capstone = context.branch(10);
+            this.look = lookFor(spellLevel, context.branch(5), context.branch(10));
             this.lastImpact = caster.position();
         }
 
@@ -195,7 +234,9 @@ public class HydroJetSpell extends Spell implements ProjectileSpell {
             }
             lastImpact = stop;
 
-            ParticleOptions stream = torrent ? ModContent.HYDRO_STREAM_WIDE.get() : tidecutter ? ModContent.HYDRO_STREAM_THIN.get() : ModContent.HYDRO_STREAM.get();
+            // Pressure Build shows too: the beam thickens and brightens as it builds.
+            float pressure = spellLevel >= 6 ? Math.min(1f, heldTicks / 50f) : 0f;
+            HydroStreamOptions stream = new HydroStreamOptions(caster.getId(), this.look, pressure);
             Vec3 line = stop.subtract(origin);
             level.sendParticles(stream, origin.x, origin.y, origin.z, 0, line.x, line.y, line.z, 1.0);
 
@@ -390,6 +431,12 @@ public class HydroJetSpell extends Spell implements ProjectileSpell {
     @Override
     public ResourceLocation model() {
         return LANCE_MODEL;
+    }
+
+    /** With a dynamic lights mod: the Tsunami Lance spear shines faintly (the stream is no entity, so it can't). */
+    @Override
+    public int luminance(SpellProjectile lance) {
+        return 5;
     }
 
     @Override

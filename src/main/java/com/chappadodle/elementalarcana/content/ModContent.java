@@ -71,15 +71,11 @@ public final class ModContent {
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> HYDRO_DROP =
             PARTICLES.register("hydro_drop", () -> new SimpleParticleType(false));
     /**
-     * Hydro Jet's stream, drawn client-side in one packet: sent with count 0, its "velocity" is
-     * the vector from the hand to where the stream lands. Normal, thin (Tidecutter) and wide (Torrent).
+     * Hydro Jet's stream, one tick of it in one packet: sent with count 0, its "velocity" is the
+     * vector from the hand to where the stream lands (see HydroStreamOptions).
      */
-    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> HYDRO_STREAM =
-            PARTICLES.register("hydro_stream", () -> new SimpleParticleType(true));
-    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> HYDRO_STREAM_THIN =
-            PARTICLES.register("hydro_stream_thin", () -> new SimpleParticleType(true));
-    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> HYDRO_STREAM_WIDE =
-            PARTICLES.register("hydro_stream_wide", () -> new SimpleParticleType(true));
+    public static final DeferredHolder<ParticleType<?>, ParticleType<HydroStreamOptions>> HYDRO_STREAM =
+            PARTICLES.register("hydro_stream", HydroStreamOptions::newType);
     /** A pale curl of wind that glides along its velocity and fades. */
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> WIND_STREAK =
             PARTICLES.register("wind_streak", () -> new SimpleParticleType(false));
