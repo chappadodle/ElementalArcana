@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.client.particle;
 
+import com.chappadodle.elementalarcana.client.DynamicLights;
 import com.chappadodle.elementalarcana.client.ScreenEffects;
 import com.chappadodle.elementalarcana.client.sound.FireballSounds;
 import com.chappadodle.elementalarcana.content.FireBlastOptions;
@@ -30,6 +31,7 @@ public class FireBlastEmitter extends NoRenderParticle {
         Vec3 toBlast = new Vec3(x, y, z).subtract(eye);
         this.toBlast = toBlast.lengthSqr() > 1.0e-4 ? toBlast.normalize() : new Vec3(0, 0, 1);
         FireballSounds.blast(level, new Vec3(x, y, z), blast.look(), blast.bomblet());
+        DynamicLights.flash(new Vec3(x, y, z), FireballEffects.blastLight(blast.look(), blast.bomblet()), blast.bomblet() ? 4 : 10);
         feel();
     }
 

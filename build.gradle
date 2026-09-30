@@ -39,6 +39,15 @@ repositories {
             includeGroup "maven.modrinth"
         }
     }
+    maven {
+        // LambDynamicLights' API (and the Yumi libraries it's built on).
+        name = "Gegy"
+        url = "https://maven.gegy.dev/releases"
+        content {
+            includeGroup "dev.lambdaurora.lambdynamiclights"
+            includeGroupByRegex "dev\\.yumi.*"
+        }
+    }
     exclusiveContent {
         forRepository {
             maven {
@@ -141,6 +150,8 @@ configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
 
+def MAPPINGS_ATTRIBUTE = Attribute.of("net.minecraft.mappings", String)
+
 dependencies {
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
@@ -174,6 +185,17 @@ dependencies {
     compileOnly "foundry.veil:veil-neoforge-1.21.1:4.5.1"
     // Its own libraries come bundled inside it (jar-in-jar), so don't add them a second time.
     localRuntime("foundry.veil:veil-neoforge-1.21.1:4.5.1") { transitive = false }
+
+    // LambDynamicLights: compiled against for the optional dynamic lights (compat/dynamiclights).
+    // Its Mojang-mapped variant; the mod itself goes in run/mods to test (see the dev notes).
+    attributesSchema {
+        attribute(MAPPINGS_ATTRIBUTE)
+    }
+    compileOnly("dev.lambdaurora.lambdynamiclights:lambdynamiclights-api:4.8.11+1.21.1") {
+        attributes {
+            attribute(MAPPINGS_ATTRIBUTE, "mojmap")
+        }
+    }
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

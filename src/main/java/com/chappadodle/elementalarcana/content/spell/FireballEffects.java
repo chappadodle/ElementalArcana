@@ -298,6 +298,18 @@ public final class FireballEffects {
 
     // ---- explosions (client, played out by FireBlastEmitter) ----
 
+    /** How bright an explosion's flash of light is (with a dynamic lights mod), by look. */
+    public static int blastLight(int look, boolean bomblet) {
+        if (bomblet) {
+            return 10;
+        }
+        return switch (heatOf(look)) {
+            case 1 -> 12;
+            case 2 -> 13;
+            default -> look == FireballSpell.LOOK_SUN || look == FireballSpell.LOOK_METEOR || heatOf(look) >= 4 ? 15 : 14;
+        };
+    }
+
     /** Whether this look's blast shakes the camera (Meteor). */
     public static boolean shakes(int look) {
         return look == FireballSpell.LOOK_METEOR;

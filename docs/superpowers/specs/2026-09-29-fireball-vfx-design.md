@@ -259,6 +259,29 @@ and Phoenix their own.
 - **`AdditiveParticles.BLOCKS_RENDER_TYPE`:** additive blending, reading from the block atlas, with
   no back-face culling. `ArcanaClient#afterParticles` turns culling back on after the particles.
 
+## Dynamic lights (optional)
+
+With **LambDynamicLights** (4.8+) or **Sodium Dynamic Lights** installed, spells light up the world
+around them. Without either, nothing changes, and neither mod's classes are touched.
+
+- **`ProjectileSpell#luminance`** (0–15, default 0).
+  - Fireball, by look: heat 1 and Cluster 9, heat 2 10, heat 3 and Phoenix 12, Meteor 13,
+    heat 4 14, Sun 15. Bomblets 6.
+  - While held, the light scales with charge (50% to 100%).
+- **Projectiles** (`compat/dynamiclights/SpellLightHandlers`):
+  - Registered once, at client setup, through the older `DynamicLightHandlers` API. Sodium
+    Dynamic Lights is built on it, and LambDynamicLights 4.x bridges it into its current system on
+    1.21.1 (it's removed from 1.21.4 on).
+- **Explosion flashes** (LambDynamicLights only):
+  - `ArcanaLightsInitializer` is declared as the `lambdynlights:initializer` entrypoint (Yumi) in
+    `neoforge.mods.toml`, and keeps the behavior manager it's given.
+  - `BlastLight`, a `DynamicLightBehavior`, is a point light that starts at full strength (by heat:
+    12–15, bomblets 10) and fades over 10 ticks (bomblets 4), then removes itself. Its strength is
+    worked out from the game time.
+- **Dev setup:**
+  - The API (Mojang-mapped variant) is `compileOnly`, from maven.gegy.dev.
+  - The mod itself is in `run/mods`, like Sodium and Iris.
+
 ## Noted for later (from play-testing step 1)
 
 - **Screen space with several held fireballs:** a full set, especially the Lv 8+ heat looks, can

@@ -49,6 +49,10 @@ description='''
 A small, expandable magic framework with four elemental spells: wind, water, fire and ice.
 '''
 
+# LambDynamicLights (optional) calls this when it starts, for explosion flashes of light.
+[modproperties.${mod_id}."yumi:entrypoints"]
+"lambdynlights:initializer" = "com.chappadodle.elementalarcana.compat.dynamiclights.ArcanaLightsInitializer"
+
 # The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.
 #[[mixins]]
 #config="${mod_id}.mixins.json"
@@ -85,6 +89,21 @@ A small, expandable magic framework with four elemental spells: wind, water, fir
     versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"
+
+# Optional: with LambDynamicLights or Sodium Dynamic Lights, spells light up their surroundings.
+[[dependencies.${mod_id}]]
+    modId="lambdynlights"
+    type="optional"
+    versionRange="[4.8,)"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies.${mod_id}]]
+    modId="sodiumdynamiclights"
+    type="optional"
+    versionRange="*"
+    ordering="NONE"
+    side="CLIENT"
 
 # Optional: with Veil installed, glowing spell effects get real bloom (can be turned off in the config).
 [[dependencies.${mod_id}]]

@@ -75,6 +75,14 @@ public interface ProjectileSpell {
 
     // ---- client-side visuals ----
 
+    /**
+     * How much light (0-15) the projectile gives off when a dynamic lights mod is installed
+     * (LambDynamicLights or Sodium Dynamic Lights): it lights up what's around it as it flies.
+     */
+    default int luminance(SpellProjectile projectile) {
+        return 0;
+    }
+
     /** Every tick while held, on the client. {@code charge} runs 0..1. */
     default void heldParticles(SpellProjectile projectile, float charge) {
         if (projectile.tickCount % 3 == 0) {

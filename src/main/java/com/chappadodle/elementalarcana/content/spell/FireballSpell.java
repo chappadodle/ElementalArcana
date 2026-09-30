@@ -252,6 +252,28 @@ public class FireballSpell extends Spell implements ProjectileSpell, ConjureSpel
         return chargeTicks(1);
     }
 
+    /**
+     * With a dynamic lights mod: the hotter the look, the brighter it lights its surroundings
+     * (a miniature sun is as bright as light gets). Held, it brightens as it grows.
+     */
+    @Override
+    public int luminance(SpellProjectile fireball) {
+        int light = switch (fireball.variant()) {
+            case LOOK_HEAT_1, LOOK_CLUSTER -> 9;
+            case LOOK_HEAT_2 -> 10;
+            case LOOK_HEAT_3, LOOK_PHOENIX -> 12;
+            case LOOK_METEOR -> 13;
+            case LOOK_HEAT_4 -> 14;
+            case LOOK_SUN -> 15;
+            default -> 10;
+        };
+        if (fireball.visualScale() < 0.5f) {
+            // A Cluster Bomb bomblet.
+            light = 6;
+        }
+        return fireball.isHeld() ? Math.round(light * (0.5f + 0.5f * fireball.charge(0f))) : light;
+    }
+
     /** A quick tap throws a small, fast bolt; a full charge is a big, heavier fireball. */
     @Override
     public float releaseSpeed(float charge) {
