@@ -24,7 +24,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -194,12 +193,10 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
         return lance;
     }
 
-    /** Fully grown: a bright chime and a burst of frost. */
+    /** Fully grown: a bright chime (its flash and glints are client-side, see IcicleEffects#grown). */
     @Override
     public void onFullyGrown(SpellProjectile icicle) {
         playAt(icicle, SoundEvents.AMETHYST_BLOCK_CHIME, 0.9f, 1.6f);
-        ((ServerLevel) icicle.level()).sendParticles(ModContent.FROST_SPARKLE.get(),
-                icicle.getX(), icicle.getY(), icicle.getZ(), 14, 0.05, 0.05, 0.05, 0.12);
     }
 
     @Override
@@ -307,59 +304,26 @@ public class IcicleSpell extends Spell implements ProjectileSpell, ConjureSpell 
         return new Vec3(0.8 * Math.cos(angle), 0.1 + 0.6 * Math.sin(angle), 0.75);
     }
 
-    // ---- visuals (client) ----
+    // ---- visuals (client only, see IcicleEffects) ----
 
-    /** Frost gathers inward while charging (fewer sparkles each when several icicles form); once full, a steady glint. */
     @Override
     public void heldParticles(SpellProjectile icicle, float charge) {
-        boolean many = icicle.formationCount() > 2;
-        if (charge < 1f) {
-            if (many && icicle.tickCount % 2 != 0) {
-                return;
-            }
-            int count = many ? 1 : 1 + Math.round(charge * 3);
-            for (int i = 0; i < count; i++) {
-                Vec3 from = randomOnSphere(icicle, 0.8 + icicle.getRandom().nextDouble() * 0.5);
-                // Sparkles slow by friction 0.86/tick, so total travel is about 7x this speed: aim to land on the icicle.
-                Vec3 inward = icicle.position().subtract(from).scale(0.15);
-                icicle.level().addParticle(ModContent.FROST_SPARKLE.get(), from.x, from.y, from.z, inward.x, inward.y, inward.z);
-            }
-            if (icicle.tickCount % 4 == 0) {
-                icicle.spawnParticleAround(ModContent.FROST_MIST.get(), 0.15, new Vec3(0, 0.005, 0));
-            }
-        } else if (icicle.tickCount % (many ? 4 : 2) == 0) {
-            icicle.spawnParticleAround(ModContent.FROST_SPARKLE.get(), 0.25 * icicle.visualScale(), new Vec3(0, 0.01, 0));
-        }
+        IcicleEffects.held(icicle, charge);
     }
 
-    /** A shimmering trail of glints, a wisp of cold mist, and the odd snowflake. */
+    @Override
+    public void grownParticles(SpellProjectile icicle) {
+        IcicleEffects.grown(icicle);
+    }
+
+    @Override
+    public void releaseParticles(SpellProjectile icicle) {
+        IcicleEffects.released(icicle);
+    }
+
     @Override
     public void flightParticles(SpellProjectile icicle) {
-        if (icicle.visualScale() < 0.5f) {
-            // Shatterburst shrapnel: just a glint now and then.
-            if (icicle.tickCount % 2 == 0) {
-                icicle.spawnParticleAround(ModContent.FROST_SPARKLE.get(), 0.03, Vec3.ZERO);
-            }
-            return;
-        }
-        Vec3 back = icicle.getDeltaMovement().scale(-0.05);
-        int sparkles = icicle.visualScale() > 1.5f ? 5 : 2;
-        for (int i = 0; i < sparkles; i++) {
-            icicle.spawnParticleAround(ModContent.FROST_SPARKLE.get(), 0.08 * icicle.visualScale(), back);
-        }
-        if (icicle.tickCount % 2 == 0) {
-            icicle.spawnParticleAround(ModContent.FROST_MIST.get(), 0.05, Vec3.ZERO);
-        }
-        if (icicle.tickCount % 3 == 0) {
-            icicle.spawnParticleAround(ParticleTypes.SNOWFLAKE, 0.1, Vec3.ZERO);
-        }
-    }
-
-    private static Vec3 randomOnSphere(SpellProjectile icicle, double radius) {
-        double theta = icicle.getRandom().nextDouble() * Mth.TWO_PI;
-        double y = icicle.getRandom().nextDouble() * 2 - 1;
-        double ring = Math.sqrt(1 - y * y);
-        return icicle.position().add(Math.cos(theta) * ring * radius, y * radius, Math.sin(theta) * ring * radius);
+        IcicleEffects.flight(icicle);
     }
 
     // ---- flight (server) ----
