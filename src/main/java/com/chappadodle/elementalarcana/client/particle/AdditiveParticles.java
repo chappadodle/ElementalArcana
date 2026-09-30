@@ -33,6 +33,28 @@ public final class AdditiveParticles {
         }
     };
 
+    /**
+     * The same, drawn from the block atlas (so the fireballs' animated fire textures can wrap 3D
+     * shapes), and without back-face culling so a shape shows its inside too. ArcanaClient turns
+     * culling back on after the particles.
+     */
+    public static final ParticleRenderType BLOCKS_RENDER_TYPE = new ParticleRenderType() {
+        @Override
+        public BufferBuilder begin(Tesselator tesselator, TextureManager textureManager) {
+            RenderSystem.depthMask(false);
+            RenderSystem.disableCull();
+            RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
+            RenderSystem.enableBlend();
+            RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+            return tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
+        }
+
+        @Override
+        public String toString() {
+            return "ELEMENTALARCANA_ADDITIVE_BLOCKS";
+        }
+    };
+
     private AdditiveParticles() {
     }
 }

@@ -1,14 +1,24 @@
 package com.chappadodle.elementalarcana.content.spell;
 
+import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
 import com.chappadodle.elementalarcana.client.decal.Decals;
+import com.chappadodle.elementalarcana.client.particle.DebrisParticle;
+import com.chappadodle.elementalarcana.client.particle.FireSphereParticle;
+import com.chappadodle.elementalarcana.client.particle.FireWaveParticle;
 import com.chappadodle.elementalarcana.content.GlowParticleOptions;
 import com.chappadodle.elementalarcana.content.ModContent;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.ParticleStatus;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
@@ -328,9 +338,16 @@ public final class FireballEffects {
         Vec3 floor = ground != null ? ground.getLocation() : at;
 
         if (age == 0) {
-            // The flash, then the fireball itself billowing out, and sparks flying through it.
+            // The flash, then the fireball itself swelling out (a 3D ball of fire, and a hotter core
+            // inside it for the hot looks), with flares billowing off it and sparks flying through it.
             add(level, glow(ModContent.FLARE.get(), palette.spark(), palette.core(), radius * (heat >= 4 ? 0.8f : 0.6f), 3), at, Vec3.ZERO);
-            int body = Math.round(8 + 5 * radius);
+            ResourceLocation fire = blastTexture(look);
+            float ball = sun ? 0.75f : meteor ? 0.6f : 0.5f + 0.05f * heat;
+            spawn(new FireSphereParticle((ClientLevel) level, at, fire, radius * ball, 0.3f, sun ? 16 : 9 + heat, palette.core(), palette.fade(), 0.85f));
+            if (heat >= 3) {
+                spawn(new FireSphereParticle((ClientLevel) level, at, fire, radius * 0.35f, 0.5f, 6, palette.spark(), palette.core(), 1f));
+            }
+            int body = Math.round(4 + 3 * radius);
             for (int i = 0; i < body; i++) {
                 Vec3 velocity = randomDirection(random).scale(radius * (0.07 + 0.07 * random.nextDouble()));
                 add(level, glow(ModContent.FLARE.get(), palette.core(), palette.fade(), 0.3f + 0.1f * radius, 12), at, velocity);
@@ -341,20 +358,28 @@ public final class FireballEffects {
                 add(level, glow(ModContent.SPARK.get(), palette.spark(), palette.fade(), 0.1f, 10), at, velocity);
             }
             shockwave(level, floor.add(0, 0.05, 0), palette, radius, 8);
+            if (ground != null) {
+                // A wall of fire rolling out along the ground.
+                spawn(new FireWaveParticle((ClientLevel) level, floor, fire, radius * 1.1f, 0.3f + radius * (meteor ? 0.45f : 0.3f), false,
+                        9, palette.core(), 0.8f));
+            }
             for (int i = 0; i < 6 + 2 * radius; i++) {
                 add(level, ModContent.EMBER.get(), at, randomDirection(random).scale(0.15).add(0, 0.05, 0));
             }
             if (ground != null) {
                 BlockState surface = level.getBlockState(ground.getBlockPos());
                 if ((heat >= 3 || meteor) && !surface.isAir()) {
-                    // Chunks of the ground thrown up around the blast.
-                    int chunks = meteor ? 24 : Math.round(6 + 2 * radius);
-                    for (int i = 0; i < chunks; i++) {
+                    // Dust thrown up around the blast, and real chunks of the ground (3D cubes).
+                    int dust = meteor ? 12 : Math.round(3 + radius);
+                    for (int i = 0; i < dust; i++) {
                         double angle = random.nextDouble() * Mth.TWO_PI;
                         double distance = radius * 0.6 * Math.sqrt(random.nextDouble());
                         Vec3 spot = floor.add(Math.cos(angle) * distance, 0.1, Math.sin(angle) * distance);
                         add(level, new BlockParticleOption(ParticleTypes.DUST_PILLAR, surface), spot,
                                 new Vec3(0, (meteor ? 0.5 : 0.25) + 0.2 * random.nextDouble(), 0));
+                    }
+                    if (Minecraft.getInstance().options.particles().get() != ParticleStatus.MINIMAL) {
+                        debris(level, floor, ground.getBlockPos(), surface, radius, meteor, sun, heat, random);
                     }
                 }
             }
@@ -381,8 +406,11 @@ public final class FireballEffects {
             // The core flares a second time as the fire rolls over itself.
             add(level, glow(ModContent.FLARE.get(), palette.spark(), palette.fade(), radius * 0.35f, 5), at, new Vec3(0, 0.02, 0));
         } else if (age == 3 && (heat >= 4)) {
-            // A second ring: a slow, wide one for Sunfire.
+            // A second ring: a slow, wide one for Sunfire, under a swelling dome of light.
             shockwave(level, floor.add(0, 0.06, 0), palette, sun ? radius * 1.5f : radius * 0.7f, sun ? 14 : 9);
+            if (sun) {
+                spawn(new FireWaveParticle((ClientLevel) level, floor, blastTexture(look), radius * 1.3f, 0f, true, 16, palette.spark(), 0.9f));
+            }
         }
 
         if (look == FireballSpell.LOOK_PHOENIX && age < 4) {
@@ -404,6 +432,42 @@ public final class FireballEffects {
         }
     }
 
+    /** Chunks of the ground block blown up and out: 3D cubes that tumble, bounce and shrink away. */
+    private static void debris(Level level, Vec3 floor, BlockPos pos, BlockState state, float radius, boolean meteor,
+                               boolean sun, int heat, RandomSource random) {
+        int count = meteor ? 18 : sun ? 14 : heat >= 4 ? Math.round(6 + 2 * radius) : Math.round(4 + 1.5f * radius);
+        float minSize = meteor ? 0.2f : 0.12f;
+        float maxSize = meteor ? 0.35f : sun ? 0.3f : 0.2f;
+        for (int i = 0; i < count; i++) {
+            double angle = random.nextDouble() * Mth.TWO_PI;
+            double distance = radius * 0.4 * Math.sqrt(random.nextDouble());
+            Vec3 spot = floor.add(Math.cos(angle) * distance, 0.15, Math.sin(angle) * distance);
+            double out = (0.1 + 0.2 * random.nextDouble()) * Math.sqrt(radius);
+            double up = meteor ? 0.45 + 0.25 * random.nextDouble() : 0.3 + 0.2 * random.nextDouble();
+            Vec3 velocity = new Vec3(Math.cos(angle) * out, up, Math.sin(angle) * out);
+            float size = minSize + random.nextFloat() * (maxSize - minSize);
+            spawn(new DebrisParticle((ClientLevel) level, spot, velocity, state, pos, size));
+        }
+    }
+
+    /** The fire texture an explosion's 3D shapes wear, by look. */
+    private static ResourceLocation blastTexture(int look) {
+        String name = switch (look) {
+            case FireballSpell.LOOK_HEAT_1 -> "heat1";
+            case FireballSpell.LOOK_HEAT_2, FireballSpell.LOOK_METEOR -> "heat2";
+            case FireballSpell.LOOK_HEAT_4 -> "heat4";
+            case FireballSpell.LOOK_SUN -> "sun";
+            case FireballSpell.LOOK_PHOENIX -> "phoenix";
+            default -> "heat3";
+        };
+        return ElementalArcana.id("block/fireball_" + name);
+    }
+
+    /** Adds a particle made here directly (the 3D shapes aren't sent or spawned by type). */
+    private static void spawn(Particle particle) {
+        Minecraft.getInstance().particleEngine.add(particle);
+    }
+
     /** A flat ring of light racing out along the ground. */
     private static void shockwave(Level level, Vec3 at, Palette palette, float radius, int lifetime) {
         add(level, glow(ModContent.SHOCKWAVE.get(), palette.spark(), palette.fade(), radius, lifetime), at, Vec3.ZERO);
@@ -412,6 +476,8 @@ public final class FireballEffects {
     /** A Cluster Bomb bomblet going off: a sharp pop, a starburst of sparks and a tiny ring. */
     private static void firecracker(Level level, Vec3 at, Palette palette, float radius, RandomSource random) {
         add(level, glow(ModContent.FLARE.get(), 0xFFFFFF, palette.spark(), 0.8f, 2), at, Vec3.ZERO);
+        spawn(new FireSphereParticle((ClientLevel) level, at, blastTexture(FireballSpell.LOOK_HEAT_3), radius * 0.3f, 0.4f, 4,
+                palette.spark(), palette.fade(), 0.9f));
         for (int i = 0; i < 18; i++) {
             Vec3 velocity = randomDirection(random).scale(0.35 + 0.1 * random.nextDouble());
             int color = random.nextBoolean() ? 0xFFFFFF : palette.spark();

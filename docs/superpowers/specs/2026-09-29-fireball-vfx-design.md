@@ -227,6 +227,38 @@ height. They hung over ledges and floated when the block under them broke.
 - **Textures:** 32×32 in `textures/misc/`. Marks are randomly mirrored so they don't all look
   alike.
 
+## 3D explosions
+
+The flat pieces stay (flash, flares, sparks, the ground ring, smoke). Explosions add real 3D
+shapes, made directly on the client by `FireballEffects#blast`; they aren't registered particle
+types. Each look wears a fire texture: heat 1–4 their own, Cluster heat 3, Meteor heat 2, and Sun
+and Phoenix their own.
+
+- **`FireSphereParticle`: a ball of fire.**
+  - A 16×8 sphere mesh wrapped in the look's animated block-atlas fire texture (4 tiles around,
+    2 from pole to pole).
+  - It swells with an ease-out from 30% of its size, turns slowly, shifts from its core colour to
+    its fade colour, and fades out.
+  - It's drawn additively and from both sides, so it's densest through the middle.
+  - Size: 0.5–0.7 of the blast radius by heat (Meteor 0.6, Sun 0.75). Hot looks (heat 3+) get a
+    smaller, brighter inner sphere too. Cluster bomblets get a tiny one.
+- **`FireWaveParticle`: a shockwave.**
+  - Wall: a ring of fire 32 segments around, rolling out to 1.1× the radius. It's bright at its
+    foot, clear at its top, and sinks as it spreads. It needs ground under the blast. Meteor's
+    wall is taller.
+  - Dome (Sunfire, at tick 3): a half-sphere swelling to 1.3× the radius, brightest at its rim.
+    Each vertex's brightness comes from how edge-on it's seen from the camera.
+- **`DebrisParticle`: chunks of ground.**
+  - Cubes cut from a random quarter of the hit block's particle texture, tinted like
+    block-breaking particles (so grass is green), and shaded per face like blocks.
+  - They tumble around a random axis. They run their own collision, because vanilla particles
+    stop moving for good on first contact: they bounce (35%), rebound off walls, roll to a stop,
+    and shrink over their last quarter of life.
+  - Count and size: heat 3–4 scale with the radius; Meteor throws 18 large chunks, Sun 14.
+  - They're skipped on Minimal particles. The dust pillars stay, fewer of them.
+- **`AdditiveParticles.BLOCKS_RENDER_TYPE`:** additive blending, reading from the block atlas, with
+  no back-face culling. `ArcanaClient#afterParticles` turns culling back on after the particles.
+
 ## Noted for later (from play-testing step 1)
 
 - **Screen space with several held fireballs:** a full set, especially the Lv 8+ heat looks, can

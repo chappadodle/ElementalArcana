@@ -244,6 +244,7 @@ public final class ArcanaClient {
         }
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
             RenderSystem.defaultBlendFunc();
+            RenderSystem.enableCull();
             Bloom.renderParticles(event.getCamera(), event.getPartialTick().getGameTimeDeltaPartialTick(false));
         }
     }
