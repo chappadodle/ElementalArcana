@@ -1,6 +1,5 @@
 package com.chappadodle.elementalarcana.content.spell;
 
-import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.CastResult;
 import com.chappadodle.elementalarcana.api.ConjureSpell;
@@ -17,7 +16,6 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -58,7 +56,20 @@ public class WindBladeSpell extends Spell implements ProjectileSpell, ConjureSpe
     public static final String SCYTHE = "scythe";
     public static final String THOUSAND_CUTS = "thousand_cuts";
 
-    private static final ResourceLocation MODEL = ElementalArcana.id("spell/wind_blade");
+
+    // Looks (SpellProjectile#variant): the air gets sharper and brighter as it levels, and each
+    // branch has its own look. Drawn by client/visual/WindSlashRenderer, not a block model
+    // (see docs/superpowers/specs/2026-09-30-wind-blade-vfx-design.md).
+    public static final int LOOK_GUST = 0;
+    public static final int LOOK_BREEZE = 1;
+    public static final int LOOK_GALE = 2;
+    public static final int LOOK_TEMPEST = 3;
+    public static final int LOOK_BOOMERANG = 4;
+    public static final int LOOK_TEMPEST_EDGE = 5;
+    public static final int LOOK_THOUSAND_CUTS = 6;
+    public static final int LOOK_SCYTHE = 7;
+    /** Added to the look at Lv 8+: the edge shines brighter. */
+    public static final int BRIGHT = 8;
     private static final int EXTRA_BLADE_COST = 3;
     private static final int RANGE_TICKS = 20;
     private static final int BOOMERANG_TURN_TICKS = 10;
@@ -125,6 +136,7 @@ public class WindBladeSpell extends Spell implements ProjectileSpell, ConjureSpe
         tag.putInt(TAG_LEVEL, level);
         tag.putString(TAG_BRANCH_5, orEmpty(context.branch(5)));
         tag.putString(TAG_BRANCH_10, orEmpty(context.branch(10)));
+        blade.setVariant(lookFor(level, context.branch(5), context.branch(10)) | (level >= 8 ? BRIGHT : 0));
         playAt(context.caster(), SoundEvents.BREEZE_INHALE, 0.8f, 1.3f);
         return blade;
     }
@@ -167,6 +179,7 @@ public class WindBladeSpell extends Spell implements ProjectileSpell, ConjureSpe
         }
         scythe.setFormation(0, 1);
         scythe.setVisualScale(2.5f);
+        scythe.setVariant(LOOK_SCYTHE | BRIGHT);
         scythe.getPersistentData().putBoolean(TAG_SCYTHE, true);
         playAt(caster, SoundEvents.BREEZE_WHIRL, 1.2f, 0.7f);
         level.sendParticles(ParticleTypes.GUST_EMITTER_SMALL, scythe.getX(), scythe.getY(), scythe.getZ(), 1, 0, 0, 0, 0);
@@ -195,9 +208,32 @@ public class WindBladeSpell extends Spell implements ProjectileSpell, ConjureSpe
         return ModContent.WIND_STREAK.get();
     }
 
+    /** The look without the Lv 8+ brightness. */
+    public static int look(int variant) {
+        return variant & (BRIGHT - 1);
+    }
+
+    /** The look for a caster's blades: Thousand Cuts, then the Lv 5 branch, then how keen the wind is. */
+    private static int lookFor(int level, @Nullable String branch5, @Nullable String branch10) {
+        if (THOUSAND_CUTS.equals(branch10)) {
+            return LOOK_THOUSAND_CUTS;
+        }
+        if (BOOMERANG.equals(branch5)) {
+            return LOOK_BOOMERANG;
+        }
+        if (TEMPEST.equals(branch5)) {
+            return LOOK_TEMPEST_EDGE;
+        }
+        return level >= 8 ? LOOK_TEMPEST : level >= 5 ? LOOK_GALE : level >= 3 ? LOOK_BREEZE : LOOK_GUST;
+    }
+
+    /** With a dynamic lights mod: air doesn't glow, except a faint Lv 8+ edge and the Storm Scythe's lightning. */
     @Override
-    public ResourceLocation model() {
-        return MODEL;
+    public int luminance(SpellProjectile blade) {
+        if (look(blade.variant()) == LOOK_SCYTHE) {
+            return 9;
+        }
+        return (blade.variant() & BRIGHT) != 0 ? 4 : 0;
     }
 
     @Override
@@ -373,6 +409,7 @@ public class WindBladeSpell extends Spell implements ProjectileSpell, ConjureSpe
             Vec3 velocity = next.getBoundingBox().getCenter().subtract(from).normalize().scale(1.8);
             SpellProjectile child = SpellProjectile.shootFrom(owner, this, from, velocity, blade.power());
             child.setVisualScale(0.6f);
+            child.setVariant(LOOK_THOUSAND_CUTS | (blade.variant() & BRIGHT));
             child.ignoreEntity(hitTarget);
             CompoundTag childTag = child.getPersistentData();
             childTag.putInt(TAG_LEVEL, blade.getPersistentData().getInt(TAG_LEVEL));

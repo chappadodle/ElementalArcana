@@ -196,27 +196,6 @@ SPRITES = {
         "......kkkk......",
         "................",
     ]),
-    # Texture for the wind blade's crescent model (models/spell/wind_blade.json).
-    "block/wind_blade": ({
-        "w": 0xE0FFFFFF, "p": 0xC8E6FFF2, "g": 0xB0B8F0D8, "d": 0x9890D8C0,
-    }, [
-        "wwppwwppwwppwwpp",
-        "wppgwppgwppgwppg",
-        "ppggppggppggppgg",
-        "pggdpggdpggdpggd",
-        "wwppwwppwwppwwpp",
-        "wppgwppgwppgwppg",
-        "ppggppggppggppgg",
-        "pggdpggdpggdpggd",
-        "wwppwwppwwppwwpp",
-        "wppgwppgwppgwppg",
-        "ppggppggppggppgg",
-        "pggdpggdpggdpggd",
-        "wwppwwppwwppwwpp",
-        "wppgwppgwppgwppg",
-        "ppggppggppggppgg",
-        "pggdpggdpggdpggd",
-    ]),
     "spell/wind_blade": ({
         "k": 0x3C6B5A, "g": 0x9FE0C8, "p": 0xD8F5EA, "w": 0xFFFFFF,
     }, [
@@ -923,6 +902,38 @@ def frost(size=32, seed=17):
     return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA")
 
 
+def wind_slash(style, width=64, height=16, seed=140):
+    """A Wind Blade's slash texture, grey (the look tints it) on black (black adds nothing, it's
+    drawn additively). U runs along the arc and tiles, so the streaks can flow; V runs across it:
+    the cutting edge along the top, fading to nothing behind. Stepped into five levels, pixel-art
+    style. Styles: soft (a wisp), sharp (a crisp edge, fine streaks), storm (swirls), lines (just
+    razor edges)."""
+    noise = tile_noise(width, seed, periods=(4, 8))
+    u, v = np.mgrid[0:height, 0:width][1], np.mgrid[0:height, 0:width][0]
+    across = v / (height - 1)
+    # Wind lines: each row is dashed by its own slice of noise, sparser further back from the edge.
+    row = noise[(v * 5 + 3) % width, u]
+    dashes = row > (0.42 + 0.25 * across)
+    if style == "soft":
+        edge = np.exp(-(v / 2.5) ** 2) * 0.8
+        body = np.where(dashes, (1 - across) ** 1.3 * 0.6, 0.0)
+    elif style == "sharp":
+        edge = np.where(v <= 1, 1.0, 0.0)
+        body = np.where(dashes & (v >= 3) & (v % 2 == 1), (1 - across) ** 1.5 * 0.8, 0.0)
+    elif style == "storm":
+        edge = np.where(v <= 1, 0.75, 0.0)
+        body = np.where(dashes, (1 - across) ** 1.1 * (0.35 + 0.4 * (row > 0.7)), 0.12 * (1 - across))
+    else:
+        edge = np.where(v <= 1, 1.0, 0.0)
+        body = np.where((v == 4) & dashes, 0.5, 0.0)
+    value = np.clip(np.maximum(edge, body), 0, 1)
+    value = np.round(value * 4) / 4
+    rgba = np.zeros((height, width, 4))
+    rgba[..., 0] = rgba[..., 1] = rgba[..., 2] = value
+    rgba[..., 3] = 1.0
+    return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA")
+
+
 def main():
     for name, (palette, grid) in SPRITES.items():
         path = ASSETS / f"{name}.png"
@@ -980,6 +991,10 @@ def main():
         path = ASSETS / f"block/{name}.png"
         ice_strip(stops, 120 + i, alpha=alpha, style=style).save(path)
         path.with_suffix(".png.mcmeta").write_text('{"animation": {"frametime": 2, "interpolate": true}}\n')
+        print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
+    for style in ("soft", "sharp", "storm", "lines"):
+        path = ASSETS / f"misc/wind_slash_{style}.png"
+        wind_slash(style).save(path)
         print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
     path = ASSETS / "misc/glow.png"
     path.parent.mkdir(parents=True, exist_ok=True)

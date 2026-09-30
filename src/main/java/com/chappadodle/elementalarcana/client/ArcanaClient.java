@@ -19,8 +19,11 @@ import com.chappadodle.elementalarcana.client.particle.FrostMistParticle;
 import com.chappadodle.elementalarcana.client.particle.FrostSparkleParticle;
 import com.chappadodle.elementalarcana.client.particle.IceShardParticle;
 import com.chappadodle.elementalarcana.client.particle.WindStreakParticle;
+import com.chappadodle.elementalarcana.client.visual.ProjectileVisuals;
+import com.chappadodle.elementalarcana.client.visual.WindSlashRenderer;
 import com.chappadodle.elementalarcana.content.BubblePrisons;
 import com.chappadodle.elementalarcana.content.ModContent;
+import com.chappadodle.elementalarcana.content.ModSpells;
 import com.chappadodle.elementalarcana.content.spell.BubblePrisonSpell;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.core.MagicData;
@@ -101,7 +104,10 @@ public final class ArcanaClient {
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-        event.enqueueWork(DynamicLights::init);
+        event.enqueueWork(() -> {
+            DynamicLights.init();
+            ProjectileVisuals.register(ModSpells.WIND_BLADE.get(), WindSlashRenderer::render);
+        });
     }
 
     @SubscribeEvent
