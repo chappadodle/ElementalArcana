@@ -1,6 +1,5 @@
 package com.chappadodle.elementalarcana.content.spell;
 
-import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.CastResult;
 import com.chappadodle.elementalarcana.api.Spell;
@@ -8,7 +7,6 @@ import com.chappadodle.elementalarcana.content.BubblePrisons;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.content.ModSchools;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -27,8 +25,6 @@ import java.util.Optional;
  * bonus damage (see BubblePrisons). No target: the cast fails and costs nothing.
  */
 public class BubblePrisonSpell extends Spell {
-    /** The bubble's 3D model (drawn by BubbleRenderer). */
-    public static final ResourceLocation BUBBLE_MODEL = ElementalArcana.id("spell/bubble");
     private static final double RANGE = 20;
     // A little leeway around creatures, so small ones are easy to target.
     private static final double AIM_LEEWAY = 0.5;
@@ -47,11 +43,10 @@ public class BubblePrisonSpell extends Spell {
         ServerLevel level = context.level();
         Vec3 from = context.eyePosition();
         Vec3 to = target.getBoundingBox().getCenter();
-        // A trail of drops from the caster's hand to the target.
-        for (double d = 1; d < from.distanceTo(to); d += 0.6) {
-            Vec3 at = from.add(to.subtract(from).normalize().scale(d));
-            level.sendParticles(ModContent.HYDRO_DROP.get(), at.x, at.y, at.z, 1, 0.05, 0.05, 0.05, 0.01);
-        }
+        // A line of little water cubes zipping from the caster to the target (see BubbleCastEmitter).
+        Vec3 start = from.add(to.subtract(from).normalize().scale(Math.min(0.8, from.distanceTo(to) / 2)));
+        Vec3 line = to.subtract(start);
+        level.sendParticles(ModContent.BUBBLE_CAST.get(), start.x, start.y, start.z, 0, line.x, line.y, line.z, 1.0);
         return CastResult.SUCCESS;
     }
 

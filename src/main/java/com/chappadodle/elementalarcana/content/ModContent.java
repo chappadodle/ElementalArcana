@@ -128,6 +128,10 @@ public final class ModContent {
     public static final DeferredHolder<ParticleType<?>, ParticleType<WindCutOptions>> WIND_CUT =
             PARTICLES.register("wind_cut", WindCutOptions::newType);
 
+    /** A Bubble Prison cast: water cubes zipping to the target (see BubbleCastEmitter). */
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> BUBBLE_CAST =
+            PARTICLES.register("bubble_cast", () -> new SimpleParticleType(false));
+
     /** A whirlpool or a crashing wave, drawn out of water cubes (see WaterBurstOptions). */
     public static final DeferredHolder<ParticleType<?>, ParticleType<WaterBurstOptions>> WATER_BURST =
             PARTICLES.register("water_burst", WaterBurstOptions::newType);

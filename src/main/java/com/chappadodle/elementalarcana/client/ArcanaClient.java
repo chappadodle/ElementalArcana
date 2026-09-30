@@ -14,6 +14,7 @@ import com.chappadodle.elementalarcana.client.particle.FireBlastEmitter;
 import com.chappadodle.elementalarcana.client.particle.GlowParticle;
 import com.chappadodle.elementalarcana.client.particle.HydroDropParticle;
 import com.chappadodle.elementalarcana.client.particle.IceShatterEmitter;
+import com.chappadodle.elementalarcana.client.particle.BubbleCastEmitter;
 import com.chappadodle.elementalarcana.client.particle.WaterBurstParticle;
 import com.chappadodle.elementalarcana.client.particle.WindCutEmitter;
 import com.chappadodle.elementalarcana.client.particle.HydroStreamEmitter;
@@ -28,7 +29,6 @@ import com.chappadodle.elementalarcana.client.visual.WindSlashRenderer;
 import com.chappadodle.elementalarcana.content.BubblePrisons;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.content.ModSpells;
-import com.chappadodle.elementalarcana.content.spell.BubblePrisonSpell;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.core.MagicData;
 import com.chappadodle.elementalarcana.network.CastSpellPayload;
@@ -129,6 +129,7 @@ public final class ArcanaClient {
     public static void onClientTick(ClientTickEvent.Post event) {
         ScreenEffects.tick();
         FrozenShells.tick();
+        BubbleRenderer.tick();
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;
         if (player == null) {
@@ -253,6 +254,7 @@ public final class ArcanaClient {
         event.registerSpecial(ModContent.ICE_SHATTER.get(), new IceShatterEmitter.Provider());
         event.registerSpecial(ModContent.WIND_CUT.get(), new WindCutEmitter.Provider());
         event.registerSpecial(ModContent.WATER_BURST.get(), new WaterBurstParticle.Provider());
+        event.registerSpecial(ModContent.BUBBLE_CAST.get(), new BubbleCastEmitter.Provider());
     }
 
     // Additive particles change the blend function and vanilla doesn't set it back; put it back
@@ -289,7 +291,6 @@ public final class ArcanaClient {
                 models.add(shield.shardModel());
             }
         }
-        models.add(BubblePrisonSpell.BUBBLE_MODEL);
         models.forEach(model -> event.register(ModelResourceLocation.standalone(model)));
     }
 
@@ -298,7 +299,7 @@ public final class ArcanaClient {
         if (event.getEntity() instanceof Player player) {
             ShieldRenderer.renderShards(player, event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource());
         }
-        BubbleRenderer.render(event.getEntity(), event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource());
+        BubbleRenderer.render(event.getEntity(), event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight());
         FrozenShells.render(event.getEntity(), event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource());
     }
 

@@ -68,7 +68,7 @@ public final class BubblePrisons {
             mob.getPersistentData().putBoolean(TAG_AI_OFF, true);
         }
         target.setDeltaMovement(Vec3.ZERO);
-        level.sendParticles(ParticleTypes.SPLASH, target.getX(), target.getY(0.5), target.getZ(), 30, 0.4, 0.5, 0.4, 0.1);
+        level.sendParticles(ParticleTypes.SPLASH, target.getX(), target.getY(0.5), target.getZ(), 12, 0.4, 0.5, 0.4, 0.1);
         level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.BUBBLE_COLUMN_UPWARDS_INSIDE, SoundSource.PLAYERS, 1f, 1.2f);
     }
 
@@ -81,8 +81,7 @@ public final class BubblePrisons {
         }
         target.resetFallDistance();
         if (target.level() instanceof ServerLevel level) {
-            level.sendParticles(ParticleTypes.SPLASH, target.getX(), target.getY(0.5), target.getZ(), popped ? 50 : 25, 0.5, 0.5, 0.5, 0.2);
-            level.sendParticles(ParticleTypes.BUBBLE_POP, target.getX(), target.getY(0.5), target.getZ(), 12, 0.4, 0.4, 0.4, 0.05);
+            // The burst itself is drawn by each client (BubbleRenderer, BubblePrisonEffects#pop).
             level.playSound(null, target.getX(), target.getY(), target.getZ(),
                     popped ? SoundEvents.GENERIC_SPLASH : SoundEvents.BUBBLE_COLUMN_BUBBLE_POP, SoundSource.PLAYERS, 1f, popped ? 1.1f : 1f);
         }
@@ -116,7 +115,6 @@ public final class BubblePrisons {
         }
         if (now % 4 == 0) {
             double width = target.getBbWidth() * 0.6;
-            level.sendParticles(ParticleTypes.BUBBLE_POP, target.getX(), target.getY(0.5), target.getZ(), 2, width, target.getBbHeight() * 0.4, width, 0.01);
             level.sendParticles(ParticleTypes.FALLING_WATER, target.getX(), target.getY(), target.getZ(), 1, width * 0.6, 0, width * 0.6, 0);
         }
         if ((now - bubble.startTick()) % 20 == 10) {
