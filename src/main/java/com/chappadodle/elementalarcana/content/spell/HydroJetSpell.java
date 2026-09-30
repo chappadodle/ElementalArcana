@@ -1,6 +1,5 @@
 package com.chappadodle.elementalarcana.content.spell;
 
-import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.CastResult;
 import com.chappadodle.elementalarcana.api.CreatureElements;
@@ -13,13 +12,13 @@ import com.chappadodle.elementalarcana.api.SpellHold;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
 import com.chappadodle.elementalarcana.content.HydroStreamOptions;
 import com.chappadodle.elementalarcana.content.ModContent;
+import com.chappadodle.elementalarcana.content.WaterBurstOptions;
 import com.chappadodle.elementalarcana.content.ModSchools;
 import com.chappadodle.elementalarcana.content.Whirlpool;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -72,7 +71,6 @@ public class HydroJetSpell extends Spell implements ProjectileSpell {
     public static final String MAELSTROM = "maelstrom";
     public static final String LANCE = "lance";
 
-    private static final ResourceLocation LANCE_MODEL = ElementalArcana.id("spell/water_lance");
 
     // Looks of the stream (HydroStreamOptions#look): the pressure rises as it levels, and each
     // branch has its own look. Drawn as a 3D water beam by client/visual/WaterBeams
@@ -428,11 +426,6 @@ public class HydroJetSpell extends Spell implements ProjectileSpell {
         return ModContent.HYDRO_DROP.get();
     }
 
-    @Override
-    public ResourceLocation model() {
-        return LANCE_MODEL;
-    }
-
     /** With a dynamic lights mod: the Tsunami Lance spear shines faintly (the stream is no entity, so it can't). */
     @Override
     public int luminance(SpellProjectile lance) {
@@ -474,10 +467,13 @@ public class HydroJetSpell extends Spell implements ProjectileSpell {
     public void onHitBlock(SpellProjectile lance, BlockHitResult hit) {
         ServerLevel level = (ServerLevel) lance.level();
         Vec3 at = hit.getLocation();
-        level.sendParticles(ParticleTypes.SPLASH, at.x, at.y, at.z, 50, 0.8, 0.3, 0.8, 0.3);
-        for (int i = 0; i < 20; i++) {
-            float angle = i * Mth.TWO_PI / 20;
-            level.sendParticles(ModContent.HYDRO_DROP.get(), at.x, at.y + 0.2, at.z, 0, Mth.cos(angle), 0.6, Mth.sin(angle), 0.4);
+        level.sendParticles(ParticleTypes.SPLASH, at.x, at.y, at.z, 30, 0.8, 0.3, 0.8, 0.3);
+        // A wave ring of water crashing outward (WaterBurstParticle).
+        WaterBurstOptions wave = new WaterBurstOptions(WaterBurstOptions.WAVE, 3.5f, 14);
+        for (ServerPlayer player : level.players()) {
+            if (player.distanceToSqr(at) < 48 * 48) {
+                level.sendParticles(player, wave, true, at.x, at.y, at.z, 1, 0, 0, 0, 0);
+            }
         }
         playAt(level, at, SoundEvents.GENERIC_SPLASH, 1f, 0.8f);
     }

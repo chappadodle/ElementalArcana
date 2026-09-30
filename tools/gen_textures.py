@@ -519,21 +519,6 @@ def hydro_drop(frame, frames=4, size=8):
     return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA")
 
 
-def water_lance(size=16):
-    """Flowing water for the Tsunami Lance model: translucent blue with bright streaks running
-    along its length (the model's long axis maps to the texture's vertical)."""
-    rng = np.random.default_rng(7)
-    y, x = np.mgrid[0:size, 0:size]
-    wave = np.sin(x * 1.3 + np.sin(y * 0.8) * 1.5) * 0.5 + 0.5
-    streak = (wave > 0.82).astype(float) + 0.15 * rng.random((size, size))
-    rgba = np.zeros((size, size, 4))
-    rgba[..., 0] = 0.2 + 0.75 * streak
-    rgba[..., 1] = 0.55 + 0.45 * streak
-    rgba[..., 2] = 0.95 + 0.05 * streak
-    rgba[..., 3] = np.clip(0.72 + 0.25 * streak, 0, 1)
-    return Image.fromarray((np.clip(rgba, 0, 1) * 255).astype(np.uint8), "RGBA")
-
-
 def essence(core, glow, edge, size=16):
     """A glowing crystal shard: a bright core fading to the element's color, a darker rim and a
     couple of sparkle pixels. core/glow/edge are (r, g, b)."""
@@ -968,6 +953,23 @@ def wind_cut(size=32):
     return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA")
 
 
+def wet(size=32, seed=170):
+    """A wet patch: a dark, damp blotch in stepped pixel shades, ragged at the edge, with a few
+    lighter glints of standing water."""
+    rng = np.random.default_rng(seed)
+    noise = tile_noise(size, seed, periods=(4, 8))
+    y, x = np.mgrid[0:size, 0:size] + 0.5
+    r = np.hypot(x - size / 2, y - size / 2) / (size / 2) + (noise - 0.5) * 0.35
+    alpha = np.select([r < 0.5, r < 0.8, r < 0.95], [0.75, 0.55, 0.3], 0.0)
+    shade = np.where(rng.random((size, size)) < 0.04, 0.45, 0.08 + 0.06 * noise)
+    rgba = np.zeros((size, size, 4))
+    rgba[..., 0] = shade * 0.8
+    rgba[..., 1] = shade * 0.9
+    rgba[..., 2] = shade * 1.2
+    rgba[..., 3] = alpha
+    return Image.fromarray((np.clip(rgba, 0, 1) * 255).astype(np.uint8), "RGBA")
+
+
 def main():
     for name, (palette, grid) in SPRITES.items():
         path = ASSETS / f"{name}.png"
@@ -995,7 +997,7 @@ def main():
         make().save(path)
         print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
     # Marks painted onto blocks (client/decal/Decals): bigger, since they span several blocks.
-    for name, make in (("cracks", cracks), ("scorch", scorch), ("frost", frost)):
+    for name, make in (("cracks", cracks), ("scorch", scorch), ("frost", frost), ("wet", wet)):
         path = ASSETS / f"misc/{name}.png"
         make(32).save(path)
         print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
@@ -1004,9 +1006,6 @@ def main():
             path = ASSETS / f"particle/{name}_{frame}.png"
             render(palette, grid).save(path)
             print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
-    path = ASSETS / "block/water_lance.png"
-    water_lance().save(path)
-    print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
     essences = {
         "fire": ((255, 250, 200), (255, 140, 30), (170, 40, 10)),
         "water": ((225, 245, 255), (60, 150, 240), (20, 60, 150)),

@@ -1,15 +1,21 @@
 package com.chappadodle.elementalarcana.content.spell;
 
+import com.chappadodle.elementalarcana.client.decal.Decals;
+import com.chappadodle.elementalarcana.client.particle.WaterCubeParticle;
 import com.chappadodle.elementalarcana.content.GlowParticleOptions;
 import com.chappadodle.elementalarcana.content.HydroStreamOptions;
 import com.chappadodle.elementalarcana.content.ModContent;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The Hydro Jet's particles, all spawned on the client each tick of a stream (see
@@ -111,6 +117,39 @@ public final class HydroJetEffects {
             add(level, ParticleTypes.SPLASH, feet, Vec3.ZERO);
         }
     }
+
+    /**
+     * Where a stream lands, each tick: a crown of little water cubes thrown up (every other tick),
+     * and now and then a wet patch left on the surface it's soaking.
+     */
+    public static void landing(Level level, HydroStreamOptions stream, Vec3 end, Vec3 direction) {
+        RandomSource random = level.getRandom();
+        long tick = level.getGameTime();
+        int look = HydroJetSpell.look(stream.look());
+        boolean torrent = look == HydroJetSpell.LOOK_TORRENT;
+        if (tick % 2 == 0 && look != HydroJetSpell.LOOK_TIDECUTTER) {
+            for (int i = 0; i < (torrent ? 4 : 2); i++) {
+                double angle = random.nextDouble() * Mth.TWO_PI;
+                Vec3 velocity = new Vec3(Math.cos(angle) * 0.12, 0.2 + random.nextDouble() * 0.15, Math.sin(angle) * 0.12)
+                        .subtract(direction.scale(0.05));
+                float size = (torrent ? 0.14f : 0.09f) + random.nextFloat() * 0.05f;
+                Minecraft.getInstance().particleEngine.add(new WaterCubeParticle((ClientLevel) level, end.add(0, 0.1, 0), velocity, size, TINTS[look]));
+            }
+        }
+        if (tick % 10 == 0) {
+            @Nullable BlockHitResult surface = ImpactSurfaces.groundBelow(level, end);
+            if (surface == null) {
+                surface = ImpactSurfaces.surfaceNear(level, end);
+            }
+            if (surface != null) {
+                float radius = torrent ? 1.6f : look == HydroJetSpell.LOOK_TIDECUTTER ? 0.5f : 0.9f;
+                Decals.add(Decals.Kind.WET, surface.getLocation(), surface.getDirection(), radius * (0.8f + 0.4f * random.nextFloat()), 160, 0xFFFFFF);
+            }
+        }
+    }
+
+    /** Water tints by look, in HydroJetSpell's order (as WaterBeams draws them). */
+    private static final int[] TINTS = {0x5FA8F0, 0x3F76E4, 0x2E5CC8, 0x1E40A8, 0x9FD8FF, 0xB8D4FF, 0x2AA89A, 0x1A3A90};
 
     private static GlowParticleOptions glow(int color, int fade, float size, int lifetime) {
         return GlowParticleOptions.of(ModContent.SPARK.get(), color, fade, size, lifetime);

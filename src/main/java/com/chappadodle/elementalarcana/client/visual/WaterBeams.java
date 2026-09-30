@@ -13,11 +13,9 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
@@ -44,14 +42,6 @@ import java.util.Map;
 public final class WaterBeams {
     private static final int EXPIRE_TICKS = 3;
     private static final int MAX_CUBES = 60;
-    private static final ResourceLocation WATER = ResourceLocation.withDefaultNamespace("block/water_still");
-
-    /** A unit cube's corners, and its faces as corner indices wound to face outward. */
-    private static final float[][] CORNERS = {
-            {-1, -1, -1}, {1, -1, -1}, {1, 1, -1}, {-1, 1, -1},
-            {-1, -1, 1}, {1, -1, 1}, {1, 1, 1}, {-1, 1, 1}};
-    private static final int[][] FACES = {
-            {0, 3, 2, 1}, {4, 5, 6, 7}, {0, 4, 7, 3}, {1, 2, 6, 5}, {3, 7, 6, 2}, {0, 1, 5, 4}};
 
     /**
      * How a look is drawn: its water tint, cube size (half its edge, in blocks), how fast the water
@@ -120,7 +110,7 @@ public final class WaterBeams {
         poseStack.translate(-camera.x, -camera.y, -camera.z);
         PoseStack.Pose pose = poseStack.last();
         MultiBufferSource.BufferSource buffers = minecraft.renderBuffers().bufferSource();
-        TextureAtlasSprite water = minecraft.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(WATER);
+        TextureAtlasSprite water = WaterCubes.water();
         RenderType glowType = RenderType.eyes(TextureAtlas.LOCATION_BLOCKS);
         @Nullable RenderType bloomType = Bloom.glowType(TextureAtlas.LOCATION_BLOCKS);
         LocalPlayer self = minecraft.player;
@@ -197,7 +187,7 @@ public final class WaterBeams {
             }
             // Its number in the stream: the same cube keeps it as it travels.
             long id = first - k;
-            float half = size * (0.7f + 0.6f * hash(id, 1)) * Math.min(1f, 0.35f + (float) d * 0.65f);
+            float half = size * (0.7f + 0.6f * WaterCubes.hash(id, 1)) * Math.min(1f, 0.35f + (float) d * 0.65f);
             double far = d / length;
             Vec3 drift;
             if (style.twist()) {
@@ -208,57 +198,26 @@ public final class WaterBeams {
                 double angle = d * 2.0 + time * 0.4;
                 drift = right.scale(Math.cos(angle) * swirl).add(up.scale(Math.sin(angle) * swirl));
             } else {
-                drift = right.scale((hash(id, 2) - 0.5) * 2 * style.spread() * far).add(up.scale((hash(id, 3) - 0.5) * 2 * style.spread() * far));
+                drift = right.scale((WaterCubes.hash(id, 2) - 0.5) * 2 * style.spread() * far).add(up.scale((WaterCubes.hash(id, 3) - 0.5) * 2 * style.spread() * far));
             }
             Vec3 centre = start.add(dir.scale(d)).add(drift);
             // A slow tumble about its own axis.
-            Quaternionf tumble = new Quaternionf().rotateAxis(time * 0.12f + hash(id, 4) * Mth.TWO_PI,
-                    new Vector3f(hash(id, 5) - 0.5f, hash(id, 6) - 0.5f, hash(id, 7) - 0.5f).normalize());
+            Quaternionf tumble = new Quaternionf().rotateAxis(time * 0.12f + WaterCubes.hash(id, 4) * Mth.TWO_PI,
+                    new Vector3f(WaterCubes.hash(id, 5) - 0.5f, WaterCubes.hash(id, 6) - 0.5f, WaterCubes.hash(id, 7) - 0.5f).normalize());
             // A random patch of the water texture, half its width, so cubes don't all match.
-            float uo = hash(id, 8) * 0.5f;
-            float vo = hash(id, 9) * 0.5f;
-            cube(body, pose, water, centre, tumble, half, uo, vo, style.tint(), 235, light);
+            float uo = WaterCubes.hash(id, 8) * 0.5f;
+            float vo = WaterCubes.hash(id, 9) * 0.5f;
+            float cx = (float) centre.x;
+            float cy = (float) centre.y;
+            float cz = (float) centre.z;
+            WaterCubes.cube(body, pose, water, cx, cy, cz, tumble, half, uo, vo, style.tint(), 235, light);
             if (glow != null) {
-                cube(glow, pose, water, centre, tumble, half * 0.55f, uo, vo, glowColor, 255, LightTexture.FULL_BRIGHT);
+                WaterCubes.cube(glow, pose, water, cx, cy, cz, tumble, half * 0.55f, uo, vo, glowColor, 255, LightTexture.FULL_BRIGHT);
             }
             if (bloom != null) {
-                cube(bloom, pose, water, centre, tumble, half * 0.55f, uo, vo, scale(glowColor, 0.7f), 255, LightTexture.FULL_BRIGHT);
+                WaterCubes.cube(bloom, pose, water, cx, cy, cz, tumble, half * 0.55f, uo, vo, scale(glowColor, 0.7f), 255, LightTexture.FULL_BRIGHT);
             }
         }
-    }
-
-    /** One cube of water: {@code half} its edge, turned by {@code rotation}, each face the same patch of texture. */
-    private static void cube(VertexConsumer consumer, PoseStack.Pose pose, TextureAtlasSprite water, Vec3 centre,
-                             Quaternionf rotation, float half, float uo, float vo, int color, int alpha, int light) {
-        int red = color >> 16 & 0xFF;
-        int green = color >> 8 & 0xFF;
-        int blue = color & 0xFF;
-        float u0 = water.getU(uo);
-        float u1 = water.getU(uo + 0.5f);
-        float v0 = water.getV(vo);
-        float v1 = water.getV(vo + 0.5f);
-        float[][] uv = {{u0, v1}, {u0, v0}, {u1, v0}, {u1, v1}};
-        Vector3f[] corners = new Vector3f[8];
-        for (int i = 0; i < 8; i++) {
-            corners[i] = rotation.transform(new Vector3f(CORNERS[i][0] * half, CORNERS[i][1] * half, CORNERS[i][2] * half));
-        }
-        for (int[] face : FACES) {
-            for (int k = 0; k < 4; k++) {
-                Vector3f corner = corners[face[k]];
-                consumer.addVertex(pose, (float) (centre.x + corner.x()), (float) (centre.y + corner.y()), (float) (centre.z + corner.z()))
-                        .setColor(red, green, blue, alpha)
-                        .setUv(uv[k][0], uv[k][1])
-                        .setOverlay(OverlayTexture.NO_OVERLAY)
-                        .setLight(light)
-                        .setNormal(pose, 0f, 1f, 0f);
-            }
-        }
-    }
-
-    /** A steady random number in [0, 1) for a cube's number and a salt. */
-    private static float hash(long id, int salt) {
-        double value = Math.sin(id * 12.9898 + salt * 78.233) * 43758.5453;
-        return (float) (value - Math.floor(value));
     }
 
     /** A colour darkened (or, above 1, brightened and clamped) by {@code strength}, for additive layers. */

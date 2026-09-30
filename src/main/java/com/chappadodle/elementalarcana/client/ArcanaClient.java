@@ -14,6 +14,7 @@ import com.chappadodle.elementalarcana.client.particle.FireBlastEmitter;
 import com.chappadodle.elementalarcana.client.particle.GlowParticle;
 import com.chappadodle.elementalarcana.client.particle.HydroDropParticle;
 import com.chappadodle.elementalarcana.client.particle.IceShatterEmitter;
+import com.chappadodle.elementalarcana.client.particle.WaterBurstParticle;
 import com.chappadodle.elementalarcana.client.particle.WindCutEmitter;
 import com.chappadodle.elementalarcana.client.particle.HydroStreamEmitter;
 import com.chappadodle.elementalarcana.client.particle.FrostMistParticle;
@@ -22,6 +23,7 @@ import com.chappadodle.elementalarcana.client.particle.IceShardParticle;
 import com.chappadodle.elementalarcana.client.particle.WindStreakParticle;
 import com.chappadodle.elementalarcana.client.visual.ProjectileVisuals;
 import com.chappadodle.elementalarcana.client.visual.WaterBeams;
+import com.chappadodle.elementalarcana.client.visual.WaterSpearRenderer;
 import com.chappadodle.elementalarcana.client.visual.WindSlashRenderer;
 import com.chappadodle.elementalarcana.content.BubblePrisons;
 import com.chappadodle.elementalarcana.content.ModContent;
@@ -109,6 +111,7 @@ public final class ArcanaClient {
         event.enqueueWork(() -> {
             DynamicLights.init();
             ProjectileVisuals.register(ModSpells.WIND_BLADE.get(), WindSlashRenderer::render);
+            ProjectileVisuals.register(ModSpells.HYDRO_JET.get(), WaterSpearRenderer::render);
         });
     }
 
@@ -249,6 +252,7 @@ public final class ArcanaClient {
         event.registerSpecial(ModContent.FIRE_BLAST.get(), new FireBlastEmitter.Provider());
         event.registerSpecial(ModContent.ICE_SHATTER.get(), new IceShatterEmitter.Provider());
         event.registerSpecial(ModContent.WIND_CUT.get(), new WindCutEmitter.Provider());
+        event.registerSpecial(ModContent.WATER_BURST.get(), new WaterBurstParticle.Provider());
     }
 
     // Additive particles change the blend function and vanilla doesn't set it back; put it back

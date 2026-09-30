@@ -93,3 +93,25 @@ of water rushing from the palm to the impact point.
   - **Tsunami Lance:** nautilus swirls, like a conduit's.
   - **Lv 8+:** cyan glints.
   - **Recoil (Lv 8+, aiming down):** droplets and a splash ringing out around your feet.
+
+## Step 3 structure (impacts)
+
+- **Shared water cubes:** `client/visual/WaterCubes` draws a cube of the vanilla water texture
+  (a patch of it, tinted), for entity buffers (with a pose) or particle buffers. The stream, its
+  splashes, the whirlpool, the wave and the spear all use it.
+- **Where the stream lands** (`HydroJetEffects.landing`, from `HydroStreamEmitter`):
+  - Every other tick: a crown of little water cubes thrown up (`WaterCubeParticle`, on
+    `TumblingParticle`), which burst into a vanilla splash when they land. More and bigger for
+    Torrent; none for Tidecutter.
+  - Every half second: a **wet mark** (`Decals.Kind.WET`): a dark, damp, pixel-blotched patch on
+    the soaked surface that dries inward over its 8 s (bigger for Torrent).
+- **`WATER_BURST`** (`WaterBurstOptions(kind, radius, ticks)`), sent to players within 48 blocks,
+  drawn by `WaterBurstParticle`:
+  - **Whirlpool** (Maelstrom and the Water Archmage's, sent by `Whirlpool.spawn`): three spiral
+    arms of cubes flowing round and inward into a sunken centre, turning, with splashes and
+    bubbles, for the whirlpool's life. The server's droplet arms are gone.
+  - **Wave** (where a Tsunami Lance lands): a ring of 28 cubes crashing outward to 3.5 blocks over
+    14 ticks, rising then falling, throwing up splashes.
+- **The Tsunami Lance spear** (`WaterSpearRenderer`, a ProjectileVisuals visual): a shaft of water
+  cubes tapering to a tip, a glowing core, and small cubes spiralling round it, sized by how long
+  the stream was held. The old block model and its texture are removed.

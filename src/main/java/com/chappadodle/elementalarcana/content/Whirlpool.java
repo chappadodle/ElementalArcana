@@ -7,9 +7,9 @@ import com.chappadodle.elementalarcana.api.SpellDamage;
 import com.chappadodle.elementalarcana.api.SpellTargets;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -26,7 +26,8 @@ import java.util.List;
 /**
  * A swirling whirlpool at a point (Hydro Jet's Maelstrom, a Water Archmage's spell) that drags
  * creatures (whoever its caster's magic may hurt, see SpellTargets) around and into its center,
- * soaking and hurting them. Server-side.
+ * soaking and hurting them. Server-side; players see it as spiral arms of little water cubes
+ * flowing into it (WaterBurstParticle).
  */
 @EventBusSubscriber(modid = ElementalArcana.MODID)
 public final class Whirlpool {
@@ -51,6 +52,12 @@ public final class Whirlpool {
 
     public static void spawn(ServerLevel level, Vec3 center, float damage, int ticks, @Nullable Entity owner) {
         ACTIVE.add(new Whirlpool(level, center, damage, ticks, owner));
+        WaterBurstOptions burst = new WaterBurstOptions(WaterBurstOptions.WHIRLPOOL, (float) RADIUS, ticks);
+        for (ServerPlayer player : level.players()) {
+            if (player.distanceToSqr(center) < 48 * 48) {
+                level.sendParticles(player, burst, true, center.x, center.y, center.z, 1, 0, 0, 0, 0);
+            }
+        }
         level.playSound(null, center.x, center.y, center.z, SoundEvents.BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundSource.PLAYERS, 1.5f, 0.8f);
         level.sendParticles(ParticleTypes.SPLASH, center.x, center.y + 0.2, center.z, 40, 1.5, 0.2, 1.5, 0.2);
     }
@@ -87,13 +94,6 @@ public final class Whirlpool {
                 Entity source = owner != null ? owner : entity;
                 SpellDamage.hurtMultiHit(entity, SpellDamage.source(level, Element.WATER, source, source), damage);
             }
-        }
-        for (int arm = 0; arm < 3; arm++) {
-            float angle = age * 0.35f + arm * Mth.TWO_PI / 3;
-            double ring = RADIUS * (0.25 + 0.7 * ((age + arm * 7) % 20) / 20.0);
-            double x = center.x + Mth.cos(angle) * ring;
-            double z = center.z + Mth.sin(angle) * ring;
-            level.sendParticles(ModContent.HYDRO_DROP.get(), x, center.y + 0.15, z, 0, -Mth.sin(angle) - Mth.cos(angle) * 0.4, 0.05, Mth.cos(angle) - Mth.sin(angle) * 0.4, 0.35);
         }
         if (age % 3 == 0) {
             level.sendParticles(ParticleTypes.SPLASH, center.x, center.y + 0.1, center.z, 6, RADIUS * 0.4, 0.05, RADIUS * 0.4, 0.1);

@@ -32,7 +32,8 @@ import java.util.List;
 /**
  * Marks painted onto the world: burn scorches and glowing lava cracks left by fireball blasts, and
  * frost left by shattering ice, which melts inward from its edges, and the cuts wind blades slash
- * into what they hit, turned to run along the blade.
+ * into what they hit, turned to run along the blade, and damp patches where water splashes, which
+ * dry inward from their edges.
  * <p>
  * A mark isn't one flat square: every frame it's projected onto the real, exposed faces of the
  * blocks around where it landed (on the ground, a wall or a ceiling), cut to each face. So it
@@ -41,12 +42,13 @@ import java.util.List;
  * way.
  */
 public final class Decals {
-    public enum Kind { SCORCH, CRACKS, FROST, CUT }
+    public enum Kind { SCORCH, CRACKS, FROST, CUT, WET }
 
     private static final ResourceLocation SCORCH_TEXTURE = ElementalArcana.id("textures/misc/scorch.png");
     private static final ResourceLocation CRACKS_TEXTURE = ElementalArcana.id("textures/misc/cracks.png");
     private static final ResourceLocation FROST_TEXTURE = ElementalArcana.id("textures/misc/frost.png");
     private static final ResourceLocation CUT_TEXTURE = ElementalArcana.id("textures/misc/wind_cut.png");
+    private static final ResourceLocation WET_TEXTURE = ElementalArcana.id("textures/misc/wet.png");
     /** How far off the surface a mark sits, against flicker (on top of the polygon offset). */
     private static final float LIFT = 0.004f;
     /** How far above or below the mark's own surface other surfaces can still take it. */
@@ -58,6 +60,8 @@ public final class Decals {
     private static final RenderType FROST = markType("elementalarcana_frost", FROST_TEXTURE);
     /** Cut marks: pale slashes, blended normally and lit by the world. */
     private static final RenderType CUT = markType("elementalarcana_wind_cut", CUT_TEXTURE);
+    /** Wet patches: darkened, damp blocks, blended normally and lit by the world. */
+    private static final RenderType WET = markType("elementalarcana_wet", WET_TEXTURE);
     /** Glowing cracks: added on top, full bright. */
     private static final RenderType CRACKS = RenderType.create("elementalarcana_cracks", DefaultVertexFormat.NEW_ENTITY,
             VertexFormat.Mode.QUADS, 1024, false, true, RenderType.CompositeState.builder()
@@ -147,6 +151,11 @@ public final class Decals {
             } else if (decal.kind() == Kind.CUT) {
                 float alpha = life < 0.5f ? 0.8f : 0.8f * (1f - (life - 0.5f) / 0.5f);
                 project(level, decal, decal.radius(), pose, buffers.getBuffer(CUT), alpha, false);
+            } else if (decal.kind() == Kind.WET) {
+                // Dries inward from its edges over the second half of its life.
+                float dry = life < 0.5f ? 1f : 1f - (life - 0.5f) / 0.5f * 0.9f;
+                float alpha = life < 0.5f ? 0.75f : 0.75f * (1f - (life - 0.5f) / 0.5f * 0.5f);
+                project(level, decal, decal.radius() * dry, pose, buffers.getBuffer(WET), alpha, false);
             } else if (decal.kind() == Kind.FROST) {
                 // Frost melts inward from its edges over the second half of its life.
                 float melt = life < 0.5f ? 1f : 1f - (life - 0.5f) / 0.5f * 0.85f;
@@ -164,6 +173,7 @@ public final class Decals {
         buffers.endBatch(SCORCH);
         buffers.endBatch(FROST);
         buffers.endBatch(CUT);
+        buffers.endBatch(WET);
         buffers.endBatch(CRACKS);
         if (bloom != null) {
             buffers.endBatch(bloom);

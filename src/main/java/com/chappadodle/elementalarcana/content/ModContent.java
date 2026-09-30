@@ -124,6 +124,10 @@ public final class ModContent {
     public static final DeferredHolder<ParticleType<?>, ParticleType<WindCutOptions>> WIND_CUT =
             PARTICLES.register("wind_cut", WindCutOptions::newType);
 
+    /** A whirlpool or a crashing wave, drawn out of water cubes (see WaterBurstOptions). */
+    public static final DeferredHolder<ParticleType<?>, ParticleType<WaterBurstOptions>> WATER_BURST =
+            PARTICLES.register("water_burst", WaterBurstOptions::newType);
+
     /** Moderate exhaustion from emptying your mana: slower, weaker, and slower mana regen. */
     public static final DeferredHolder<MobEffect, MobEffect> MANA_SICKNESS = EFFECTS.register("mana_sickness",
             () -> new MobEffect(MobEffectCategory.HARMFUL, 0x7A3FA0) {

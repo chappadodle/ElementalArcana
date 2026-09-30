@@ -50,6 +50,7 @@ public class HydroStreamEmitter extends NoRenderParticle {
     @Override
     public void tick() {
         HydroJetEffects.stream(level, stream, start, line);
+        HydroJetEffects.landing(level, stream, end, direction);
         // The splash where it lands.
         for (int i = 0; i < Math.round(2 * width) + 1; i++) {
             level.addParticle(ParticleTypes.SPLASH, end.x + (random.nextDouble() - 0.5) * 0.4 * width, end.y, end.z + (random.nextDouble() - 0.5) * 0.4 * width, 0, 0.1, 0);
