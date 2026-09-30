@@ -80,3 +80,16 @@ of water rushing from the palm to the impact point.
     at Lv 8+) also draw an additive inner cube, and Lv 8+ blooms it.
 - **`HydroStreamEmitter`** now just updates the beam and keeps the splash where the stream lands
   (the droplets come back in step 2, sparser, peeling off the beam).
+
+## Step 2 structure (particles)
+
+- **`HydroJetEffects.stream`** is called by `HydroStreamEmitter` each tick of a stream. Your own
+  stream is re-aimed from your hand and view, like its cubes. It uses vanilla-style pixel water:
+  - **At the palm:** droplets swirling out and a splash (more for Torrent).
+  - **Along the stream:** vanilla falling-water drips peeling off, 1 to 4 a tick by look.
+  - **Tidecutter:** fine glints and mist along the line.
+  - **Torrent:** heavy splashes and spray off the sides.
+  - **Maelstrom:** droplets flung off the spiral once it has wound out.
+  - **Tsunami Lance:** nautilus swirls, like a conduit's.
+  - **Lv 8+:** cyan glints.
+  - **Recoil (Lv 8+, aiming down):** droplets and a splash ringing out around your feet.
