@@ -1,10 +1,17 @@
 package com.chappadodle.elementalarcana.content.spell;
 
 import com.chappadodle.elementalarcana.api.SpellProjectile;
-import com.chappadodle.elementalarcana.client.visual.WindSlashRenderer;
+import com.chappadodle.elementalarcana.client.decal.Decals;
+import com.chappadodle.elementalarcana.client.particle.DebrisParticle;
+import com.chappadodle.elementalarcana.client.particle.WindFunnelParticle;
 import com.chappadodle.elementalarcana.content.GlowParticleOptions;
 import com.chappadodle.elementalarcana.content.ModContent;
+import com.chappadodle.elementalarcana.content.WindCutOptions;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.particle.Particle;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
@@ -26,9 +33,11 @@ import java.util.List;
  * docs/superpowers/specs/2026-09-30-wind-blade-vfx-design.md, step 2): wind curls tinted by look,
  * gusts, dust kicked up from the ground it skims, and glints. Branch signatures: the Boomerang
  * leaves a spiral wake, Tempest Edge dark swirls, Thousand Cuts sharp glints, and the Storm Scythe
- * sparks of lightning.
+ * sparks of lightning. Impacts (step 3) are played out on each client by WindCutEmitter.
  */
-final class WindBladeEffects {
+public final class WindBladeEffects {
+    /** How many ticks an impact takes to play out. */
+    public static final int IMPACT_TICKS = 6;
 
     /** A look's particles: its wind tint (0xRRGGBB), glint colour and the colour glints fade to. */
     private record Palette(int tint, int glint, int fade) {
@@ -132,7 +141,7 @@ final class WindBladeEffects {
         // Where its tips are this tick: across the blade (tilted by its fan angle), a little behind.
         Vec3 side = sideOf(forward);
         Vec3 up = side.cross(forward).normalize();
-        float roll = WindSlashRenderer.fanAngle(blade.formationSlot(), blade.formationCount());
+        float roll = WindBladeSpell.fanAngle(blade.formationSlot(), blade.formationCount());
         // (The renderer's local x runs opposite to this side, hence the minus.)
         Vec3 across = side.scale(Math.cos(roll)).subtract(up.scale(Math.sin(roll)));
         Vec3 behind = forward.scale(TIP_BACK * size);
@@ -198,6 +207,98 @@ final class WindBladeEffects {
                 }
             }
         }
+    }
+
+    // ---- impacts (client, played out by WindCutEmitter) ----
+
+    /**
+     * One tick ({@code age}, from 0) of a blade striking at {@code at}: a gust and rings of air, wind
+     * curls, a cut slashed into the surface (turned to run along the blade), bits of it blown off,
+     * a spinning funnel for a Tempest Edge whirlwind, and a lightning flash for the Storm Scythe.
+     */
+    public static void impact(Level level, Vec3 at, WindCutOptions cut, int age) {
+        RandomSource random = level.getRandom();
+        int look = WindBladeSpell.look(cut.look());
+        Palette palette = PALETTES.get(look);
+        boolean scythe = look == WindBladeSpell.LOOK_SCYTHE;
+        float size = cut.size();
+        float scale = size * (0.6f + 0.4f * cut.charge());
+        @Nullable BlockHitResult ground = ImpactSurfaces.groundBelow(level, at);
+        Vec3 floor = ground != null ? ground.getLocation() : at;
+
+        if (age == 0) {
+            add(level, scythe ? ParticleTypes.GUST : ParticleTypes.SMALL_GUST, at, Vec3.ZERO);
+            add(level, glow(ModContent.SHOCKWAVE.get(), palette.glint(), palette.fade(), (0.8f + 0.6f * cut.charge()) * size, 6),
+                    floor.add(0, 0.05, 0), Vec3.ZERO);
+            for (int i = 0; i < Math.round(10 * Math.min(size, 2f)); i++) {
+                add(level, swirl(palette), at, randomDirection(random).scale(0.18));
+            }
+            @Nullable BlockHitResult surface = ground != null ? ground : ImpactSurfaces.surfaceNear(level, at);
+            if (surface != null) {
+                cutMark(level, surface, cut, scythe);
+                blowOff(level, surface, cut, scythe, random);
+            }
+            if (cut.vortex()) {
+                spawn(new WindFunnelParticle((ClientLevel) level, floor, 20));
+            }
+            if (scythe) {
+                // A lightning flash where the storm strikes.
+                add(level, glow(ModContent.FLARE.get(), 0xFFFFFF, palette.glint(), 1.4f, 3), at, Vec3.ZERO);
+                for (int i = 0; i < 20; i++) {
+                    add(level, ParticleTypes.ELECTRIC_SPARK, at, randomDirection(random).scale(0.3));
+                }
+                for (int i = 0; i < 8; i++) {
+                    add(level, glow(ModContent.SPARK.get(), 0xFFFFFF, palette.glint(), 0.16f, 5), at, randomDirection(random).scale(0.35));
+                }
+            }
+        } else if (age % 2 == 0) {
+            add(level, swirl(palette), at.add(randomDirection(random).scale(0.4 * scale)), new Vec3(0, 0.03, 0));
+        }
+    }
+
+    /** A cut slashed into the surface it struck, running the way the blade's edge lay. */
+    private static void cutMark(Level level, BlockHitResult surface, WindCutOptions cut, boolean scythe) {
+        Direction face = surface.getDirection();
+        Vec3 forward = cut.direction().lengthSqr() > 1.0e-6 ? cut.direction().normalize() : new Vec3(0, 0, 1);
+        Vec3 side = sideOf(forward);
+        Vec3 up = side.cross(forward).normalize();
+        Vec3 across = side.scale(Math.cos(cut.roll())).subtract(up.scale(Math.sin(cut.roll())));
+        // The surface's own axes, as the marks use them.
+        Direction.Axis normal = face.getAxis();
+        Vec3 uAxis = normal == Direction.Axis.X ? new Vec3(0, 0, 1) : new Vec3(1, 0, 0);
+        Vec3 vAxis = normal == Direction.Axis.Y ? new Vec3(0, 0, 1) : new Vec3(0, 1, 0);
+        double onU = across.dot(uAxis);
+        double onV = across.dot(vAxis);
+        float angle = onU * onU + onV * onV < 1.0e-4 ? 0.001f : (float) Math.atan2(onV, onU);
+        if (angle == 0f) {
+            angle = 0.001f;
+        }
+        float radius = scythe ? 2.6f : (0.45f + 0.3f * cut.charge()) * cut.size();
+        Decals.add(Decals.Kind.CUT, surface.getLocation(), face, radius, scythe ? 160 : 100, 0xFFFFFF, angle);
+    }
+
+    /** Bits of the struck block blown off it. */
+    private static void blowOff(Level level, BlockHitResult surface, WindCutOptions cut, boolean scythe, RandomSource random) {
+        BlockPos pos = surface.getBlockPos();
+        BlockState state = level.getBlockState(pos);
+        if (state.isAir()) {
+            return;
+        }
+        Vec3 away = Vec3.atLowerCornerOf(surface.getDirection().getNormal());
+        int count = scythe ? 10 : Math.round(3 + 2 * cut.size());
+        float minSize = scythe ? 0.12f : 0.06f;
+        float maxSize = scythe ? 0.22f : 0.12f;
+        for (int i = 0; i < count; i++) {
+            Vec3 velocity = away.scale(0.15 + 0.1 * random.nextDouble()).add(cut.direction().scale(0.1))
+                    .add(randomDirection(random).scale(0.08)).add(0, 0.12, 0);
+            float bit = minSize + random.nextFloat() * (maxSize - minSize);
+            spawn(new DebrisParticle((ClientLevel) level, surface.getLocation().add(away.scale(0.1)), velocity, state, pos, bit));
+        }
+    }
+
+    /** Adds a particle made here directly (the 3D shapes aren't sent or spawned by type). */
+    private static void spawn(Particle particle) {
+        Minecraft.getInstance().particleEngine.add(particle);
     }
 
     // ---- pieces ----

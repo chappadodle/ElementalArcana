@@ -11,6 +11,7 @@ import com.chappadodle.elementalarcana.api.SpellDamage;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.content.ModSchools;
+import com.chappadodle.elementalarcana.content.WindCutOptions;
 import com.chappadodle.elementalarcana.content.WindVortex;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -194,7 +195,7 @@ public class WindBladeSpell extends Spell implements ProjectileSpell, ConjureSpe
 
     @Override
     public void fizzle(SpellProjectile blade) {
-        impact(blade);
+        impact(blade, blade.position(), false);
         blade.discard();
     }
 
@@ -377,22 +378,24 @@ public class WindBladeSpell extends Spell implements ProjectileSpell, ConjureSpe
         }
         ElementalReactions.swirl(target, owner, blade.power());
 
-        if (TEMPEST.equals(tag.getString(TAG_BRANCH_5)) && charge >= 1f && !tag.getBoolean(TAG_CHILD)) {
+        boolean vortex = TEMPEST.equals(tag.getString(TAG_BRANCH_5)) && charge >= 1f && !tag.getBoolean(TAG_CHILD);
+        if (vortex) {
             WindVortex.spawn((ServerLevel) blade.level(), target.position(), 4.0, 0.35, 20, owner);
         }
         if (THOUSAND_CUTS.equals(tag.getString(TAG_BRANCH_10)) && !tag.getBoolean(TAG_CHILD)) {
             splitTowardOthers(blade, target);
         }
-        impact(blade);
+        impact(blade, blade.impactPoint(hit), vortex);
     }
 
     @Override
     public void onHitBlock(SpellProjectile blade, BlockHitResult hit) {
         CompoundTag tag = blade.getPersistentData();
-        if (TEMPEST.equals(tag.getString(TAG_BRANCH_5)) && blade.charge(0f) >= 1f && !tag.getBoolean(TAG_CHILD)) {
+        boolean vortex = TEMPEST.equals(tag.getString(TAG_BRANCH_5)) && blade.charge(0f) >= 1f && !tag.getBoolean(TAG_CHILD);
+        if (vortex) {
             WindVortex.spawn((ServerLevel) blade.level(), hit.getLocation(), 4.0, 0.35, 20, blade.getOwner());
         }
-        impact(blade);
+        impact(blade, hit.getLocation(), vortex);
     }
 
     /** Thousand Cuts: the blade splits into two smaller blades that seek the nearest other enemies. */
@@ -417,13 +420,36 @@ public class WindBladeSpell extends Spell implements ProjectileSpell, ConjureSpe
         }
     }
 
-    private static void impact(SpellProjectile blade) {
+    /**
+     * Where it strikes: the whole impact goes out as one particle, and each client plays it out
+     * (WindBladeEffects#impact). The Storm Scythe's reaches further.
+     */
+    private static void impact(SpellProjectile blade, Vec3 at, boolean vortex) {
         ServerLevel level = (ServerLevel) blade.level();
         float size = blade.visualScale();
-        level.sendParticles(ParticleTypes.GUST, blade.getX(), blade.getY(), blade.getZ(), 1, 0, 0, 0, 0);
-        level.sendParticles(ModContent.WIND_STREAK.get(), blade.getX(), blade.getY(), blade.getZ(), Math.round(8 * size), 0.3 * size, 0.3 * size, 0.3 * size, 0.2);
-        level.playSound(null, blade.getX(), blade.getY(), blade.getZ(), SoundEvents.WIND_CHARGE_BURST.value(), SoundSource.PLAYERS,
+        Vec3 direction = blade.getDeltaMovement().lengthSqr() > 1.0e-6 ? blade.getDeltaMovement().normalize() : new Vec3(0, 0, 1);
+        float roll = fanAngle(blade.formationSlot(), blade.formationCount());
+        WindCutOptions cut = WindCutOptions.of(blade.variant(), size, blade.charge(0f), direction, roll, vortex);
+        double reach = size > 1.5f ? 48 : 32;
+        for (ServerPlayer player : level.players()) {
+            if (player.distanceToSqr(at) < reach * reach) {
+                level.sendParticles(player, cut, true, at.x, at.y, at.z, 1, 0, 0, 0, 0);
+            }
+        }
+        level.playSound(null, at.x, at.y, at.z, SoundEvents.WIND_CHARGE_BURST.value(), SoundSource.PLAYERS,
                 Math.min(1.5f, 0.5f * size), 1.4f / (float) Math.sqrt(size));
+    }
+
+    /**
+     * A fanned set's fixed tilts, in radians: each blade keeps its own angle (the renderer draws it
+     * so, and its cut mark runs along it).
+     */
+    public static float fanAngle(int slot, int count) {
+        if (count <= 1) {
+            return 0f;
+        }
+        float spread = count >= 5 ? 60f : count >= 3 ? 40f : 30f;
+        return Mth.DEG_TO_RAD * Mth.lerp(slot / (float) (count - 1), -spread, spread);
     }
 
     private static void playAt(Entity at, SoundEvent sound, float volume, float pitch) {

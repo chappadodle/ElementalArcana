@@ -112,3 +112,28 @@ lightning (9) give light.
   - The Scythe: electric sparks and bright bolts.
   - Lv 8+ tiers: the odd glint.
 - Split Thousand Cuts blades are lighter.
+
+## Step 3 structure (impacts)
+
+- **One packet per impact:** `WindBladeSpell#impact` sends one `WIND_CUT` particle,
+  `WindCutOptions(look, size, charge, flight direction, fan tilt, whirlwind)`, at the true impact
+  point (`impactPoint` for creatures). It goes to players within 32 blocks, 48 for the Scythe.
+  `WindCutEmitter` plays it out over 6 ticks through `WindBladeEffects#impact`. The impact sound
+  stays on the server until step 4.
+  - `WindBladeSpell#fanAngle` is now the one copy of the fan tilt, used by the renderer, the
+    particles and the cut marks.
+- **The impact:**
+  - A small gust (a full gust for the Scythe), a flat air ring on the ground or a halo in
+    mid-air, and a burst of curls.
+  - A **cut mark** (`Decals.Kind.CUT`): three pale slashes on the struck surface. It's turned to
+    run along the blade's edge, from the flight direction and fan tilt projected onto the surface,
+    and fades over 5 s (8 s and 2.6 blocks for the Scythe).
+    - Marks can now be turned. A turned mark is mapped at 1/√2 of its size, so its art has to sit
+      inside the texture's inner circle, or the corners would repeat.
+  - **Bits blown off:** debris cubes of the struck block, flung off its face and along the flight.
+- **Tempest Edge:**
+  - `WindFunnelParticle`: a 3D funnel for the whirlwind's 20 ticks. It's narrow at the ground and
+    widens as it rises (2.4 blocks), twisting and turning, and throws off curls. The texture is
+    `block/wind_funnel`, and it's drawn additively from both sides.
+  - `WindVortex` keeps the pull and no longer draws streaks.
+- **Storm Scythe:** a lightning flash with electric sparks and bolts.

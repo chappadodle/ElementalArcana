@@ -14,6 +14,7 @@ import com.chappadodle.elementalarcana.client.particle.FireBlastEmitter;
 import com.chappadodle.elementalarcana.client.particle.GlowParticle;
 import com.chappadodle.elementalarcana.client.particle.HydroDropParticle;
 import com.chappadodle.elementalarcana.client.particle.IceShatterEmitter;
+import com.chappadodle.elementalarcana.client.particle.WindCutEmitter;
 import com.chappadodle.elementalarcana.client.particle.HydroStreamEmitter;
 import com.chappadodle.elementalarcana.client.particle.FrostMistParticle;
 import com.chappadodle.elementalarcana.client.particle.FrostSparkleParticle;
@@ -248,6 +249,7 @@ public final class ArcanaClient {
         event.registerSpriteSet(ModContent.CORONA.get(), sprites -> new GlowParticle.Provider(GlowParticle.Kind.CORONA, sprites));
         event.registerSpecial(ModContent.FIRE_BLAST.get(), new FireBlastEmitter.Provider());
         event.registerSpecial(ModContent.ICE_SHATTER.get(), new IceShatterEmitter.Provider());
+        event.registerSpecial(ModContent.WIND_CUT.get(), new WindCutEmitter.Provider());
     }
 
     // Additive particles change the blend function and vanilla doesn't set it back; put it back

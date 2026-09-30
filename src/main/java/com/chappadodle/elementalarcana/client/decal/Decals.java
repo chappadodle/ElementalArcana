@@ -31,7 +31,8 @@ import java.util.List;
 
 /**
  * Marks painted onto the world: burn scorches and glowing lava cracks left by fireball blasts, and
- * frost left by shattering ice, which melts inward from its edges.
+ * frost left by shattering ice, which melts inward from its edges, and the cuts wind blades slash
+ * into what they hit, turned to run along the blade.
  * <p>
  * A mark isn't one flat square: every frame it's projected onto the real, exposed faces of the
  * blocks around where it landed (on the ground, a wall or a ceiling), cut to each face. So it
@@ -40,11 +41,12 @@ import java.util.List;
  * way.
  */
 public final class Decals {
-    public enum Kind { SCORCH, CRACKS, FROST }
+    public enum Kind { SCORCH, CRACKS, FROST, CUT }
 
     private static final ResourceLocation SCORCH_TEXTURE = ElementalArcana.id("textures/misc/scorch.png");
     private static final ResourceLocation CRACKS_TEXTURE = ElementalArcana.id("textures/misc/cracks.png");
     private static final ResourceLocation FROST_TEXTURE = ElementalArcana.id("textures/misc/frost.png");
+    private static final ResourceLocation CUT_TEXTURE = ElementalArcana.id("textures/misc/wind_cut.png");
     /** How far off the surface a mark sits, against flicker (on top of the polygon offset). */
     private static final float LIFT = 0.004f;
     /** How far above or below the mark's own surface other surfaces can still take it. */
@@ -54,6 +56,8 @@ public final class Decals {
     private static final RenderType SCORCH = markType("elementalarcana_scorch", SCORCH_TEXTURE);
     /** Frost: pale crystals, blended normally and lit by the world. */
     private static final RenderType FROST = markType("elementalarcana_frost", FROST_TEXTURE);
+    /** Cut marks: pale slashes, blended normally and lit by the world. */
+    private static final RenderType CUT = markType("elementalarcana_wind_cut", CUT_TEXTURE);
     /** Glowing cracks: added on top, full bright. */
     private static final RenderType CRACKS = RenderType.create("elementalarcana_cracks", DefaultVertexFormat.NEW_ENTITY,
             VertexFormat.Mode.QUADS, 1024, false, true, RenderType.CompositeState.builder()
@@ -82,11 +86,11 @@ public final class Decals {
 
     /**
      * One mark: its centre on the surface it hit, which way that surface faces, its radius, when it
-     * was made and for how long (ticks), its tint (0xRRGGBB), and whether its texture is mirrored
-     * (so marks don't all look alike).
+     * was made and for how long (ticks), its tint (0xRRGGBB), whether its texture is mirrored (so
+     * marks don't all look alike), and how far it's turned on the surface (radians; 0 = not turned).
      */
     private record Decal(Kind kind, Vec3 center, Direction face, float radius, long born, int lifetime, int color,
-                         boolean flipU, boolean flipV, ClientLevel level) {
+                         boolean flipU, boolean flipV, float angle, ClientLevel level) {
     }
 
     private static final List<Decal> DECALS = new ArrayList<>();
@@ -96,12 +100,21 @@ public final class Decals {
 
     /** Leaves a mark centred on {@code center}, on a surface facing {@code face}. */
     public static void add(Kind kind, Vec3 center, Direction face, float radius, int lifetime, int color) {
+        add(kind, center, face, radius, lifetime, color, 0f);
+    }
+
+    /**
+     * Leaves a mark turned by {@code angle} (radians) on the surface: its texture's horizontal runs
+     * that way from the surface's first axis (x, or z on an east or west face). A turned mark's art
+     * must fit within its texture's inner circle (see project).
+     */
+    public static void add(Kind kind, Vec3 center, Direction face, float radius, int lifetime, int color, float angle) {
         ClientLevel level = Minecraft.getInstance().level;
         if (level == null) {
             return;
         }
         DECALS.add(new Decal(kind, center, face, radius, level.getGameTime(), lifetime, color,
-                level.random.nextBoolean(), level.random.nextBoolean(), level));
+                level.random.nextBoolean(), angle == 0f && level.random.nextBoolean(), angle, level));
     }
 
     /** Draws every live mark (after the cutout blocks, before water and other see-through blocks). */
@@ -131,6 +144,9 @@ public final class Decals {
             if (decal.kind() == Kind.SCORCH) {
                 float alpha = life < 0.6f ? 0.9f : 0.9f * (1f - (life - 0.6f) / 0.4f);
                 project(level, decal, decal.radius(), pose, buffers.getBuffer(SCORCH), alpha, false);
+            } else if (decal.kind() == Kind.CUT) {
+                float alpha = life < 0.5f ? 0.8f : 0.8f * (1f - (life - 0.5f) / 0.5f);
+                project(level, decal, decal.radius(), pose, buffers.getBuffer(CUT), alpha, false);
             } else if (decal.kind() == Kind.FROST) {
                 // Frost melts inward from its edges over the second half of its life.
                 float melt = life < 0.5f ? 1f : 1f - (life - 0.5f) / 0.5f * 0.85f;
@@ -147,6 +163,7 @@ public final class Decals {
         }
         buffers.endBatch(SCORCH);
         buffers.endBatch(FROST);
+        buffers.endBatch(CUT);
         buffers.endBatch(CRACKS);
         if (bloom != null) {
             buffers.endBatch(bloom);
@@ -204,8 +221,22 @@ public final class Decals {
                 for (float[] corner : corners) {
                     double u = corner[0] == 0 ? u0 : u1;
                     double v = corner[1] == 0 ? v0 : v1;
-                    float texU = (float) ((u - (cu - r)) / (2 * r));
-                    float texV = (float) ((v - (cv - r)) / (2 * r));
+                    float texU;
+                    float texV;
+                    if (decal.angle() == 0f) {
+                        texU = (float) ((u - (cu - r)) / (2 * r));
+                        texV = (float) ((v - (cv - r)) / (2 * r));
+                    } else {
+                        // Turned: the mark's whole square must still land inside the texture once
+                        // rotated, so it's mapped at 1/sqrt(2) the size (its art sits in the inner circle).
+                        double cos = Math.cos(decal.angle());
+                        double sin = Math.sin(decal.angle());
+                        double offU = u - cu;
+                        double offV = v - cv;
+                        double scale = 2 * r * Math.sqrt(2);
+                        texU = (float) (0.5 + (offU * cos + offV * sin) / scale);
+                        texV = (float) (0.5 + (-offU * sin + offV * cos) / scale);
+                    }
                     Vec3 point = point(normalAxis, uAxis, vAxis, lifted, u, v);
                     consumer.addVertex(pose, (float) point.x, (float) point.y, (float) point.z)
                             .setColor(red, green, blue, Mth.clamp(alpha, 0, 255))

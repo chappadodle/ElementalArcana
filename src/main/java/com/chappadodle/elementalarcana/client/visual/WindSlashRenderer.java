@@ -71,15 +71,6 @@ public final class WindSlashRenderer {
         return ElementalArcana.id("textures/misc/wind_slash_" + style.texture() + ".png");
     }
 
-    /** A fanned set's fixed tilts: each blade keeps its own angle, so a Cross Cut reads as an X. */
-    public static float fanAngle(int slot, int count) {
-        if (count <= 1) {
-            return 0f;
-        }
-        float spread = count >= 5 ? 60f : count >= 3 ? 40f : 30f;
-        return Mth.DEG_TO_RAD * Mth.lerp(slot / (float) (count - 1), -spread, spread);
-    }
-
     public static void render(SpellProjectile blade, Vec3 direction, float scale, float partialTick, PoseStack poseStack, MultiBufferSource buffers) {
         int look = WindBladeSpell.look(blade.variant());
         boolean bright = (blade.variant() & WindBladeSpell.BRIGHT) != 0;
@@ -91,7 +82,7 @@ public final class WindSlashRenderer {
         poseStack.pushPose();
         poseStack.mulPose(Axis.YP.rotation(yaw));
         poseStack.mulPose(Axis.XP.rotation(pitch));
-        poseStack.mulPose(Axis.ZP.rotation(fanAngle(blade.formationSlot(), blade.formationCount())));
+        poseStack.mulPose(Axis.ZP.rotation(WindBladeSpell.fanAngle(blade.formationSlot(), blade.formationCount())));
         if (look == WindBladeSpell.LOOK_BOOMERANG && !blade.isHeld()) {
             // The Boomerang turns as it flies.
             poseStack.mulPose(Axis.ZP.rotation(time * 0.6f));

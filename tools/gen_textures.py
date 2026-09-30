@@ -934,6 +934,40 @@ def wind_slash(style, width=64, height=16, seed=140):
     return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA")
 
 
+def wind_funnel(size=16, seed=150):
+    """The Tempest Edge funnel's wind, grey on black (drawn additively): diagonal streaks of air
+    twisting around it, some brighter, in four steps."""
+    noise = tile_noise(size, seed, periods=(2, 4))
+    y, x = np.mgrid[0:size, 0:size]
+    bands = ((x + y // 2) % 6) / 5.0
+    value = np.where(bands < 0.35, 0.9, np.where(bands < 0.6, 0.45, 0.1)) * (0.6 + 0.4 * noise)
+    value = np.round(np.clip(value, 0, 1) * 3) / 3
+    rgba = np.zeros((size, size, 4))
+    rgba[..., 0] = rgba[..., 1] = rgba[..., 2] = value
+    rgba[..., 3] = 1.0
+    return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA")
+
+
+def wind_cut(size=32):
+    """A cut mark: three pale, thin slashes, tapering at both ends. It's drawn turned to run along
+    the blade, so everything stays inside the inner circle (radius 0.35) to never reach the corners."""
+    a = np.zeros((size, size))
+    c = size / 2
+    for offset, half, strength in ((-3, 8, 0.7), (0, 10, 0.95), (3, 6, 0.6)):
+        row = int(c + offset)
+        for x in range(size):
+            d = abs(x + 0.5 - c) / half
+            if d < 1:
+                a[row, x] = max(a[row, x], strength * (1 - d ** 2))
+    a = np.where(a > 0.15, a, 0)
+    rgba = np.zeros((size, size, 4))
+    rgba[..., 0] = 0.96
+    rgba[..., 1] = 1.0
+    rgba[..., 2] = 0.98
+    rgba[..., 3] = np.round(np.clip(a, 0, 1) * 4) / 4
+    return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA")
+
+
 def main():
     for name, (palette, grid) in SPRITES.items():
         path = ASSETS / f"{name}.png"
@@ -991,6 +1025,9 @@ def main():
         path = ASSETS / f"block/{name}.png"
         ice_strip(stops, 120 + i, alpha=alpha, style=style).save(path)
         path.with_suffix(".png.mcmeta").write_text('{"animation": {"frametime": 2, "interpolate": true}}\n')
+        print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
+    for path, make in ((ASSETS / "block/wind_funnel.png", wind_funnel), (ASSETS / "misc/wind_cut.png", wind_cut)):
+        make().save(path)
         print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
     for style in ("soft", "sharp", "storm", "lines"):
         path = ASSETS / f"misc/wind_slash_{style}.png"

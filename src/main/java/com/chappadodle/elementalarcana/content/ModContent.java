@@ -120,6 +120,10 @@ public final class ModContent {
     public static final DeferredHolder<ParticleType<?>, ParticleType<IceShatterOptions>> ICE_SHATTER =
             PARTICLES.register("ice_shatter", IceShatterOptions::newType);
 
+    /** A Wind Blade's whole impact in one particle (see WindCutOptions). */
+    public static final DeferredHolder<ParticleType<?>, ParticleType<WindCutOptions>> WIND_CUT =
+            PARTICLES.register("wind_cut", WindCutOptions::newType);
+
     /** Moderate exhaustion from emptying your mana: slower, weaker, and slower mana regen. */
     public static final DeferredHolder<MobEffect, MobEffect> MANA_SICKNESS = EFFECTS.register("mana_sickness",
             () -> new MobEffect(MobEffectCategory.HARMFUL, 0x7A3FA0) {

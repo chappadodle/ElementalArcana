@@ -4,7 +4,6 @@ import com.chappadodle.elementalarcana.ElementalArcana;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -21,8 +20,9 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * A short-lived whirlwind at a point: pulls nearby creatures (never players) toward its center
- * and draws itself as a rising spiral of wind. Server-side only; nothing is saved.
+ * A short-lived whirlwind at a point: pulls nearby creatures (never players) toward its center.
+ * Server-side only; nothing is saved. Players see it as a spinning funnel of wind, drawn by the
+ * Wind Blade's impact (WindBladeEffects#impact).
  */
 @EventBusSubscriber(modid = ElementalArcana.MODID)
 public final class WindVortex {
@@ -35,7 +35,6 @@ public final class WindVortex {
     @Nullable
     private final UUID owner;
     private int ticksLeft;
-    private int age;
 
     private WindVortex(ServerLevel level, Vec3 center, double radius, double pull, int ticks, @Nullable UUID owner) {
         this.level = level;
@@ -64,7 +63,6 @@ public final class WindVortex {
     }
 
     private void tick() {
-        age++;
         for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, new AABB(center, center).inflate(radius),
                 e -> !(e instanceof Player) && !e.getUUID().equals(owner) && e.isAlive() && e.position().distanceTo(center) <= radius)) {
             Vec3 toward = center.subtract(entity.position());
@@ -74,13 +72,6 @@ public final class WindVortex {
                 entity.setDeltaMovement(entity.getDeltaMovement().multiply(0.6, 1, 0.6).add(step.x, 0, step.z));
                 entity.hurtMarked = true;
             }
-        }
-        for (int i = 0; i < 3; i++) {
-            float angle = age * 0.6f + i * Mth.TWO_PI / 3;
-            double height = (age % 20) / 20.0 * 1.8;
-            double ring = radius * 0.35 * (0.6 + height / 1.8);
-            level.sendParticles(ModContent.WIND_STREAK.get(), center.x + Mth.cos(angle) * ring, center.y + height,
-                    center.z + Mth.sin(angle) * ring, 0, -Mth.sin(angle), 0.3, Mth.cos(angle), 0.25);
         }
     }
 }
