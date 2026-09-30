@@ -72,7 +72,7 @@ public final class WindSlashRenderer {
     }
 
     /** A fanned set's fixed tilts: each blade keeps its own angle, so a Cross Cut reads as an X. */
-    private static float fanAngle(int slot, int count) {
+    public static float fanAngle(int slot, int count) {
         if (count <= 1) {
             return 0f;
         }

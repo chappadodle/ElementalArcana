@@ -190,7 +190,6 @@ public class WindBladeSpell extends Spell implements ProjectileSpell, ConjureSpe
     @Override
     public void onFullyGrown(SpellProjectile blade) {
         playAt(blade, SoundEvents.BREEZE_CHARGE, 0.6f, 1.4f);
-        ((ServerLevel) blade.level()).sendParticles(ModContent.WIND_STREAK.get(), blade.getX(), blade.getY(), blade.getZ(), 8, 0.1, 0.1, 0.1, 0.15);
     }
 
     @Override
@@ -262,25 +261,26 @@ public class WindBladeSpell extends Spell implements ProjectileSpell, ConjureSpe
         return new Vec3(x, -0.3, 1.15 - 0.2 * Math.abs(x));
     }
 
-    // ---- visuals (client) ----
+    // ---- visuals (client only, see WindBladeEffects) ----
 
     @Override
     public void heldParticles(SpellProjectile blade, float charge) {
-        int every = blade.formationCount() > 2 ? 3 : 2;
-        if (blade.tickCount % every == 0) {
-            float angle = blade.tickCount * 0.7f;
-            Vec3 swirl = new Vec3(-Mth.sin(angle), 0.02, Mth.cos(angle)).scale(0.08 + 0.1 * charge);
-            blade.spawnParticleAround(ModContent.WIND_STREAK.get(), 0.35, swirl);
-        }
+        WindBladeEffects.held(blade, charge);
+    }
+
+    @Override
+    public void grownParticles(SpellProjectile blade) {
+        WindBladeEffects.grown(blade);
+    }
+
+    @Override
+    public void releaseParticles(SpellProjectile blade) {
+        WindBladeEffects.released(blade);
     }
 
     @Override
     public void flightParticles(SpellProjectile blade) {
-        Vec3 back = blade.getDeltaMovement().scale(-0.08);
-        int count = blade.visualScale() > 1.5f ? 4 : 1 + (blade.tickCount % 2);
-        for (int i = 0; i < count; i++) {
-            blade.spawnParticleAround(ModContent.WIND_STREAK.get(), 0.25 * blade.visualScale(), back);
-        }
+        WindBladeEffects.flight(blade);
     }
 
     // ---- flight (server) ----
