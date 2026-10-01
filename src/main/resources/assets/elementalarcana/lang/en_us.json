@@ -397,5 +397,7 @@
   "message.elementalarcana.awakening.catalyst.fail": "The Catalyst crumbles. It did not take.",
   "message.elementalarcana.awakening.catalyst.dormant": "Your magic hasn't woken yet. A Catalyst needs a first element to build on.",
   "message.elementalarcana.awakening.catalyst.held": "You already hold this element's magic.",
-  "message.elementalarcana.awakening.catalyst.opposed": "%s magic holds this one back until level 50."
+  "message.elementalarcana.awakening.catalyst.opposed": "%s magic holds this one back until level 50.",
+  "message.elementalarcana.mastery_full_no_point": "%s has mastered its level! Its next node needs a tree point: you earn one with each level.",
+  "message.elementalarcana.mastery_ready": "%s is ready for its next node: spend your new tree point in the skill tree (%s)."
 }

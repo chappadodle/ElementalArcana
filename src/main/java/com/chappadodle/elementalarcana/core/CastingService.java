@@ -161,7 +161,9 @@ public final class CastingService {
         boolean wasFull = data.isMasteryFull(spell);
         data.addMastery(spell, cost);
         if (!wasFull && data.isMasteryFull(spell)) {
-            player.sendSystemMessage(Component.translatable("message.elementalarcana.mastery_full", spell.displayName(),
+            // With no tree point to spend yet, say so instead of sending them to the tree for nothing.
+            String key = data.treePoints() > 0 ? "message.elementalarcana.mastery_full" : "message.elementalarcana.mastery_full_no_point";
+            player.sendSystemMessage(Component.translatable(key, spell.displayName(),
                     Component.keybind("key.elementalarcana.status")).withStyle(style -> style.withColor(spell.school().color())));
         }
     }
@@ -246,6 +248,16 @@ public final class CastingService {
                 Component.translatable("title.elementalarcana.level_up.sub", data.statPoints(), data.treePoints()).withStyle(ChatFormatting.GRAY)));
         player.playNotifySound(ModContent.LEVEL_UP_SOUND.get(), SoundSource.PLAYERS, 1f, 1f);
         player.serverLevel().sendParticles(ParticleTypes.END_ROD, player.getX(), player.getY(1.0), player.getZ(), 30, 0.5, 0.8, 0.5, 0.05);
+
+        // A spell whose bar was already full has been waiting for a tree point: if this level-up is the
+        // first one you could spend (you had none before), tell the player.
+        boolean firstPoint = data.treePoints() > 0 && data.treePoints() - (newLevel - oldLevel) <= 0;
+        for (Spell spell : data.castableSpells()) {
+            if (firstPoint && data.isMasteryFull(spell)) {
+                player.sendSystemMessage(Component.translatable("message.elementalarcana.mastery_ready", spell.displayName(),
+                        Component.keybind("key.elementalarcana.status")).withStyle(style -> style.withColor(spell.school().color())));
+            }
+        }
     }
 
     static void fizzle(ServerPlayer player, Component reason) {
