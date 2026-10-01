@@ -101,7 +101,7 @@ public final class CastingService {
         }
 
         CastContext context = new CastContext(player, player.serverLevel(), InteractionHand.MAIN_HAND, data.spellPower(spell),
-                spellLevel, data.progress(spell).branches());
+                spellLevel, data.branches(spell));
         CastResult result = spell.cast(context);
         if (!result.success()) {
             if (result.failReason() != null) {
@@ -243,16 +243,10 @@ public final class CastingService {
         player.connection.send(new ClientboundSetTitleTextPacket(
                 Component.translatable("title.elementalarcana.level_up", newLevel).withStyle(ChatFormatting.LIGHT_PURPLE)));
         player.connection.send(new ClientboundSetSubtitleTextPacket(
-                Component.translatable("title.elementalarcana.level_up.sub", data.statPoints()).withStyle(ChatFormatting.GRAY)));
+                Component.translatable("title.elementalarcana.level_up.sub", data.statPoints(), data.treePoints()).withStyle(ChatFormatting.GRAY)));
         player.playNotifySound(ModContent.LEVEL_UP_SOUND.get(), SoundSource.PLAYERS, 1f, 1f);
         player.serverLevel().sendParticles(ParticleTypes.END_ROD, player.getX(), player.getY(1.0), player.getZ(), 30, 0.5, 0.8, 0.5, 0.05);
 
-        for (Spell spell : SpellRegistries.SPELLS) {
-            if (data.hasAffinity(spell.school()) && spell.requiredLevel() > oldLevel && spell.requiredLevel() <= newLevel) {
-                player.sendSystemMessage(Component.translatable("message.elementalarcana.new_spell", spell.displayName())
-                        .withStyle(style -> style.withColor(spell.school().color())));
-            }
-        }
         for (int slotLevel : MagicData.AFFINITY_SLOT_LEVELS) {
             if (slotLevel > oldLevel && slotLevel <= newLevel && data.hasFreeAffinitySlot()) {
                 player.sendSystemMessage(Component.translatable("message.elementalarcana.new_affinity_slot",

@@ -1,0 +1,334 @@
+{
+  "nodes": [
+    {
+      "id": "core_0",
+      "type": "small",
+      "x": 0,
+      "y": -140,
+      "stat": "reservoir",
+      "amount": 2,
+      "links": [
+        "core_1"
+      ]
+    },
+    {
+      "id": "core_1",
+      "type": "small",
+      "x": 29,
+      "y": -137,
+      "stat": "potency",
+      "amount": 2,
+      "links": [
+        "core_2"
+      ]
+    },
+    {
+      "id": "core_2",
+      "type": "small",
+      "x": 57,
+      "y": -128,
+      "stat": "focus",
+      "amount": 2,
+      "links": [
+        "core_3"
+      ]
+    },
+    {
+      "id": "core_3",
+      "type": "small",
+      "x": 82,
+      "y": -113,
+      "stat": "ward",
+      "amount": 2,
+      "links": [
+        "core_4"
+      ]
+    },
+    {
+      "id": "core_4",
+      "type": "small",
+      "x": 104,
+      "y": -94,
+      "stat": "vitality",
+      "amount": 2,
+      "links": [
+        "core_5"
+      ]
+    },
+    {
+      "id": "core_5",
+      "type": "small",
+      "x": 121,
+      "y": -70,
+      "stat": "insight",
+      "amount": 2,
+      "links": [
+        "core_6"
+      ]
+    },
+    {
+      "id": "core_6",
+      "type": "small",
+      "x": 133,
+      "y": -43,
+      "stat": "reservoir",
+      "amount": 2,
+      "links": [
+        "core_7"
+      ]
+    },
+    {
+      "id": "core_7",
+      "type": "small",
+      "x": 139,
+      "y": -15,
+      "stat": "potency",
+      "amount": 2,
+      "links": [
+        "core_8"
+      ]
+    },
+    {
+      "id": "core_8",
+      "type": "small",
+      "x": 139,
+      "y": 15,
+      "stat": "focus",
+      "amount": 2,
+      "links": [
+        "core_9"
+      ]
+    },
+    {
+      "id": "core_9",
+      "type": "small",
+      "x": 133,
+      "y": 43,
+      "stat": "ward",
+      "amount": 2,
+      "links": [
+        "core_10"
+      ]
+    },
+    {
+      "id": "core_10",
+      "type": "small",
+      "x": 121,
+      "y": 70,
+      "stat": "vitality",
+      "amount": 2,
+      "links": [
+        "core_11"
+      ]
+    },
+    {
+      "id": "core_11",
+      "type": "small",
+      "x": 104,
+      "y": 94,
+      "stat": "insight",
+      "amount": 2,
+      "links": [
+        "core_12"
+      ]
+    },
+    {
+      "id": "core_12",
+      "type": "small",
+      "x": 82,
+      "y": 113,
+      "stat": "reservoir",
+      "amount": 2,
+      "links": [
+        "core_13"
+      ]
+    },
+    {
+      "id": "core_13",
+      "type": "small",
+      "x": 57,
+      "y": 128,
+      "stat": "potency",
+      "amount": 2,
+      "links": [
+        "core_14"
+      ]
+    },
+    {
+      "id": "core_14",
+      "type": "small",
+      "x": 29,
+      "y": 137,
+      "stat": "focus",
+      "amount": 2,
+      "links": [
+        "core_15"
+      ]
+    },
+    {
+      "id": "core_15",
+      "type": "small",
+      "x": 0,
+      "y": 140,
+      "stat": "ward",
+      "amount": 2,
+      "links": [
+        "core_16"
+      ]
+    },
+    {
+      "id": "core_16",
+      "type": "small",
+      "x": -29,
+      "y": 137,
+      "stat": "vitality",
+      "amount": 2,
+      "links": [
+        "core_17"
+      ]
+    },
+    {
+      "id": "core_17",
+      "type": "small",
+      "x": -57,
+      "y": 128,
+      "stat": "insight",
+      "amount": 2,
+      "links": [
+        "core_18"
+      ]
+    },
+    {
+      "id": "core_18",
+      "type": "small",
+      "x": -82,
+      "y": 113,
+      "stat": "reservoir",
+      "amount": 2,
+      "links": [
+        "core_19"
+      ]
+    },
+    {
+      "id": "core_19",
+      "type": "small",
+      "x": -104,
+      "y": 94,
+      "stat": "potency",
+      "amount": 2,
+      "links": [
+        "core_20"
+      ]
+    },
+    {
+      "id": "core_20",
+      "type": "small",
+      "x": -121,
+      "y": 70,
+      "stat": "focus",
+      "amount": 2,
+      "links": [
+        "core_21"
+      ]
+    },
+    {
+      "id": "core_21",
+      "type": "small",
+      "x": -133,
+      "y": 43,
+      "stat": "ward",
+      "amount": 2,
+      "links": [
+        "core_22"
+      ]
+    },
+    {
+      "id": "core_22",
+      "type": "small",
+      "x": -139,
+      "y": 15,
+      "stat": "vitality",
+      "amount": 2,
+      "links": [
+        "core_23"
+      ]
+    },
+    {
+      "id": "core_23",
+      "type": "small",
+      "x": -139,
+      "y": -15,
+      "stat": "insight",
+      "amount": 2,
+      "links": [
+        "core_24"
+      ]
+    },
+    {
+      "id": "core_24",
+      "type": "small",
+      "x": -133,
+      "y": -43,
+      "stat": "reservoir",
+      "amount": 2,
+      "links": [
+        "core_25"
+      ]
+    },
+    {
+      "id": "core_25",
+      "type": "small",
+      "x": -121,
+      "y": -70,
+      "stat": "potency",
+      "amount": 2,
+      "links": [
+        "core_26"
+      ]
+    },
+    {
+      "id": "core_26",
+      "type": "small",
+      "x": -104,
+      "y": -94,
+      "stat": "focus",
+      "amount": 2,
+      "links": [
+        "core_27"
+      ]
+    },
+    {
+      "id": "core_27",
+      "type": "small",
+      "x": -82,
+      "y": -113,
+      "stat": "ward",
+      "amount": 2,
+      "links": [
+        "core_28"
+      ]
+    },
+    {
+      "id": "core_28",
+      "type": "small",
+      "x": -57,
+      "y": -128,
+      "stat": "vitality",
+      "amount": 2,
+      "links": [
+        "core_29"
+      ]
+    },
+    {
+      "id": "core_29",
+      "type": "small",
+      "x": -29,
+      "y": -137,
+      "stat": "insight",
+      "amount": 2,
+      "links": [
+        "core_0"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+# The skill tree loads from data, with every spell path expanded.
+arcana tree info

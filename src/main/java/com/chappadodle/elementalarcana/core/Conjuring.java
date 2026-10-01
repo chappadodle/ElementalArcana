@@ -85,7 +85,7 @@ public final class Conjuring {
             return;
         }
         CastContext context = new CastContext(player, player.serverLevel(), InteractionHand.MAIN_HAND, data.spellPower(spell),
-                level, data.progress(spell).branches());
+                level, data.branches(spell));
         boolean first = session.held.isEmpty();
         SpellProjectile projectile = conjurer.conjure(context, session.seed);
         projectile.setFormation(freeSlot(session), conjurer.maxConjured(level));
@@ -200,7 +200,7 @@ public final class Conjuring {
         boolean fullSet = session.held.size() >= session.conjurer().maxConjured(level);
         boolean allGrown = session.held.stream().allMatch(projectile -> projectile.charge(0f) >= 1f);
         if (session.keyHeld && !session.fused && fullSet && allGrown && session.held.size() > 1
-                && session.conjurer().canFuse(level, data.progress(session.spell).branches())) {
+                && session.conjurer().canFuse(level, data.branches(session.spell))) {
             if (session.fuseStart < 0) {
                 session.fuseStart = now;
             } else if (now - session.fuseStart >= FUSE_HOLD_TICKS) {

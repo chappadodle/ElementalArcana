@@ -1,0 +1,179 @@
+{
+  "nodes": [
+    {
+      "id": "water_spoke",
+      "type": "small",
+      "x": 0,
+      "y": 200,
+      "stat": "affinity/water",
+      "amount": 2,
+      "links": [
+        "core_15"
+      ],
+      "element": "water"
+    },
+    {
+      "id": "water_start",
+      "type": "start",
+      "x": 0,
+      "y": 260,
+      "element": "water",
+      "spell": "elementalarcana:hydro_jet",
+      "links": [
+        "water_spoke"
+      ]
+    },
+    {
+      "id": "water_hydro_jet",
+      "type": "path",
+      "spell": "elementalarcana:hydro_jet",
+      "x": 0,
+      "y": 260,
+      "dx": 0.0,
+      "dy": 40.0,
+      "element": "water",
+      "from": "water_start"
+    },
+    {
+      "id": "tidal_wave",
+      "type": "spell",
+      "x": -20,
+      "y": 295,
+      "spell": "elementalarcana:tidal_wave",
+      "element": "water",
+      "links": [
+        "water_start"
+      ]
+    },
+    {
+      "id": "water_rain_1",
+      "type": "small",
+      "x": 31,
+      "y": 286,
+      "stat": "affinity/water",
+      "amount": 2,
+      "links": [
+        "water_start"
+      ],
+      "element": "water"
+    },
+    {
+      "id": "water_rain_2",
+      "type": "small",
+      "x": 61,
+      "y": 311,
+      "stat": "reservoir",
+      "amount": 2,
+      "links": [
+        "water_rain_1"
+      ],
+      "element": "water"
+    },
+    {
+      "id": "bubble_prison",
+      "type": "spell",
+      "x": 92,
+      "y": 337,
+      "spell": "elementalarcana:bubble_prison",
+      "element": "water",
+      "links": [
+        "water_rain_2"
+      ]
+    },
+    {
+      "id": "water_rain_4",
+      "type": "small",
+      "x": 123,
+      "y": 363,
+      "stat": "affinity/water",
+      "amount": 2,
+      "links": [
+        "bubble_prison"
+      ],
+      "element": "water"
+    },
+    {
+      "id": "healing_rain",
+      "type": "spell",
+      "x": 153,
+      "y": 389,
+      "spell": "elementalarcana:healing_rain",
+      "element": "water",
+      "links": [
+        "water_rain_4"
+      ]
+    },
+    {
+      "id": "water_deep_1",
+      "type": "small",
+      "x": -35,
+      "y": 280,
+      "stat": "affinity/water",
+      "amount": 2,
+      "links": [
+        "water_start"
+      ],
+      "element": "water"
+    },
+    {
+      "id": "water_deep_2",
+      "type": "small",
+      "x": -69,
+      "y": 300,
+      "stat": "ward",
+      "amount": 2,
+      "links": [
+        "water_deep_1"
+      ],
+      "element": "water"
+    },
+    {
+      "id": "water_deep_3",
+      "type": "small",
+      "x": -104,
+      "y": 320,
+      "stat": "affinity/water",
+      "amount": 2,
+      "links": [
+        "water_deep_2"
+      ],
+      "element": "water"
+    },
+    {
+      "id": "water_deep_4",
+      "type": "small",
+      "x": -139,
+      "y": 340,
+      "stat": "vitality",
+      "amount": 2,
+      "links": [
+        "water_deep_3"
+      ],
+      "element": "water"
+    },
+    {
+      "id": "water_deep_5",
+      "type": "small",
+      "x": -173,
+      "y": 360,
+      "stat": "affinity/water",
+      "amount": 2,
+      "links": [
+        "water_deep_4"
+      ],
+      "element": "water"
+    },
+    {
+      "id": "water_deep_6",
+      "type": "small",
+      "x": -208,
+      "y": 380,
+      "stat": "reservoir",
+      "amount": 2,
+      "links": [
+        "water_deep_5"
+      ],
+      "element": "water"
+    }
+  ]
+}

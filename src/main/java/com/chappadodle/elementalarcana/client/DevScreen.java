@@ -89,11 +89,9 @@ public class DevScreen extends Screen {
 
         // Acts on the selected spell.
         row(5);
-        spellButton("-1", 26, Action.ADD_SPELL_LEVELS, -1);
-        spellButton("+1", 26, Action.ADD_SPELL_LEVELS, 1);
-        spellButton("+10", 32, Action.ADD_SPELL_LEVELS, 10);
+        spellButtonKey("screen.elementalarcana.dev.max_spell", 70, Action.MAX_SPELL);
         spellButtonKey("screen.elementalarcana.dev.fill_mastery", 76, Action.FILL_MASTERY);
-        spellButtonKey("screen.elementalarcana.dev.clear_paths", 70, Action.CLEAR_BRANCHES);
+        addButton(Component.translatable("screen.elementalarcana.dev.reset_tree"), 66, DevActionPayload.of(Action.RESET_TREE, 0));
 
         // Spawn an Attuned zombie: pick the element and rank, then spawn.
         row(6);
@@ -183,7 +181,7 @@ public class DevScreen extends Screen {
                 + "   XP " + data.xp() + "/" + data.xpToNextLevel()
                 + "   Mana " + (int) data.mana() + "/" + (int) data.maxMana()
                 + (minecraft.player.hasEffect(ModContent.MANA_SICKNESS) ? "   [Sick]" : "")
-                + "   Points " + data.skillPoints();
+                + "   Tree points " + data.treePoints();
         Spell selected = data.selectedSpell();
         if (selected != null) {
             graphics.drawString(font, Component.translatable("screen.elementalarcana.dev.selected", selected.displayName(),

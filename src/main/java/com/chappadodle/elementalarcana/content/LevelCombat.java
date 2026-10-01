@@ -39,14 +39,14 @@ public final class LevelCombat {
             amount *= Progression.damageLevelFactor(CreatureLevels.levelOf(attacker), CreatureLevels.levelOf(target));
         }
         if (SpellDamage.elementOf(source) != null) {
-            int ward = target instanceof Player player ? MagicAttachments.get(player).stats().get(Stat.WARD) : CreatureLevels.creaturePoints(target);
+            int ward = target instanceof Player player ? MagicAttachments.get(player).stat(Stat.WARD) : CreatureLevels.creaturePoints(target);
             amount *= StatRules.wardFactor(ward);
             if (attacker != null && !(attacker instanceof Player)) {
                 amount *= (float) StatRules.effect(CreatureLevels.creaturePoints(attacker), Stat.POTENCY.exponent());
             }
         }
         if (attacker instanceof Player player && ReactionRewards.reactedThisTick(target)) {
-            amount *= StatRules.insightFactor(MagicAttachments.get(player).stats().get(Stat.INSIGHT));
+            amount *= StatRules.insightFactor(MagicAttachments.get(player).stat(Stat.INSIGHT));
         }
         event.setAmount(amount);
     }

@@ -83,6 +83,11 @@ public final class Progression {
         return Math.round(baseTicks * (1f - COOLDOWN_CUT_PER_LEVEL * (level - 1)) * cooldownFactor);
     }
 
+    /** Essence to refund one skill tree node or stat point at {@code level}: 1, plus 1 every 20 levels. */
+    public static int refundCost(int level) {
+        return 1 + Math.max(1, level) / 20;
+    }
+
     /** Share of a spell's mastery bar one Essence fills: half at Lv 1, then 20% less each level. */
     public static float essenceBarFraction(int spellLevel) {
         return ESSENCE_FIRST_FILL * (float) Math.pow(ESSENCE_FALLOFF, Math.max(1, spellLevel) - 1);

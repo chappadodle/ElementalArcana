@@ -76,7 +76,7 @@ public final class CreatureRewards {
             return;
         }
         AttunementRank rank = magic == null ? null : magic.rank();
-        float insight = StatRules.insightFactor(MagicAttachments.get(player).stats().get(Stat.INSIGHT));
+        float insight = StatRules.insightFactor(MagicAttachments.get(player).stat(Stat.INSIGHT));
         int count = AttunementRewards.essenceDrops(rank, insight, dead.getRandom()::nextDouble);
         if (count > 0) {
             event.getDrops().add(new ItemEntity(level, dead.getX(), dead.getY(), dead.getZ(),

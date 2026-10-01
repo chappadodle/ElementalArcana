@@ -3,10 +3,13 @@ package com.chappadodle.elementalarcana.core;
 import com.chappadodle.elementalarcana.api.AttunementRank;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
+import com.chappadodle.elementalarcana.api.SkillTree;
+import com.chappadodle.elementalarcana.api.SkillTrees;
 import com.chappadodle.elementalarcana.api.SpellSchool;
 import com.chappadodle.elementalarcana.content.Attunement;
 import com.chappadodle.elementalarcana.content.BubblePrisons;
 import com.chappadodle.elementalarcana.content.CreatureLevels;
+import com.chappadodle.elementalarcana.content.SkillTreeLoader;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -63,6 +66,18 @@ public final class ArcanaCommand {
                                 .then(Commands.argument("stat", StringArgumentType.greedyString())
                                         .executes(ctx -> spendStats(ctx.getSource(), StringArgumentType.getString(ctx, "stat"),
                                                 IntegerArgumentType.getInteger(ctx, "count")))))))
+                .then(Commands.literal("tree")
+                        .then(Commands.literal("info").executes(ctx -> {
+                            String info = SkillTreeLoader.describe(SkillTrees.current());
+                            ctx.getSource().sendSuccess(() -> Component.literal("Skill tree: " + info), false);
+                            return 1;
+                        }))
+                        .then(Commands.literal("take").then(Commands.argument("node", StringArgumentType.greedyString())
+                                .executes(ctx -> treeChange(ctx.getSource(), StringArgumentType.getString(ctx, "node"), true))))
+                        .then(Commands.literal("refund").then(Commands.argument("node", StringArgumentType.greedyString())
+                                .executes(ctx -> treeChange(ctx.getSource(), StringArgumentType.getString(ctx, "node"), false))))
+                        .then(Commands.literal("reset")
+                                .executes(ctx -> modify(ctx.getSource(), MagicData::resetTree, "commands.elementalarcana.tree_reset"))))
                 .then(Commands.literal("affinity")
                         .then(Commands.literal("add").then(Commands.argument("school", ResourceLocationArgument.id())
                                 .suggests((ctx, builder) -> SharedSuggestionProvider.suggestResource(SpellRegistries.SCHOOLS.keySet(), builder))
@@ -199,6 +214,17 @@ public final class ArcanaCommand {
         int total = spent;
         source.sendSuccess(() -> Component.translatable("commands.elementalarcana.stats_spent", total, key, data.stats().get(key)), false);
         return spent;
+    }
+
+    /** /arcana tree take|refund <node>: like clicking it in the tree (refunds here cost no Essence). */
+    private static int treeChange(CommandSourceStack source, String node, boolean take) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        MagicData data = MagicAttachments.get(player);
+        SkillTree.Check check = take ? data.take(node) : data.refund(node);
+        PlayerStats.apply(player);
+        MagicAttachments.sync(player);
+        source.sendSuccess(() -> Component.translatable("commands.elementalarcana.tree_change", node, check.name(), data.treePoints()), false);
+        return check == SkillTree.Check.OK ? 1 : 0;
     }
 
     private static int modify(CommandSourceStack source, Consumer<MagicData> change, String messageKey) throws CommandSyntaxException {

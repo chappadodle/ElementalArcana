@@ -22,7 +22,7 @@ public final class PlayerStats {
         if (health == null) {
             return;
         }
-        int vitality = MagicAttachments.get(player).stats().get(Stat.VITALITY);
+        int vitality = MagicAttachments.get(player).stat(Stat.VITALITY);
         health.removeModifier(VITALITY);
         double bonus = StatRules.healthMultiplier(vitality) - 1;
         if (bonus > 0) {

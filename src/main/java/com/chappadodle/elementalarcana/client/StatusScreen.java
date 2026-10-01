@@ -29,7 +29,8 @@ import java.util.List;
 /**
  * The isekai "Status" window: level, XP and skill points, mana stats and unspent stat points (the
  * Stats button opens StatsScreen), affinities (with the Awaken button when a slot opens), and every
- * spell grouped by element; click one for its skill tree.
+ * spell grouped by element. The Tree button opens the skill tree; clicking a spell opens it on that
+ * spell.
  */
 public class StatusScreen extends Screen {
     private static final int WIDTH = 290;
@@ -88,6 +89,9 @@ public class StatusScreen extends Screen {
         addRenderableWidget(Button.builder(Component.translatable("screen.elementalarcana.stats"), button -> minecraft.setScreen(new StatsScreen(this)))
                 .bounds(left + 6, top + 4, 40, 14)
                 .build());
+        addRenderableWidget(Button.builder(Component.translatable("screen.elementalarcana.tree"), button -> minecraft.setScreen(new SkillTreeScreen(this, null)))
+                .bounds(left + 50, top + 4, 40, 14)
+                .build());
 
         if (minecraft.player.hasPermissions(2)) {
             addRenderableWidget(Button.builder(Component.translatable("screen.elementalarcana.status.dev"), button -> ArcanaClient.openDevMenu(minecraft))
@@ -110,12 +114,12 @@ public class StatusScreen extends Screen {
 
     private void updateCondenseButton() {
         MagicData data = MagicAttachments.get(minecraft.player);
-        int cost = Progression.condenseCost(data.bonusSkillPoints());
+        int cost = Progression.condenseCost(data.bonusTreePoints());
         int have = EssenceService.total(minecraft.player);
         condenseButton.setMessage(Component.translatable("screen.elementalarcana.status.condense", cost));
         condenseButton.active = have >= cost;
         condenseButton.setTooltip(Tooltip.create(Component.translatable("screen.elementalarcana.status.condense.hint",
-                have, data.bonusSkillPoints())));
+                have, data.bonusTreePoints())));
     }
 
     @Override
@@ -141,8 +145,8 @@ public class StatusScreen extends Screen {
                 ? Component.translatable("screen.elementalarcana.status.max_level")
                 : Component.translatable("screen.elementalarcana.status.xp", data.xp(), data.xpToNextLevel());
         graphics.drawString(font, xpText, left + WIDTH - 10 - font.width(xpText), top + 40, 0xFF9A8FB8, false);
-        int points = data.skillPoints();
-        graphics.drawString(font, Component.translatable("screen.elementalarcana.status.skill_points", points),
+        int points = data.treePoints();
+        graphics.drawString(font, Component.translatable("screen.elementalarcana.status.tree_points", points),
                 left + 10, top + 40, points > 0 ? GOLD : 0xFF6A6480, false);
 
         // Stats
@@ -264,21 +268,15 @@ public class StatusScreen extends Screen {
 
         Component right;
         int rightColor;
-        if (castable && data.pendingBranchLevel(spell) > 0) {
-            right = Component.translatable("screen.elementalarcana.status.choose_path");
-            rightColor = GOLD;
-        } else if (castable && data.canLevelUp(spell)) {
+        if (castable && data.isMasteryFull(spell) && data.treePoints() > 0) {
             right = Component.translatable("screen.elementalarcana.status.level_up_ready");
             rightColor = GOLD;
         } else if (castable) {
             right = Component.translatable("screen.elementalarcana.cost", spell.manaCost(data.spellLevel(spell)));
             rightColor = 0xFF7FB2FF;
-        } else if (!data.hasAffinity(spell.school())) {
-            right = Component.literal("—");
-            rightColor = 0xFF6A6480;
         } else {
-            right = Component.translatable("screen.elementalarcana.status.requires_level", spell.requiredLevel());
-            rightColor = 0xFFC08040;
+            right = Component.translatable("screen.elementalarcana.status.locked");
+            rightColor = 0xFF6A6480;
         }
         graphics.drawString(font, right, left + WIDTH - 12 - font.width(right), y + 5, rightColor, false);
     }
@@ -295,10 +293,8 @@ public class StatusScreen extends Screen {
         }
         lines.add(Component.translatable("tooltip.elementalarcana.mana_cost", spell.manaCost(data.spellLevel(spell))).withStyle(ChatFormatting.BLUE));
         lines.add(Component.translatable("tooltip.elementalarcana.cooldown", String.format("%.1f", spell.cooldownTicks(data.spellLevel(spell), data.cooldownFactor()) / 20f)).withStyle(ChatFormatting.BLUE));
-        if (!data.hasAffinity(spell.school())) {
-            lines.add(Component.translatable("tooltip.elementalarcana.requires_affinity", spell.school().displayName()).withStyle(ChatFormatting.RED));
-        } else if (data.level() < spell.requiredLevel()) {
-            lines.add(Component.translatable("tooltip.elementalarcana.requires_level", spell.requiredLevel()).withStyle(ChatFormatting.GOLD));
+        if (!data.canCast(spell)) {
+            lines.add(Component.translatable("tooltip.elementalarcana.unlock_in_tree").withStyle(ChatFormatting.GOLD));
         }
         lines.add(Component.translatable("tooltip.elementalarcana.click_for_details").withStyle(ChatFormatting.DARK_GRAY));
         return lines;
@@ -312,7 +308,7 @@ public class StatusScreen extends Screen {
                 if (mouseY >= rowY && mouseY < rowY + row.height()) {
                     if (row.spell() != null) {
                         minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1f));
-                        minecraft.setScreen(new SpellDetailScreen(row.spell(), this));
+                        minecraft.setScreen(new SkillTreeScreen(this, row.spell()));
                         return true;
                     }
                     break;

@@ -4,11 +4,13 @@ import com.chappadodle.elementalarcana.api.AffinityRules;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.Progression;
 import com.chappadodle.elementalarcana.api.SchoolElements;
+import com.chappadodle.elementalarcana.api.SkillTree;
+import com.chappadodle.elementalarcana.api.SkillTrees;
 import com.chappadodle.elementalarcana.api.Spell;
-import com.chappadodle.elementalarcana.api.Stat;
-import com.chappadodle.elementalarcana.api.StatRules;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.SpellSchool;
+import com.chappadodle.elementalarcana.api.Stat;
+import com.chappadodle.elementalarcana.api.StatRules;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.FriendlyByteBuf;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -48,12 +51,13 @@ public final class MagicData {
             Codec.BOOL.optionalFieldOf("fall_immune", false).forGetter(data -> data.fallImmune),
             Codec.BOOL.optionalFieldOf("free_cast", false).forGetter(data -> data.freeCast),
             Codec.unboundedMap(ResourceLocation.CODEC, SpellProgress.CODEC).optionalFieldOf("spells", Map.of()).forGetter(data -> data.spells),
-            Codec.LONG.optionalFieldOf("respec_ready_at", 0L).forGetter(data -> data.respecReadyAt),
-            Codec.INT.optionalFieldOf("bonus_skill_points", 0).forGetter(data -> data.bonusSkillPoints),
-            StatPoints.CODEC.optionalFieldOf("stats", new StatPoints()).forGetter(data -> data.stats)
-    ).apply(instance, (mana, level, xp, affinities, selected, cooldowns, fallImmune, freeCast, spells, respecReadyAt, bonusSkillPoints, stats) ->
-            new MagicData(mana, level, xp, affinities, selected.orElse(null), cooldowns, fallImmune, freeCast, spells, respecReadyAt,
-                    bonusSkillPoints, stats, false, 0)));
+            // Bonus tree points condensed from Essence (saved under its old name).
+            Codec.INT.optionalFieldOf("bonus_skill_points", 0).forGetter(data -> data.bonusTreePoints),
+            StatPoints.CODEC.optionalFieldOf("stats", new StatPoints()).forGetter(data -> data.stats),
+            Codec.STRING.listOf().optionalFieldOf("tree", List.of()).forGetter(data -> List.copyOf(data.treeNodes))
+    ).apply(instance, (mana, level, xp, affinities, selected, cooldowns, fallImmune, freeCast, spells, bonusTreePoints, stats, tree) ->
+            new MagicData(mana, level, xp, affinities, selected.orElse(null), cooldowns, fallImmune, freeCast, spells,
+                    bonusTreePoints, stats, tree, false, 0)));
 
     // What the owning client needs: no fall flag, plus the live meditation state for the HUD.
     public static final StreamCodec<RegistryFriendlyByteBuf, MagicData> STREAM_CODEC = StreamCodec.of(
@@ -66,9 +70,9 @@ public final class MagicData {
                 buf.writeMap(data.cooldownEnds, FriendlyByteBuf::writeResourceLocation, FriendlyByteBuf::writeVarLong);
                 buf.writeBoolean(data.freeCast);
                 buf.writeMap(data.spells, FriendlyByteBuf::writeResourceLocation, SpellProgress::write);
-                buf.writeVarLong(data.respecReadyAt);
-                buf.writeVarInt(data.bonusSkillPoints);
+                buf.writeVarInt(data.bonusTreePoints);
                 StatPoints.write(buf, data.stats);
+                buf.writeCollection(data.treeNodes, FriendlyByteBuf::writeUtf);
                 buf.writeBoolean(data.meditating);
                 buf.writeVarInt(data.conjured);
             },
@@ -82,9 +86,9 @@ public final class MagicData {
                     false,
                     buf.readBoolean(),
                     buf.readMap(FriendlyByteBuf::readResourceLocation, SpellProgress::read),
-                    buf.readVarLong(),
                     buf.readVarInt(),
                     StatPoints.read(buf),
+                    buf.readList(FriendlyByteBuf::readUtf),
                     buf.readBoolean(),
                     buf.readVarInt()));
 
@@ -99,10 +103,17 @@ public final class MagicData {
     // Dev-menu toggle: casting costs no mana and triggers no cooldowns.
     private boolean freeCast;
     private final HashMap<ResourceLocation, SpellProgress> spells;
-    private long respecReadyAt;
-    // Skill points condensed from Elemental Essence, on top of those from levels.
-    private int bonusSkillPoints;
+    // Tree points condensed from Elemental Essence, on top of those from levels.
+    private int bonusTreePoints;
     private final StatPoints stats;
+    // The skill tree nodes this player took (their starts come from their elements).
+    private final Set<String> treeNodes;
+    // What the held nodes give, cached until the nodes, the elements or the tree change.
+    @Nullable
+    private SkillTree.Grants grants;
+    @Nullable
+    private Set<String> held;
+    private int grantsVersion = -1;
 
     // Server-side meditation tracking; only `meditating` is synced.
     private boolean meditating;
@@ -114,12 +125,12 @@ public final class MagicData {
     private double lastZ;
 
     public MagicData() {
-        this(START_MANA, 1, 0, List.of(), null, Map.of(), false, false, Map.of(), 0L, 0, new StatPoints(), false, 0);
+        this(START_MANA, 1, 0, List.of(), null, Map.of(), false, false, Map.of(), 0, new StatPoints(), List.of(), false, 0);
     }
 
     private MagicData(float mana, int level, int xp, List<ResourceLocation> affinities, @Nullable ResourceLocation selected,
                       Map<ResourceLocation, Long> cooldownEnds, boolean fallImmune, boolean freeCast,
-                      Map<ResourceLocation, SpellProgress> spells, long respecReadyAt, int bonusSkillPoints, StatPoints stats,
+                      Map<ResourceLocation, SpellProgress> spells, int bonusTreePoints, StatPoints stats, List<String> treeNodes,
                       boolean meditating, int conjured) {
         this.level = Mth.clamp(level, 1, MAX_LEVEL);
         this.xp = xp;
@@ -129,9 +140,9 @@ public final class MagicData {
         this.fallImmune = fallImmune;
         this.freeCast = freeCast;
         this.spells = new HashMap<>(spells);
-        this.respecReadyAt = respecReadyAt;
-        this.bonusSkillPoints = Math.max(0, bonusSkillPoints);
+        this.bonusTreePoints = Math.max(0, bonusTreePoints);
         this.stats = stats;
+        this.treeNodes = new HashSet<>(treeNodes);
         this.meditating = meditating;
         this.conjured = conjured;
         this.mana = Mth.clamp(mana, 0f, maxMana());
@@ -180,29 +191,44 @@ public final class MagicData {
     }
 
     public float maxMana() {
-        return StatRules.maxMana(level, stats.get(Stat.RESERVOIR));
+        return StatRules.maxMana(level, stat(Stat.RESERVOIR));
     }
 
     public float regenPerSecond() {
-        return StatRules.regenPerSecond(level, stats.get(Stat.RESERVOIR));
+        return StatRules.regenPerSecond(level, stat(Stat.RESERVOIR));
     }
 
     /** Multiplier a spell applies to damage, knockback and durations: Potency, and its element family's Affinity. */
     public float spellPower(Spell spell) {
         Element element = SchoolElements.of(spell.school());
-        return StatRules.spellPower(stats.get(Stat.POTENCY), element == null ? 0 : stats.affinity(element));
+        return StatRules.spellPower(stat(Stat.POTENCY), element == null ? 0 : affinity(element));
     }
 
     /** Multiplier on cooldowns, from Focus. */
     public float cooldownFactor() {
-        return StatRules.cooldownFactor(stats.get(Stat.FOCUS));
+        return StatRules.cooldownFactor(stat(Stat.FOCUS));
     }
 
     // ---- stat points ----
     // Every level after the first earns a stat point. Spent points are stored, unspent ones derived.
 
+    /** Stat points spent (without tree bonuses). */
     public StatPoints stats() {
         return stats;
+    }
+
+    /** A stat's total: points spent plus the skill tree's bonus. */
+    public int statTotal(String key) {
+        return stats.get(key) + grants().stat(key);
+    }
+
+    public int stat(Stat stat) {
+        return statTotal(stat.key());
+    }
+
+    /** The total Affinity of {@code element}'s family. */
+    public int affinity(Element element) {
+        return statTotal(StatPoints.affinityKey(element));
     }
 
     public int statPoints() {
@@ -231,6 +257,20 @@ public final class MagicData {
         }
         stats.add(key, 1);
         return true;
+    }
+
+    /** Whether one point of {@code key} can be given back: one is spent, and no tree node needs it. */
+    public boolean canRefundStat(String key) {
+        return stats.get(key) > 0
+                && SkillTrees.current().requirementsMet(heldNodes(), other -> stats.get(other) - (other.equals(key) ? 1 : 0));
+    }
+
+    /** Gives one point of {@code key} back (check canRefundStat first). */
+    public void refundStat(String key) {
+        if (canRefundStat(key)) {
+            stats.add(key, -1);
+            mana = Math.min(mana, maxMana());
+        }
     }
 
     /** Hands every spent stat point back. */
@@ -322,6 +362,7 @@ public final class MagicData {
             return false;
         }
         affinities.add(school.id());
+        invalidateTree();
         if (selectedSpell() == null) {
             castableSpells().stream().findFirst().ifPresent(spell -> selected = spell.id());
         }
@@ -331,22 +372,25 @@ public final class MagicData {
     public void forceAffinity(SpellSchool school) {
         if (!hasAffinity(school)) {
             affinities.add(school.id());
+            invalidateTree();
         }
     }
 
     public void removeAffinity(SpellSchool school) {
         affinities.remove(school.id());
+        invalidateTree();
     }
 
     public void clearAffinities() {
         affinities.clear();
         selected = null;
+        invalidateTree();
     }
 
     // ---- spells ----
 
     public boolean canCast(Spell spell) {
-        return hasAffinity(spell.school()) && level >= spell.requiredLevel();
+        return grants().spells().contains(spell.id().toString());
     }
 
     /** Castable spells in registry order - the order the wheel and status window use. */
@@ -375,11 +419,172 @@ public final class MagicData {
         return true;
     }
 
-    // ---- spell levels & skill points ----
-    // Every level after the first earns a skill point; every spell level after the first
-    // costs one. Points are derived from those, so they can never drift out of sync.
+    // ---- skill tree, spell levels & mastery ----
+    // Every level after the first earns a tree point; every node taken (but not the starts your
+    // elements give you) costs one. Spell levels and branches come from the nodes you hold. A
+    // spell's next level also needs its mastery bar full (mastery = mana spent casting it).
 
     private static final SpellProgress NO_PROGRESS = new SpellProgress();
+
+    /** The rule-facing view of this player for the skill tree. */
+    private final SkillTree.Player treePlayer = new SkillTree.Player() {
+        @Override
+        public int freePoints() {
+            return treePoints();
+        }
+
+        @Override
+        public boolean holdsElement(String element) {
+            Element held = elementNamed(element);
+            return held != null && affinityElements().contains(held);
+        }
+
+        @Override
+        public boolean holdsFamily(String element) {
+            Element wanted = elementNamed(element);
+            return wanted != null && affinityElements().stream().anyMatch(held -> held.family() == wanted.family());
+        }
+
+        @Override
+        public int statPoints(String key) {
+            return stats.get(key);
+        }
+
+        @Override
+        public boolean masteryFull(String spellId, int currentLevel) {
+            ResourceLocation id = ResourceLocation.tryParse(spellId);
+            Spell spell = id == null ? null : SpellRegistries.SPELLS.get(id);
+            if (spell == null || currentLevel >= spell.maxLevel()) {
+                return false;
+            }
+            int needed = spell.masteryToNextLevel(currentLevel);
+            return progress(spell).mastery() >= needed;
+        }
+    };
+
+    @Nullable
+    private static Element elementNamed(String name) {
+        for (Element element : Element.values()) {
+            if (element.name().equalsIgnoreCase(name)) {
+                return element;
+            }
+        }
+        return null;
+    }
+
+    private void invalidateTree() {
+        grants = null;
+        held = null;
+    }
+
+    /** Every node this player holds: the ones they took, plus the starts of their elements. */
+    public Set<String> heldNodes() {
+        if (held == null || grantsVersion != SkillTrees.version()) {
+            held = SkillTrees.current().held(treeNodes, treePlayer);
+            grants = null;
+            grantsVersion = SkillTrees.version();
+        }
+        return held;
+    }
+
+    /** What the held nodes give: stat bonuses, castable spells, spell levels and branches. */
+    public SkillTree.Grants grants() {
+        Set<String> nodes = heldNodes();
+        if (grants == null) {
+            grants = SkillTrees.current().grants(nodes);
+        }
+        return grants;
+    }
+
+    /** The nodes this player took (not counting the starts their elements give them). */
+    public Set<String> treeNodes() {
+        return Collections.unmodifiableSet(treeNodes);
+    }
+
+    public int treePoints() {
+        SkillTree tree = SkillTrees.current();
+        long spent = treeNodes.stream().filter(id -> tree.node(id) != null).count();
+        return (int) Math.max(0, (level - 1) + bonusTreePoints - spent);
+    }
+
+    /** Tree points condensed from Elemental Essence, on top of those from levels. */
+    public int bonusTreePoints() {
+        return bonusTreePoints;
+    }
+
+    public void addBonusTreePoint() {
+        bonusTreePoints++;
+    }
+
+    public SkillTree.Check checkTake(String id) {
+        return SkillTrees.current().canTake(treeNodes, id, treePlayer);
+    }
+
+    /** Takes a node if the rules allow it. Taking a spell's next level empties its mastery bar. */
+    public SkillTree.Check take(String id) {
+        SkillTree.Check check = checkTake(id);
+        if (check == SkillTree.Check.OK) {
+            treeNodes.add(id);
+            SkillTree.Node node = SkillTrees.current().node(id);
+            if (node != null && (node.type() == SkillTree.Type.UPGRADE || node.type() == SkillTree.Type.FORK)) {
+                Spell spell = spellOf(node.spell());
+                if (spell != null) {
+                    editProgress(spell).setMastery(0);
+                }
+            }
+            invalidateTree();
+        }
+        return check;
+    }
+
+    public SkillTree.Check checkRefund(String id) {
+        return SkillTrees.current().canRefund(treeNodes, id, treePlayer);
+    }
+
+    /** Gives a node back if the rules allow it (the Essence cost is paid by the caller). */
+    public SkillTree.Check refund(String id) {
+        SkillTree.Check check = checkRefund(id);
+        if (check == SkillTree.Check.OK) {
+            treeNodes.remove(id);
+            invalidateTree();
+            mana = Math.min(mana, maxMana());
+        }
+        return check;
+    }
+
+    /** Dev/admin: gives back every node. */
+    public void resetTree() {
+        treeNodes.clear();
+        invalidateTree();
+        mana = Math.min(mana, maxMana());
+    }
+
+    /** Dev/admin: takes {@code spell}'s node and its whole path for free (the first branch at each fork). */
+    public void takeWholePath(Spell spell) {
+        String spellId = spell.id().toString();
+        for (SkillTree.Node node : SkillTrees.current().nodes()) {
+            if (node.type() == SkillTree.Type.SPELL && spellId.equals(node.spell())) {
+                treeNodes.add(node.id());
+            }
+        }
+        for (int target = 2; target <= spell.maxLevel(); target++) {
+            int spellLevel = target;
+            boolean has = SkillTrees.current().nodes().stream().anyMatch(node -> spellId.equals(node.spell())
+                    && node.spellLevel() == spellLevel && treeNodes.contains(node.id()));
+            if (!has) {
+                SkillTrees.current().nodes().stream()
+                        .filter(node -> spellId.equals(node.spell()) && node.spellLevel() == spellLevel)
+                        .findFirst().ifPresent(node -> treeNodes.add(node.id()));
+            }
+        }
+        invalidateTree();
+    }
+
+    @Nullable
+    private static Spell spellOf(@Nullable String id) {
+        ResourceLocation location = id == null ? null : ResourceLocation.tryParse(id);
+        return location == null ? null : SpellRegistries.SPELLS.get(location);
+    }
 
     public SpellProgress progress(Spell spell) {
         return spells.getOrDefault(spell.id(), NO_PROGRESS);
@@ -390,24 +595,12 @@ public final class MagicData {
     }
 
     public int spellLevel(Spell spell) {
-        return Math.min(progress(spell).level(), spell.maxLevel());
+        return Math.min(grants().spellLevel(spell.id().toString()), spell.maxLevel());
     }
 
-    public int skillPoints() {
-        int spent = 0;
-        for (SpellProgress progress : spells.values()) {
-            spent += progress.level() - 1;
-        }
-        return Math.max(0, (level - 1) + bonusSkillPoints - spent);
-    }
-
-    /** Skill points condensed from Elemental Essence, on top of those from levels. */
-    public int bonusSkillPoints() {
-        return bonusSkillPoints;
-    }
-
-    public void addBonusSkillPoint() {
-        bonusSkillPoints++;
+    /** The branches chosen for {@code spell}, by level. */
+    public Map<Integer, String> branches(Spell spell) {
+        return grants().branches().getOrDefault(spell.id().toString(), Map.of());
     }
 
     /** Mastery needed for the next level of {@code spell}; 0 at max level. */
@@ -416,7 +609,7 @@ public final class MagicData {
         return spellLevel >= spell.maxLevel() ? 0 : spell.masteryToNextLevel(spellLevel);
     }
 
-    /** Mastery fills up to the next level's requirement, then waits for a skill point. */
+    /** Mastery fills up to the next level's requirement, then waits for that level's node. */
     public void addMastery(Spell spell, int amount) {
         int needed = masteryToNextLevel(spell);
         if (needed > 0 && amount > 0) {
@@ -430,65 +623,9 @@ public final class MagicData {
         return needed > 0 && progress(spell).mastery() >= needed;
     }
 
-    public boolean canLevelUp(Spell spell) {
-        return canCast(spell) && isMasteryFull(spell) && skillPoints() > 0;
-    }
-
-    public boolean levelUp(Spell spell) {
-        if (!canLevelUp(spell)) {
-            return false;
-        }
-        SpellProgress progress = editProgress(spell);
-        progress.setLevel(progress.level() + 1);
-        progress.setMastery(0);
-        return true;
-    }
-
-    /** The lowest reached level whose branch choice hasn't been made yet, or -1. */
-    public int pendingBranchLevel(Spell spell) {
-        int spellLevel = spellLevel(spell);
-        for (int level = 1; level <= spellLevel; level++) {
-            if (!spell.branchOptions(level).isEmpty() && !progress(spell).branches().containsKey(level)) {
-                return level;
-            }
-        }
-        return -1;
-    }
-
-    public boolean chooseBranch(Spell spell, int level, String branch) {
-        if (level > spellLevel(spell) || !spell.branchOptions(level).contains(branch) || progress(spell).branches().containsKey(level)) {
-            return false;
-        }
-        editProgress(spell).setBranch(level, branch);
-        return true;
-    }
-
-    public long respecReadyAt() {
-        return respecReadyAt;
-    }
-
-    /** Clears this spell's branch choices so they can be picked again; starts the respec cooldown. */
-    public void respec(Spell spell, long gameTime, long cooldownTicks) {
-        editProgress(spell).clearBranches();
-        respecReadyAt = gameTime + cooldownTicks;
-    }
-
-    /** Dev/admin: set a spell's level directly (no skill points), dropping choices above it. */
-    public void setSpellLevel(Spell spell, int spellLevel) {
-        SpellProgress progress = editProgress(spell);
-        progress.setLevel(Mth.clamp(spellLevel, 1, spell.maxLevel()));
-        progress.setMastery(0);
-        progress.clearBranchesAbove(progress.level());
-    }
-
     /** Dev/admin: fill the mastery bar toward the next level. */
     public void fillMastery(Spell spell) {
         addMastery(spell, masteryToNextLevel(spell));
-    }
-
-    /** Dev/admin: clear branch choices without the respec cost. */
-    public void clearBranches(Spell spell) {
-        editProgress(spell).clearBranches();
     }
 
     // ---- cooldowns ----

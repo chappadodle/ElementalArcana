@@ -1,12 +1,14 @@
 package com.chappadodle.elementalarcana.client;
 
 import com.chappadodle.elementalarcana.api.Element;
+import com.chappadodle.elementalarcana.api.Progression;
 import com.chappadodle.elementalarcana.api.Stat;
 import com.chappadodle.elementalarcana.api.StatRules;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.core.MagicData;
 import com.chappadodle.elementalarcana.core.StatPoints;
 import com.chappadodle.elementalarcana.network.StatPayload;
+import com.chappadodle.elementalarcana.network.TreePayload;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -22,8 +24,9 @@ import java.util.Locale;
 
 /**
  * The Stats window: every level gives a stat point to spend here. One row per stat, plus one per
- * awakened element family's Affinity, each with its points, what it does right now and a "+" button.
- * Hover a row for what the stat is for. See StatRules for the numbers.
+ * awakened element family's Affinity, each with its points (and the skill tree's bonus), what it
+ * does right now and a "+" button. Right-click a row to give a point back for Essence. Hover a row
+ * for what the stat is for. See StatRules for the numbers.
  */
 public class StatsScreen extends Screen {
     private static final int WIDTH = 320;
@@ -111,8 +114,9 @@ public class StatsScreen extends Screen {
             }
             int color = row.family() != null ? FastColor.ARGB32.opaque(row.family().color()) : 0xFFE0D8F0;
             graphics.drawString(font, name(row), left + 12, y + 6, color, false);
-            String value = String.valueOf(data.stats().get(row.key()));
-            graphics.drawString(font, value, left + 118 - font.width(value), y + 6, 0xFFFFFFFF, false);
+            int bonus = data.grants().stat(row.key());
+            String value = data.stats().get(row.key()) + (bonus > 0 ? " +" + bonus : "");
+            graphics.drawString(font, value, left + 124 - font.width(value), y + 6, 0xFFFFFFFF, false);
             graphics.drawString(font, effect(data, row), left + 130, y + 6, 0xFF9A8FB8, false);
         }
 
@@ -120,8 +124,11 @@ public class StatsScreen extends Screen {
             renderable.render(graphics, mouseX, mouseY, partialTick);
         }
         if (hovered != null) {
+            Component refund = data.canRefundStat(hovered.key())
+                    ? Component.translatable("screen.elementalarcana.stats.refund", Progression.refundCost(data.level())).withStyle(ChatFormatting.DARK_GRAY)
+                    : Component.translatable("screen.elementalarcana.stats.no_refund").withStyle(ChatFormatting.DARK_GRAY);
             graphics.renderComponentTooltip(font, List.of(name(hovered).copy().withStyle(ChatFormatting.WHITE),
-                    description(hovered).copy().withStyle(ChatFormatting.GRAY)), mouseX, mouseY);
+                    description(hovered).copy().withStyle(ChatFormatting.GRAY), refund), mouseX, mouseY);
         }
     }
 
@@ -141,7 +148,7 @@ public class StatsScreen extends Screen {
 
     /** What the stat does right now, e.g. "Spell power ×1.22". */
     private static Component effect(MagicData data, Row row) {
-        int points = data.stats().get(row.key());
+        int points = data.statTotal(row.key());
         if (row.stat() == null) {
             return Component.translatable("stat.elementalarcana.affinity.effect", familyName(row.family()),
                     times(StatRules.effect(points, StatRules.AFFINITY_EXPONENT)));
@@ -163,6 +170,20 @@ public class StatsScreen extends Screen {
 
     private static String percentLess(double factor) {
         return String.valueOf(Math.round((1 - factor) * 100));
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (button == 1) {
+            for (int i = 0; i < rows.size(); i++) {
+                int y = rowY(i);
+                if (mouseX >= left + 6 && mouseX < left + WIDTH - 30 && mouseY >= y && mouseY < y + ROW) {
+                    PacketDistributor.sendToServer(new TreePayload(TreePayload.Action.REFUND_STAT, rows.get(i).key()));
+                    return true;
+                }
+            }
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override

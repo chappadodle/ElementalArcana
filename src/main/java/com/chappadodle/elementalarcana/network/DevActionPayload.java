@@ -36,7 +36,7 @@ public record DevActionPayload(Action action, int value, String target) implemen
     public enum Action {
         ADD_LEVELS, SET_LEVEL, ADD_XP, SET_MANA_PERCENT, GIVE_SICKNESS, CURE_SICKNESS,
         TOGGLE_AFFINITY, RESET_AFFINITIES, RESET_COOLDOWNS, TOGGLE_FREE_CAST, HEAL,
-        ADD_SPELL_LEVELS, FILL_MASTERY, CLEAR_BRANCHES, SPAWN_ATTUNED, RESET_STATS
+        MAX_SPELL, FILL_MASTERY, RESET_TREE, SPAWN_ATTUNED, RESET_STATS
     }
 
     public static DevActionPayload of(Action action, int value) {
@@ -90,14 +90,14 @@ public record DevActionPayload(Action action, int value, String target) implemen
             case RESET_COOLDOWNS -> data.clearCooldowns();
             case TOGGLE_FREE_CAST -> data.setFreeCast(!data.freeCast());
             case HEAL -> player.setHealth(player.getMaxHealth());
-            case ADD_SPELL_LEVELS, FILL_MASTERY, CLEAR_BRANCHES -> {
+            case RESET_TREE -> data.resetTree();
+            case MAX_SPELL, FILL_MASTERY -> {
                 ResourceLocation id = ResourceLocation.tryParse(payload.target());
                 Spell spell = id == null ? null : SpellRegistries.SPELLS.get(id);
                 if (spell != null) {
                     switch (payload.action()) {
-                        case ADD_SPELL_LEVELS -> data.setSpellLevel(spell, data.spellLevel(spell) + payload.value());
-                        case FILL_MASTERY -> data.fillMastery(spell);
-                        default -> data.clearBranches(spell);
+                        case MAX_SPELL -> data.takeWholePath(spell);
+                        default -> data.fillMastery(spell);
                     }
                 }
             }

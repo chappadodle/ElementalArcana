@@ -1,0 +1,108 @@
+{
+  "nodes": [
+    {
+      "id": "wind_spoke",
+      "type": "small",
+      "x": 0,
+      "y": -200,
+      "stat": "affinity/wind",
+      "amount": 2,
+      "links": [
+        "core_0"
+      ],
+      "element": "wind"
+    },
+    {
+      "id": "wind_start",
+      "type": "start",
+      "x": 0,
+      "y": -260,
+      "element": "wind",
+      "spell": "elementalarcana:wind_blade",
+      "links": [
+        "wind_spoke"
+      ]
+    },
+    {
+      "id": "wind_wind_blade",
+      "type": "path",
+      "spell": "elementalarcana:wind_blade",
+      "x": 0,
+      "y": -260,
+      "dx": 0.0,
+      "dy": -40.0,
+      "element": "wind",
+      "from": "wind_start"
+    },
+    {
+      "id": "gale_dash",
+      "type": "spell",
+      "x": 28,
+      "y": -288,
+      "spell": "elementalarcana:gale_dash",
+      "element": "wind",
+      "links": [
+        "wind_start"
+      ]
+    },
+    {
+      "id": "wind_sky_1",
+      "type": "small",
+      "x": -28,
+      "y": -288,
+      "stat": "affinity/wind",
+      "amount": 2,
+      "links": [
+        "wind_start"
+      ],
+      "element": "wind"
+    },
+    {
+      "id": "wind_sky_2",
+      "type": "small",
+      "x": -57,
+      "y": -317,
+      "stat": "focus",
+      "amount": 2,
+      "links": [
+        "wind_sky_1"
+      ],
+      "element": "wind"
+    },
+    {
+      "id": "wind_sky_3",
+      "type": "small",
+      "x": -85,
+      "y": -345,
+      "stat": "affinity/wind",
+      "amount": 2,
+      "links": [
+        "wind_sky_2"
+      ],
+      "element": "wind"
+    },
+    {
+      "id": "wind_sky_4",
+      "type": "small",
+      "x": -113,
+      "y": -373,
+      "stat": "potency",
+      "amount": 2,
+      "links": [
+        "wind_sky_3"
+      ],
+      "element": "wind"
+    },
+    {
+      "id": "updraft",
+      "type": "spell",
+      "x": -141,
+      "y": -401,
+      "spell": "elementalarcana:updraft",
+      "element": "wind",
+      "links": [
+        "wind_sky_4"
+      ]
+    }
+  ]
+}

@@ -24,8 +24,6 @@ import net.minecraft.sounds.SoundSource;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.joml.Vector3f;
 
-import java.util.Arrays;
-import java.util.Comparator;
 
 /**
  * Client -> server: spend Elemental Essence. INFUSE puts Essence of a spell's element into its
@@ -92,21 +90,12 @@ public record EssencePayload(Action action, ResourceLocation spell, boolean fill
     }
 
     private static void condense(ServerPlayer player, MagicData data) {
-        int cost = Progression.condenseCost(data.bonusSkillPoints());
+        int cost = Progression.condenseCost(data.bonusTreePoints());
         if (EssenceService.total(player) < cost) {
             return;
         }
-        // Largest stacks first.
-        Element[] byCount = Element.values().clone();
-        Arrays.sort(byCount, Comparator.comparingInt((Element element) -> EssenceService.count(player, element)).reversed());
-        int remaining = cost;
-        for (Element element : byCount) {
-            remaining -= EssenceService.remove(player, element, remaining);
-            if (remaining <= 0) {
-                break;
-            }
-        }
-        data.addBonusSkillPoint();
+        EssenceService.removeAny(player, cost);
+        data.addBonusTreePoint();
         player.sendSystemMessage(Component.translatable("message.elementalarcana.condensed", cost).withStyle(ChatFormatting.LIGHT_PURPLE));
         player.playNotifySound(ModContent.LEVEL_UP_SOUND.get(), SoundSource.PLAYERS, 0.9f, 1.2f);
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.PLAYERS, 1f, 1f);

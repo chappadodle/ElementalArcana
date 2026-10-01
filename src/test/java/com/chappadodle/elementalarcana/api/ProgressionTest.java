@@ -77,6 +77,14 @@ class ProgressionTest {
     }
 
     @Test
+    void refundCostRisesEveryTwentyLevels() {
+        assertEquals(1, Progression.refundCost(1));
+        assertEquals(1, Progression.refundCost(19));
+        assertEquals(2, Progression.refundCost(20));
+        assertEquals(6, Progression.refundCost(100));
+    }
+
+    @Test
     void focusFactorShortensCooldowns() {
         assertEquals(60, cooldownTicks(60, 1, 1f));
         assertEquals(30, cooldownTicks(60, 1, 0.5f));

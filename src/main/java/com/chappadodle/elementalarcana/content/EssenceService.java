@@ -9,6 +9,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 /**
  * Elemental Essence for spell progression, shared by the server handler and the screens:
  * which element a spell is, how much Essence a player carries, and what infusing is worth.
@@ -43,6 +46,20 @@ public final class EssenceService {
     }
 
     /** Mastery one Essence adds to {@code spell} right now (0 if it can't take any). */
+    /** Takes {@code amount} Essence of any elements, largest stacks first; returns how many were taken. */
+    public static int removeAny(Player player, int amount) {
+        Element[] byCount = Element.values().clone();
+        Arrays.sort(byCount, Comparator.comparingInt((Element element) -> count(player, element)).reversed());
+        int taken = 0;
+        for (Element element : byCount) {
+            taken += remove(player, element, amount - taken);
+            if (taken >= amount) {
+                break;
+            }
+        }
+        return taken;
+    }
+
     public static int infuseAmount(MagicData data, Spell spell) {
         int bar = data.masteryToNextLevel(spell);
         return bar <= 0 ? 0 : Progression.essenceMastery(data.spellLevel(spell), bar);

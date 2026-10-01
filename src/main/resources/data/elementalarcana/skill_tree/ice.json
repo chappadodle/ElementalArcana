@@ -1,0 +1,147 @@
+{
+  "nodes": [
+    {
+      "id": "ice_gate",
+      "type": "small",
+      "x": -246,
+      "y": 390,
+      "stat": "affinity/water",
+      "amount": 2,
+      "links": [
+        "water_deep_6"
+      ],
+      "element": "ice",
+      "requires": {
+        "stat": "affinity/water",
+        "min": 10
+      }
+    },
+    {
+      "id": "ice_start",
+      "type": "start",
+      "x": -285,
+      "y": 401,
+      "element": "ice",
+      "spell": "elementalarcana:icicle",
+      "links": [
+        "ice_gate"
+      ]
+    },
+    {
+      "id": "ice_icicle",
+      "type": "path",
+      "spell": "elementalarcana:icicle",
+      "x": -285,
+      "y": 401,
+      "dx": -38.637,
+      "dy": -10.353,
+      "element": "ice",
+      "from": "ice_start"
+    },
+    {
+      "id": "ice_shield_1",
+      "type": "small",
+      "x": -313,
+      "y": 429,
+      "stat": "ward",
+      "amount": 2,
+      "links": [
+        "ice_start"
+      ],
+      "element": "ice"
+    },
+    {
+      "id": "ice_shield_2",
+      "type": "small",
+      "x": -342,
+      "y": 457,
+      "stat": "affinity/water",
+      "amount": 2,
+      "links": [
+        "ice_shield_1"
+      ],
+      "element": "ice"
+    },
+    {
+      "id": "frost_shield",
+      "type": "spell",
+      "x": -370,
+      "y": 486,
+      "spell": "elementalarcana:frost_shield",
+      "element": "ice",
+      "links": [
+        "ice_shield_2"
+      ]
+    },
+    {
+      "id": "ice_frost_shield",
+      "type": "path",
+      "spell": "elementalarcana:frost_shield",
+      "x": -370,
+      "y": 486,
+      "dx": -37.588,
+      "dy": 13.681,
+      "element": "ice",
+      "from": "frost_shield"
+    },
+    {
+      "id": "ice_nova_1",
+      "type": "small",
+      "x": -289,
+      "y": 441,
+      "stat": "focus",
+      "amount": 2,
+      "links": [
+        "ice_start"
+      ],
+      "element": "ice"
+    },
+    {
+      "id": "ice_nova_2",
+      "type": "small",
+      "x": -292,
+      "y": 480,
+      "stat": "affinity/water",
+      "amount": 2,
+      "links": [
+        "ice_nova_1"
+      ],
+      "element": "ice"
+    },
+    {
+      "id": "ice_nova_3",
+      "type": "small",
+      "x": -296,
+      "y": 520,
+      "stat": "ward",
+      "amount": 2,
+      "links": [
+        "ice_nova_2"
+      ],
+      "element": "ice"
+    },
+    {
+      "id": "ice_nova_4",
+      "type": "small",
+      "x": -299,
+      "y": 560,
+      "stat": "potency",
+      "amount": 2,
+      "links": [
+        "ice_nova_3"
+      ],
+      "element": "ice"
+    },
+    {
+      "id": "frost_nova",
+      "type": "spell",
+      "x": -303,
+      "y": 600,
+      "spell": "elementalarcana:frost_nova",
+      "element": "ice",
+      "links": [
+        "ice_nova_4"
+      ]
+    }
+  ]
+}
