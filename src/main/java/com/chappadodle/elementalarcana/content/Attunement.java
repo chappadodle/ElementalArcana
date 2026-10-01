@@ -45,15 +45,14 @@ import java.util.Set;
 
 /**
  * Creature magic (design spec, Part 2): now and then a hostile mob spawns Attuned, with an element
- * and a rank. This class owns the attunement data and its health and knockback bonuses. It also
- * rolls attunement when creatures spawn, and plays the faint element hints; their spells are cast by
- * CastMobSpellGoal.
+ * and a rank. This class owns the attunement data and its knockback bonus (the rank's bonus levels
+ * are applied by CreatureLevels). It also rolls attunement when creatures spawn, and plays the faint
+ * element hints; their spells are cast by CastMobSpellGoal.
  */
 @EventBusSubscriber(modid = ElementalArcana.MODID)
 public final class Attunement {
     /** Entity types that can spawn Attuned. */
     public static final TagKey<EntityType<?>> CAN_ATTUNE = TagKey.create(Registries.ENTITY_TYPE, ElementalArcana.id("can_attune"));
-    private static final ResourceLocation HEALTH_BONUS = ElementalArcana.id("attunement_health");
     private static final ResourceLocation ARCHMAGE_KNOCKBACK = ElementalArcana.id("archmage_knockback");
     private static final double ARCHMAGE_KNOCKBACK_RESISTANCE = 0.75;
     private static final Map<Element, TagKey<Biome>> BIOME_TAGS = new EnumMap<>(Element.class);
@@ -89,7 +88,8 @@ public final class Attunement {
             return false;
         }
         mob.setData(MagicAttachments.CREATURE_MAGIC, new CreatureMagic(element, rank));
-        setBonus(mob, Attributes.MAX_HEALTH, HEALTH_BONUS, rank.healthBonus(), AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+        // The rank's bonus levels raise its Vitality (see CreatureLevels).
+        CreatureLevels.refreshStats(mob);
         mob.setHealth(mob.getMaxHealth());
         boolean archmage = rank == AttunementRank.ARCHMAGE;
         setBonus(mob, Attributes.KNOCKBACK_RESISTANCE, ARCHMAGE_KNOCKBACK,
@@ -109,7 +109,7 @@ public final class Attunement {
             return false;
         }
         mob.removeData(MagicAttachments.CREATURE_MAGIC);
-        setBonus(mob, Attributes.MAX_HEALTH, HEALTH_BONUS, 0, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+        CreatureLevels.refreshStats(mob);
         setBonus(mob, Attributes.KNOCKBACK_RESISTANCE, ARCHMAGE_KNOCKBACK, 0, AttributeModifier.Operation.ADD_VALUE);
         mob.setHealth(Math.min(mob.getHealth(), mob.getMaxHealth()));
         return true;
@@ -148,7 +148,7 @@ public final class Attunement {
         }
         BlockPos worldSpawn = level.getSharedSpawnPos();
         double distance = Math.hypot(event.getX() - worldSpawn.getX(), event.getZ() - worldSpawn.getZ());
-        AttunementRank rank = AttunementRules.rollRank(MagicAttachments.get(player).level(), distance, mob.getRandom()::nextDouble);
+        AttunementRank rank = AttunementRules.rollRank(distance, mob.getRandom()::nextDouble);
         if (rank == null) {
             return;
         }

@@ -6,9 +6,11 @@ import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.SpellSchool;
 import com.chappadodle.elementalarcana.content.Attunement;
 import com.chappadodle.elementalarcana.content.BubblePrisons;
+import com.chappadodle.elementalarcana.content.CreatureLevels;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -25,6 +27,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.Collection;
 import java.util.Locale;
@@ -53,6 +56,13 @@ public final class ArcanaCommand {
                                     int amount = IntegerArgumentType.getInteger(ctx, "amount");
                                     return modify(ctx.getSource(), data -> data.addXp(amount), "commands.elementalarcana.xp_added");
                                 }))))
+                .then(Commands.literal("stats")
+                        .then(Commands.literal("reset")
+                                .executes(ctx -> modify(ctx.getSource(), MagicData::resetStats, "commands.elementalarcana.stats_reset")))
+                        .then(Commands.literal("spend").then(Commands.argument("count", IntegerArgumentType.integer(1))
+                                .then(Commands.argument("stat", StringArgumentType.greedyString())
+                                        .executes(ctx -> spendStats(ctx.getSource(), StringArgumentType.getString(ctx, "stat"),
+                                                IntegerArgumentType.getInteger(ctx, "count")))))))
                 .then(Commands.literal("affinity")
                         .then(Commands.literal("add").then(Commands.argument("school", ResourceLocationArgument.id())
                                 .suggests((ctx, builder) -> SharedSuggestionProvider.suggestResource(SpellRegistries.SCHOOLS.keySet(), builder))
@@ -77,6 +87,11 @@ public final class ArcanaCommand {
                 .then(Commands.literal("cooldowns").then(Commands.literal("reset")
                         .executes(ctx -> modify(ctx.getSource(), MagicData::clearCooldowns, "commands.elementalarcana.cooldowns_reset"))))
                 .then(Commands.literal("attune").then(attuneTargets()))
+                .then(Commands.literal("creaturelevel").then(Commands.argument("targets", EntityArgument.entities())
+                        .executes(ctx -> showLevels(ctx.getSource(), EntityArgument.getEntities(ctx, "targets")))
+                        .then(Commands.literal("set").then(Commands.argument("level", IntegerArgumentType.integer(1, MagicData.MAX_LEVEL))
+                                .executes(ctx -> setLevels(ctx.getSource(), EntityArgument.getEntities(ctx, "targets"),
+                                        IntegerArgumentType.getInteger(ctx, "level")))))))
                 .then(Commands.literal("bubble").then(Commands.argument("targets", EntityArgument.entities())
                         .executes(ctx -> bubble(ctx.getSource(), EntityArgument.getEntities(ctx, "targets"))))));
     }
@@ -117,6 +132,34 @@ public final class ArcanaCommand {
         return done;
     }
 
+    /** /arcana creaturelevel <targets>: each one's level (with its rank's bonus) and max health. */
+    private static int showLevels(CommandSourceStack source, Collection<? extends Entity> targets) {
+        int shown = 0;
+        for (Entity entity : targets) {
+            if (entity instanceof LivingEntity living) {
+                int level = CreatureLevels.levelOf(living);
+                String health = String.format(Locale.ROOT, "%.1f", living.getMaxHealth());
+                source.sendSuccess(() -> Component.translatable("commands.elementalarcana.creature_level", living.getDisplayName(), level, health), false);
+                shown++;
+            }
+        }
+        return shown;
+    }
+
+    /** /arcana creaturelevel <targets> set <level>: sets creatures' zone level (players are skipped). */
+    private static int setLevels(CommandSourceStack source, Collection<? extends Entity> targets, int level) {
+        int set = 0;
+        for (Entity entity : targets) {
+            if (entity instanceof LivingEntity living && !(living instanceof Player)) {
+                CreatureLevels.setBaseLevel(living, level);
+                set++;
+            }
+        }
+        int done = set;
+        source.sendSuccess(() -> Component.translatable("commands.elementalarcana.creature_level_set", done, level), true);
+        return done;
+    }
+
     /** /arcana bubble <targets>: traps them in a Bubble Prison, as if hit by the spell (for testing). */
     private static int bubble(CommandSourceStack source, Collection<? extends Entity> targets) {
         int trapped = 0;
@@ -143,9 +186,25 @@ public final class ArcanaCommand {
         return done;
     }
 
+    /** Spends up to {@code count} stat points on {@code key} (e.g. "potency", "affinity/fire"). */
+    private static int spendStats(CommandSourceStack source, String key, int count) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        MagicData data = MagicAttachments.get(player);
+        int spent = 0;
+        while (spent < count && data.spend(key)) {
+            spent++;
+        }
+        PlayerStats.apply(player);
+        MagicAttachments.sync(player);
+        int total = spent;
+        source.sendSuccess(() -> Component.translatable("commands.elementalarcana.stats_spent", total, key, data.stats().get(key)), false);
+        return spent;
+    }
+
     private static int modify(CommandSourceStack source, Consumer<MagicData> change, String messageKey) throws CommandSyntaxException {
         ServerPlayer player = source.getPlayerOrException();
         change.accept(MagicAttachments.get(player));
+        PlayerStats.apply(player);
         MagicAttachments.sync(player);
         source.sendSuccess(() -> Component.translatable(messageKey), false);
         return 1;

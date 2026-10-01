@@ -4,7 +4,7 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 
 ## Playing
 
-**Awakening.** The first time you join, you choose the element your magic answers to: Fire, Water, Ice or Wind. The choice is permanent. You get another affinity slot at Magic Level 10, 20 and 30. Opposed elements (Fire vs Water, Fire vs Ice) can't be combined until Magic Level 30; from then on they fit any free slot. Your own elements hurt you 25% less: their spells, and their everyday damage too (Fire: burning and lava; Ice: freezing; Water: drowning; Wind: falling).
+**Awakening.** The first time you join, you choose the element your magic answers to: Fire, Water, Ice or Wind. The choice is permanent. You get another affinity slot at level 10, 20 and 30. Opposed elements (Fire vs Water, Fire vs Ice) can't be combined until level 50; from then on they fit any free slot. Your own elements hurt you 25% less: their spells, and their everyday damage too (Fire: burning and lava; Ice: freezing; Water: drowning; Wind: falling).
 
 **Controls** (rebindable under *Elemental Arcana* in Controls):
 
@@ -16,8 +16,23 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 | **Right click** (while conjuring) | Launch all of them. With nothing conjured, the mouse works as normal |
 | **K** | Status window: level, XP, mana stats, affinities and every spell |
 
-**Mana and growth**
-- Every point of mana you spend gives Magic XP. Each level adds +10 max mana, +0.25 mana/s regen (2.5/s at level 1) and +2% spell power (max level 30).
+**Level and stats**
+- Everyone has a level, up to 100: you, and every creature in the world. Each level needs 9% more XP than the last.
+- XP is mana you absorb from what you kill: more from higher-level creatures, Attuned ones and big ones, less from weaker ones, and nothing from creatures 10 or more levels below you. Setting off a reaction (Melt, Vaporize, Freeze, Swirl) on a creature gives a fifth of its kill XP, once every 5 seconds. Casting itself gives no XP.
+- The level gap matters in every fight: each level of difference makes the stronger side hit 4.5% harder and take 4.5% less, both ways (a creature 20 levels above you hits about 2.4 times as hard and takes 2.4 times less).
+- Each level gives a **stat point**. Spend them in the **Stats** window (the Status window's top-left button):
+
+  | Stat | Does |
+  |---|---|
+  | Reservoir | Max mana and regen (both also grow a little with your level) |
+  | Potency | Power of every spell |
+  | Affinity (one per element family; Ice belongs to Water's) | Power of that family's spells |
+  | Focus | Shorter cooldowns |
+  | Ward | Less elemental damage taken |
+  | Vitality | More max health |
+  | Insight | Harder reaction hits, more Essence |
+
+  Points are worth the most up to 20 in a stat, less up to 40 and less again after that.
 - Mana regenerates over time. To meditate, sneak and stand still for 2 seconds; regen is tripled while you do. A full night's sleep refills your mana.
 - Emptying your mana gives you *Mana Sickness* for 15s: slower movement, weaker attacks and half regen.
 - If you cast without enough mana, the missing amount is paid in health (1 heart per 20 mana). This is called overcasting. It never kills you and always causes Mana Sickness. The HUD mana bar pulses red when your next cast would overcast.
@@ -33,9 +48,9 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 
 **Conjuring** (Icicle, Fireball, Wind Blade): press R to conjure one projectile at a time, up to your spell level's maximum. Each costs mana when conjured (the first full price, each extra less), grows while you hold it, and costs 1 mana per second to keep; if you can't pay, everything you hold launches itself. Left click launches one, right click launches all. The cooldown starts when the last one leaves. With a full, fully grown set, hold R for a second to fuse it (Glacial Lance, Sunfire, Storm Scythe).
 
-**Bubble Prison** (Water, Magic Level 3): tap R to trap the creature (or player) under your crosshair in a floating water bubble for 4 seconds. It's helpless and Wet, which sets up Freeze and Vaporize combos, and any hit pops it for +4 damage. Bosses can't be trapped.
+**Bubble Prison** (Water, level 3): tap R to trap the creature (or player) under your crosshair in a floating water bubble for 4 seconds. It's helpless and Wet, which sets up Freeze and Vaporize combos, and any hit pops it for +4 damage. Bosses can't be trapped.
 
-**Frost Shield** (Ice, Magic Level 3): tap R to raise orbiting ice shards that absorb damage (shown as ice hearts) and shatter outward when broken.
+**Frost Shield** (Ice, level 3): tap R to raise orbiting ice shards that absorb damage (shown as ice hearts) and shatter outward when broken.
 
 **Fire** has **Melt**: a fire hit on a frozen or frosted enemy thaws it in a burst of steam for 75% more damage.
 
@@ -43,13 +58,13 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 
 **Elements matter.** Every spell deals damage of its element, and some creatures are born with an element of their own. Water is strong against Fire, Fire against Ice and Ice against Water (×1.5), and every element resists itself (×0.5). Wind is neutral. The game never tells you a creature's element: watch and listen to how your hits land. (With [Jade](https://modrinth.com/mod/jade) installed, its tooltip shows the element.)
 
-**Creature magic.** Once someone has awakened magic, hostile mobs nearby occasionally spawn **Attuned** to an element: an **Adept** (5%), a **Magus** (1%, needs Magic Level 5, +50% health) or, very rarely, an **Archmage** (0.1%, needs Magic Level 10, three times the health, a boss bar). They are more common far from world spawn (up to three times as likely), and their element leans toward the biome's. Attuned creatures are hit by the element chart like any elemental creature, and they cast their element's spells: Adepts know one, Magi two, Archmages three (Fire: fireballs, burning ground, Meteors; Water: a jet, healing their allies, a whirlpool; Ice: icicles, Frost Nova, an ice ward; Wind: wind blades, Gale Dash, Updraft). Every cast is announced by half a second of glowing hands and a warning sound: move! Getting close doesn't stop them: up close they cast point-blank, or burst their element in your face to shove you back. Defeating one grants Magic XP (Adept 20, Magus 60, Archmage 250) and may drop **Elemental Essence** of its element (Adept: half the time; Magus: 1-2; Archmage: 3-5). Creatures born with an element, like blazes, drop it now and then too. Essence feeds your spells (see below). Watch for a faint hint of their element.
+**Creature magic.** Once someone has awakened magic, hostile mobs nearby occasionally spawn **Attuned** to an element: an **Adept** (5%), a **Magus** (1%, 8 levels above the creatures around it) or, very rarely, an **Archmage** (0.1%, 20 levels above them, with a boss bar). Every creature's level comes from where it is: 1 to 5 near world spawn and higher further away (up to +30), more in deep caves, structures and the deep dark; the Nether is level 25 to 50 and the End 60 and up. Creatures put their stat points into Vitality, Ward and Potency. They are more common far from world spawn (up to three times as likely), and their element leans toward the biome's. Attuned creatures are hit by the element chart like any elemental creature, and they cast their element's spells: Adepts know one, Magi two, Archmages three (Fire: fireballs, burning ground, Meteors; Water: a jet, healing their allies, a whirlpool; Ice: icicles, Frost Nova, an ice ward; Wind: wind blades, Gale Dash, Updraft). Every cast is announced by half a second of glowing hands and a warning sound: move! Getting close doesn't stop them: up close they cast point-blank, or burst their element in your face to shove you back. Defeating one gives far more XP than an ordinary creature (Adept ×3, Magus ×5, Archmage ×12) and may drop **Elemental Essence** of its element (Adept: half the time; Magus: 1-2; Archmage: 3-5). Creatures born with an element, like blazes, drop it now and then too. Essence feeds your spells (see below). Watch for a faint hint of their element.
 
 **Wind** has two signature mechanics. **Swirl**: a wind hit on a frozen, frosted, burning or wet enemy spreads that element to every creature within 4 blocks. **Airborne**: enemies launched by wind take 25% more damage until they land.
 
-Fireball, Hydro Jet, Icicle, Frost Shield and Wind Blade level from 1 to 10. Each level also shortens the spell's cooldown (Lv 10: under half of Lv 1), and so does every Magic Level (1% each). Casting a spell fills its mastery bar, and each level-up costs one skill point (you earn one per Magic Level). Each offers permanent path choices at Lv 5 and 10. Open a spell's skill tree from the Status window. Elemental Essence speeds this up: **Infuse** it into a spell of its element from the spell's screen (one Essence fills half of a Lv 1 bar, 20% less each level after), or **Condense** it into bonus skill points from the Status screen (8 Essence for the first, 4 more for each after).
+Fireball, Hydro Jet, Icicle, Frost Shield and Wind Blade level from 1 to 10. Each level also shortens the spell's cooldown (Lv 10: under half of Lv 1), and so does Focus. Casting a spell fills its mastery bar, and each level-up costs one skill point (you earn one per level). Each offers permanent path choices at Lv 5 and 10. Open a spell's skill tree from the Status window. Elemental Essence speeds this up: **Infuse** it into a spell of its element from the spell's screen (one Essence fills half of a Lv 1 bar, 20% less each level after), or **Condense** it into bonus skill points from the Status screen (8 Essence for the first, 4 more for each after).
 
-Operators can use `/arcana level set <n>`, `/arcana xp add <n>`, `/arcana affinity add <element>`, `/arcana affinity reset`, `/arcana mana fill|set <n>`, `/arcana attune <targets> <element> <rank>|none` and `/arcana cooldowns reset`.
+Operators can use `/arcana level set <n>`, `/arcana xp add <n>`, `/arcana affinity add <element>`, `/arcana affinity reset`, `/arcana mana fill|set <n>`, `/arcana attune <targets> <element> <rank>|none`, `/arcana cooldowns reset`, `/arcana stats reset`, `/arcana stats spend <count> <stat>` (e.g. `potency` or `affinity/fire`) and `/arcana creaturelevel <targets> [set <n>]`.
 
 ## Adding a spell
 

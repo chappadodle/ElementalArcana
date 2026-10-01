@@ -113,6 +113,7 @@ public final class MagicEvents {
 
     private static void syncIfServer(PlayerEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
+            PlayerStats.apply(player);
             MagicAttachments.sync(player);
         }
     }

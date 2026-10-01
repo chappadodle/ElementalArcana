@@ -1,6 +1,7 @@
 package com.chappadodle.elementalarcana.api;
 
 import com.chappadodle.elementalarcana.content.ModContent;
+import com.chappadodle.elementalarcana.content.ReactionRewards;
 import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -83,6 +84,7 @@ public final class ElementalReactions {
         if (aura == null || !(target.level() instanceof ServerLevel level)) {
             return false;
         }
+        ReactionRewards.reacted(target, attacker);
         Entity source = attacker != null ? attacker : target;
         for (LivingEntity nearby : level.getEntitiesOfClass(LivingEntity.class, target.getBoundingBox().inflate(SWIRL_RADIUS),
                 e -> e != target && e != attacker && !(e instanceof Player) && e.isAlive() && e.distanceTo(target) <= SWIRL_RADIUS)) {
@@ -125,6 +127,7 @@ public final class ElementalReactions {
         if (auraOf(target) != Aura.CRYO || !(target.level() instanceof ServerLevel level)) {
             return 1f;
         }
+        ReactionRewards.reacted(target, null);
         target.removeEffect(ModContent.FROZEN);
         target.setTicksFrozen(0);
         level.sendParticles(ParticleTypes.CLOUD, target.getX(), target.getY(0.6), target.getZ(), 14, 0.4, 0.4, 0.4, 0.06);
@@ -180,6 +183,7 @@ public final class ElementalReactions {
         if (!(target.level() instanceof ServerLevel level)) {
             return 1f;
         }
+        ReactionRewards.reacted(target, null);
         target.removeEffect(ModContent.WET);
         level.sendParticles(ParticleTypes.CLOUD, target.getX(), target.getY(0.6), target.getZ(), 18, 0.45, 0.5, 0.45, 0.08);
         level.sendParticles(ParticleTypes.WHITE_SMOKE, target.getX(), target.getY(0.8), target.getZ(), 8, 0.3, 0.3, 0.3, 0.05);
@@ -196,6 +200,7 @@ public final class ElementalReactions {
                 || level.getGameTime() < target.getPersistentData().getLong(TAG_FREEZE_IMMUNE_UNTIL)) {
             return false;
         }
+        ReactionRewards.reacted(target, null);
         target.removeEffect(ModContent.WET);
         // Frozen solid is harsh on a player, so it's short for them.
         int ticks = target instanceof Player ? PLAYER_FREEZE_TICKS : FREEZE_TICKS;

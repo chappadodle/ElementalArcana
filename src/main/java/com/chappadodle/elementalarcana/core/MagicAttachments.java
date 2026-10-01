@@ -6,6 +6,7 @@ import com.chappadodle.elementalarcana.api.Bubble;
 import com.chappadodle.elementalarcana.api.CreatureMagic;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.SpellShield;
+import com.mojang.serialization.Codec;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -56,6 +57,15 @@ public final class MagicAttachments {
             () -> AttachmentType.builder(() -> new CreatureMagic(Element.FIRE, AttunementRank.ADEPT))
                     .serialize(CreatureMagic.CODEC)
                     .sync(CreatureMagic.STREAM_CODEC)
+                    .build());
+
+    // A creature's level from the zone it was in on its first tick (an Attuned creature's rank adds
+    // bonus levels on top; see CreatureLevels). Saved, and synced to everyone who can see it so the
+    // Jade tooltip can show it. Players use MagicData's level instead.
+    public static final Supplier<AttachmentType<Integer>> CREATURE_LEVEL = ATTACHMENT_TYPES.register("creature_level",
+            () -> AttachmentType.builder(() -> 1)
+                    .serialize(Codec.INT)
+                    .sync(ByteBufCodecs.VAR_INT)
                     .build());
 
     private MagicAttachments() {

@@ -100,7 +100,7 @@ public final class CastingService {
             return;
         }
 
-        CastContext context = new CastContext(player, player.serverLevel(), InteractionHand.MAIN_HAND, data.power(),
+        CastContext context = new CastContext(player, player.serverLevel(), InteractionHand.MAIN_HAND, data.spellPower(spell),
                 spellLevel, data.progress(spell).branches());
         CastResult result = spell.cast(context);
         if (!result.success()) {
@@ -112,7 +112,7 @@ public final class CastingService {
 
         pay(player, data, spell, cost);
         if (context.hold() == null && !isFree(player, data)) {
-            data.startCooldown(spell.id(), player.level().getGameTime(), spell.cooldownTicks(data.spellLevel(spell), data.level()));
+            data.startCooldown(spell.id(), player.level().getGameTime(), spell.cooldownTicks(data.spellLevel(spell), data.cooldownFactor()));
         }
         if (context.hold() != null) {
             HOLDS.put(player.getUUID(), new ActiveHold(spell, context.hold(), player.level().getGameTime()));
@@ -142,7 +142,8 @@ public final class CastingService {
 
     /**
      * Pays for a cast: takes the mana (health for any shortfall, with Mana Sickness), then grants
-     * Magic XP and mastery in {@code spell} for it. Nothing for creative or free casting.
+     * mastery in {@code spell} for it (XP comes from kills, not casting). Nothing for creative or
+     * free casting.
      */
     static void pay(ServerPlayer player, MagicData data, Spell spell, int cost) {
         data.interruptMeditation();
@@ -156,10 +157,6 @@ public final class CastingService {
         }
         if (healthCost > 0 || data.mana() <= 0f) {
             player.addEffect(new MobEffectInstance(ModContent.MANA_SICKNESS, MANA_SICKNESS_TICKS));
-        }
-        int oldLevel = data.level();
-        if (data.addXp(cost) > 0) {
-            onLevelUp(player, data, oldLevel);
         }
         boolean wasFull = data.isMasteryFull(spell);
         data.addMastery(spell, cost);
@@ -216,7 +213,7 @@ public final class CastingService {
     private static void endHold(ServerPlayer player, ActiveHold active) {
         MagicData data = MagicAttachments.get(player);
         if (!player.isCreative() && !data.freeCast()) {
-            data.startCooldown(active.spell().id(), player.level().getGameTime(), active.spell().cooldownTicks(data.spellLevel(active.spell()), data.level()));
+            data.startCooldown(active.spell().id(), player.level().getGameTime(), active.spell().cooldownTicks(data.spellLevel(active.spell()), data.cooldownFactor()));
             MagicAttachments.sync(player);
         }
     }
@@ -229,8 +226,7 @@ public final class CastingService {
     }
 
     /**
-     * Gives Magic XP from anything other than casting (e.g. defeating Attuned creatures), with the
-     * same level-up title, sound and messages as casting XP, and syncs.
+     * Gives XP (from kills and reactions) with the level-up title, sound and messages, and syncs.
      */
     public static void grantXp(ServerPlayer player, int amount) {
         MagicData data = MagicAttachments.get(player);
@@ -247,7 +243,7 @@ public final class CastingService {
         player.connection.send(new ClientboundSetTitleTextPacket(
                 Component.translatable("title.elementalarcana.level_up", newLevel).withStyle(ChatFormatting.LIGHT_PURPLE)));
         player.connection.send(new ClientboundSetSubtitleTextPacket(
-                Component.translatable("title.elementalarcana.level_up.sub", (int) data.maxMana()).withStyle(ChatFormatting.GRAY)));
+                Component.translatable("title.elementalarcana.level_up.sub", data.statPoints()).withStyle(ChatFormatting.GRAY)));
         player.playNotifySound(ModContent.LEVEL_UP_SOUND.get(), SoundSource.PLAYERS, 1f, 1f);
         player.serverLevel().sendParticles(ParticleTypes.END_ROD, player.getX(), player.getY(1.0), player.getZ(), 30, 0.5, 0.8, 0.5, 0.05);
 

@@ -1,0 +1,14 @@
+# Creature levels: a zone level on the first tick, set by command, ranks as bonus levels, Vitality on max health.
+time set midnight
+forceload add 0 0
+summon zombie 0.5 100 0.5 {NoAI:1b,Tags:["eatest"]}
+sleep 1
+arcana creaturelevel @e[tag=eatest]
+arcana creaturelevel @e[tag=eatest] set 40
+arcana creaturelevel @e[tag=eatest]
+arcana attune @e[tag=eatest] fire archmage
+arcana creaturelevel @e[tag=eatest]
+arcana attune @e[tag=eatest] none
+arcana creaturelevel @e[tag=eatest]
+kill @e[tag=eatest]
+forceload remove 0 0

@@ -27,8 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The isekai "Status" window: level, XP and skill points, mana stats, affinities (with the Awaken
- * button when a slot opens), and every spell grouped by element; click one for its skill tree.
+ * The isekai "Status" window: level, XP and skill points, mana stats and unspent stat points (the
+ * Stats button opens StatsScreen), affinities (with the Awaken button when a slot opens), and every
+ * spell grouped by element; click one for its skill tree.
  */
 public class StatusScreen extends Screen {
     private static final int WIDTH = 290;
@@ -83,6 +84,10 @@ public class StatusScreen extends Screen {
                         button -> PacketDistributor.sendToServer(EssencePayload.condense()))
                 .bounds(left + 10, top + 101, 190, 14).build());
         updateCondenseButton();
+
+        addRenderableWidget(Button.builder(Component.translatable("screen.elementalarcana.stats"), button -> minecraft.setScreen(new StatsScreen(this)))
+                .bounds(left + 6, top + 4, 40, 14)
+                .build());
 
         if (minecraft.player.hasPermissions(2)) {
             addRenderableWidget(Button.builder(Component.translatable("screen.elementalarcana.status.dev"), button -> ArcanaClient.openDevMenu(minecraft))
@@ -145,7 +150,8 @@ public class StatusScreen extends Screen {
         stat(graphics, 0, "screen.elementalarcana.status.mana", (int) data.mana() + " / " + (int) data.maxMana(), 0xFF9FCBFF);
         String regen = String.format("%.1f/s", data.regenPerSecond()) + (data.meditating() ? " ×3" : "");
         stat(graphics, 1, "screen.elementalarcana.status.regen", regen, 0xFF9FCBFF);
-        stat(graphics, 2, "screen.elementalarcana.status.power", "+" + Math.round((data.power() - 1f) * 100) + "%", 0xFFFFC870);
+        int statPoints = data.statPoints();
+        stat(graphics, 2, "screen.elementalarcana.status.stat_points", String.valueOf(statPoints), statPoints > 0 ? GOLD : 0xFF6A6480);
         stat(graphics, 3, "screen.elementalarcana.status.condition", sickness == null
                 ? Component.translatable("screen.elementalarcana.status.condition.normal").getString()
                 : Component.translatable("screen.elementalarcana.status.condition.sick", sickness.getDuration() / 20).getString(),
@@ -288,7 +294,7 @@ public class StatusScreen extends Screen {
                     .withStyle(ChatFormatting.LIGHT_PURPLE));
         }
         lines.add(Component.translatable("tooltip.elementalarcana.mana_cost", spell.manaCost(data.spellLevel(spell))).withStyle(ChatFormatting.BLUE));
-        lines.add(Component.translatable("tooltip.elementalarcana.cooldown", String.format("%.1f", spell.cooldownTicks(data.spellLevel(spell), data.level()) / 20f)).withStyle(ChatFormatting.BLUE));
+        lines.add(Component.translatable("tooltip.elementalarcana.cooldown", String.format("%.1f", spell.cooldownTicks(data.spellLevel(spell), data.cooldownFactor()) / 20f)).withStyle(ChatFormatting.BLUE));
         if (!data.hasAffinity(spell.school())) {
             lines.add(Component.translatable("tooltip.elementalarcana.requires_affinity", spell.school().displayName()).withStyle(ChatFormatting.RED));
         } else if (data.level() < spell.requiredLevel()) {

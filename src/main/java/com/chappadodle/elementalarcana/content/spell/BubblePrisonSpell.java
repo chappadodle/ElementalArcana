@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 /**
- * Water, Magic Level 3: traps the creature under your crosshair (up to 20 blocks) in a floating
+ * Water, level 3: traps the creature under your crosshair (up to 20 blocks) in a floating
  * water bubble for 4 seconds. It hangs there helpless and Wet; any hit from a player pops it for
  * bonus damage (see BubblePrisons). No target: the cast fails and costs nothing.
  */

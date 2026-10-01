@@ -55,14 +55,16 @@ public class DevScreen extends Screen {
         button("-1", 26, Action.ADD_LEVELS, -1);
         button("+1", 26, Action.ADD_LEVELS, 1);
         button("Lv 1", 34, Action.SET_LEVEL, 1);
-        button("Lv 5", 34, Action.SET_LEVEL, 5);
         button("Lv 10", 38, Action.SET_LEVEL, 10);
         button("Lv 20", 38, Action.SET_LEVEL, 20);
+        button("Lv 50", 38, Action.SET_LEVEL, 50);
         button("Max", 30, Action.SET_LEVEL, MagicData.MAX_LEVEL);
 
         row(1);
         button("+100 XP", 54, Action.ADD_XP, 100);
         button("+1000 XP", 60, Action.ADD_XP, 1000);
+        button("+20000 XP", 66, Action.ADD_XP, 20000);
+        addButton(Component.translatable("screen.elementalarcana.dev.reset_stats"), 70, DevActionPayload.of(Action.RESET_STATS, 0));
 
         row(2);
         button("0%", 30, Action.SET_MANA_PERCENT, 0);

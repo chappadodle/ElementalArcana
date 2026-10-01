@@ -5,6 +5,8 @@ import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.Progression;
 import com.chappadodle.elementalarcana.api.SchoolElements;
 import com.chappadodle.elementalarcana.api.Spell;
+import com.chappadodle.elementalarcana.api.Stat;
+import com.chappadodle.elementalarcana.api.StatRules;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.SpellSchool;
 import com.mojang.serialization.Codec;
@@ -26,20 +28,18 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Everything about a player's magic: level and XP, awakened elements (affinities), mana,
- * the selected spell and cooldowns. Stats like max mana, regen and power are derived from the
- * level, so balance lives in the constants below. Spells and schools are stored by id, so
+ * Everything about a player's magic: level and XP, stat points, awakened elements (affinities),
+ * mana, the selected spell and cooldowns. Max mana, regen, spell power and cooldowns are derived
+ * from the level and stats (see StatRules), so balance lives there. Spells and schools are stored by id, so
  * removing an addon never corrupts a save.
  */
 public final class MagicData {
-    public static final int MAX_LEVEL = 30;
+    public static final int MAX_LEVEL = Progression.MAX_LEVEL;
     public static final int[] AFFINITY_SLOT_LEVELS = {1, 10, 20, 30};
-    private static final float BASE_MAX_MANA = 100f;
-    private static final float MAX_MANA_PER_LEVEL = 10f;
-    private static final float POWER_PER_LEVEL = 0.02f;
+    private static final float START_MANA = 100f;
 
     public static final Codec<MagicData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.FLOAT.optionalFieldOf("mana", BASE_MAX_MANA).forGetter(data -> data.mana),
+            Codec.FLOAT.optionalFieldOf("mana", START_MANA).forGetter(data -> data.mana),
             Codec.INT.optionalFieldOf("level", 1).forGetter(data -> data.level),
             Codec.INT.optionalFieldOf("xp", 0).forGetter(data -> data.xp),
             ResourceLocation.CODEC.listOf().optionalFieldOf("affinities", List.of()).forGetter(data -> data.affinities),
@@ -49,10 +49,11 @@ public final class MagicData {
             Codec.BOOL.optionalFieldOf("free_cast", false).forGetter(data -> data.freeCast),
             Codec.unboundedMap(ResourceLocation.CODEC, SpellProgress.CODEC).optionalFieldOf("spells", Map.of()).forGetter(data -> data.spells),
             Codec.LONG.optionalFieldOf("respec_ready_at", 0L).forGetter(data -> data.respecReadyAt),
-            Codec.INT.optionalFieldOf("bonus_skill_points", 0).forGetter(data -> data.bonusSkillPoints)
-    ).apply(instance, (mana, level, xp, affinities, selected, cooldowns, fallImmune, freeCast, spells, respecReadyAt, bonusSkillPoints) ->
+            Codec.INT.optionalFieldOf("bonus_skill_points", 0).forGetter(data -> data.bonusSkillPoints),
+            StatPoints.CODEC.optionalFieldOf("stats", new StatPoints()).forGetter(data -> data.stats)
+    ).apply(instance, (mana, level, xp, affinities, selected, cooldowns, fallImmune, freeCast, spells, respecReadyAt, bonusSkillPoints, stats) ->
             new MagicData(mana, level, xp, affinities, selected.orElse(null), cooldowns, fallImmune, freeCast, spells, respecReadyAt,
-                    bonusSkillPoints, false, 0)));
+                    bonusSkillPoints, stats, false, 0)));
 
     // What the owning client needs: no fall flag, plus the live meditation state for the HUD.
     public static final StreamCodec<RegistryFriendlyByteBuf, MagicData> STREAM_CODEC = StreamCodec.of(
@@ -67,6 +68,7 @@ public final class MagicData {
                 buf.writeMap(data.spells, FriendlyByteBuf::writeResourceLocation, SpellProgress::write);
                 buf.writeVarLong(data.respecReadyAt);
                 buf.writeVarInt(data.bonusSkillPoints);
+                StatPoints.write(buf, data.stats);
                 buf.writeBoolean(data.meditating);
                 buf.writeVarInt(data.conjured);
             },
@@ -82,6 +84,7 @@ public final class MagicData {
                     buf.readMap(FriendlyByteBuf::readResourceLocation, SpellProgress::read),
                     buf.readVarLong(),
                     buf.readVarInt(),
+                    StatPoints.read(buf),
                     buf.readBoolean(),
                     buf.readVarInt()));
 
@@ -97,8 +100,9 @@ public final class MagicData {
     private boolean freeCast;
     private final HashMap<ResourceLocation, SpellProgress> spells;
     private long respecReadyAt;
-    // Skill points condensed from Elemental Essence, on top of those from Magic Level.
+    // Skill points condensed from Elemental Essence, on top of those from levels.
     private int bonusSkillPoints;
+    private final StatPoints stats;
 
     // Server-side meditation tracking; only `meditating` is synced.
     private boolean meditating;
@@ -110,13 +114,13 @@ public final class MagicData {
     private double lastZ;
 
     public MagicData() {
-        this(BASE_MAX_MANA, 1, 0, List.of(), null, Map.of(), false, false, Map.of(), 0L, 0, false, 0);
+        this(START_MANA, 1, 0, List.of(), null, Map.of(), false, false, Map.of(), 0L, 0, new StatPoints(), false, 0);
     }
 
     private MagicData(float mana, int level, int xp, List<ResourceLocation> affinities, @Nullable ResourceLocation selected,
                       Map<ResourceLocation, Long> cooldownEnds, boolean fallImmune, boolean freeCast,
-                      Map<ResourceLocation, SpellProgress> spells, long respecReadyAt, int bonusSkillPoints, boolean meditating,
-                      int conjured) {
+                      Map<ResourceLocation, SpellProgress> spells, long respecReadyAt, int bonusSkillPoints, StatPoints stats,
+                      boolean meditating, int conjured) {
         this.level = Mth.clamp(level, 1, MAX_LEVEL);
         this.xp = xp;
         this.affinities = new ArrayList<>(affinities);
@@ -127,6 +131,7 @@ public final class MagicData {
         this.spells = new HashMap<>(spells);
         this.respecReadyAt = respecReadyAt;
         this.bonusSkillPoints = Math.max(0, bonusSkillPoints);
+        this.stats = stats;
         this.meditating = meditating;
         this.conjured = conjured;
         this.mana = Mth.clamp(mana, 0f, maxMana());
@@ -143,7 +148,7 @@ public final class MagicData {
     }
 
     public int xpToNextLevel() {
-        return level >= MAX_LEVEL ? 0 : 40 + 20 * level;
+        return Progression.xpToNextLevel(level);
     }
 
     /** Adds XP and returns how many levels were gained. */
@@ -167,20 +172,71 @@ public final class MagicData {
     public void setLevel(int level) {
         this.level = Mth.clamp(level, 1, MAX_LEVEL);
         this.xp = 0;
+        // Fewer levels than points spent (an admin lowered it): hand the points back.
+        if (stats.total() > this.level - 1) {
+            stats.clear();
+        }
         this.mana = Math.min(mana, maxMana());
     }
 
     public float maxMana() {
-        return BASE_MAX_MANA + MAX_MANA_PER_LEVEL * (level - 1);
+        return StatRules.maxMana(level, stats.get(Stat.RESERVOIR));
     }
 
     public float regenPerSecond() {
-        return Progression.regenPerSecond(level);
+        return StatRules.regenPerSecond(level, stats.get(Stat.RESERVOIR));
     }
 
-    /** Multiplier spells apply to damage, knockback and durations. */
-    public float power() {
-        return 1f + POWER_PER_LEVEL * (level - 1);
+    /** Multiplier a spell applies to damage, knockback and durations: Potency, and its element family's Affinity. */
+    public float spellPower(Spell spell) {
+        Element element = SchoolElements.of(spell.school());
+        return StatRules.spellPower(stats.get(Stat.POTENCY), element == null ? 0 : stats.affinity(element));
+    }
+
+    /** Multiplier on cooldowns, from Focus. */
+    public float cooldownFactor() {
+        return StatRules.cooldownFactor(stats.get(Stat.FOCUS));
+    }
+
+    // ---- stat points ----
+    // Every level after the first earns a stat point. Spent points are stored, unspent ones derived.
+
+    public StatPoints stats() {
+        return stats;
+    }
+
+    public int statPoints() {
+        return Math.max(0, (level - 1) - stats.total());
+    }
+
+    /** Whether {@code key} is a stat this player can raise: any Stat, or the Affinity of an awakened element's family. */
+    public boolean canRaise(String key) {
+        for (Stat stat : Stat.values()) {
+            if (stat.key().equals(key)) {
+                return true;
+            }
+        }
+        for (Element element : affinityElements()) {
+            if (StatPoints.affinityKey(element).equals(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Spends one stat point on {@code key}; false if none is free or the key can't be raised. */
+    public boolean spend(String key) {
+        if (statPoints() <= 0 || !canRaise(key)) {
+            return false;
+        }
+        stats.add(key, 1);
+        return true;
+    }
+
+    /** Hands every spent stat point back. */
+    public void resetStats() {
+        stats.clear();
+        mana = Math.min(mana, maxMana());
     }
 
     // ---- mana ----
@@ -249,7 +305,7 @@ public final class MagicData {
 
     /**
      * The element you hold that {@code school} opposes while opposites are still locked (below
-     * Magic Level 30), or null if {@code school} can be awakened as far as opposites go.
+     * level 50), or null if {@code school} can be awakened as far as opposites go.
      */
     @Nullable
     public Element opposedBy(SpellSchool school) {
@@ -258,8 +314,8 @@ public final class MagicData {
     }
 
     /**
-     * Awakens a new element if there's a free slot and no element you hold opposes it (until Magic
-     * Level 30). Selects its first spell if nothing is selected.
+     * Awakens a new element if there's a free slot and no element you hold opposes it (until level
+     * 50). Selects its first spell if nothing is selected.
      */
     public boolean awaken(SpellSchool school) {
         if (hasAffinity(school) || !hasFreeAffinitySlot() || opposedBy(school) != null) {
@@ -320,7 +376,7 @@ public final class MagicData {
     }
 
     // ---- spell levels & skill points ----
-    // Every Magic Level after the first earns a skill point; every spell level after the first
+    // Every level after the first earns a skill point; every spell level after the first
     // costs one. Points are derived from those, so they can never drift out of sync.
 
     private static final SpellProgress NO_PROGRESS = new SpellProgress();
@@ -345,7 +401,7 @@ public final class MagicData {
         return Math.max(0, (level - 1) + bonusSkillPoints - spent);
     }
 
-    /** Skill points condensed from Elemental Essence, on top of those from Magic Level. */
+    /** Skill points condensed from Elemental Essence, on top of those from levels. */
     public int bonusSkillPoints() {
         return bonusSkillPoints;
     }

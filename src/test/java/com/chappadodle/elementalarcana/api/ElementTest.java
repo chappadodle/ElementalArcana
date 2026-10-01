@@ -19,6 +19,14 @@ class ElementTest {
     }
 
     @Test
+    void iceBelongsToWatersFamily() {
+        assertEquals(Element.WATER, Element.ICE.family());
+        assertEquals(Element.WATER, Element.WATER.family());
+        assertEquals(Element.FIRE, Element.FIRE.family());
+        assertEquals(Element.WIND, Element.WIND.family());
+    }
+
+    @Test
     void everythingElseIsCompatible() {
         assertFalse(Element.WATER.opposes(Element.ICE));
         assertFalse(Element.ICE.opposes(Element.WATER));

@@ -26,6 +26,14 @@ public enum Element {
         return color;
     }
 
+    /**
+     * The element family this element belongs to: Ice belongs to Water's. Affinity (a stat) is per
+     * family, so related elements are raised together.
+     */
+    public Element family() {
+        return this == ICE ? WATER : this;
+    }
+
     /** Fire is opposed to Water and to Ice ("Fire vs the cold"); every other pair is compatible. */
     public boolean opposes(Element other) {
         return this == FIRE && (other == WATER || other == ICE)

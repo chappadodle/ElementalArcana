@@ -84,7 +84,7 @@ public final class Conjuring {
         if (pre.isCanceled() || !CastingService.canAfford(player, data, pre.manaCost())) {
             return;
         }
-        CastContext context = new CastContext(player, player.serverLevel(), InteractionHand.MAIN_HAND, data.power(),
+        CastContext context = new CastContext(player, player.serverLevel(), InteractionHand.MAIN_HAND, data.spellPower(spell),
                 level, data.progress(spell).branches());
         boolean first = session.held.isEmpty();
         SpellProjectile projectile = conjurer.conjure(context, session.seed);
@@ -239,7 +239,7 @@ public final class Conjuring {
         MagicData data = MagicAttachments.get(player);
         if (!CastingService.isFree(player, data)) {
             Spell spell = session.spell;
-            data.startCooldown(spell.id(), player.level().getGameTime(), spell.cooldownTicks(data.spellLevel(spell), data.level()));
+            data.startCooldown(spell.id(), player.level().getGameTime(), spell.cooldownTicks(data.spellLevel(spell), data.cooldownFactor()));
         }
         data.setConjured(0);
         MagicAttachments.sync(player);

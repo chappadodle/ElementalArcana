@@ -16,11 +16,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class AffinityRulesTest {
 
     @Test
-    void fireBlocksWaterAndIceUntilLevel30() {
-        assertEquals(FIRE, blockingOpposite(Set.of(FIRE), WATER, 29));
-        assertEquals(FIRE, blockingOpposite(Set.of(FIRE), ICE, 29));
-        assertNull(blockingOpposite(Set.of(FIRE), WATER, 30));
-        assertNull(blockingOpposite(Set.of(FIRE), ICE, 30));
+    void fireBlocksWaterAndIceUntilLevel50() {
+        assertEquals(FIRE, blockingOpposite(Set.of(FIRE), WATER, 49));
+        assertEquals(FIRE, blockingOpposite(Set.of(FIRE), ICE, 49));
+        assertNull(blockingOpposite(Set.of(FIRE), WATER, 50));
+        assertNull(blockingOpposite(Set.of(FIRE), ICE, 50));
     }
 
     @Test

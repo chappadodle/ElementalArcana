@@ -98,7 +98,7 @@ public class AwakeningScreen extends Screen {
         for (int i = 0; i < choices.size(); i++) {
             SpellSchool school = choices.get(i);
             int x = cardsLeft + i * (cardWidth + GAP);
-            // Opposed to an element you hold: shown, but locked until Magic Level 30.
+            // Opposed to an element you hold: shown, but locked until level 50.
             boolean locked = data.opposedBy(school) != null;
             int color = locked ? 0xFF5A5468 : FastColor.ARGB32.opaque(school.color());
             boolean hovered = !locked && isOverCard(i, mouseX, mouseY);

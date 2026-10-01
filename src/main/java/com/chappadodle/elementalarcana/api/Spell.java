@@ -57,11 +57,12 @@ public abstract class Spell {
     }
 
     /**
-     * Cooldown for a caster at {@code magicLevel} with this spell at {@code spellLevel}: 6% of the
-     * Lv 1 cooldown shorter per spell level, and 1% shorter per Magic Level on top.
+     * Cooldown with this spell at {@code spellLevel}, for a caster whose Focus gives
+     * {@code cooldownFactor} (see StatRules#cooldownFactor): 6% of the Lv 1 cooldown shorter per
+     * spell level, times the factor.
      */
-    public int cooldownTicks(int spellLevel, int magicLevel) {
-        return Progression.cooldownTicks(cooldownTicks(), spellLevel, magicLevel);
+    public int cooldownTicks(int spellLevel, float cooldownFactor) {
+        return Progression.cooldownTicks(cooldownTicks(), spellLevel, cooldownFactor);
     }
 
     public ResourceLocation id() {

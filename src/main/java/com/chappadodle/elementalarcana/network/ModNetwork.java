@@ -14,6 +14,7 @@ public final class ModNetwork {
                 .playToServer(AwakenPayload.TYPE, AwakenPayload.STREAM_CODEC, AwakenPayload::handle)
                 .playToServer(DevActionPayload.TYPE, DevActionPayload.STREAM_CODEC, DevActionPayload::handle)
                 .playToServer(SpellProgressPayload.TYPE, SpellProgressPayload.STREAM_CODEC, SpellProgressPayload::handle)
-                .playToServer(EssencePayload.TYPE, EssencePayload.STREAM_CODEC, EssencePayload::handle);
+                .playToServer(EssencePayload.TYPE, EssencePayload.STREAM_CODEC, EssencePayload::handle)
+                .playToServer(StatPayload.TYPE, StatPayload.STREAM_CODEC, StatPayload::handle);
     }
 }

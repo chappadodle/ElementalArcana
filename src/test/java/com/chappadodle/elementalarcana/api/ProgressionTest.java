@@ -7,7 +7,12 @@ import static com.chappadodle.elementalarcana.api.Progression.cooldownTicks;
 import static com.chappadodle.elementalarcana.api.Progression.essenceBarFraction;
 import static com.chappadodle.elementalarcana.api.Progression.essenceMastery;
 import static com.chappadodle.elementalarcana.api.Progression.essenceToFill;
-import static com.chappadodle.elementalarcana.api.Progression.regenPerSecond;
+import static com.chappadodle.elementalarcana.api.Progression.creatureXp;
+import static com.chappadodle.elementalarcana.api.Progression.damageLevelFactor;
+import static com.chappadodle.elementalarcana.api.Progression.killXp;
+import static com.chappadodle.elementalarcana.api.Progression.sizeFactor;
+import static com.chappadodle.elementalarcana.api.Progression.xpGapFactor;
+import static com.chappadodle.elementalarcana.api.Progression.xpToNextLevel;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ProgressionTest {
@@ -24,24 +29,58 @@ class ProgressionTest {
     }
 
     @Test
-    void magicLevelShortensCooldownsOnePercentPerLevel() {
-        assertEquals(60, cooldownTicks(60, 1, 1));
-        assertEquals(43, cooldownTicks(60, 1, 30));   // 60 x 0.71 = 42.6
-        assertEquals(16, cooldownTicks(50, 10, 30));  // Icicle: 50 x 0.46 x 0.71 = 16.3
-        assertEquals(131, cooldownTicks(400, 10, 30)); // 400 x 0.46 x 0.71 = 130.6
-        assertEquals(23, cooldownTicks(50, 10, 1));
-    }
-
-    @Test
     void levelBelowOneCountsAsOne() {
         assertEquals(60, cooldownTicks(60, 0));
     }
 
     @Test
-    void regenGrowsWithMagicLevel() {
-        assertEquals(2.5f, regenPerSecond(1), 1e-6f);
-        assertEquals(4.75f, regenPerSecond(10), 1e-6f);
-        assertEquals(9.75f, regenPerSecond(30), 1e-6f);
+    void xpCurveGrowsNinePercentPerLevel() {
+        assertEquals(55, xpToNextLevel(1));
+        assertEquals(669, xpToNextLevel(30));   // 55 x 1.09^29 = 669.5
+        assertEquals(255_953, xpToNextLevel(99));
+        assertEquals(0, xpToNextLevel(100));
+    }
+
+    @Test
+    void sameLevelKillsPerLevelRiseFromEightToForty() {
+        assertEquals(7, creatureXp(1));          // 55 / 8 = 6.9
+        assertEquals(6399, creatureXp(100));     // 255,953 / 40
+    }
+
+    @Test
+    void lowerCreaturesPayLessAndHigherOnesMore() {
+        assertEquals(1.0, xpGapFactor(10, 10), 1e-9);
+        assertEquals(0.5, xpGapFactor(10, 5), 1e-9);
+        assertEquals(0.0, xpGapFactor(20, 10), 1e-9);
+        assertEquals(0.0, xpGapFactor(30, 10), 1e-9);
+        assertEquals(1.25, xpGapFactor(10, 15), 1e-9);
+        assertEquals(1.5, xpGapFactor(10, 40), 1e-9);
+    }
+
+    @Test
+    void killXpScalesBySizeAndRank() {
+        assertEquals(7, killXp(1, 1, 1.0, 1.0));
+        assertEquals(1, killXp(1, 1, 0.2, 1.0));     // a chicken: 1.4
+        assertEquals(84, killXp(1, 1, 1.0, 12.0));
+        assertEquals(0, killXp(20, 1, 5.0, 12.0));
+        assertEquals(0.1, sizeFactor(1), 1e-9);
+        assertEquals(1.0, sizeFactor(20), 1e-9);
+        assertEquals(5.0, sizeFactor(300), 1e-9);
+    }
+
+    @Test
+    void levelGapScalesDamageBothWays() {
+        assertEquals(1f, damageLevelFactor(10, 10), 1e-6f);
+        assertEquals((float) Math.pow(1.045, 20), damageLevelFactor(30, 10), 1e-4f);
+        assertEquals((float) Math.pow(1.045, -20), damageLevelFactor(10, 30), 1e-6f);
+        assertEquals(damageLevelFactor(41, 1), damageLevelFactor(100, 1), 1e-6f);
+    }
+
+    @Test
+    void focusFactorShortensCooldowns() {
+        assertEquals(60, cooldownTicks(60, 1, 1f));
+        assertEquals(30, cooldownTicks(60, 1, 0.5f));
+        assertEquals(14, cooldownTicks(60, 10, 0.5f));  // 60 x 0.46 x 0.5 = 13.8
     }
 
     @Test

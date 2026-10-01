@@ -7,8 +7,8 @@ import java.util.function.DoubleSupplier;
 
 /**
  * The dice for creature attunement, free of Minecraft types so they can be unit tested. The spawn
- * hook (Attunement) supplies the nearby player's Magic Level, the distance from world spawn, the
- * biome's elements and a random source.
+ * hook (Attunement) supplies the distance from world spawn, the biome's elements and a random
+ * source. Every rank can appear anywhere: an Archmage near spawn is 20 levels above its zone.
  */
 public final class AttunementRules {
     // Chances grow with distance from world spawn: x2 at 1000 blocks, capped at x3.
@@ -26,14 +26,14 @@ public final class AttunementRules {
     }
 
     /**
-     * Rolls a rank for a newly spawned creature, rarest first. Every rank the player's Magic Level
-     * allows gets its own roll. Returns null when the creature spawns normal.
+     * Rolls a rank for a newly spawned creature, rarest first, each rank with its own roll. Returns
+     * null when the creature spawns normal.
      */
     @Nullable
-    public static AttunementRank rollRank(int magicLevel, double distanceFromSpawn, DoubleSupplier random) {
+    public static AttunementRank rollRank(double distanceFromSpawn, DoubleSupplier random) {
         double multiplier = distanceMultiplier(distanceFromSpawn);
         for (AttunementRank rank : RAREST_FIRST) {
-            if (magicLevel >= rank.requiredMagicLevel() && random.getAsDouble() < rank.baseChance() * multiplier) {
+            if (random.getAsDouble() < rank.baseChance() * multiplier) {
                 return rank;
             }
         }

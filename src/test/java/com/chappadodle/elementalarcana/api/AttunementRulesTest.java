@@ -25,21 +25,17 @@ class AttunementRulesTest {
     }
 
     @Test
-    void ranksNeedTheirMagicLevel() {
-        // A roll of 0 always hits, so the result is the rarest rank the level allows.
-        assertEquals(ADEPT, rollRank(1, 0, always(0)));
-        assertEquals(ADEPT, rollRank(4, 0, always(0)));
-        assertEquals(MAGUS, rollRank(5, 0, always(0)));
-        assertEquals(MAGUS, rollRank(9, 0, always(0)));
-        assertEquals(ARCHMAGE, rollRank(10, 0, always(0)));
+    void rarestRankWinsWithoutALevelGate() {
+        // A roll of 0 always hits, so the result is the rarest rank.
+        assertEquals(ARCHMAGE, rollRank(0, always(0)));
     }
 
     @Test
     void baseChancesAtWorldSpawn() {
-        assertEquals(ADEPT, rollRank(1, 0, always(0.049)));
-        assertNull(rollRank(1, 0, always(0.05)));
-        assertEquals(MAGUS, rollRank(5, 0, always(0.0099)));
-        assertEquals(ARCHMAGE, rollRank(10, 0, always(0.00099)));
+        assertEquals(ADEPT, rollRank(0, always(0.049)));
+        assertNull(rollRank(0, always(0.05)));
+        assertEquals(MAGUS, rollRank(0, always(0.0099)));
+        assertEquals(ARCHMAGE, rollRank(0, always(0.00099)));
     }
 
     @Test
@@ -48,10 +44,10 @@ class AttunementRulesTest {
         assertEquals(2.0, distanceMultiplier(1000), 1e-9);
         assertEquals(3.0, distanceMultiplier(2000), 1e-9);
         assertEquals(3.0, distanceMultiplier(50_000), 1e-9);
-        assertEquals(ADEPT, rollRank(1, 1000, always(0.099)));
-        assertNull(rollRank(1, 1000, always(0.1)));
-        assertEquals(ADEPT, rollRank(1, 50_000, always(0.149)));
-        assertNull(rollRank(1, 50_000, always(0.151)));
+        assertEquals(ADEPT, rollRank(1000, always(0.099)));
+        assertNull(rollRank(1000, always(0.1)));
+        assertEquals(ADEPT, rollRank(50_000, always(0.149)));
+        assertNull(rollRank(50_000, always(0.151)));
     }
 
     @Test
@@ -59,7 +55,7 @@ class AttunementRulesTest {
         // Archmage and Magus rolls miss, then the Adept roll hits: three rolls in total.
         double[] rolls = {0.5, 0.5, 0.01};
         int[] used = {0};
-        assertEquals(ADEPT, rollRank(10, 0, () -> rolls[used[0]++]));
+        assertEquals(ADEPT, rollRank(0, () -> rolls[used[0]++]));
         assertEquals(3, used[0]);
     }
 
