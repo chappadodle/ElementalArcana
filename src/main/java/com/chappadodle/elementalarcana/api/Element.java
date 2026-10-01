@@ -26,6 +26,11 @@ public enum Element {
         return color;
     }
 
+    /** Whether this element is derived from another (Ice from Water) and so far rarer to awaken first. */
+    public boolean derived() {
+        return this == ICE;
+    }
+
     /**
      * The element family this element belongs to: Ice belongs to Water's. Affinity (a stat) is per
      * family, so related elements are raised together.

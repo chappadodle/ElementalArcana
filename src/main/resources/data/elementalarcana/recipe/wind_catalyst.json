@@ -1,0 +1,37 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "elementalarcana:wind_essence"
+    },
+    {
+      "item": "elementalarcana:wind_essence"
+    },
+    {
+      "item": "elementalarcana:wind_essence"
+    },
+    {
+      "item": "elementalarcana:wind_essence"
+    },
+    {
+      "item": "elementalarcana:wind_essence"
+    },
+    {
+      "item": "elementalarcana:wind_essence"
+    },
+    {
+      "item": "elementalarcana:wind_essence"
+    },
+    {
+      "item": "elementalarcana:wind_essence"
+    },
+    {
+      "item": "minecraft:diamond"
+    }
+  ],
+  "result": {
+    "id": "elementalarcana:wind_catalyst",
+    "count": 1
+  }
+}

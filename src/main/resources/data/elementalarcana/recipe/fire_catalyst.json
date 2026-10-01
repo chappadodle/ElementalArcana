@@ -1,0 +1,37 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "elementalarcana:fire_essence"
+    },
+    {
+      "item": "elementalarcana:fire_essence"
+    },
+    {
+      "item": "elementalarcana:fire_essence"
+    },
+    {
+      "item": "elementalarcana:fire_essence"
+    },
+    {
+      "item": "elementalarcana:fire_essence"
+    },
+    {
+      "item": "elementalarcana:fire_essence"
+    },
+    {
+      "item": "elementalarcana:fire_essence"
+    },
+    {
+      "item": "elementalarcana:fire_essence"
+    },
+    {
+      "item": "minecraft:diamond"
+    }
+  ],
+  "result": {
+    "id": "elementalarcana:fire_catalyst",
+    "count": 1
+  }
+}

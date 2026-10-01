@@ -16,6 +16,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
@@ -28,7 +29,7 @@ import java.util.List;
 
 /**
  * The isekai "Status" window: level, XP and skill points, mana stats and unspent stat points (the
- * Stats button opens StatsScreen), affinities (with the Awaken button when a slot opens), and every
+ * Stats button opens StatsScreen), the elements you hold, and every
  * spell grouped by element. The Tree button opens the skill tree; clicking a spell opens it on that
  * spell.
  */
@@ -49,7 +50,6 @@ public class StatusScreen extends Screen {
     private int bottom;
     private int listTop;
     private int scroll;
-    private Button awakenButton;
     private Button condenseButton;
 
     public StatusScreen() {
@@ -73,12 +73,6 @@ public class StatusScreen extends Screen {
         bottom = top + panelHeight;
         listTop = top + HEADER_HEIGHT;
         scroll = Mth.clamp(scroll, 0, maxScroll());
-
-        awakenButton = addRenderableWidget(Button.builder(Component.translatable("screen.elementalarcana.status.awaken"),
-                        button -> minecraft.setScreen(new AwakeningScreen()))
-                .bounds(left + WIDTH - 70, top + 84, 60, 16)
-                .build());
-        updateAwakenButton();
 
         // Under the affinities, above the spell list.
         condenseButton = addRenderableWidget(Button.builder(Component.empty(),
@@ -108,10 +102,6 @@ public class StatusScreen extends Screen {
         return Math.max(0, contentHeight() - (bottom - 8 - listTop));
     }
 
-    private void updateAwakenButton() {
-        awakenButton.visible = MagicAttachments.get(minecraft.player).hasFreeAffinitySlot();
-    }
-
     private void updateCondenseButton() {
         MagicData data = MagicAttachments.get(minecraft.player);
         int cost = Progression.condenseCost(data.bonusTreePoints());
@@ -124,7 +114,6 @@ public class StatusScreen extends Screen {
 
     @Override
     public void tick() {
-        updateAwakenButton();
         updateCondenseButton();
     }
 
@@ -164,23 +153,16 @@ public class StatusScreen extends Screen {
         // Affinities
         graphics.drawString(font, Component.translatable("screen.elementalarcana.status.affinities"), left + 10, top + 88, 0xFFB0A8C8, false);
         int badgeX = left + 72;
-        int slotCount = Math.min(MagicData.AFFINITY_SLOT_LEVELS.length, SpellRegistries.SCHOOLS.size());
-        for (int slot = 0; slot < slotCount; slot++) {
-            Component label;
-            int color;
-            if (slot < data.affinities().size()) {
-                SpellSchool school = SpellRegistries.SCHOOLS.get(data.affinities().get(slot));
-                if (school == null) {
-                    continue;
-                }
-                label = school.displayName();
-                color = FastColor.ARGB32.opaque(school.color());
-            } else if (slot < data.affinitySlots()) {
-                continue; // free slot: the Awaken button covers it
-            } else {
-                label = Component.translatable("screen.elementalarcana.status.slot_locked", MagicData.AFFINITY_SLOT_LEVELS[slot]);
-                color = 0xFF6A6480;
+        if (data.affinities().isEmpty()) {
+            graphics.drawString(font, Component.translatable("screen.elementalarcana.status.dormant"), badgeX, top + 88, 0xFF8A7FA8, false);
+        }
+        for (ResourceLocation id : data.affinities()) {
+            SpellSchool school = SpellRegistries.SCHOOLS.get(id);
+            if (school == null) {
+                continue;
             }
+            Component label = school.displayName();
+            int color = FastColor.ARGB32.opaque(school.color());
             int labelWidth = font.width(label) + 8;
             graphics.fill(badgeX, top + 85, badgeX + labelWidth, top + 99, FastColor.ARGB32.color(60, color));
             graphics.drawString(font, label, badgeX + 4, top + 88, color, false);

@@ -1,6 +1,7 @@
 package com.chappadodle.elementalarcana.core;
 
 import com.chappadodle.elementalarcana.api.AffinityRules;
+import com.chappadodle.elementalarcana.api.AwakeningRules;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.Progression;
 import com.chappadodle.elementalarcana.api.SchoolElements;
@@ -38,7 +39,6 @@ import java.util.Set;
  */
 public final class MagicData {
     public static final int MAX_LEVEL = Progression.MAX_LEVEL;
-    public static final int[] AFFINITY_SLOT_LEVELS = {1, 10, 20, 30};
     private static final float START_MANA = 100f;
 
     public static final Codec<MagicData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -54,10 +54,11 @@ public final class MagicData {
             // Bonus tree points condensed from Essence (saved under its old name).
             Codec.INT.optionalFieldOf("bonus_skill_points", 0).forGetter(data -> data.bonusTreePoints),
             StatPoints.CODEC.optionalFieldOf("stats", new StatPoints()).forGetter(data -> data.stats),
-            Codec.STRING.listOf().optionalFieldOf("tree", List.of()).forGetter(data -> List.copyOf(data.treeNodes))
-    ).apply(instance, (mana, level, xp, affinities, selected, cooldowns, fallImmune, freeCast, spells, bonusTreePoints, stats, tree) ->
+            Codec.STRING.listOf().optionalFieldOf("tree", List.of()).forGetter(data -> List.copyOf(data.treeNodes)),
+            AwakeningState.CODEC.optionalFieldOf("awakening", new AwakeningState()).forGetter(data -> data.awakening)
+    ).apply(instance, (mana, level, xp, affinities, selected, cooldowns, fallImmune, freeCast, spells, bonusTreePoints, stats, tree, awakening) ->
             new MagicData(mana, level, xp, affinities, selected.orElse(null), cooldowns, fallImmune, freeCast, spells,
-                    bonusTreePoints, stats, tree, false, 0)));
+                    bonusTreePoints, stats, tree, awakening, false, 0)));
 
     // What the owning client needs: no fall flag, plus the live meditation state for the HUD.
     public static final StreamCodec<RegistryFriendlyByteBuf, MagicData> STREAM_CODEC = StreamCodec.of(
@@ -73,6 +74,7 @@ public final class MagicData {
                 buf.writeVarInt(data.bonusTreePoints);
                 StatPoints.write(buf, data.stats);
                 buf.writeCollection(data.treeNodes, FriendlyByteBuf::writeUtf);
+                AwakeningState.write(buf, data.awakening);
                 buf.writeBoolean(data.meditating);
                 buf.writeVarInt(data.conjured);
             },
@@ -89,6 +91,7 @@ public final class MagicData {
                     buf.readVarInt(),
                     StatPoints.read(buf),
                     buf.readList(FriendlyByteBuf::readUtf),
+                    AwakeningState.read(buf),
                     buf.readBoolean(),
                     buf.readVarInt()));
 
@@ -108,6 +111,8 @@ public final class MagicData {
     private final StatPoints stats;
     // The skill tree nodes this player took (their starts come from their elements).
     private final Set<String> treeNodes;
+    // The awakening clock and Catalyst failures.
+    private final AwakeningState awakening;
     // What the held nodes give, cached until the nodes, the elements or the tree change.
     @Nullable
     private SkillTree.Grants grants;
@@ -125,13 +130,13 @@ public final class MagicData {
     private double lastZ;
 
     public MagicData() {
-        this(START_MANA, 1, 0, List.of(), null, Map.of(), false, false, Map.of(), 0, new StatPoints(), List.of(), false, 0);
+        this(START_MANA, 1, 0, List.of(), null, Map.of(), false, false, Map.of(), 0, new StatPoints(), List.of(), new AwakeningState(), false, 0);
     }
 
     private MagicData(float mana, int level, int xp, List<ResourceLocation> affinities, @Nullable ResourceLocation selected,
                       Map<ResourceLocation, Long> cooldownEnds, boolean fallImmune, boolean freeCast,
                       Map<ResourceLocation, SpellProgress> spells, int bonusTreePoints, StatPoints stats, List<String> treeNodes,
-                      boolean meditating, int conjured) {
+                      AwakeningState awakening, boolean meditating, int conjured) {
         this.level = Mth.clamp(level, 1, MAX_LEVEL);
         this.xp = xp;
         this.affinities = new ArrayList<>(affinities);
@@ -143,6 +148,7 @@ public final class MagicData {
         this.bonusTreePoints = Math.max(0, bonusTreePoints);
         this.stats = stats;
         this.treeNodes = new HashSet<>(treeNodes);
+        this.awakening = awakening;
         this.meditating = meditating;
         this.conjured = conjured;
         this.mana = Mth.clamp(mana, 0f, maxMana());
@@ -313,20 +319,6 @@ public final class MagicData {
         return !affinities.isEmpty();
     }
 
-    public int affinitySlots() {
-        int slots = 0;
-        for (int slotLevel : AFFINITY_SLOT_LEVELS) {
-            if (level >= slotLevel) {
-                slots++;
-            }
-        }
-        return slots;
-    }
-
-    public boolean hasFreeAffinitySlot() {
-        return affinities.size() < Math.min(affinitySlots(), SpellRegistries.SCHOOLS.size());
-    }
-
     public boolean hasAffinity(SpellSchool school) {
         return affinities.contains(school.id());
     }
@@ -354,11 +346,11 @@ public final class MagicData {
     }
 
     /**
-     * Awakens a new element if there's a free slot and no element you hold opposes it (until level
-     * 50). Selects its first spell if nothing is selected.
+     * Awakens a new element unless you hold it or one you hold opposes it (until level 50). Selects
+     * its first spell if nothing is selected.
      */
     public boolean awaken(SpellSchool school) {
-        if (hasAffinity(school) || !hasFreeAffinitySlot() || opposedBy(school) != null) {
+        if (hasAffinity(school) || opposedBy(school) != null) {
             return false;
         }
         affinities.add(school.id());
@@ -385,6 +377,54 @@ public final class MagicData {
         affinities.clear();
         selected = null;
         invalidateTree();
+    }
+
+    // ---- awakening ----
+
+    public AwakeningState awakening() {
+        return awakening;
+    }
+
+    /** Starts the awakening day count at {@code dayTime} (the world's day clock) unless it has started. */
+    public void startAwakeningClock(long dayTime) {
+        if (awakening.start() < 0) {
+            awakening.setStart(dayTime);
+        }
+    }
+
+    /** Dev: makes today day {@code day} of the count. */
+    public void setAwakeningDay(long dayTime, int day) {
+        awakening.setStart(dayTime - (long) day * AwakeningRules.DAY_TICKS);
+        awakening.setLastRolledDay(-1);
+    }
+
+    /** Which day of the awakening count it is at {@code dayTime}. */
+    public int awakeningDay(long dayTime) {
+        return awakening.start() < 0 ? 0 : AwakeningRules.day(dayTime, awakening.start());
+    }
+
+    public void setLastRolledDay(int day) {
+        awakening.setLastRolledDay(day);
+    }
+
+    /** How many element families you hold (Water and Ice count once). */
+    public int familiesHeld() {
+        Set<Element> families = EnumSet.noneOf(Element.class);
+        affinityElements().forEach(element -> families.add(element.family()));
+        return families.size();
+    }
+
+    public boolean holdsFamily(Element element) {
+        return affinityElements().stream().anyMatch(held -> held.family() == element.family());
+    }
+
+    public void addCatalystFailure() {
+        int held = familiesHeld();
+        awakening.setFailures(held, awakening.failures(held) + 1);
+    }
+
+    public void resetCatalystFailures() {
+        awakening.setFailures(familiesHeld(), 0);
     }
 
     // ---- spells ----

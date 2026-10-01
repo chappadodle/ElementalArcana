@@ -1,12 +1,14 @@
 package com.chappadodle.elementalarcana.core;
 
 import com.chappadodle.elementalarcana.api.AttunementRank;
+import com.chappadodle.elementalarcana.api.AwakeningRules;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.SkillTree;
 import com.chappadodle.elementalarcana.api.SkillTrees;
 import com.chappadodle.elementalarcana.api.SpellSchool;
 import com.chappadodle.elementalarcana.content.Attunement;
+import com.chappadodle.elementalarcana.content.Awakenings;
 import com.chappadodle.elementalarcana.content.BubblePrisons;
 import com.chappadodle.elementalarcana.content.CreatureLevels;
 import com.chappadodle.elementalarcana.content.SkillTreeLoader;
@@ -66,6 +68,12 @@ public final class ArcanaCommand {
                                 .then(Commands.argument("stat", StringArgumentType.greedyString())
                                         .executes(ctx -> spendStats(ctx.getSource(), StringArgumentType.getString(ctx, "stat"),
                                                 IntegerArgumentType.getInteger(ctx, "count")))))))
+                .then(Commands.literal("awaken")
+                        .then(Commands.literal("clock").executes(ctx -> awakeningClock(ctx.getSource())))
+                        .then(Commands.literal("day").then(Commands.argument("day", IntegerArgumentType.integer(0, 1000))
+                                .executes(ctx -> setAwakeningDay(ctx.getSource(), IntegerArgumentType.getInteger(ctx, "day")))))
+                        .then(awakenElement(Element.FIRE)).then(awakenElement(Element.WATER))
+                        .then(awakenElement(Element.ICE)).then(awakenElement(Element.WIND)))
                 .then(Commands.literal("tree")
                         .then(Commands.literal("info").executes(ctx -> {
                             String info = SkillTreeLoader.describe(SkillTrees.current());
@@ -214,6 +222,43 @@ public final class ArcanaCommand {
         int total = spent;
         source.sendSuccess(() -> Component.translatable("commands.elementalarcana.stats_spent", total, key, data.stats().get(key)), false);
         return spent;
+    }
+
+    /** /arcana awaken <element>: wakes that element in you at once (opposites don't hold it back). */
+    private static LiteralArgumentBuilder<CommandSourceStack> awakenElement(Element element) {
+        return Commands.literal(element.name().toLowerCase(Locale.ROOT)).executes(ctx -> {
+            ServerPlayer player = ctx.getSource().getPlayerOrException();
+            boolean woke = Awakenings.force(player, element, Component.translatable("message.elementalarcana.awakening.command"));
+            ctx.getSource().sendSuccess(() -> Component.literal(woke ? "Awakened " + element.name() : "Already awakened to " + element.name()), false);
+            return woke ? 1 : 0;
+        });
+    }
+
+    /** /arcana awaken day <n>: makes today day n of your awakening count (to test the day-10 ramp). */
+    private static int setAwakeningDay(CommandSourceStack source, int day) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        MagicAttachments.get(player).setAwakeningDay(player.serverLevel().getDayTime(), day);
+        MagicAttachments.sync(player);
+        source.sendSuccess(() -> Component.literal("Awakening day set to " + day), false);
+        return 1;
+    }
+
+    /** /arcana awaken clock: your day count, the odds of waking now, and what a Catalyst would give. */
+    private static int awakeningClock(CommandSourceStack source) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        MagicData data = MagicAttachments.get(player);
+        int day = data.awakeningDay(player.serverLevel().getDayTime());
+        int held = data.familiesHeld();
+        String line = String.format(Locale.ROOT, "Day %d. First awakening: %.0f%% each day, %.0f%% per brush. %d element families held",
+                day, AwakeningRules.dailyChance(day) * 100, AwakeningRules.brushChance(day) * 100, held);
+        if (held > 0) {
+            line += String.format(Locale.ROOT, "; a Catalyst now: %.2f%% (level %d, %d failed tries)",
+                    AwakeningRules.catalystChance(held, data.level(), data.awakening().failures(held)) * 100, data.level(),
+                    data.awakening().failures(held));
+        }
+        String text = line;
+        source.sendSuccess(() -> Component.literal(text), false);
+        return 1;
     }
 
     /** /arcana tree take|refund <node>: like clicking it in the tree (refunds here cost no Essence). */

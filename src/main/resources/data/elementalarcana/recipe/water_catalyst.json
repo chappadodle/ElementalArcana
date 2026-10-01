@@ -1,0 +1,37 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "elementalarcana:water_essence"
+    },
+    {
+      "item": "elementalarcana:water_essence"
+    },
+    {
+      "item": "elementalarcana:water_essence"
+    },
+    {
+      "item": "elementalarcana:water_essence"
+    },
+    {
+      "item": "elementalarcana:water_essence"
+    },
+    {
+      "item": "elementalarcana:water_essence"
+    },
+    {
+      "item": "elementalarcana:water_essence"
+    },
+    {
+      "item": "elementalarcana:water_essence"
+    },
+    {
+      "item": "minecraft:diamond"
+    }
+  ],
+  "result": {
+    "id": "elementalarcana:water_catalyst",
+    "count": 1
+  }
+}

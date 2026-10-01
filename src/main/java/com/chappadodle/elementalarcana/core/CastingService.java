@@ -246,13 +246,6 @@ public final class CastingService {
                 Component.translatable("title.elementalarcana.level_up.sub", data.statPoints(), data.treePoints()).withStyle(ChatFormatting.GRAY)));
         player.playNotifySound(ModContent.LEVEL_UP_SOUND.get(), SoundSource.PLAYERS, 1f, 1f);
         player.serverLevel().sendParticles(ParticleTypes.END_ROD, player.getX(), player.getY(1.0), player.getZ(), 30, 0.5, 0.8, 0.5, 0.05);
-
-        for (int slotLevel : MagicData.AFFINITY_SLOT_LEVELS) {
-            if (slotLevel > oldLevel && slotLevel <= newLevel && data.hasFreeAffinitySlot()) {
-                player.sendSystemMessage(Component.translatable("message.elementalarcana.new_affinity_slot",
-                        Component.keybind("key.elementalarcana.status")).withStyle(ChatFormatting.LIGHT_PURPLE));
-            }
-        }
     }
 
     static void fizzle(ServerPlayer player, Component reason) {

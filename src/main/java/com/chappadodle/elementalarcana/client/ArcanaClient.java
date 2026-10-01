@@ -94,8 +94,6 @@ public final class ArcanaClient {
     public static final KeyMapping LAUNCH_ALL = new KeyMapping("key.elementalarcana.launch_all", SHARES_MOUSE,
             InputConstants.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_RIGHT, CATEGORY);
 
-    // The awakening screen is offered once per player instance (i.e. per join/respawn).
-    private static LocalPlayer awakeningOfferedTo;
     // Whether the server currently thinks the cast key is down (for hold-to-cast spells).
     private static boolean castKeyHeld;
 
@@ -184,7 +182,7 @@ public final class ArcanaClient {
         }
         while (STATUS.consumeClick()) {
             if (minecraft.screen == null) {
-                minecraft.setScreen(data.isAwakened() ? new StatusScreen() : new AwakeningScreen());
+                minecraft.setScreen(new StatusScreen());
             }
         }
 
@@ -201,14 +199,6 @@ public final class ArcanaClient {
                 if (shield.isActive() && spell != null) {
                     spell.shieldParticles(shielded, shield);
                 }
-            }
-        }
-
-        // Wait a moment after joining so the synced magic data has arrived before deciding.
-        if (awakeningOfferedTo != player && player.tickCount > 40 && minecraft.screen == null) {
-            awakeningOfferedTo = player;
-            if (!data.isAwakened()) {
-                minecraft.setScreen(new AwakeningScreen());
             }
         }
     }

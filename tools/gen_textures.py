@@ -541,6 +541,29 @@ def essence(core, glow, edge, size=16):
     return Image.fromarray((np.clip(rgba, 0, 1) * 255).astype(np.uint8), "RGBA")
 
 
+def catalyst(core, glow, edge, size=16):
+    """A Catalyst: a small corked vial of the element's light, a bright glow in a darker glass rim. core/glow/edge are (r, g, b)."""
+    img = np.zeros((size, size, 4))
+    y, x = np.mgrid[0:size, 0:size] + 0.5
+    cx, cy = size / 2, size * 0.62
+    # The flask body: a round belly.
+    belly = ((x - cx) / (size * 0.34)) ** 2 + ((y - cy) / (size * 0.32)) ** 2
+    neck = (np.abs(x - cx) <= 2.2) & (y >= size * 0.2) & (y <= size * 0.46)
+    inside = (belly <= 1.0) | neck
+    t = np.clip(belly, 0, 1)
+    for c in range(3):
+        channel = core[c] * (1 - t) ** 1.5 + glow[c] * (1 - (1 - t) ** 1.5)
+        channel = np.where(t > 0.72, edge[c], channel)
+        img[..., c] = channel / 255
+    img[..., 3] = np.where(inside, 1.0, 0.0)
+    # The cork and a highlight.
+    cork = (np.abs(x - cx) <= 2.2) & (y >= size * 0.1) & (y < size * 0.22)
+    img[cork] = [0.55, 0.38, 0.22, 1.0]
+    for px, py in ((5, 9), (5, 10), (6, 8), (10, 7)):
+        img[py, px] = [1, 1, 1, 1 if inside[py, px] else 0.9]
+    return Image.fromarray((np.clip(img, 0, 1) * 255).astype(np.uint8), "RGBA")
+
+
 def bubble_icon(size=16):
     """Spell icon: a round water bubble with a highlight and a little creature shadow inside."""
     y, x = np.mgrid[0:size, 0:size] + 0.5
@@ -1022,6 +1045,10 @@ def main():
     glow_sprite().save(path)
     print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
     for name, colors in essences.items():
+        if name != "ice":
+            catalyst_path = ASSETS / f"item/{name}_catalyst.png"
+            catalyst(*colors).save(catalyst_path)
+            print("wrote", catalyst_path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
         path = ASSETS / f"item/{name}_essence.png"
         path.parent.mkdir(parents=True, exist_ok=True)
         essence(*colors).save(path)
