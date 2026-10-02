@@ -103,6 +103,55 @@
       "links": [
         "wind_sky_4"
       ]
+    },
+    {
+      "id": "wind_gust_1",
+      "type": "small",
+      "x": 39,
+      "y": -253,
+      "stat": "affinity/wind",
+      "amount": 2,
+      "links": [
+        "wind_start"
+      ],
+      "element": "wind"
+    },
+    {
+      "id": "wind_gust_2",
+      "type": "small",
+      "x": 79,
+      "y": -246,
+      "stat": "focus",
+      "amount": 2,
+      "links": [
+        "wind_gust_1"
+      ],
+      "element": "wind"
+    },
+    {
+      "id": "wind_tailwind",
+      "type": "notable",
+      "x": 118,
+      "y": -239,
+      "links": [
+        "wind_gust_2"
+      ],
+      "stats": {
+        "affinity/wind": 6,
+        "focus": 4
+      },
+      "element": "wind"
+    },
+    {
+      "id": "wind_gale_step",
+      "type": "keystone",
+      "x": 158,
+      "y": -232,
+      "links": [
+        "wind_tailwind"
+      ],
+      "keystone": "gale_step",
+      "element": "wind"
     }
   ]
 }

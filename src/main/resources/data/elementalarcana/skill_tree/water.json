@@ -174,6 +174,55 @@
         "water_deep_5"
       ],
       "element": "water"
+    },
+    {
+      "id": "water_spring_1",
+      "type": "small",
+      "x": 40,
+      "y": 257,
+      "stat": "reservoir",
+      "amount": 2,
+      "links": [
+        "water_start"
+      ],
+      "element": "water"
+    },
+    {
+      "id": "water_spring_2",
+      "type": "small",
+      "x": 80,
+      "y": 253,
+      "stat": "affinity/water",
+      "amount": 2,
+      "links": [
+        "water_spring_1"
+      ],
+      "element": "water"
+    },
+    {
+      "id": "water_deep_reserves",
+      "type": "notable",
+      "x": 120,
+      "y": 250,
+      "links": [
+        "water_spring_2"
+      ],
+      "stats": {
+        "reservoir": 6,
+        "vitality": 4
+      },
+      "element": "water"
+    },
+    {
+      "id": "water_wellspring",
+      "type": "keystone",
+      "x": 159,
+      "y": 246,
+      "links": [
+        "water_deep_reserves"
+      ],
+      "keystone": "wellspring",
+      "element": "water"
     }
   ]
 }

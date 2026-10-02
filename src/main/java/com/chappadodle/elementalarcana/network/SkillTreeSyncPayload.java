@@ -10,6 +10,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
+import java.util.Map;
 
 /** Server -> client: the whole skill tree (paths already expanded), sent on join and after /reload. */
 public record SkillTreeSyncPayload(List<SkillTree.Node> nodes, List<List<String>> links) implements CustomPacketPayload {
@@ -51,12 +52,15 @@ public record SkillTreeSyncPayload(List<SkillTree.Node> nodes, List<List<String>
         buf.writeNullable(node.branch(), FriendlyByteBuf::writeUtf);
         buf.writeNullable(node.requiresStat(), FriendlyByteBuf::writeUtf);
         buf.writeVarInt(node.requiresMin());
+        buf.writeMap(node.stats(), FriendlyByteBuf::writeUtf, FriendlyByteBuf::writeVarInt);
+        buf.writeNullable(node.keystone(), FriendlyByteBuf::writeUtf);
     }
 
     private static SkillTree.Node readNode(FriendlyByteBuf buf) {
         return new SkillTree.Node(buf.readUtf(), buf.readEnum(SkillTree.Type.class), buf.readVarInt(), buf.readVarInt(),
                 buf.readNullable(FriendlyByteBuf::readUtf), buf.readNullable(FriendlyByteBuf::readUtf), buf.readVarInt(),
                 buf.readNullable(FriendlyByteBuf::readUtf), buf.readVarInt(), buf.readNullable(FriendlyByteBuf::readUtf),
-                buf.readNullable(FriendlyByteBuf::readUtf), buf.readVarInt());
+                buf.readNullable(FriendlyByteBuf::readUtf), buf.readVarInt(),
+                Map.copyOf(buf.readMap(FriendlyByteBuf::readUtf, FriendlyByteBuf::readVarInt)), buf.readNullable(FriendlyByteBuf::readUtf));
     }
 }

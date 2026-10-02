@@ -157,6 +157,8 @@ public class SkillTreeScreen extends Screen {
             case SMALL -> 8;
             case UPGRADE -> 10;
             case FORK -> 12;
+            case NOTABLE -> 14;
+            case KEYSTONE -> 18;
             case SPELL, START -> 20;
         };
     }
@@ -338,13 +340,28 @@ public class SkillTreeScreen extends Screen {
         if (node.type() == SkillTree.Type.FORK) {
             border = held ? GOLD : border;
         }
+        float shade = held ? 1f : takeable ? 0.7f : 0.3f;
+        if (node.type() == SkillTree.Type.KEYSTONE) {
+            // A keystone: a gold outer frame, a dark ring, and a gem in the middle.
+            graphics.fill(x - half - 2, y - half - 2, x + half + 2, y + half + 2, held ? GOLD : takeable ? ArcanaDraw.withAlpha(GOLD, pulse) : 0xFF4A3A20);
+            graphics.fill(x - half, y - half, x + half, y + half, 0xFF100C18);
+            int inset = Math.max(1, half / 5);
+            graphics.fill(x - half + inset, y - half + inset, x + half - inset, y + half - inset, darken(color, shade));
+            int gem = Math.max(1, half / 3);
+            graphics.fill(x - gem, y - gem, x + gem, y + gem, darken(0xFFF0E0FF, shade));
+            return;
+        }
         graphics.fill(x - half - 1, y - half - 1, x + half + 1, y + half + 1, border);
         Spell spell = node.spell() == null ? null : spellOf(node.spell());
         if ((node.type() == SkillTree.Type.SPELL || node.type() == SkillTree.Type.START) && spell != null) {
             graphics.fill(x - half, y - half, x + half, y + half, 0xFF141020);
             ArcanaDraw.icon(graphics, spell, x - half, y - half, half * 2, held ? 1f : takeable ? 0.75f : 0.3f, 1f);
+        } else if (node.type() == SkillTree.Type.NOTABLE) {
+            // A notable: its main stat's colour inside a gold ring.
+            graphics.fill(x - half, y - half, x + half, y + half, darken(GOLD, shade));
+            int inset = Math.max(1, half / 4);
+            graphics.fill(x - half + inset, y - half + inset, x + half - inset, y + half - inset, darken(color, shade));
         } else {
-            float shade = held ? 1f : takeable ? 0.7f : 0.3f;
             graphics.fill(x - half, y - half, x + half, y + half, darken(color, shade));
         }
     }
@@ -357,6 +374,12 @@ public class SkillTreeScreen extends Screen {
     private static int nodeColor(SkillTree.Node node) {
         if (node.type() == SkillTree.Type.SMALL && node.stat() != null) {
             return statColor(node.stat());
+        }
+        if (node.type() == SkillTree.Type.NOTABLE && !node.stats().isEmpty()) {
+            return statColor(node.stats().keySet().iterator().next());
+        }
+        if (node.type() == SkillTree.Type.KEYSTONE) {
+            return 0xFF8A4FD0;
         }
         Spell spell = node.spell() == null ? null : spellOf(node.spell());
         return spell != null ? FastColor.ARGB32.opaque(spell.school().color()) : 0xFF9A8FB8;
@@ -439,6 +462,18 @@ public class SkillTreeScreen extends Screen {
                             spell.branchName(node.branch())).withColor(spell.school().color()));
                     lines.add(spell.branchDescription(node.branch()).copy().withStyle(ChatFormatting.GRAY));
                     lines.add(Component.translatable("screen.elementalarcana.tree.fork").withStyle(ChatFormatting.GOLD));
+                }
+            }
+            case NOTABLE -> {
+                lines.add(Component.translatable("skill.elementalarcana." + node.id()).withColor(GOLD));
+                node.stats().forEach((key, amount) -> lines.add(Component.translatable("screen.elementalarcana.tree.small", amount,
+                        statName(key)).withColor(statColor(key))));
+            }
+            case KEYSTONE -> {
+                lines.add(Component.translatable("skill.elementalarcana." + node.id()).withColor(0xFFC9A8FF));
+                lines.add(Component.translatable("screen.elementalarcana.tree.keystone").withStyle(ChatFormatting.DARK_PURPLE));
+                for (String line : Component.translatable("skill.elementalarcana." + node.id() + ".desc").getString().split("\n")) {
+                    lines.add(Component.literal(line).withStyle(ChatFormatting.GRAY));
                 }
             }
         }

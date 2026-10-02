@@ -329,6 +329,30 @@
       "links": [
         "core_0"
       ]
+    },
+    {
+      "id": "core_arcane_vigor",
+      "type": "notable",
+      "x": 134,
+      "y": 134,
+      "stats": {
+        "reservoir": 4,
+        "vitality": 4,
+        "potency": 2
+      },
+      "links": [
+        "core_11"
+      ]
+    },
+    {
+      "id": "core_blood_magic",
+      "type": "keystone",
+      "x": 166,
+      "y": 166,
+      "keystone": "blood_magic",
+      "links": [
+        "core_arcane_vigor"
+      ]
     }
   ]
 }

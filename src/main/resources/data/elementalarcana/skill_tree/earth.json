@@ -129,6 +129,55 @@
       "element": "earth"
     },
     {
+      "id": "earth_bedrock_1",
+      "type": "small",
+      "x": -253,
+      "y": -39,
+      "stat": "affinity/earth",
+      "amount": 2,
+      "links": [
+        "earth_start"
+      ],
+      "element": "earth"
+    },
+    {
+      "id": "earth_bedrock_2",
+      "type": "small",
+      "x": -246,
+      "y": -79,
+      "stat": "vitality",
+      "amount": 2,
+      "links": [
+        "earth_bedrock_1"
+      ],
+      "element": "earth"
+    },
+    {
+      "id": "earth_stone_blood",
+      "type": "notable",
+      "x": -239,
+      "y": -118,
+      "links": [
+        "earth_bedrock_2"
+      ],
+      "stats": {
+        "vitality": 6,
+        "ward": 4
+      },
+      "element": "earth"
+    },
+    {
+      "id": "earth_mountain_heart",
+      "type": "keystone",
+      "x": -232,
+      "y": -158,
+      "links": [
+        "earth_stone_blood"
+      ],
+      "keystone": "mountain_heart",
+      "element": "earth"
+    },
+    {
       "id": "earth_stone_skin",
       "type": "path",
       "spell": "elementalarcana:stone_skin",

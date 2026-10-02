@@ -3,6 +3,7 @@ package com.chappadodle.elementalarcana.core;
 import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.CastResult;
 import com.chappadodle.elementalarcana.api.ConjureSpell;
+import com.chappadodle.elementalarcana.api.Keystones;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellHold;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
@@ -10,6 +11,7 @@ import com.chappadodle.elementalarcana.api.event.SpellCastEvent;
 import com.chappadodle.elementalarcana.content.BubblePrisons;
 import com.chappadodle.elementalarcana.content.ModContent;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
@@ -23,6 +25,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,9 +71,20 @@ public final class CastingService {
         return null;
     }
 
-    /** Health an overcast of {@code manaCost} would take right now (0 when mana suffices). */
+    /**
+     * Health a cast of {@code manaCost} would take right now: an overcast's shortfall (0 when mana
+     * suffices), or with the Blood Magic keystone the whole cost.
+     */
     public static float healthCost(MagicData data, int manaCost) {
+        if (data.hasKeystone(Keystones.BLOOD_MAGIC)) {
+            return bloodPrice(manaCost);
+        }
         return Math.max(0f, manaCost - data.mana()) * HEALTH_PER_MISSING_MANA;
+    }
+
+    /** What {@code mana} costs in health under Blood Magic (1 heart per 20 mana). */
+    static float bloodPrice(int mana) {
+        return mana * HEALTH_PER_MISSING_MANA;
     }
 
     /** The cast key went down. */
@@ -141,9 +155,9 @@ public final class CastingService {
     }
 
     /**
-     * Pays for a cast: takes the mana (health for any shortfall, with Mana Sickness), then grants
-     * mastery in {@code spell} for it (XP comes from kills, not casting). Nothing for creative or
-     * free casting.
+     * Pays for a cast: takes the mana (health for any shortfall, with Mana Sickness), or with Blood
+     * Magic only health, then grants mastery in {@code spell} for it (XP comes from kills, not
+     * casting). Nothing for creative or free casting.
      */
     static void pay(ServerPlayer player, MagicData data, Spell spell, int cost) {
         data.interruptMeditation();
@@ -151,12 +165,19 @@ public final class CastingService {
             return;
         }
         float healthCost = healthCost(data, cost);
-        data.setMana(data.mana() - cost);
-        if (healthCost > 0) {
-            overcast(player, healthCost);
-        }
-        if (healthCost > 0 || data.mana() <= 0f) {
-            player.addEffect(new MobEffectInstance(ModContent.MANA_SICKNESS, MANA_SICKNESS_TICKS));
+        if (data.hasKeystone(Keystones.BLOOD_MAGIC)) {
+            // Paid in blood: mana untouched, and no sickness.
+            if (healthCost > 0) {
+                bleed(player, healthCost);
+            }
+        } else {
+            data.setMana(data.mana() - cost);
+            if (healthCost > 0) {
+                overcast(player, healthCost);
+            }
+            if (healthCost > 0 || data.mana() <= 0f) {
+                player.addEffect(new MobEffectInstance(ModContent.MANA_SICKNESS, MANA_SICKNESS_TICKS));
+            }
         }
         boolean wasFull = data.isMasteryFull(spell);
         data.addMastery(spell, cost);
@@ -218,6 +239,13 @@ public final class CastingService {
             data.startCooldown(active.spell().id(), player.level().getGameTime(), active.spell().cooldownTicks(data.spellLevel(active.spell()), data.cooldownFactor()));
             MagicAttachments.sync(player);
         }
+    }
+
+    /** Blood Magic's price: health, with a little red mist and none of the overcast's warning. */
+    static void bleed(ServerPlayer player, float healthCost) {
+        player.setHealth(player.getHealth() - healthCost);
+        player.serverLevel().sendParticles(new DustParticleOptions(new Vector3f(0.55f, 0.04f, 0.06f), 1f),
+                player.getX(), player.getY(0.6), player.getZ(), 6, 0.3, 0.3, 0.3, 0);
     }
 
     private static void overcast(ServerPlayer player, float healthCost) {

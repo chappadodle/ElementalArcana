@@ -26,22 +26,31 @@ import java.util.function.ToIntFunction;
  * <li>SPELL: unlocks a spell.</li>
  * <li>UPGRADE / FORK: the next level of a spell; a fork also picks a branch and locks the other
  * forks of that level. Both need the spell's mastery bar full.</li>
+ * <li>NOTABLE: a named node with several stat bonuses at once.</li>
+ * <li>KEYSTONE: a named node that changes a rule of magic, for better and worse (see Keystones).</li>
  * </ul>
  */
 public final class SkillTree {
     public static final SkillTree EMPTY = new SkillTree(List.of(), List.of());
 
-    public enum Type { START, SMALL, SPELL, UPGRADE, FORK }
+    public enum Type { START, SMALL, SPELL, UPGRADE, FORK, NOTABLE, KEYSTONE }
 
     /**
      * A node. {@code element} is its region (null in the shared core); {@code stat}/{@code amount}
      * for SMALL; {@code spell} for START, SPELL, UPGRADE and FORK; {@code spellLevel} for UPGRADE
      * and FORK; {@code branch} for FORK; {@code requiresStat}/{@code requiresMin} an optional stat
-     * requirement.
+     * requirement; {@code stats} a NOTABLE's bonuses; {@code keystone} a KEYSTONE's rule.
      */
     public record Node(String id, Type type, int x, int y, @Nullable String element,
                        @Nullable String stat, int amount, @Nullable String spell, int spellLevel,
-                       @Nullable String branch, @Nullable String requiresStat, int requiresMin) {
+                       @Nullable String branch, @Nullable String requiresStat, int requiresMin,
+                       Map<String, Integer> stats, @Nullable String keystone) {
+
+        /** A node without a notable's stats or a keystone. */
+        public Node(String id, Type type, int x, int y, @Nullable String element, @Nullable String stat, int amount,
+                    @Nullable String spell, int spellLevel, @Nullable String branch, @Nullable String requiresStat, int requiresMin) {
+            this(id, type, x, y, element, stat, amount, spell, spellLevel, branch, requiresStat, requiresMin, Map.of(), null);
+        }
     }
 
     /** What the rules need to know about a player. */
@@ -66,16 +75,20 @@ public final class SkillTree {
 
     /**
      * What a set of held nodes gives: stat bonuses by key, castable spells, each castable spell's
-     * level (1 plus its upgrades and forks) and its chosen branches by level.
+     * level (1 plus its upgrades and forks), its chosen branches by level, and the keystones held.
      */
     public record Grants(Map<String, Integer> stats, Map<String, Integer> spellLevels,
-                         Map<String, Map<Integer, String>> branches, Set<String> spells) {
+                         Map<String, Map<Integer, String>> branches, Set<String> spells, Set<String> keystones) {
         public int stat(String key) {
             return stats.getOrDefault(key, 0);
         }
 
         public int spellLevel(String spell) {
             return spellLevels.getOrDefault(spell, 1);
+        }
+
+        public boolean hasKeystone(String keystone) {
+            return keystones.contains(keystone);
         }
     }
 
@@ -143,6 +156,7 @@ public final class SkillTree {
         Set<String> spells = new HashSet<>();
         Map<String, Integer> levels = new HashMap<>();
         Map<String, Map<Integer, String>> branches = new HashMap<>();
+        Set<String> keystones = new HashSet<>();
         for (String id : held) {
             Node node = nodes.get(id);
             if (node == null) {
@@ -152,6 +166,12 @@ public final class SkillTree {
                 case SMALL -> {
                     if (node.stat() != null) {
                         stats.merge(node.stat(), node.amount(), Integer::sum);
+                    }
+                }
+                case NOTABLE -> node.stats().forEach((key, amount) -> stats.merge(key, amount, Integer::sum));
+                case KEYSTONE -> {
+                    if (node.keystone() != null) {
+                        keystones.add(node.keystone());
                     }
                 }
                 case START, SPELL -> {
@@ -173,7 +193,7 @@ public final class SkillTree {
             }
         }
         levels.replaceAll((spell, upgrades) -> upgrades + 1);
-        return new Grants(stats, levels, branches, spells);
+        return new Grants(stats, levels, branches, spells, keystones);
     }
 
     /** Whether the player can take node {@code id} now. */

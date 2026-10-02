@@ -2,6 +2,7 @@ package com.chappadodle.elementalarcana.core;
 
 import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.ConjureSpell;
+import com.chappadodle.elementalarcana.api.Keystones;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
 import com.chappadodle.elementalarcana.api.event.SpellCastEvent;
@@ -185,12 +186,17 @@ public final class Conjuring {
             session.nextUpkeep = now + UPKEEP_INTERVAL_TICKS;
             if (!CastingService.isFree(player, data)) {
                 int upkeep = UPKEEP_PER_PROJECTILE * session.held.size();
-                if (data.mana() < upkeep) {
+                boolean blood = data.hasKeystone(Keystones.BLOOD_MAGIC);
+                if (blood ? player.getHealth() - CastingService.bloodPrice(upkeep) < 1f : data.mana() < upkeep) {
                     // Can't hold them any longer: they fly.
                     launchAll(player);
                     return;
                 }
-                data.setMana(data.mana() - upkeep);
+                if (blood) {
+                    CastingService.bleed(player, CastingService.bloodPrice(upkeep));
+                } else {
+                    data.setMana(data.mana() - upkeep);
+                }
                 data.interruptMeditation();
                 MagicAttachments.sync(player);
             }

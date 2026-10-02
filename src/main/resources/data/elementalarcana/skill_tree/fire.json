@@ -128,6 +128,31 @@
         "fire_ember_2"
       ],
       "element": "fire"
+    },
+    {
+      "id": "fire_kindled_soul",
+      "type": "notable",
+      "x": 373,
+      "y": -113,
+      "links": [
+        "fire_ember_3"
+      ],
+      "stats": {
+        "affinity/fire": 6,
+        "potency": 4
+      },
+      "element": "fire"
+    },
+    {
+      "id": "fire_glass_cannon",
+      "type": "keystone",
+      "x": 401,
+      "y": -141,
+      "links": [
+        "fire_kindled_soul"
+      ],
+      "keystone": "glass_cannon",
+      "element": "fire"
     }
   ]
 }

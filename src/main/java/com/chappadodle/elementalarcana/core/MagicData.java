@@ -3,6 +3,7 @@ package com.chappadodle.elementalarcana.core;
 import com.chappadodle.elementalarcana.api.AffinityRules;
 import com.chappadodle.elementalarcana.api.AwakeningRules;
 import com.chappadodle.elementalarcana.api.Element;
+import com.chappadodle.elementalarcana.api.Keystones;
 import com.chappadodle.elementalarcana.api.Progression;
 import com.chappadodle.elementalarcana.api.SchoolElements;
 import com.chappadodle.elementalarcana.api.SkillTree;
@@ -203,17 +204,17 @@ public final class MagicData {
     }
 
     public float maxMana() {
-        return StatRules.maxMana(level, stat(Stat.RESERVOIR));
+        return StatRules.maxMana(level, stat(Stat.RESERVOIR)) * Keystones.maxManaFactor(keystones());
     }
 
     public float regenPerSecond() {
-        return StatRules.regenPerSecond(level, stat(Stat.RESERVOIR));
+        return StatRules.regenPerSecond(level, stat(Stat.RESERVOIR)) * Keystones.regenFactor(keystones());
     }
 
     /** Multiplier a spell applies to damage, knockback and durations: Potency, and its element family's Affinity. */
     public float spellPower(Spell spell) {
         Element element = SchoolElements.of(spell.school());
-        return StatRules.spellPower(stat(Stat.POTENCY), element == null ? 0 : affinity(element));
+        return StatRules.spellPower(stat(Stat.POTENCY), element == null ? 0 : affinity(element)) * Keystones.powerFactor(keystones());
     }
 
     /** Multiplier on cooldowns, from Focus. */
@@ -560,6 +561,15 @@ public final class MagicData {
             grants = SkillTrees.current().grants(nodes);
         }
         return grants;
+    }
+
+    /** The keystones this player's tree holds (see Keystones). */
+    public Set<String> keystones() {
+        return grants().keystones();
+    }
+
+    public boolean hasKeystone(String keystone) {
+        return grants().hasKeystone(keystone);
     }
 
     /** The nodes this player took (not counting the starts their elements give them). */

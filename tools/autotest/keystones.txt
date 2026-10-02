@@ -1,0 +1,49 @@
+# Keystones: take Glass Cannon (max health 20 -> 14) and Blood Magic (a cast costs health, not
+# mana; natural regeneration is off meanwhile, so the cost shows: a 15-mana Fireball takes 1.5),
+# then the tree screen with the new notables and keystones. Values go to the log.
+hud on
+cmd kill @e[type=!player]
+cmd time set noon
+cmd weather clear
+cmd gamemode survival
+cmd effect clear @s
+cmd tp @s 60000 161 60100 180 8
+wait 40
+cmd arcana awaken fire
+cmd arcana level set 40
+cmd arcana tree reset
+cmd arcana tree take fire_ember_1
+cmd arcana tree take fire_ember_2
+cmd arcana tree take fire_ember_3
+cmd arcana tree take fire_kindled_soul
+cmd arcana tree take fire_glass_cannon
+wait 10
+cmd attribute @s minecraft:generic.max_health get
+cmd arcana tree take fire_spoke
+cmd arcana tree take core_8
+cmd arcana tree take core_9
+cmd arcana tree take core_10
+cmd arcana tree take core_11
+cmd arcana tree take core_arcane_vigor
+cmd arcana tree take core_blood_magic
+cmd effect give @s minecraft:instant_health 1 5 true
+cmd gamerule naturalRegeneration false
+cmd arcana mana set 60
+cmd arcana cooldowns reset
+wait 20
+cmd data get entity @s Health
+select elementalarcana:fireball
+press
+wait 5
+release
+wait 10
+launch_all
+wait 10
+cmd data get entity @s Health
+shot blood_magic_cast
+cmd gamerule naturalRegeneration true
+screen tree elementalarcana:fireball
+wait 20
+shot keystone_tree
+screen close
+quit

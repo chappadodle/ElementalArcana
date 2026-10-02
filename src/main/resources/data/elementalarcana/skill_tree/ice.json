@@ -142,6 +142,31 @@
       "links": [
         "ice_nova_4"
       ]
+    },
+    {
+      "id": "ice_winters_edge",
+      "type": "notable",
+      "x": -306,
+      "y": 640,
+      "links": [
+        "frost_nova"
+      ],
+      "stats": {
+        "affinity/water": 6,
+        "potency": 4
+      },
+      "element": "ice"
+    },
+    {
+      "id": "ice_winters_grasp",
+      "type": "keystone",
+      "x": -310,
+      "y": 680,
+      "links": [
+        "ice_winters_edge"
+      ],
+      "keystone": "winters_grasp",
+      "element": "ice"
     }
   ]
 }

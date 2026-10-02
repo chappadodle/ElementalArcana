@@ -4,8 +4,11 @@ import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.AffinityRules;
 import com.chappadodle.elementalarcana.api.CreatureElements;
 import com.chappadodle.elementalarcana.api.Element;
+import com.chappadodle.elementalarcana.api.ElementalReactions;
+import com.chappadodle.elementalarcana.api.Keystones;
 import com.chappadodle.elementalarcana.api.SpellDamage;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
+import com.chappadodle.elementalarcana.core.MagicData;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -43,18 +46,29 @@ public final class ElementalMatchups {
         LivingEntity target = event.getEntity();
         Element spell = SpellDamage.elementOf(event.getSource());
         if (spell == null) {
-            // A player's affinities also soften their elements' everyday damage. No feedback: it
-            // would play on every burning tick.
+            // A player's affinities (and keystones) also change their elements' everyday damage. No
+            // feedback: it would play on every burning tick.
             Element nature = natureOf(event.getSource());
             if (nature != null && target instanceof Player player) {
-                event.setAmount(event.getAmount() * AffinityRules.damageTaken(MagicAttachments.get(player).affinityElements(), nature));
+                MagicData data = MagicAttachments.get(player);
+                event.setAmount(event.getAmount() * AffinityRules.damageTaken(data.affinityElements(), nature)
+                        * Keystones.damageTakenFactor(data.keystones(), nature));
             }
             return;
         }
-        // Creatures use the chart; players resist the elements they've awakened.
-        float multiplier = target instanceof Player player
-                ? AffinityRules.damageTaken(MagicAttachments.get(player).affinityElements(), spell)
-                : spell.multiplierAgainst(CreatureElements.elementOf(target));
+        // A caster with Winter's Grasp hits the frozen and frosted harder.
+        if (event.getSource().getEntity() instanceof Player caster) {
+            boolean chilled = ElementalReactions.auraOf(target) == ElementalReactions.Aura.CRYO;
+            event.setAmount(event.getAmount() * Keystones.damageDealtFactor(MagicAttachments.get(caster).keystones(), chilled));
+        }
+        // Creatures use the chart; players resist the elements they've awakened (and take keystones' extra).
+        float multiplier;
+        if (target instanceof Player player) {
+            MagicData data = MagicAttachments.get(player);
+            multiplier = AffinityRules.damageTaken(data.affinityElements(), spell) * Keystones.damageTakenFactor(data.keystones(), spell);
+        } else {
+            multiplier = spell.multiplierAgainst(CreatureElements.elementOf(target));
+        }
         if (multiplier == 1f) {
             return;
         }

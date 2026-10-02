@@ -56,7 +56,8 @@ def ring_node_at(angle_deg):
 
 
 def arm(file, element, origin_id, origin, angle, items, prefix):
-    """A line of nodes leaving origin at angle: ("stat", key) small nodes or ("spell", id) spell nodes."""
+    """A line of nodes leaving origin at angle: ("stat", key) small nodes, ("spell", id) spell nodes,
+    ("notable", (id, {stat: amount})) notables and ("keystone", (id, keystone)) keystones."""
     previous = origin_id
     last = None
     for k, (kind, value) in enumerate(items, start=1):
@@ -64,10 +65,17 @@ def arm(file, element, origin_id, origin, angle, items, prefix):
         node_id = f"{prefix}_{k}"
         if kind == "stat":
             small(file, node_id, xy, value, [previous], element)
-        else:
+        elif kind == "spell":
             node_id = value
             add(file, {"id": node_id, "type": "spell", "x": round(xy[0]), "y": round(xy[1]), "spell": NS + value,
                        "element": element, "links": [previous]})
+        else:
+            node_id, payload = value
+            node = {"id": node_id, "type": kind, "x": round(xy[0]), "y": round(xy[1]), "links": [previous]}
+            node["stats" if kind == "notable" else "keystone"] = payload
+            if element:
+                node["element"] = element
+            add(file, node)
         previous = node_id
         last = (node_id, xy)
     return last
@@ -100,15 +108,22 @@ def region(file, element, angle, starter, arms):
     return ends
 
 
+# Each region ends one arm in a notable (several stats at once) and a keystone (a rule of magic
+# changed, for better and worse; see docs/superpowers/specs/2026-10-02-notables-and-keystones-design.md).
 region("wind", "wind", -90, "wind_blade", [
     ("dash", 45, [("spell", "gale_dash")]),
     ("sky", -45, [("stat", "affinity/wind"), ("stat", "focus"), ("stat", "affinity/wind"), ("stat", "potency"),
                   ("spell", "updraft")]),
+    ("gust", 100, [("stat", "affinity/wind"), ("stat", "focus"),
+                   ("notable", ("wind_tailwind", {"affinity/wind": 6, "focus": 4})),
+                   ("keystone", ("wind_gale_step", "gale_step"))]),
 ])
 region("fire", "fire", 0, "fireball", [
     ("burst", 45, [("stat", "affinity/fire"), ("stat", "potency"), ("stat", "affinity/fire"), ("stat", "reservoir"),
                    ("spell", "flame_burst")]),
-    ("ember", -45, [("stat", "affinity/fire"), ("stat", "focus"), ("stat", "potency")]),
+    ("ember", -45, [("stat", "affinity/fire"), ("stat", "focus"), ("stat", "potency"),
+                    ("notable", ("fire_kindled_soul", {"affinity/fire": 6, "potency": 4})),
+                    ("keystone", ("fire_glass_cannon", "glass_cannon"))]),
 ])
 water_ends = region("water", "water", 90, "hydro_jet", [
     ("tide", 30, [("spell", "tidal_wave")]),
@@ -116,13 +131,25 @@ water_ends = region("water", "water", 90, "hydro_jet", [
                    ("stat", "affinity/water"), ("spell", "healing_rain")]),
     ("deep", 60, [("stat", "affinity/water"), ("stat", "ward"), ("stat", "affinity/water"), ("stat", "vitality"),
                   ("stat", "affinity/water"), ("stat", "reservoir")]),
+    ("spring", -95, [("stat", "reservoir"), ("stat", "affinity/water"),
+                     ("notable", ("water_deep_reserves", {"reservoir": 6, "vitality": 4})),
+                     ("keystone", ("water_wellspring", "wellspring"))]),
 ])
 
 earth_ends = region("earth", "earth", 180, "boulder", [
     ("shield", 45, [("stat", "affinity/earth"), ("stat", "ward"), ("spell", "stone_skin")]),
     ("quake", -45, [("stat", "affinity/earth"), ("stat", "reservoir"), ("spell", "tremor"),
                     ("stat", "affinity/earth"), ("stat", "vitality")]),
+    ("bedrock", 100, [("stat", "affinity/earth"), ("stat", "vitality"),
+                      ("notable", ("earth_stone_blood", {"vitality": 6, "ward": 4})),
+                      ("keystone", ("earth_mountain_heart", "mountain_heart"))]),
 ])
+
+# ---- the core's keystone: Blood Magic, out past the ring between Fire and Water ----
+vigor = add("core", {"id": "core_arcane_vigor", "type": "notable", "x": round(polar(45, 190)[0]), "y": round(polar(45, 190)[1]),
+                     "stats": {"reservoir": 4, "vitality": 4, "potency": 2}, "links": [ring_node_at(45)]})
+add("core", {"id": "core_blood_magic", "type": "keystone", "x": round(polar(45, 235)[0]), "y": round(polar(45, 235)[1]),
+             "keystone": "blood_magic", "links": ["core_arcane_vigor"]})
 shield_id, shield_xy = earth_ends["shield"]
 path("earth", "earth", "earth_stone_skin", "stone_skin", shield_xy, 225, start_from="stone_skin")
 
@@ -137,8 +164,10 @@ path("ice", "ice", "ice_icicle", "icicle", ice_xy, 195, start_from="ice_start")
 shield_end_id, shield_end = arm("ice", "ice", "ice_start", ice_xy, 135, [("stat", "ward"), ("stat", "affinity/water"),
                                                                         ("spell", "frost_shield")], "ice_shield")
 path("ice", "ice", "ice_frost_shield", "frost_shield", shield_end, 160, start_from="frost_shield")
-arm("ice", "ice", "ice_start", ice_xy, 95, [("stat", "focus"), ("stat", "affinity/water"), ("stat", "ward"),
-                                             ("stat", "potency"), ("spell", "frost_nova")], "ice_nova")
+nova_id, nova_xy = arm("ice", "ice", "ice_start", ice_xy, 95, [("stat", "focus"), ("stat", "affinity/water"), ("stat", "ward"),
+                                                                ("stat", "potency"), ("spell", "frost_nova")], "ice_nova")
+arm("ice", "ice", nova_id, nova_xy, 95, [("notable", ("ice_winters_edge", {"affinity/water": 6, "potency": 4})),
+                                         ("keystone", ("ice_winters_grasp", "winters_grasp"))], "ice_grasp")
 
 # ---- checks and output ----
 ids = list(positions)

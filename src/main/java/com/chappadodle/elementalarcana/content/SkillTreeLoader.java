@@ -32,8 +32,9 @@ import java.util.TreeMap;
  * Loads the skill tree from data/&lt;namespace&gt;/skill_tree/*.json (all files merge into one tree,
  * so addons can add regions) on server start and /reload, and sends it to players. Entries:
  * <ul>
- * <li>start, small, spell nodes: {@code id, type, x, y, links, element?, stat?, amount?, spell?,
- * requires?: {stat, min}}.</li>
+ * <li>start, small, spell, notable and keystone nodes: {@code id, type, x, y, links, element?,
+ * stat?, amount?, spell?, stats?: {key: amount} (a notable's), keystone? (a keystone's rule, see
+ * Keystones), requires?: {stat, min}}.</li>
  * <li>{@code path}: a spell's whole upgrade chain, built here from the spell's own max level and
  * branch options so it always matches the spell: {@code id, spell, x, y, dx, dy, from?, links?,
  * element?}. With {@code from}, the chain hangs off that node (a start); without it, a spell node
@@ -112,14 +113,24 @@ public final class SkillTreeLoader extends SimpleJsonResourceReloadListener {
             case "start" -> SkillTree.Type.START;
             case "small" -> SkillTree.Type.SMALL;
             case "spell" -> SkillTree.Type.SPELL;
+            case "notable" -> SkillTree.Type.NOTABLE;
+            case "keystone" -> SkillTree.Type.KEYSTONE;
             default -> throw new IllegalArgumentException("unknown node type '" + type + "' for " + id);
         };
         String spell = GsonHelper.getAsString(json, "spell", null);
         if (spell != null && spellOf(spell) == null) {
             throw new IllegalArgumentException("unknown spell " + spell + " for " + id);
         }
+        Map<String, Integer> stats = new TreeMap<>();
+        if (json.has("stats")) {
+            GsonHelper.getAsJsonObject(json, "stats").entrySet().forEach(stat -> stats.put(stat.getKey(), stat.getValue().getAsInt()));
+        }
+        String keystone = GsonHelper.getAsString(json, "keystone", null);
+        if (nodeType == SkillTree.Type.KEYSTONE && keystone == null) {
+            throw new IllegalArgumentException("keystone " + id + " names no keystone");
+        }
         nodes.add(new SkillTree.Node(id, nodeType, x, y, element, GsonHelper.getAsString(json, "stat", null),
-                GsonHelper.getAsInt(json, "amount", 0), spell, 0, null, requiresStat, requiresMin));
+                GsonHelper.getAsInt(json, "amount", 0), spell, 0, null, requiresStat, requiresMin, Map.copyOf(stats), keystone));
     }
 
     /** A spell's chain: Lv 2..max, one upgrade node per level, or one fork per branch where it branches. */
