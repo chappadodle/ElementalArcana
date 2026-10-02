@@ -36,6 +36,11 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
+import com.chappadodle.elementalarcana.content.gear.FocusItem;
+import com.chappadodle.elementalarcana.content.gear.ModGear;
+import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.minecraft.util.FastColor;
+import com.chappadodle.elementalarcana.api.Element;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
@@ -262,6 +267,15 @@ public final class ArcanaClient {
             RenderSystem.enableCull();
             Bloom.renderParticles(event.getCamera(), event.getPartialTick().getGameTimeDeltaPartialTick(false));
         }
+    }
+
+    /** A focus's gem (its second texture layer) takes its element's colour. */
+    @SubscribeEvent
+    public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
+        event.register((stack, tintIndex) -> {
+            Element element = FocusItem.elementOf(stack);
+            return tintIndex == 1 && element != null ? FastColor.ARGB32.opaque(element.color()) : -1;
+        }, ModGear.APPRENTICE_WAND.get(), ModGear.ADEPT_STAFF.get());
     }
 
     @SubscribeEvent

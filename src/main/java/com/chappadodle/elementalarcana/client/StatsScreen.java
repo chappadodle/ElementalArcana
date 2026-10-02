@@ -114,7 +114,7 @@ public class StatsScreen extends Screen {
             }
             int color = row.family() != null ? FastColor.ARGB32.opaque(row.family().color()) : 0xFFE0D8F0;
             graphics.drawString(font, name(row), left + 12, y + 6, color, false);
-            int bonus = data.grants().stat(row.key());
+            int bonus = data.statBonus(row.key());
             String value = data.stats().get(row.key()) + (bonus > 0 ? " +" + bonus : "");
             graphics.drawString(font, value, left + 124 - font.width(value), y + 6, 0xFFFFFFFF, false);
             graphics.drawString(font, effect(data, row), left + 130, y + 6, 0xFF9A8FB8, false);

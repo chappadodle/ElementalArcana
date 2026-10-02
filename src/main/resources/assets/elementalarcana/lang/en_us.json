@@ -491,5 +491,21 @@
   "journal.elementalarcana.lore.2": "§5§lThe Seals§r\n\nFour Sovereigns keep the seals, one for each element. The seals are fading. That is why mana stirs in people like you again, and why elemental things walk the world.",
   "journal.elementalarcana.lore.3": "§5§lThe Road§r\n\nSeek the places where an element runs strong. Learn from those who walked this path before you. Grow.\n\nThe Hollow is patient. You will need to be strong when it wakes.",
   "item.elementalarcana.arcanist_journal": "Arcanist's Journal",
-  "message.elementalarcana.journal_given": "A journal appears among your things: the Arcanist's Journal. Read it."
+  "message.elementalarcana.journal_given": "A journal appears among your things: the Arcanist's Journal. Read it.",
+  "itemGroup.elementalarcana": "Elemental Arcana",
+  "item.elementalarcana.apprentice_wand": "Apprentice Wand",
+  "item.elementalarcana.adept_staff": "Adept Staff",
+  "item.elementalarcana.focus.named": "%2$s of %1$s",
+  "item.elementalarcana.apprentice_hood": "Apprentice's Hood",
+  "item.elementalarcana.apprentice_robe": "Apprentice's Robe",
+  "item.elementalarcana.apprentice_trousers": "Apprentice's Trousers",
+  "item.elementalarcana.apprentice_boots": "Apprentice's Boots",
+  "item.elementalarcana.adept_hood": "Adept's Hood",
+  "item.elementalarcana.adept_robe": "Adept's Robe",
+  "item.elementalarcana.adept_trousers": "Adept's Trousers",
+  "item.elementalarcana.adept_boots": "Adept's Boots",
+  "tooltip.elementalarcana.gear.held": "When held:",
+  "tooltip.elementalarcana.gear.worn": "When worn:",
+  "tooltip.elementalarcana.gear.stat": "+%s %s",
+  "tooltip.elementalarcana.gear.requires": "Requires level %s"
 }

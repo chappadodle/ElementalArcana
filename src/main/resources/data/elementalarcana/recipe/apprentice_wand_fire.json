@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "  E",
+    " S ",
+    "S  "
+  ],
+  "key": {
+    "E": {
+      "item": "elementalarcana:fire_essence"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "id": "elementalarcana:apprentice_wand",
+    "count": 1,
+    "components": {
+      "elementalarcana:element": "fire"
+    }
+  }
+}

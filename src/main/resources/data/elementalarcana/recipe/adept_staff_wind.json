@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " EA",
+    " WE",
+    "G  "
+  ],
+  "key": {
+    "E": {
+      "item": "elementalarcana:wind_essence"
+    },
+    "A": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "W": {
+      "item": "elementalarcana:apprentice_wand"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    }
+  },
+  "result": {
+    "id": "elementalarcana:adept_staff",
+    "count": 1,
+    "components": {
+      "elementalarcana:element": "wind"
+    }
+  }
+}

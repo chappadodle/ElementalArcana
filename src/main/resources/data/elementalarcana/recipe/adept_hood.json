@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "EGE",
+    "GPG",
+    "EAE"
+  ],
+  "key": {
+    "E": {
+      "tag": "elementalarcana:essences"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "A": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "P": {
+      "item": "elementalarcana:apprentice_hood"
+    }
+  },
+  "result": {
+    "id": "elementalarcana:adept_hood",
+    "count": 1
+  }
+}

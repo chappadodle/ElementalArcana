@@ -1,0 +1,38 @@
+# Gear: adept robes worn and a Fire staff held, from the front, plus the Stats window.
+hud on
+cmd kill @e[type=!player]
+cmd clear @s
+cmd time set noon
+cmd gamemode creative
+cmd tp @s 0.5 100 0.5 -90 0
+cmd arcana affinity reset
+cmd arcana awaken fire
+cmd arcana level set 30
+cmd item replace entity @s armor.head with elementalarcana:adept_hood
+cmd item replace entity @s armor.chest with elementalarcana:adept_robe
+cmd item replace entity @s armor.legs with elementalarcana:adept_trousers
+cmd item replace entity @s armor.feet with elementalarcana:adept_boots
+cmd item replace entity @s weapon.mainhand with elementalarcana:adept_staff[elementalarcana:element="fire"]
+cmd item replace entity @s weapon.offhand with elementalarcana:apprentice_wand[elementalarcana:element="water"]
+cmd give @s elementalarcana:apprentice_hood
+wait 40
+shot gear_first_person
+camera front
+wait 5
+shot gear_front
+camera back
+wait 5
+shot gear_back
+camera first
+screen stats
+wait 5
+shot gear_stats
+screen close
+cmd item replace entity @s armor.head with elementalarcana:apprentice_hood
+cmd item replace entity @s armor.chest with elementalarcana:apprentice_robe
+cmd item replace entity @s armor.legs with elementalarcana:apprentice_trousers
+cmd item replace entity @s armor.feet with elementalarcana:apprentice_boots
+camera front
+wait 5
+shot gear_apprentice_front
+quit

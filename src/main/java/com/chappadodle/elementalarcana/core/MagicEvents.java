@@ -2,6 +2,7 @@ package com.chappadodle.elementalarcana.core;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.content.ModContent;
+import com.chappadodle.elementalarcana.content.gear.GearStats;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -47,6 +48,11 @@ public final class MagicEvents {
             regen *= SICKNESS_MULTIPLIER;
         }
         changed |= data.regenerate(regen);
+        // Once a second: what the player's gear adds to their stats (worn, held, level requirements).
+        if (player.tickCount % 20 == 0 && data.setGearStats(GearStats.compute(player))) {
+            PlayerStats.apply(player);
+            changed = true;
+        }
 
         // Landing in water or starting to fly also ends a dash; LivingFallEvent never fires for those.
         if (data.fallImmune() && (player.isInWater() || player.getAbilities().flying)) {

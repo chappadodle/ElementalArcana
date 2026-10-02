@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "  E",
+    " S ",
+    "S  "
+  ],
+  "key": {
+    "E": {
+      "item": "elementalarcana:water_essence"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "id": "elementalarcana:apprentice_wand",
+    "count": 1,
+    "components": {
+      "elementalarcana:element": "water"
+    }
+  }
+}

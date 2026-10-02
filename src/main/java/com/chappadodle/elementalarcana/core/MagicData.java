@@ -58,7 +58,7 @@ public final class MagicData {
             AwakeningState.CODEC.optionalFieldOf("awakening", new AwakeningState()).forGetter(data -> data.awakening)
     ).apply(instance, (mana, level, xp, affinities, selected, cooldowns, fallImmune, freeCast, spells, bonusTreePoints, stats, tree, awakening) ->
             new MagicData(mana, level, xp, affinities, selected.orElse(null), cooldowns, fallImmune, freeCast, spells,
-                    bonusTreePoints, stats, tree, awakening, false, 0)));
+                    bonusTreePoints, stats, tree, awakening, false, 0, Map.of())));
 
     // What the owning client needs: no fall flag, plus the live meditation state for the HUD.
     public static final StreamCodec<RegistryFriendlyByteBuf, MagicData> STREAM_CODEC = StreamCodec.of(
@@ -77,6 +77,7 @@ public final class MagicData {
                 AwakeningState.write(buf, data.awakening);
                 buf.writeBoolean(data.meditating);
                 buf.writeVarInt(data.conjured);
+                buf.writeMap(data.gearStats, FriendlyByteBuf::writeUtf, FriendlyByteBuf::writeVarInt);
             },
             buf -> new MagicData(
                     buf.readFloat(),
@@ -93,7 +94,8 @@ public final class MagicData {
                     buf.readList(FriendlyByteBuf::readUtf),
                     AwakeningState.read(buf),
                     buf.readBoolean(),
-                    buf.readVarInt()));
+                    buf.readVarInt(),
+                    buf.readMap(FriendlyByteBuf::readUtf, FriendlyByteBuf::readVarInt)));
 
     private float mana;
     private int level;
@@ -125,18 +127,21 @@ public final class MagicData {
     // How many projectiles are conjured and held right now (see Conjuring). Synced, never saved:
     // the client uses it to know whether the mouse launches spells.
     private int conjured;
+    // Stat points from worn and held gear (see content/gear/GearStats). Synced, never saved: the
+    // server works it out from the equipment every second.
+    private final Map<String, Integer> gearStats;
     private int stillTicks;
     private double lastX;
     private double lastZ;
 
     public MagicData() {
-        this(START_MANA, 1, 0, List.of(), null, Map.of(), false, false, Map.of(), 0, new StatPoints(), List.of(), new AwakeningState(), false, 0);
+        this(START_MANA, 1, 0, List.of(), null, Map.of(), false, false, Map.of(), 0, new StatPoints(), List.of(), new AwakeningState(), false, 0, Map.of());
     }
 
     private MagicData(float mana, int level, int xp, List<ResourceLocation> affinities, @Nullable ResourceLocation selected,
                       Map<ResourceLocation, Long> cooldownEnds, boolean fallImmune, boolean freeCast,
                       Map<ResourceLocation, SpellProgress> spells, int bonusTreePoints, StatPoints stats, List<String> treeNodes,
-                      AwakeningState awakening, boolean meditating, int conjured) {
+                      AwakeningState awakening, boolean meditating, int conjured, Map<String, Integer> gearStats) {
         this.level = Mth.clamp(level, 1, MAX_LEVEL);
         this.xp = xp;
         this.affinities = new ArrayList<>(affinities);
@@ -151,6 +156,7 @@ public final class MagicData {
         this.awakening = awakening;
         this.meditating = meditating;
         this.conjured = conjured;
+        this.gearStats = new HashMap<>(gearStats);
         this.mana = Mth.clamp(mana, 0f, maxMana());
     }
 
@@ -225,7 +231,27 @@ public final class MagicData {
 
     /** A stat's total: points spent plus the skill tree's bonus. */
     public int statTotal(String key) {
-        return stats.get(key) + grants().stat(key);
+        return stats.get(key) + statBonus(key);
+    }
+
+    /** What the skill tree and gear add to a stat, on top of its stat points. */
+    public int statBonus(String key) {
+        return grants().stat(key) + gearStats.getOrDefault(key, 0);
+    }
+
+    public Map<String, Integer> gearStats() {
+        return Collections.unmodifiableMap(gearStats);
+    }
+
+    /** Replaces the stat points gear adds; returns whether anything changed. */
+    public boolean setGearStats(Map<String, Integer> stats) {
+        if (gearStats.equals(stats)) {
+            return false;
+        }
+        gearStats.clear();
+        gearStats.putAll(stats);
+        mana = Math.min(mana, maxMana());
+        return true;
     }
 
     public int stat(Stat stat) {

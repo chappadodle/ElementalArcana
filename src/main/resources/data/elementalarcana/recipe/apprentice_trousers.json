@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "WEW",
+    "W W",
+    "W W"
+  ],
+  "key": {
+    "W": {
+      "tag": "minecraft:wool"
+    },
+    "E": {
+      "tag": "elementalarcana:essences"
+    }
+  },
+  "result": {
+    "id": "elementalarcana:apprentice_trousers",
+    "count": 1
+  }
+}
