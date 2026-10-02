@@ -4,6 +4,7 @@ import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.content.spell.BubblePrisonSpell;
+import com.chappadodle.elementalarcana.content.spell.BoulderSpell;
 import com.chappadodle.elementalarcana.content.spell.FireballSpell;
 import com.chappadodle.elementalarcana.content.spell.FlameBurstSpell;
 import com.chappadodle.elementalarcana.content.spell.FrostNovaSpell;
@@ -13,6 +14,8 @@ import com.chappadodle.elementalarcana.content.spell.HealingRainSpell;
 import com.chappadodle.elementalarcana.content.spell.HydroJetSpell;
 import com.chappadodle.elementalarcana.content.spell.IcicleSpell;
 import com.chappadodle.elementalarcana.content.spell.TidalWaveSpell;
+import com.chappadodle.elementalarcana.content.spell.StoneSkinSpell;
+import com.chappadodle.elementalarcana.content.spell.TremorSpell;
 import com.chappadodle.elementalarcana.content.spell.UpdraftSpell;
 import com.chappadodle.elementalarcana.content.spell.WindBladeSpell;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -36,6 +39,11 @@ public final class ModSpells {
     public static final DeferredHolder<Spell, WindBladeSpell> WIND_BLADE = SPELLS.register("wind_blade", WindBladeSpell::new);
     public static final DeferredHolder<Spell, GaleDashSpell> GALE_DASH = SPELLS.register("gale_dash", GaleDashSpell::new);
     public static final DeferredHolder<Spell, UpdraftSpell> UPDRAFT = SPELLS.register("updraft", UpdraftSpell::new);
+
+    // Boulder is registered first so it's earth's starter spell.
+    public static final DeferredHolder<Spell, BoulderSpell> BOULDER = SPELLS.register("boulder", BoulderSpell::new);
+    public static final DeferredHolder<Spell, StoneSkinSpell> STONE_SKIN = SPELLS.register("stone_skin", StoneSkinSpell::new);
+    public static final DeferredHolder<Spell, TremorSpell> TREMOR = SPELLS.register("tremor", TremorSpell::new);
 
     private ModSpells() {
     }

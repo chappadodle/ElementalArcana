@@ -24,6 +24,7 @@ class ElementTest {
         assertEquals(Element.WATER, Element.WATER.family());
         assertEquals(Element.FIRE, Element.FIRE.family());
         assertEquals(Element.WIND, Element.WIND.family());
+        assertEquals(Element.EARTH, Element.EARTH.family());
     }
 
     @Test
@@ -44,6 +45,8 @@ class ElementTest {
             "WATER, FIRE, 1.5", "WATER, WATER, 0.5", "WATER, ICE, 1.0", "WATER, WIND, 1.0", "WATER, NONE, 1.0",
             "ICE, FIRE, 0.5", "ICE, WATER, 1.5", "ICE, ICE, 0.5", "ICE, WIND, 1.0", "ICE, NONE, 1.0",
             "WIND, FIRE, 1.0", "WIND, WATER, 1.0", "WIND, ICE, 1.0", "WIND, WIND, 0.5", "WIND, NONE, 1.0",
+            "WATER, EARTH, 1.5", "EARTH, WIND, 1.5", "EARTH, EARTH, 0.5", "EARTH, NONE, 1.0",
+            "EARTH, FIRE, 1.0", "EARTH, WATER, 1.0", "EARTH, ICE, 1.0", "FIRE, EARTH, 1.0", "ICE, EARTH, 1.0", "WIND, EARTH, 1.0",
     })
     void matchupChart(Element spell, String creature, float expected) {
         Element target = creature.equals("NONE") ? null : Element.valueOf(creature);

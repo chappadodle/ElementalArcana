@@ -1,0 +1,63 @@
+# Earth: a boulder held, thrown and landing on a burning zombie (Crystallize), Stone Skin, Tremor.
+hud off
+cmd clear @s
+cmd kill @e[type=item]
+cmd kill @e[type=!player]
+cmd time set noon
+cmd weather clear
+cmd gamerule doMobSpawning false
+cmd gamerule doDaylightCycle false
+cmd gamemode creative
+cmd fill -4 99 -8 24 99 8 minecraft:grass_block
+cmd fill -4 100 -8 24 108 8 minecraft:air
+cmd tp @s 0.5 100 0.5 -90 5
+cmd arcana affinity reset
+cmd arcana awaken earth
+cmd arcana level set 30
+cmd arcana mana fill
+cmd summon zombie 9.5 100 0.5 {NoAI:1b,Tags:["eat"],Fire:400s,PersistenceRequired:1b}
+wait 20
+select elementalarcana:boulder
+press
+release
+wait 30
+shot earth_boulder_held
+launch_one
+wait 5
+shot earth_boulder_flight
+wait 4
+shot earth_boulder_impact
+wait 30
+shot earth_crystal_shard
+# Stone Skin and Tremor need their tree nodes.
+cmd arcana tree take earth_shield_1
+cmd arcana tree take earth_shield_2
+cmd arcana tree take stone_skin
+cmd arcana tree take earth_quake_1
+cmd arcana tree take earth_quake_2
+cmd arcana tree take tremor
+cmd arcana cooldowns reset
+cmd arcana mana fill
+wait 5
+select elementalarcana:stone_skin
+press
+release
+camera back
+wait 20
+shot earth_stone_skin
+camera first
+cmd summon zombie 7.5 100 2.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b}
+cmd summon zombie 9.5 100 -1.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b}
+wait 10
+select elementalarcana:tremor
+press
+release
+wait 4
+shot earth_tremor
+wait 30
+hud on
+screen tree elementalarcana:boulder
+wait 10
+shot earth_tree
+screen close
+quit

@@ -60,6 +60,7 @@ class AwakeningRulesTest {
         Map<Element, Double> any = anyWeights();
         assertEquals(100.0, any.get(Element.FIRE), 1e-9);
         assertEquals(100.0, any.get(Element.WIND), 1e-9);
+        assertEquals(100.0, any.get(Element.EARTH), 1e-9);
         assertEquals(100.0, any.get(Element.WATER) + any.get(Element.ICE), 1e-9);
         assertEquals(any.get(Element.WATER) / 100, any.get(Element.ICE), 1e-9);
     }

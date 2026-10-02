@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
@@ -22,7 +23,7 @@ import java.util.UUID;
 /**
  * How a first element wakes (see AwakeningRules and the awakening spec). Until it does, a player has
  * dormant mana: each Minecraft day it may wake by itself (surely by day 16), and surviving a brush
- * with an element (fire, drowning, freezing, a hard fall) at 3 hearts or less may wake it too.
+ * with an element (fire, drowning, freezing, a hard fall, a falling block or suffocation) at 3 hearts or less may wake it too.
  */
 @EventBusSubscriber(modid = ElementalArcana.MODID)
 public final class AwakeningEvents {
@@ -94,7 +95,7 @@ public final class AwakeningEvents {
         }
     }
 
-    /** Which kind of brush a damage source is: fire, drowning, freezing or fall; null for anything else. */
+    /** Which kind of brush a damage source is: fire, drowning, freezing, fall or earth (a falling block or suffocation); null for anything else. */
     @Nullable
     private static String kindOf(DamageSource source) {
         if (source.is(DamageTypeTags.IS_FIRE)) {
@@ -109,6 +110,10 @@ public final class AwakeningEvents {
         if (source.is(DamageTypeTags.IS_FALL)) {
             return "fall";
         }
+        if (source.is(DamageTypes.FALLING_BLOCK) || source.is(DamageTypes.FALLING_ANVIL) || source.is(DamageTypes.FALLING_STALACTITE)
+                || source.is(DamageTypes.STALAGMITE) || source.is(DamageTypes.IN_WALL)) {
+            return "earth";
+        }
         return null;
     }
 
@@ -119,6 +124,7 @@ public final class AwakeningEvents {
             case "fire" -> Element.FIRE;
             case "drowning", "freezing" -> Element.WATER;
             case "fall" -> Element.WIND;
+            case "earth" -> Element.EARTH;
             default -> null;
         };
     }

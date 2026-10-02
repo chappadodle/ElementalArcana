@@ -73,7 +73,8 @@ public final class ArcanaCommand {
                         .then(Commands.literal("day").then(Commands.argument("day", IntegerArgumentType.integer(0, 1000))
                                 .executes(ctx -> setAwakeningDay(ctx.getSource(), IntegerArgumentType.getInteger(ctx, "day")))))
                         .then(awakenElement(Element.FIRE)).then(awakenElement(Element.WATER))
-                        .then(awakenElement(Element.ICE)).then(awakenElement(Element.WIND)))
+                        .then(awakenElement(Element.ICE)).then(awakenElement(Element.WIND))
+                        .then(awakenElement(Element.EARTH)))
                 .then(Commands.literal("tree")
                         .then(Commands.literal("info").executes(ctx -> {
                             String info = SkillTreeLoader.describe(SkillTrees.current());

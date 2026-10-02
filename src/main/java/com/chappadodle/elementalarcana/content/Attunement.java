@@ -10,6 +10,7 @@ import com.chappadodle.elementalarcana.content.mob.CastMobSpellGoal;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
@@ -29,6 +30,7 @@ import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -211,6 +213,7 @@ public final class Attunement {
             case WATER -> ParticleTypes.DRIPPING_WATER;
             case ICE -> ParticleTypes.SNOWFLAKE;
             case WIND -> ModContent.WIND_STREAK.get();
+            case EARTH -> new BlockParticleOption(ParticleTypes.FALLING_DUST, Blocks.DIRT.defaultBlockState());
         };
     }
 }

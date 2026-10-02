@@ -14,6 +14,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -63,7 +64,7 @@ public final class ElementalMatchups {
         }
     }
 
-    /** The element of a vanilla damage source: burning and lava, freezing, drowning, falling. */
+    /** The element of a vanilla damage source: burning and lava, freezing, drowning, falling, and falling blocks and suffocation (earth). */
     @Nullable
     private static Element natureOf(DamageSource source) {
         if (source.is(DamageTypeTags.IS_FIRE)) {
@@ -77,6 +78,10 @@ public final class ElementalMatchups {
         }
         if (source.is(DamageTypeTags.IS_FALL)) {
             return Element.WIND;
+        }
+        if (source.is(DamageTypes.FALLING_BLOCK) || source.is(DamageTypes.FALLING_ANVIL) || source.is(DamageTypes.FALLING_STALACTITE)
+                || source.is(DamageTypes.STALAGMITE) || source.is(DamageTypes.IN_WALL)) {
+            return Element.EARTH;
         }
         return null;
     }

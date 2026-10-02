@@ -1,0 +1,37 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "elementalarcana:earth_essence"
+    },
+    {
+      "item": "elementalarcana:earth_essence"
+    },
+    {
+      "item": "elementalarcana:earth_essence"
+    },
+    {
+      "item": "elementalarcana:earth_essence"
+    },
+    {
+      "item": "elementalarcana:earth_essence"
+    },
+    {
+      "item": "elementalarcana:earth_essence"
+    },
+    {
+      "item": "elementalarcana:earth_essence"
+    },
+    {
+      "item": "elementalarcana:earth_essence"
+    },
+    {
+      "item": "minecraft:diamond"
+    }
+  ],
+  "result": {
+    "id": "elementalarcana:earth_catalyst",
+    "count": 1
+  }
+}

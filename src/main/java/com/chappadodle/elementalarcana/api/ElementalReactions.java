@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.api;
 
+import com.chappadodle.elementalarcana.content.CrystalShards;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.content.ReactionRewards;
 import net.minecraft.core.particles.ColorParticleOption;
@@ -27,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
  * Freeze    ice on hydro,        frozen solid for 2.5s
  *           water on cryo        (1s for players)
  * Swirl     wind on any aura     spreads it around
+ * Crystallize earth on any aura  puts the aura out and leaves a shield shard
  * </pre>
  */
 public final class ElementalReactions {
@@ -39,6 +41,9 @@ public final class ElementalReactions {
     // After a Freeze wears off, the target can't be re-frozen by a reaction for a few seconds.
     private static final int FREEZE_IMMUNITY_TICKS = 60;
     private static final String TAG_FREEZE_IMMUNE_UNTIL = "ea_freeze_immune_until";
+    // A creature leaves one Crystallize shard per 5 seconds.
+    private static final String TAG_CRYSTAL_UNTIL = "ea_crystal_until";
+    private static final int CRYSTAL_GAP_TICKS = 100;
 
     /** Elements an entity can carry, with the color their reactions show in. */
     public enum Aura {
@@ -209,6 +214,35 @@ public final class ElementalReactions {
         level.sendParticles(ModContent.ICE_SHARD.get(), target.getX(), target.getY(0.5), target.getZ(), 16, 0.3, 0.4, 0.3, 0.08);
         level.sendParticles(ModContent.FROST_MIST.get(), target.getX(), target.getY(0.3), target.getZ(), 4, 0.4, 0.3, 0.4, 0.01);
         level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.GLASS_PLACE, SoundSource.PLAYERS, 1f, 0.6f);
+        return true;
+    }
+
+    /**
+     * Crystallize: an earth hit on a burning, wet or frozen creature puts that aura out and leaves a
+     * shard where it stood; whoever walks into it gets absorption hearts (see CrystalShards). A
+     * creature leaves one shard every 5 seconds. {@code shardTicks} is how long the shard lasts.
+     * Returns whether it crystallized.
+     */
+    public static boolean earthHit(LivingEntity target, @Nullable Entity attacker, int shardTicks) {
+        Aura aura = auraOf(target);
+        if (aura == null || !(target.level() instanceof ServerLevel level)) {
+            return false;
+        }
+        long now = level.getGameTime();
+        if (now < target.getPersistentData().getLong(TAG_CRYSTAL_UNTIL)) {
+            return false;
+        }
+        target.getPersistentData().putLong(TAG_CRYSTAL_UNTIL, now + CRYSTAL_GAP_TICKS);
+        switch (aura) {
+            case CRYO -> {
+                target.removeEffect(ModContent.FROZEN);
+                target.setTicksFrozen(0);
+            }
+            case PYRO -> target.clearFire();
+            case HYDRO -> target.removeEffect(ModContent.WET);
+        }
+        ReactionRewards.reacted(target, attacker);
+        CrystalShards.spawn(level, target.position(), aura.color(), shardTicks);
         return true;
     }
 

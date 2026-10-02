@@ -18,6 +18,7 @@ public final class MobSpells {
         BY_ELEMENT.put(Element.WATER, WaterMobSpells.ALL);
         BY_ELEMENT.put(Element.ICE, IceMobSpells.ALL);
         BY_ELEMENT.put(Element.WIND, WindMobSpells.ALL);
+        BY_ELEMENT.put(Element.EARTH, EarthMobSpells.ALL);
     }
 
     private MobSpells() {

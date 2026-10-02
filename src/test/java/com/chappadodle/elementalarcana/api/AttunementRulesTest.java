@@ -11,6 +11,7 @@ import static com.chappadodle.elementalarcana.api.AttunementRank.MAGUS;
 import static com.chappadodle.elementalarcana.api.AttunementRules.distanceMultiplier;
 import static com.chappadodle.elementalarcana.api.AttunementRules.pickElement;
 import static com.chappadodle.elementalarcana.api.AttunementRules.rollRank;
+import static com.chappadodle.elementalarcana.api.Element.EARTH;
 import static com.chappadodle.elementalarcana.api.Element.FIRE;
 import static com.chappadodle.elementalarcana.api.Element.ICE;
 import static com.chappadodle.elementalarcana.api.Element.WATER;
@@ -62,19 +63,21 @@ class AttunementRulesTest {
     @Test
     void elementsAreEvenWithoutABiomeElement() {
         assertEquals(FIRE, pickElement(Set.of(), always(0.0)));
-        assertEquals(FIRE, pickElement(Set.of(), always(0.24)));
-        assertEquals(WATER, pickElement(Set.of(), always(0.26)));
-        assertEquals(ICE, pickElement(Set.of(), always(0.51)));
-        assertEquals(WIND, pickElement(Set.of(), always(0.99)));
+        assertEquals(FIRE, pickElement(Set.of(), always(0.19)));
+        assertEquals(WATER, pickElement(Set.of(), always(0.21)));
+        assertEquals(ICE, pickElement(Set.of(), always(0.41)));
+        assertEquals(WIND, pickElement(Set.of(), always(0.61)));
+        assertEquals(EARTH, pickElement(Set.of(), always(0.99)));
     }
 
     @Test
     void biomeElementIsFourTimesAsLikely() {
-        // With Ice as the biome element the weights are Fire 1, Water 1, Ice 4, Wind 1 (total 7).
-        assertEquals(FIRE, pickElement(Set.of(ICE), always(0.5 / 7)));
-        assertEquals(WATER, pickElement(Set.of(ICE), always(1.5 / 7)));
-        assertEquals(ICE, pickElement(Set.of(ICE), always(2.1 / 7)));
-        assertEquals(ICE, pickElement(Set.of(ICE), always(5.9 / 7)));
-        assertEquals(WIND, pickElement(Set.of(ICE), always(6.5 / 7)));
+        // With Ice as the biome element the weights are Fire 1, Water 1, Ice 4, Wind 1, Earth 1 (total 8).
+        assertEquals(FIRE, pickElement(Set.of(ICE), always(0.5 / 8)));
+        assertEquals(WATER, pickElement(Set.of(ICE), always(1.5 / 8)));
+        assertEquals(ICE, pickElement(Set.of(ICE), always(2.1 / 8)));
+        assertEquals(ICE, pickElement(Set.of(ICE), always(5.9 / 8)));
+        assertEquals(WIND, pickElement(Set.of(ICE), always(6.5 / 8)));
+        assertEquals(EARTH, pickElement(Set.of(ICE), always(7.5 / 8)));
     }
 }

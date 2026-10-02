@@ -1,0 +1,143 @@
+{
+  "nodes": [
+    {
+      "id": "earth_spoke",
+      "type": "small",
+      "x": -200,
+      "y": 0,
+      "stat": "affinity/earth",
+      "amount": 2,
+      "links": [
+        "core_22"
+      ],
+      "element": "earth"
+    },
+    {
+      "id": "earth_start",
+      "type": "start",
+      "x": -260,
+      "y": 0,
+      "element": "earth",
+      "spell": "elementalarcana:boulder",
+      "links": [
+        "earth_spoke"
+      ]
+    },
+    {
+      "id": "earth_boulder",
+      "type": "path",
+      "spell": "elementalarcana:boulder",
+      "x": -260,
+      "y": 0,
+      "dx": -40.0,
+      "dy": 0.0,
+      "element": "earth",
+      "from": "earth_start"
+    },
+    {
+      "id": "earth_shield_1",
+      "type": "small",
+      "x": -288,
+      "y": -28,
+      "stat": "affinity/earth",
+      "amount": 2,
+      "links": [
+        "earth_start"
+      ],
+      "element": "earth"
+    },
+    {
+      "id": "earth_shield_2",
+      "type": "small",
+      "x": -317,
+      "y": -57,
+      "stat": "ward",
+      "amount": 2,
+      "links": [
+        "earth_shield_1"
+      ],
+      "element": "earth"
+    },
+    {
+      "id": "stone_skin",
+      "type": "spell",
+      "x": -345,
+      "y": -85,
+      "spell": "elementalarcana:stone_skin",
+      "element": "earth",
+      "links": [
+        "earth_shield_2"
+      ]
+    },
+    {
+      "id": "earth_quake_1",
+      "type": "small",
+      "x": -288,
+      "y": 28,
+      "stat": "affinity/earth",
+      "amount": 2,
+      "links": [
+        "earth_start"
+      ],
+      "element": "earth"
+    },
+    {
+      "id": "earth_quake_2",
+      "type": "small",
+      "x": -317,
+      "y": 57,
+      "stat": "reservoir",
+      "amount": 2,
+      "links": [
+        "earth_quake_1"
+      ],
+      "element": "earth"
+    },
+    {
+      "id": "tremor",
+      "type": "spell",
+      "x": -345,
+      "y": 85,
+      "spell": "elementalarcana:tremor",
+      "element": "earth",
+      "links": [
+        "earth_quake_2"
+      ]
+    },
+    {
+      "id": "earth_quake_4",
+      "type": "small",
+      "x": -373,
+      "y": 113,
+      "stat": "affinity/earth",
+      "amount": 2,
+      "links": [
+        "tremor"
+      ],
+      "element": "earth"
+    },
+    {
+      "id": "earth_quake_5",
+      "type": "small",
+      "x": -401,
+      "y": 141,
+      "stat": "vitality",
+      "amount": 2,
+      "links": [
+        "earth_quake_4"
+      ],
+      "element": "earth"
+    },
+    {
+      "id": "earth_stone_skin",
+      "type": "path",
+      "spell": "elementalarcana:stone_skin",
+      "x": -345,
+      "y": -85,
+      "dx": -28.284,
+      "dy": -28.284,
+      "element": "earth",
+      "from": "stone_skin"
+    }
+  ]
+}

@@ -3,14 +3,15 @@ package com.chappadodle.elementalarcana.api;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The four elements. Plain data with no Minecraft types: which elements oppose each other, and how
+ * The elements. Plain data with no Minecraft types: which elements oppose each other, and how
  * hard a spell of one element hits a creature of another (see ElementalMatchups).
  */
 public enum Element {
     FIRE(0xFF7A1F),
     WATER(0x3F9CFF),
     ICE(0x9EE6FF),
-    WIND(0x8FE3C0);
+    WIND(0x8FE3C0),
+    EARTH(0xB5895A);
 
     private static final float STRONG = 1.5f;
     private static final float RESISTED = 0.5f;
@@ -47,8 +48,8 @@ public enum Element {
 
     /**
      * Damage multiplier for a spell of this element hitting a creature of {@code target}'s element
-     * (null = a creature with no element). Water beats fire, fire beats ice, ice beats water, and
-     * every element resists itself.
+     * (null = a creature with no element). Water beats fire, fire beats ice, ice beats water, earth
+     * grounds wind, water erodes earth, and every element resists itself.
      */
     public float multiplierAgainst(@Nullable Element target) {
         if (target == null) {
@@ -59,9 +60,10 @@ public enum Element {
         }
         return switch (this) {
             case FIRE -> target == ICE ? STRONG : target == WATER ? RESISTED : 1f;
-            case WATER -> target == FIRE ? STRONG : 1f;
+            case WATER -> target == FIRE || target == EARTH ? STRONG : 1f;
             case ICE -> target == WATER ? STRONG : target == FIRE ? RESISTED : 1f;
             case WIND -> 1f;
+            case EARTH -> target == WIND ? STRONG : 1f;
         };
     }
 }

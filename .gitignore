@@ -35,6 +35,7 @@ bin/
 ### Minecraft Modding ###
 run/
 run-server/
+run-autotest/
 !**/src/**/run/
 **/src/generated/**/.cache/
 repo/

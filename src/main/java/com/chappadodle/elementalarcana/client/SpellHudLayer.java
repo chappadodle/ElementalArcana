@@ -40,7 +40,7 @@ public class SpellHudLayer implements LayeredDraw.Layer {
         int y = graphics.guiHeight() - 34;
 
         if (!data.isAwakened()) {
-            graphics.drawString(font, Component.translatable("hud.elementalarcana.not_awakened", Component.keybind("key.elementalarcana.status")),
+            graphics.drawString(font, Component.translatable("hud.elementalarcana.not_awakened"),
                     x, y + 16, 0xFFB8A8E0);
             return;
         }

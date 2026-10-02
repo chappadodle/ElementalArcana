@@ -4,7 +4,7 @@ src/main/resources/data/elementalarcana/skill_tree/*.json.
 
 Layout (1 unit = 1 screen pixel at zoom 1, y grows downward):
 - a core ring of 30 small stat nodes at radius 140;
-- Wind to the north, Fire to the east, Water to the south (the west is kept for Earth): a spoke
+- Wind to the north, Fire to the east, Water to the south, Earth to the west: a spoke
   node, the element's start, and arms of small nodes and spells leaving it;
 - each leveled spell is one "path" entry, expanded by the game into its upgrade chain and forks;
 - Ice as a cluster off Water's outer edge, behind a gate that needs Water Affinity 10.
@@ -20,7 +20,7 @@ NS = "elementalarcana:"
 STEP = 40
 STATS = ["reservoir", "potency", "focus", "ward", "vitality", "insight"]
 
-files = {name: [] for name in ("core", "fire", "water", "wind", "ice")}
+files = {name: [] for name in ("core", "fire", "water", "wind", "earth", "ice")}
 positions = {}
 
 
@@ -117,6 +117,14 @@ water_ends = region("water", "water", 90, "hydro_jet", [
     ("deep", 60, [("stat", "affinity/water"), ("stat", "ward"), ("stat", "affinity/water"), ("stat", "vitality"),
                   ("stat", "affinity/water"), ("stat", "reservoir")]),
 ])
+
+earth_ends = region("earth", "earth", 180, "boulder", [
+    ("shield", 45, [("stat", "affinity/earth"), ("stat", "ward"), ("spell", "stone_skin")]),
+    ("quake", -45, [("stat", "affinity/earth"), ("stat", "reservoir"), ("spell", "tremor"),
+                    ("stat", "affinity/earth"), ("stat", "vitality")]),
+])
+shield_id, shield_xy = earth_ends["shield"]
+path("earth", "earth", "earth_stone_skin", "stone_skin", shield_xy, 225, start_from="stone_skin")
 
 # ---- Ice: a cluster off Water's outer edge ----
 deep_end_id, deep_end = water_ends["deep"]

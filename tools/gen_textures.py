@@ -196,6 +196,66 @@ SPRITES = {
         "......kkkk......",
         "................",
     ]),
+    "spell/boulder": ({
+        "k": 0x3A332C, "d": 0x6B6258, "b": 0x948A7C, "l": 0xBDB3A3, "w": 0xE6DED0,
+    }, [
+        "................",
+        "................",
+        "......kkkk......",
+        "....kkblllkk....",
+        "...kbbllwwlbk...",
+        "..kbblwwlllbbk..",
+        "..kblwwllbbbbk..",
+        ".kbbllllbbbddbk.",
+        ".kbbbbbbbbbddbk.",
+        ".kdbbbkbbbbdddk.",
+        ".kddbbkkbbbdddk.",
+        "..kddbbkbbddkk..",
+        "..kkdddbbddkk...",
+        "...kkkddddkk....",
+        ".....kkkkk......",
+        "................",
+    ]),
+    "spell/stone_skin": ({
+        "k": 0x3A332C, "d": 0x6B6258, "b": 0x948A7C, "l": 0xBDB3A3, "w": 0xE6DED0,
+    }, [
+        "................",
+        "......kkkk......",
+        "....kkllllkk....",
+        "...kllbbbbllk...",
+        "..klbbblbbbblk..",
+        "..klbblwlbbblk..",
+        ".klbbbbwbbbbblk.",
+        ".klbkbwwwwlkblk.",
+        ".klbbkbwbbkbblk.",
+        ".klbblkkkbbbdlk.",
+        "..klbbbkbbbdlk..",
+        "..kldbbbbbddlk..",
+        "...kldddddddk...",
+        "....kkddddkk....",
+        "......kkkk......",
+        "................",
+    ]),
+    "spell/tremor": ({
+        "k": 0x3A332C, "d": 0x6B6258, "b": 0x948A7C, "l": 0xBDB3A3, "e": 0x8A5F3A,
+    }, [
+        "................",
+        "................",
+        ".......l..l.....",
+        "......bl.bl.....",
+        ".....bbl.dbl....",
+        "....kbdl..kdl...",
+        "...kkd.k...kd...",
+        "..kk.d.k....kk..",
+        "eeekkeekkeeekkee",
+        "eeeekkekeeekeeee",
+        "kkkkkkkkkkkkkkkk",
+        "eeeeekeeeekeeeee",
+        "eeekeeeeeeeekeee",
+        "kkkkkkkkkkkkkkkk",
+        "................",
+        "................",
+    ]),
     "spell/wind_blade": ({
         "k": 0x3C6B5A, "g": 0x9FE0C8, "p": 0xD8F5EA, "w": 0xFFFFFF,
     }, [
@@ -562,6 +622,31 @@ def catalyst(core, glow, edge, size=16):
     for px, py in ((5, 9), (5, 10), (6, 8), (10, 7)):
         img[py, px] = [1, 1, 1, 1 if inside[py, px] else 0.9]
     return Image.fromarray((np.clip(img, 0, 1) * 255).astype(np.uint8), "RGBA")
+
+
+def stone_texture(seed, base, light, dark, cracks=True, size=16):
+    """A pixel-art chunk of stone for Earth's projectiles: speckled blocks of three shades with a few
+    dark cracks, in the style of the game's own stone. base/light/dark are (r, g, b)."""
+    rng = np.random.default_rng(seed)
+    noise = rng.random((size, size))
+    # Chunky: smooth the noise over 2x2 blocks so it reads as stones, not static.
+    blocky = noise.reshape(size // 2, 2, size // 2, 2).mean(axis=(1, 3))
+    blocky = np.kron(blocky, np.ones((2, 2)))
+    rgba = np.zeros((size, size, 4))
+    rgba[..., 3] = 1.0
+    for c in range(3):
+        channel = np.where(blocky < 0.38, dark[c], np.where(blocky > 0.64, light[c], base[c]))
+        # A little per-pixel speckle on top.
+        channel = channel + (noise - 0.5) * 14
+        rgba[..., c] = np.clip(channel, 0, 255) / 255
+    if cracks:
+        for _ in range(3):
+            x, y = rng.integers(2, size - 2, size=2)
+            for _ in range(rng.integers(3, 6)):
+                rgba[y, x, :3] = np.array(dark) * 0.55 / 255
+                x = int(np.clip(x + rng.integers(-1, 2), 0, size - 1))
+                y = int(np.clip(y + rng.integers(0, 2), 0, size - 1))
+    return Image.fromarray((np.clip(rgba, 0, 1) * 255).astype(np.uint8), "RGBA")
 
 
 def bubble_icon(size=16):
@@ -1019,6 +1104,7 @@ def main():
         "water": ((225, 245, 255), (60, 150, 240), (20, 60, 150)),
         "ice": ((255, 255, 255), (160, 225, 255), (70, 140, 200)),
         "wind": ((245, 255, 250), (150, 225, 195), (60, 140, 110)),
+        "earth": ((250, 235, 205), (190, 140, 85), (95, 62, 38)),
     }
     for path, make in ((ASSETS / "spell/bubble_prison.png", bubble_icon),):
         make().save(path)
@@ -1044,6 +1130,14 @@ def main():
     path.parent.mkdir(parents=True, exist_ok=True)
     glow_sprite().save(path)
     print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
+    for name, (seed, base, light, dark) in {
+        "boulder": (301, (128, 122, 114), (160, 153, 142), (88, 83, 78)),
+        "boulder_bedrock": (302, (96, 92, 98), (128, 124, 132), (58, 56, 62)),
+        "stone_shard": (303, (140, 132, 120), (176, 168, 154), (96, 90, 82)),
+    }.items():
+        stone_path = ASSETS / f"block/{name}.png"
+        stone_texture(seed, base, light, dark).save(stone_path)
+        print("wrote", stone_path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
     for name, colors in essences.items():
         if name != "ice":
             catalyst_path = ASSETS / f"item/{name}_catalyst.png"

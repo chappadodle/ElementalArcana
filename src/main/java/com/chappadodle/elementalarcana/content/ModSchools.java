@@ -19,6 +19,9 @@ public final class ModSchools {
     public static final DeferredHolder<SpellSchool, SpellSchool> WIND =
             SCHOOLS.register("wind", () -> new SpellSchool(0xCFEFE0, () -> SoundEvents.WIND_CHARGE_THROW));
 
+    public static final DeferredHolder<SpellSchool, SpellSchool> EARTH =
+            SCHOOLS.register("earth", () -> new SpellSchool(0xB5895A, () -> SoundEvents.STONE_PLACE));
+
     private ModSchools() {
     }
 }

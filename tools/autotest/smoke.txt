@@ -1,0 +1,9 @@
+# Join the test world, look around, take a screenshot, quit.
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamemode creative
+cmd tp @s 0 120 0
+wait 40
+shot smoke
+quit

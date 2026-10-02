@@ -5,6 +5,7 @@ import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.ElementalReactions;
 import com.chappadodle.elementalarcana.api.SpellDamage;
 import com.chappadodle.elementalarcana.content.ModContent;
+import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
@@ -13,12 +14,13 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 
 /**
  * Up close (within 2.5 blocks), every Attuned creature can burst its element in your face: a
  * little damage and a shove back out of melee range, so it can go back to casting. Fire sets you
- * alight, water soaks you, ice frosts and slows you, wind throws you further.
+ * alight, water soaks you, ice frosts and slows you, wind throws you further, earth slows you.
  */
 final class CloseBurst implements MobSpell {
     private static final double RANGE = 2.5;
@@ -59,7 +61,7 @@ final class CloseBurst implements MobSpell {
             case FIRE -> damage *= ElementalReactions.fireHit(target);
             case WATER -> damage *= ElementalReactions.waterHit(target, 100);
             case ICE -> ElementalReactions.iceHit(target);
-            case WIND -> {
+            case WIND, EARTH -> {
             }
         }
         // The burst decides the knockback, not the damage.
@@ -76,6 +78,7 @@ final class CloseBurst implements MobSpell {
                     target.setTicksFrozen(Math.max(target.getTicksFrozen(), target.getTicksRequiredToFreeze() + 40));
                 }
             }
+            case EARTH -> target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 1));
             default -> {
             }
         }
@@ -87,6 +90,7 @@ final class CloseBurst implements MobSpell {
             case WATER -> level.sendParticles(ParticleTypes.SPLASH, at.x, at.y, at.z, 30, 0.4, 0.3, 0.4, 0.2);
             case ICE -> level.sendParticles(ModContent.ICE_SHARD.get(), at.x, at.y, at.z, 16, 0.2, 0.2, 0.2, 0.2);
             case WIND -> level.sendParticles(ParticleTypes.GUST_EMITTER_SMALL, at.x, at.y, at.z, 1, 0, 0, 0, 0);
+            case EARTH -> level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.STONE.defaultBlockState()), at.x, at.y, at.z, 18, 0.3, 0.3, 0.3, 0.1);
         }
         MobCasting.play(caster, sound(), 1f, 1.1f);
     }
@@ -97,6 +101,7 @@ final class CloseBurst implements MobSpell {
             case WATER -> SoundEvents.GENERIC_SPLASH;
             case ICE -> SoundEvents.GLASS_BREAK;
             case WIND -> SoundEvents.WIND_CHARGE_BURST.value();
+            case EARTH -> SoundEvents.STONE_BREAK;
         };
     }
 }
