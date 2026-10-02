@@ -1,0 +1,129 @@
+{
+  "nodes": [
+    {
+      "id": "crystal_way_1",
+      "type": "small",
+      "x": -430,
+      "y": 170,
+      "stat": "affinity/earth",
+      "amount": 2,
+      "links": [
+        "earth_quake_5"
+      ],
+      "element": "earth"
+    },
+    {
+      "id": "crystal_way_2",
+      "type": "small",
+      "x": -458,
+      "y": 198,
+      "stat": "potency",
+      "amount": 2,
+      "links": [
+        "crystal_way_1"
+      ],
+      "element": "earth"
+    },
+    {
+      "id": "crystal_gate",
+      "type": "small",
+      "x": -486,
+      "y": 226,
+      "stat": "affinity/earth",
+      "amount": 2,
+      "links": [
+        "crystal_way_2"
+      ],
+      "element": "crystal",
+      "requires": {
+        "stat": "affinity/earth",
+        "min": 10
+      }
+    },
+    {
+      "id": "crystal_start",
+      "type": "start",
+      "x": -515,
+      "y": 255,
+      "element": "crystal",
+      "spell": "elementalarcana:prism_bolt",
+      "links": [
+        "crystal_gate"
+      ]
+    },
+    {
+      "id": "crystal_facet_1",
+      "type": "small",
+      "x": -555,
+      "y": 255,
+      "stat": "ward",
+      "amount": 2,
+      "links": [
+        "crystal_start"
+      ],
+      "element": "crystal"
+    },
+    {
+      "id": "crystal_facet_2",
+      "type": "small",
+      "x": -595,
+      "y": 255,
+      "stat": "affinity/earth",
+      "amount": 2,
+      "links": [
+        "crystal_facet_1"
+      ],
+      "element": "crystal"
+    },
+    {
+      "id": "crystal_facet_3",
+      "type": "small",
+      "x": -635,
+      "y": 255,
+      "stat": "focus",
+      "amount": 2,
+      "links": [
+        "crystal_facet_2"
+      ],
+      "element": "crystal"
+    },
+    {
+      "id": "crystal_prismatic_ward",
+      "type": "notable",
+      "x": -675,
+      "y": 255,
+      "links": [
+        "crystal_facet_3"
+      ],
+      "stats": {
+        "ward": 6,
+        "affinity/earth": 4
+      },
+      "element": "crystal"
+    },
+    {
+      "id": "crystal_geode_1",
+      "type": "small",
+      "x": -543,
+      "y": 226,
+      "stat": "potency",
+      "amount": 2,
+      "links": [
+        "crystal_start"
+      ],
+      "element": "crystal"
+    },
+    {
+      "id": "crystal_geode_2",
+      "type": "small",
+      "x": -571,
+      "y": 198,
+      "stat": "affinity/earth",
+      "amount": 2,
+      "links": [
+        "crystal_geode_1"
+      ],
+      "element": "crystal"
+    }
+  ]
+}

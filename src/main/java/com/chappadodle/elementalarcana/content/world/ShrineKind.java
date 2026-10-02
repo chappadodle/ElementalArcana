@@ -24,6 +24,16 @@ public enum ShrineKind implements StringRepresentable {
         return element;
     }
 
+    /** The kind for {@code element}: its own if it has one (Ice does), else its family's. */
+    public static ShrineKind of(Element element) {
+        for (ShrineKind kind : values()) {
+            if (kind.element == element) {
+                return kind;
+            }
+        }
+        return of(element.family());
+    }
+
     @Override
     public String getSerializedName() {
         return element.name().toLowerCase(java.util.Locale.ROOT);

@@ -132,7 +132,7 @@ public class TowerMageEntity extends AbstractIllager {
         SpawnGroupData result = super.finalizeSpawn(level, difficulty, spawnType, spawnData);
         if (heart == null && spawnType != MobSpawnType.STRUCTURE) {
             // From an egg or a command: an element of its own.
-            entityData.set(ELEMENT, (byte) getRandom().nextInt(Element.values().length));
+            entityData.set(ELEMENT, (byte) MageTowerStructure.TOWER_ELEMENTS.get(getRandom().nextInt(MageTowerStructure.TOWER_ELEMENTS.size())).ordinal());
         }
         AttunementRank rank = magister ? AttunementRank.ARCHMAGE
                 : getRandom().nextFloat() < 0.25f ? AttunementRank.MAGUS : AttunementRank.ADEPT;

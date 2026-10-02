@@ -22,6 +22,14 @@ public final class ModSchools {
     public static final DeferredHolder<SpellSchool, SpellSchool> EARTH =
             SCHOOLS.register("earth", () -> new SpellSchool(0xB5895A, () -> SoundEvents.STONE_PLACE));
 
+    // The derived elements (docs/superpowers/specs/2026-10-03-derived-elements-design.md).
+    public static final DeferredHolder<SpellSchool, SpellSchool> CRYSTAL =
+            SCHOOLS.register("crystal", () -> new SpellSchool(0xD08CFF, () -> SoundEvents.AMETHYST_BLOCK_HIT));
+    public static final DeferredHolder<SpellSchool, SpellSchool> LIGHTNING =
+            SCHOOLS.register("lightning", () -> new SpellSchool(0xFFE14D, () -> SoundEvents.LIGHTNING_BOLT_IMPACT));
+    public static final DeferredHolder<SpellSchool, SpellSchool> RADIANCE =
+            SCHOOLS.register("radiance", () -> new SpellSchool(0xFFF1B8, () -> SoundEvents.BEACON_POWER_SELECT));
+
     private ModSchools() {
     }
 }

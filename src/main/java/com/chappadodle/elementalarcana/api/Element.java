@@ -11,7 +11,11 @@ public enum Element {
     WATER(0x3F9CFF),
     ICE(0x9EE6FF),
     WIND(0x8FE3C0),
-    EARTH(0xB5895A);
+    EARTH(0xB5895A),
+    // Derived elements (docs/superpowers/specs/2026-10-03-derived-elements-design.md).
+    CRYSTAL(0xD08CFF),
+    LIGHTNING(0xFFE14D),
+    RADIANCE(0xFFF1B8);
 
     private static final float STRONG = 1.5f;
     private static final float RESISTED = 0.5f;
@@ -27,29 +31,39 @@ public enum Element {
         return color;
     }
 
-    /** Whether this element is derived from another (Ice from Water) and so far rarer to awaken first. */
+    /**
+     * Whether this element is derived from another (Ice from Water, Crystal from Earth, Lightning
+     * from Wind, Radiance from Fire) and so far rarer to awaken first.
+     */
     public boolean derived() {
-        return this == ICE;
+        return family() != this;
     }
 
     /**
-     * The element family this element belongs to: Ice belongs to Water's. Affinity (a stat) is per
-     * family, so related elements are raised together.
+     * The element family this element belongs to: Ice belongs to Water's, Crystal to Earth's,
+     * Lightning to Wind's and Radiance to Fire's. Affinity (a stat) is per family, so related
+     * elements are raised together.
      */
     public Element family() {
-        return this == ICE ? WATER : this;
+        return switch (this) {
+            case ICE -> WATER;
+            case CRYSTAL -> EARTH;
+            case LIGHTNING -> WIND;
+            case RADIANCE -> FIRE;
+            default -> this;
+        };
     }
 
-    /** Fire is opposed to Water and to Ice ("Fire vs the cold"); every other pair is compatible. */
+    /** The Fire family is opposed to the Water family ("fire vs the cold"); every other pair is compatible. */
     public boolean opposes(Element other) {
-        return this == FIRE && (other == WATER || other == ICE)
-                || other == FIRE && (this == WATER || this == ICE);
+        return family() == FIRE && other.family() == WATER || family() == WATER && other.family() == FIRE;
     }
 
     /**
      * Damage multiplier for a spell of this element hitting a creature of {@code target}'s element
      * (null = a creature with no element). Water beats fire, fire beats ice, ice beats water, earth
-     * grounds wind, water erodes earth, and every element resists itself.
+     * grounds wind and lightning, water erodes earth, lightning runs through water, crystal splits
+     * wind and lightning, radiance burns the cold like fire, and every element resists itself.
      */
     public float multiplierAgainst(@Nullable Element target) {
         if (target == null) {
@@ -59,11 +73,13 @@ public enum Element {
             return RESISTED;
         }
         return switch (this) {
-            case FIRE -> target == ICE ? STRONG : target == WATER ? RESISTED : 1f;
+            case FIRE, RADIANCE -> target == ICE ? STRONG : target == WATER ? RESISTED : 1f;
             case WATER -> target == FIRE || target == EARTH ? STRONG : 1f;
             case ICE -> target == WATER ? STRONG : target == FIRE ? RESISTED : 1f;
             case WIND -> 1f;
-            case EARTH -> target == WIND ? STRONG : 1f;
+            case EARTH -> target == WIND || target == LIGHTNING ? STRONG : 1f;
+            case CRYSTAL -> target == WIND || target == LIGHTNING ? STRONG : 1f;
+            case LIGHTNING -> target == WATER ? STRONG : target == EARTH || target == CRYSTAL ? RESISTED : 1f;
         };
     }
 }

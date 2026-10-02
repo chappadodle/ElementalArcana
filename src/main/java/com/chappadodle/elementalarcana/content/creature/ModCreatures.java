@@ -17,7 +17,7 @@ import java.util.EnumMap;
 import java.util.Locale;
 import java.util.Map;
 
-/** The mod's creatures (docs/superpowers/specs/2026-10-02-wisps-design.md): the five elemental wisps and their spawn eggs. */
+/** The mod's creatures (docs/superpowers/specs/2026-10-02-wisps-design.md): a wisp of every element and their spawn eggs. */
 public final class ModCreatures {
     private static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(Registries.ENTITY_TYPE, ElementalArcana.MODID);
     private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ElementalArcana.MODID);
@@ -73,6 +73,9 @@ public final class ModCreatures {
             case ICE -> 0x8CCDFA;
             case WIND -> 0x78DEB2;
             case EARTH -> 0x786450;
+            case CRYSTAL -> 0x9A5CC8;
+            case LIGHTNING -> 0xE6C21E;
+            case RADIANCE -> 0xF2E2A8;
         };
     }
 
@@ -84,6 +87,9 @@ public final class ModCreatures {
             case ICE -> 0xFFFFFF;
             case WIND -> 0xF0FFF8;
             case EARTH -> 0xFFC460;
+            case CRYSTAL -> 0xF0D8FF;
+            case LIGHTNING -> 0xFFFFFF;
+            case RADIANCE -> 0xFFFFFF;
         };
     }
 }

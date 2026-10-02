@@ -52,17 +52,19 @@ class AwakeningRulesTest {
         assertEquals(Element.WATER, pick(water, 0.5));
         assertEquals(Element.WATER, pick(water, 0.989));
         assertEquals(Element.ICE, pick(water, 0.999));
-        assertEquals(Map.of(Element.FIRE, 100.0), weights(Element.FIRE));
+        // Every family has a derived element now: Fire's is Radiance.
+        assertEquals(Map.of(Element.FIRE, 100.0, Element.RADIANCE, 1.0), weights(Element.FIRE));
     }
 
     @Test
     void theBackgroundRollGivesEveryFamilyTheSameShare() {
         Map<Element, Double> any = anyWeights();
-        assertEquals(100.0, any.get(Element.FIRE), 1e-9);
-        assertEquals(100.0, any.get(Element.WIND), 1e-9);
-        assertEquals(100.0, any.get(Element.EARTH), 1e-9);
-        assertEquals(100.0, any.get(Element.WATER) + any.get(Element.ICE), 1e-9);
-        assertEquals(any.get(Element.WATER) / 100, any.get(Element.ICE), 1e-9);
+        // Each family totals 100, its derived element a hundredth of its base.
+        for (Element[] family : new Element[][]{{Element.FIRE, Element.RADIANCE}, {Element.WATER, Element.ICE},
+                {Element.WIND, Element.LIGHTNING}, {Element.EARTH, Element.CRYSTAL}}) {
+            assertEquals(100.0, any.get(family[0]) + any.get(family[1]), 1e-9);
+            assertEquals(any.get(family[0]) / 100, any.get(family[1]), 1e-9);
+        }
     }
 
     @Test

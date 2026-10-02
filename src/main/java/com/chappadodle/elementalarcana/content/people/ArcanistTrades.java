@@ -1,6 +1,7 @@
 package com.chappadodle.elementalarcana.content.people;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
+import com.chappadodle.elementalarcana.api.AttunementRules;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.content.ModItems;
 import com.chappadodle.elementalarcana.content.ModTabs;
@@ -78,8 +79,9 @@ public final class ArcanistTrades {
                 maxUses, xp, PRICE_MULTIPLIER);
     }
 
+    /** One of the elements creatures are commonly Attuned to, so its Essence is easy to come by. */
     private static Element anyElement(RandomSource random) {
-        return Element.values()[random.nextInt(Element.values().length)];
+        return AttunementRules.ATTUNABLE.get(random.nextInt(AttunementRules.ATTUNABLE.size()));
     }
 
     /** An element family that has a Catalyst (Fire, Water, Wind or Earth). */

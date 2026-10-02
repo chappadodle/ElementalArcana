@@ -28,6 +28,28 @@ class ElementTest {
     }
 
     @Test
+    void derivedElementsBelongToTheirKin() {
+        assertEquals(Element.EARTH, Element.CRYSTAL.family());
+        assertEquals(Element.WIND, Element.LIGHTNING.family());
+        assertEquals(Element.FIRE, Element.RADIANCE.family());
+        for (Element element : Element.values()) {
+            boolean derived = element == Element.ICE || element == Element.CRYSTAL || element == Element.LIGHTNING
+                    || element == Element.RADIANCE;
+            assertEquals(derived, element.derived(), element.name());
+            assertFalse(element.family().derived(), element.name());
+        }
+    }
+
+    @Test
+    void radianceTakesFiresSide() {
+        assertTrue(Element.RADIANCE.opposes(Element.WATER));
+        assertTrue(Element.RADIANCE.opposes(Element.ICE));
+        assertTrue(Element.WATER.opposes(Element.RADIANCE));
+        assertFalse(Element.RADIANCE.opposes(Element.FIRE));
+        assertFalse(Element.CRYSTAL.opposes(Element.LIGHTNING));
+    }
+
+    @Test
     void everythingElseIsCompatible() {
         assertFalse(Element.WATER.opposes(Element.ICE));
         assertFalse(Element.ICE.opposes(Element.WATER));
@@ -47,6 +69,14 @@ class ElementTest {
             "WIND, FIRE, 1.0", "WIND, WATER, 1.0", "WIND, ICE, 1.0", "WIND, WIND, 0.5", "WIND, NONE, 1.0",
             "WATER, EARTH, 1.5", "EARTH, WIND, 1.5", "EARTH, EARTH, 0.5", "EARTH, NONE, 1.0",
             "EARTH, FIRE, 1.0", "EARTH, WATER, 1.0", "EARTH, ICE, 1.0", "FIRE, EARTH, 1.0", "ICE, EARTH, 1.0", "WIND, EARTH, 1.0",
+            // The derived elements (docs/superpowers/specs/2026-10-03-derived-elements-design.md).
+            "CRYSTAL, WIND, 1.5", "CRYSTAL, LIGHTNING, 1.5", "CRYSTAL, CRYSTAL, 0.5", "CRYSTAL, EARTH, 1.0", "CRYSTAL, WATER, 1.0",
+            "CRYSTAL, NONE, 1.0", "EARTH, LIGHTNING, 1.5", "EARTH, CRYSTAL, 1.0", "WATER, CRYSTAL, 1.0",
+            "LIGHTNING, WATER, 1.5", "LIGHTNING, EARTH, 0.5", "LIGHTNING, CRYSTAL, 0.5", "LIGHTNING, LIGHTNING, 0.5",
+            "LIGHTNING, WIND, 1.0", "LIGHTNING, FIRE, 1.0", "LIGHTNING, ICE, 1.0", "LIGHTNING, NONE, 1.0", "WIND, LIGHTNING, 1.0",
+            "WATER, LIGHTNING, 1.0",
+            "RADIANCE, ICE, 1.5", "RADIANCE, WATER, 0.5", "RADIANCE, RADIANCE, 0.5", "RADIANCE, FIRE, 1.0", "RADIANCE, EARTH, 1.0",
+            "RADIANCE, NONE, 1.0", "FIRE, RADIANCE, 1.0", "WATER, RADIANCE, 1.0", "ICE, RADIANCE, 1.0",
     })
     void matchupChart(Element spell, String creature, float expected) {
         Element target = creature.equals("NONE") ? null : Element.valueOf(creature);

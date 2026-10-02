@@ -1,0 +1,129 @@
+{
+  "nodes": [
+    {
+      "id": "lightning_way_1",
+      "type": "small",
+      "x": 57,
+      "y": -317,
+      "stat": "affinity/wind",
+      "amount": 2,
+      "links": [
+        "gale_dash"
+      ],
+      "element": "wind"
+    },
+    {
+      "id": "lightning_way_2",
+      "type": "small",
+      "x": 85,
+      "y": -345,
+      "stat": "potency",
+      "amount": 2,
+      "links": [
+        "lightning_way_1"
+      ],
+      "element": "wind"
+    },
+    {
+      "id": "lightning_gate",
+      "type": "small",
+      "x": 113,
+      "y": -373,
+      "stat": "affinity/wind",
+      "amount": 2,
+      "links": [
+        "lightning_way_2"
+      ],
+      "element": "lightning",
+      "requires": {
+        "stat": "affinity/wind",
+        "min": 10
+      }
+    },
+    {
+      "id": "lightning_start",
+      "type": "start",
+      "x": 141,
+      "y": -401,
+      "element": "lightning",
+      "spell": "elementalarcana:chain_lightning",
+      "links": [
+        "lightning_gate"
+      ]
+    },
+    {
+      "id": "lightning_storm_1",
+      "type": "small",
+      "x": 141,
+      "y": -441,
+      "stat": "potency",
+      "amount": 2,
+      "links": [
+        "lightning_start"
+      ],
+      "element": "lightning"
+    },
+    {
+      "id": "lightning_storm_2",
+      "type": "small",
+      "x": 141,
+      "y": -481,
+      "stat": "affinity/wind",
+      "amount": 2,
+      "links": [
+        "lightning_storm_1"
+      ],
+      "element": "lightning"
+    },
+    {
+      "id": "lightning_storm_3",
+      "type": "small",
+      "x": 141,
+      "y": -521,
+      "stat": "focus",
+      "amount": 2,
+      "links": [
+        "lightning_storm_2"
+      ],
+      "element": "lightning"
+    },
+    {
+      "id": "lightning_static_charge",
+      "type": "notable",
+      "x": 141,
+      "y": -561,
+      "links": [
+        "lightning_storm_3"
+      ],
+      "stats": {
+        "potency": 6,
+        "affinity/wind": 4
+      },
+      "element": "lightning"
+    },
+    {
+      "id": "lightning_spark_1",
+      "type": "small",
+      "x": 181,
+      "y": -401,
+      "stat": "focus",
+      "amount": 2,
+      "links": [
+        "lightning_start"
+      ],
+      "element": "lightning"
+    },
+    {
+      "id": "lightning_spark_2",
+      "type": "small",
+      "x": 221,
+      "y": -401,
+      "stat": "affinity/wind",
+      "amount": 2,
+      "links": [
+        "lightning_spark_1"
+      ],
+      "element": "lightning"
+    }
+  ]
+}

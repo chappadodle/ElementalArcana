@@ -37,9 +37,11 @@ public class MageTowerStructure extends Structure {
     private static final int MAX_SLOPE = 8;
     private static final int MIN_DISTANCE = 800;
     private static final Map<Element, TagKey<Biome>> BIOME_ELEMENTS = new EnumMap<>(Element.class);
+    /** The elements towers are built of (each has its own stone): the base elements and Ice. */
+    public static final List<Element> TOWER_ELEMENTS = List.of(Element.FIRE, Element.WATER, Element.ICE, Element.WIND, Element.EARTH);
 
     static {
-        for (Element element : Element.values()) {
+        for (Element element : TOWER_ELEMENTS) {
             BIOME_ELEMENTS.put(element, TagKey.create(Registries.BIOME, ElementalArcana.id("attunes/" + element.name().toLowerCase(Locale.ROOT))));
         }
     }
@@ -92,7 +94,7 @@ public class MageTowerStructure extends Structure {
             }
         });
         if (elements.isEmpty()) {
-            return Element.values()[context.random().nextInt(Element.values().length)];
+            return TOWER_ELEMENTS.get(context.random().nextInt(TOWER_ELEMENTS.size()));
         }
         return elements.get(context.random().nextInt(elements.size()));
     }

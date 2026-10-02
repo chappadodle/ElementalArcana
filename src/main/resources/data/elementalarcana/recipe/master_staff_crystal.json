@@ -1,0 +1,38 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " CE",
+    "DSE",
+    "D  "
+  ],
+  "key": {
+    "C": {
+      "type": "neoforge:components",
+      "items": "elementalarcana:guardian_core",
+      "components": {
+        "elementalarcana:element": "earth"
+      }
+    },
+    "E": {
+      "item": "elementalarcana:crystal_essence"
+    },
+    "S": {
+      "type": "neoforge:components",
+      "items": "elementalarcana:adept_staff",
+      "components": {
+        "elementalarcana:element": "crystal"
+      }
+    },
+    "D": {
+      "item": "minecraft:diamond"
+    }
+  },
+  "result": {
+    "id": "elementalarcana:master_staff",
+    "count": 1,
+    "components": {
+      "elementalarcana:element": "crystal"
+    }
+  }
+}

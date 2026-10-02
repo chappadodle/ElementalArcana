@@ -4,6 +4,9 @@
     "elementalarcana:water_essence",
     "elementalarcana:ice_essence",
     "elementalarcana:wind_essence",
-    "elementalarcana:earth_essence"
+    "elementalarcana:earth_essence",
+    "elementalarcana:crystal_essence",
+    "elementalarcana:lightning_essence",
+    "elementalarcana:radiance_essence"
   ]
 }

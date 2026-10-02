@@ -78,9 +78,15 @@ public final class ElementalMatchups {
         }
     }
 
-    /** The element of a vanilla damage source: burning and lava, freezing, drowning, falling, and falling blocks and suffocation (earth). */
+    /**
+     * The element of a vanilla damage source: a lightning strike, burning and lava, freezing,
+     * drowning, falling, and falling blocks and suffocation (earth).
+     */
     @Nullable
     private static Element natureOf(DamageSource source) {
+        if (source.is(DamageTypes.LIGHTNING_BOLT)) {
+            return Element.LIGHTNING;
+        }
         if (source.is(DamageTypeTags.IS_FIRE)) {
             return Element.FIRE;
         }

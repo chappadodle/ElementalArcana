@@ -169,6 +169,9 @@ public class WispEntity extends Monster implements FlyingAnimal {
             case ICE -> ParticleTypes.SNOWFLAKE;
             case WIND -> ModContent.WIND_STREAK.get();
             case EARTH -> new BlockParticleOption(ParticleTypes.FALLING_DUST, Blocks.ROOTED_DIRT.defaultBlockState());
+            case CRYSTAL -> new BlockParticleOption(ParticleTypes.FALLING_DUST, Blocks.AMETHYST_BLOCK.defaultBlockState());
+            case LIGHTNING -> ParticleTypes.ELECTRIC_SPARK;
+            case RADIANCE -> ParticleTypes.END_ROD;
         };
     }
 
@@ -179,6 +182,9 @@ public class WispEntity extends Monster implements FlyingAnimal {
             case ICE -> ModContent.FROST_SPARKLE.get();
             case WIND -> ParticleTypes.CLOUD;
             case EARTH -> new BlockParticleOption(ParticleTypes.BLOCK, Blocks.MOSSY_COBBLESTONE.defaultBlockState());
+            case CRYSTAL -> new BlockParticleOption(ParticleTypes.BLOCK, Blocks.AMETHYST_BLOCK.defaultBlockState());
+            case LIGHTNING -> ParticleTypes.ELECTRIC_SPARK;
+            case RADIANCE -> ParticleTypes.END_ROD;
         };
     }
 

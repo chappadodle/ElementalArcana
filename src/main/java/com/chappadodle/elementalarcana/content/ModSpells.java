@@ -5,6 +5,7 @@ import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.content.spell.BubblePrisonSpell;
 import com.chappadodle.elementalarcana.content.spell.BoulderSpell;
+import com.chappadodle.elementalarcana.content.spell.ChainLightningSpell;
 import com.chappadodle.elementalarcana.content.spell.FireballSpell;
 import com.chappadodle.elementalarcana.content.spell.FlameBurstSpell;
 import com.chappadodle.elementalarcana.content.spell.FrostNovaSpell;
@@ -13,6 +14,8 @@ import com.chappadodle.elementalarcana.content.spell.GaleDashSpell;
 import com.chappadodle.elementalarcana.content.spell.HealingRainSpell;
 import com.chappadodle.elementalarcana.content.spell.HydroJetSpell;
 import com.chappadodle.elementalarcana.content.spell.IcicleSpell;
+import com.chappadodle.elementalarcana.content.spell.PrismBoltSpell;
+import com.chappadodle.elementalarcana.content.spell.SmiteSpell;
 import com.chappadodle.elementalarcana.content.spell.TidalWaveSpell;
 import com.chappadodle.elementalarcana.content.spell.StoneSkinSpell;
 import com.chappadodle.elementalarcana.content.spell.TremorSpell;
@@ -44,6 +47,11 @@ public final class ModSpells {
     public static final DeferredHolder<Spell, BoulderSpell> BOULDER = SPELLS.register("boulder", BoulderSpell::new);
     public static final DeferredHolder<Spell, StoneSkinSpell> STONE_SKIN = SPELLS.register("stone_skin", StoneSkinSpell::new);
     public static final DeferredHolder<Spell, TremorSpell> TREMOR = SPELLS.register("tremor", TremorSpell::new);
+
+    // The derived elements' first spells (docs/superpowers/specs/2026-10-03-derived-elements-design.md).
+    public static final DeferredHolder<Spell, PrismBoltSpell> PRISM_BOLT = SPELLS.register("prism_bolt", PrismBoltSpell::new);
+    public static final DeferredHolder<Spell, ChainLightningSpell> CHAIN_LIGHTNING = SPELLS.register("chain_lightning", ChainLightningSpell::new);
+    public static final DeferredHolder<Spell, SmiteSpell> SMITE = SPELLS.register("smite", SmiteSpell::new);
 
     private ModSpells() {
     }

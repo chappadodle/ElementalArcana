@@ -9,8 +9,9 @@ import java.util.Map;
  * The dice for awakening (docs/superpowers/specs/2026-10-01-awakening-design.md). Plain Java, no
  * Minecraft types (unit tested). Your first element wakes by itself: a small chance each Minecraft
  * day, a much bigger one from day 10, certain by day 16, and a one-in-three chance each time you
- * survive a brush with an element (certain from day 10). A derived element (Ice) is a hundredth as
- * likely as its base element. Extra elements come from Catalysts: each family you already hold makes
+ * survive a brush with an element (certain from day 10). A derived element (Ice, Crystal, Lightning,
+ * Radiance) is a hundredth as likely as its base element (but a brush with lightning wakes Lightning
+ * itself, see AwakeningEvents). Extra elements come from Catalysts: each family you already hold makes
  * the next about 4 times harder, and a level milestone (10, 20, 30...) makes it realistic.
  */
 public final class AwakeningRules {

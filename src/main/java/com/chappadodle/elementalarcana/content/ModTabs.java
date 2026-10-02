@@ -7,6 +7,7 @@ import com.chappadodle.elementalarcana.content.brew.ModBrews;
 import com.chappadodle.elementalarcana.content.gear.ModGear;
 import com.chappadodle.elementalarcana.content.people.ModPeople;
 import com.chappadodle.elementalarcana.content.tower.GuardianCoreItem;
+import com.chappadodle.elementalarcana.content.tower.MageTowerStructure;
 import com.chappadodle.elementalarcana.content.tower.ModTowers;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -45,7 +46,7 @@ public final class ModTabs {
                 output.accept(ModPeople.ARCANE_LECTERN_ITEM.get());
                 output.accept(ModPeople.SCROLL_OF_UNBINDING.get());
                 output.accept(ModPeople.TOME_OF_INSIGHT.get());
-                for (Element element : Element.values()) {
+                for (Element element : MageTowerStructure.TOWER_ELEMENTS) {
                     output.accept(GuardianCoreItem.of(element));
                 }
                 output.accept(ModBrews.WISP_MOTE.get());

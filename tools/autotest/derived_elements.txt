@@ -1,0 +1,136 @@
+# The derived elements in game: Prism Bolt bursting on a husk (shards on to two more), Chain
+# Lightning leaping down a row of husks (one soaked, so it carries on to a fifth), Smite's mark and
+# pillar, the three wisps by day and night, the lightning brush (a sleeping player struck at half
+# health wakes to Lightning), and the three clusters in the tree view. Health and chat go to the log.
+# Husks, not zombies: they don't burn at noon. Mob loot is off meanwhile, so nothing ends up in the
+# hand, and the tree is reset (other tests leave keystones like Blood Magic behind).
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doMobSpawning false
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobLoot false
+cmd gamemode creative
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd tp @s 0.5 100 0.5 -90 5
+wait 40
+cmd kill @e[type=!player]
+cmd kill @e[type=item]
+cmd clear @s
+cmd fill -4 99 -8 30 99 8 minecraft:grass_block
+cmd fill -4 100 -8 30 108 8 minecraft:air
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken crystal
+cmd arcana level set 30
+cmd arcana mana fill
+cmd title @s clear
+wait 40
+cmd summon husk 9.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b}
+cmd summon husk 13.5 100 -1.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b}
+cmd summon husk 13.5 100 2.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b}
+wait 20
+select elementalarcana:prism_bolt
+press
+release
+wait 2
+shot crystal_prism_bolt
+wait 3
+shot crystal_prism_shards
+wait 20
+cmd execute as @e[type=husk] run data get entity @s Health
+# Chain Lightning.
+cmd kill @e[type=!player]
+cmd arcana affinity reset
+cmd arcana awaken lightning
+cmd arcana mana fill
+cmd title @s clear
+wait 40
+cmd summon husk 9.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b}
+cmd summon husk 13.5 100 -2.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b}
+cmd summon husk 17.5 100 1.5 {NoAI:1b,Tags:["eat","eawet"],PersistenceRequired:1b}
+cmd summon husk 21.5 100 -1.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b}
+cmd summon husk 25.5 100 1.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b}
+cmd effect give @e[tag=eawet] elementalarcana:wet 30 0
+wait 20
+select elementalarcana:chain_lightning
+press
+release
+wait 1
+shot lightning_chain
+wait 3
+shot lightning_chain_after
+wait 10
+cmd execute as @e[type=husk] run data get entity @s Health
+# Smite: the mark, then the pillar three quarters of a second later (on a sturdier husk, so its
+# health shows the undead taking half again as much).
+cmd kill @e[type=!player]
+cmd arcana affinity reset
+cmd arcana awaken radiance
+cmd arcana mana fill
+cmd title @s clear
+wait 40
+cmd summon husk 9.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:60f,attributes:[{id:"minecraft:generic.max_health",base:60.0}]}
+wait 20
+select elementalarcana:smite
+press
+release
+wait 6
+shot radiance_smite_mark
+wait 11
+shot radiance_smite_pillar
+wait 20
+cmd execute as @e[type=husk] run data get entity @s Health
+# The three wisps.
+cmd kill @e[type=!player]
+look -90 0
+cmd execute at @s anchored eyes run summon elementalarcana:crystal_wisp ^1.5 ^-0.3 ^3 {NoAI:1b}
+cmd execute at @s anchored eyes run summon elementalarcana:lightning_wisp ^0 ^-0.3 ^3 {NoAI:1b}
+cmd execute at @s anchored eyes run summon elementalarcana:radiance_wisp ^-1.5 ^-0.3 ^3 {NoAI:1b}
+wait 40
+shot derived_wisps
+cmd time set midnight
+wait 20
+shot derived_wisps_night
+cmd time set noon
+cmd kill @e[type=!player]
+# The lightning brush: from full health, 10 damage, then the bolt's 5 leaves 5 (3 hearts or less).
+# Natural regeneration is off meanwhile so the numbers hold. The first hit is the one that counts;
+# a bolt flashes again a little later, so the player goes creative right after it.
+cmd arcana affinity reset
+cmd arcana awaken day 12
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd gamerule naturalRegeneration false
+cmd gamemode survival
+cmd effect give @s minecraft:fire_resistance 60 0 true
+wait 10
+cmd damage @s 10 minecraft:generic
+wait 30
+cmd data get entity @s Health
+cmd execute at @s run summon lightning_bolt ~ ~ ~
+wait 2
+shot lightning_brush_strike
+cmd gamemode creative
+cmd gamerule naturalRegeneration true
+cmd data get entity @s Health
+wait 40
+shot lightning_brush_awake
+cmd effect give @s minecraft:instant_health 1 10 true
+# The clusters, with all three held.
+cmd arcana awaken crystal
+cmd arcana awaken radiance
+screen tree elementalarcana:chain_lightning
+wait 20
+shot derived_tree_lightning
+screen close
+screen tree elementalarcana:smite
+wait 20
+shot derived_tree_radiance
+screen close
+screen tree elementalarcana:prism_bolt
+wait 20
+shot derived_tree_crystal
+screen close
+cmd gamerule doMobLoot true
+quit

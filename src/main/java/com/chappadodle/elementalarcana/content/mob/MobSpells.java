@@ -19,6 +19,9 @@ public final class MobSpells {
         BY_ELEMENT.put(Element.ICE, IceMobSpells.ALL);
         BY_ELEMENT.put(Element.WIND, WindMobSpells.ALL);
         BY_ELEMENT.put(Element.EARTH, EarthMobSpells.ALL);
+        BY_ELEMENT.put(Element.CRYSTAL, DerivedMobSpells.CRYSTAL);
+        BY_ELEMENT.put(Element.LIGHTNING, DerivedMobSpells.LIGHTNING);
+        BY_ELEMENT.put(Element.RADIANCE, DerivedMobSpells.RADIANCE);
     }
 
     private MobSpells() {

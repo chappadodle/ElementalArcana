@@ -385,6 +385,69 @@ SPRITES = {
         "kddkd...........",
         "kkk.............",
     ]),
+    # Prism Bolt: a faceted violet crystal flying up and to the right, bursting into three shards.
+    "spell/prism_bolt": ({
+        "k": 0x3A1A5A, "d": 0x7A3FB8, "m": 0xB070F0, "l": 0xD8B0FF, "w": 0xFFFFFF,
+    }, [
+        "................",
+        "..........w...w.",
+        "..........lk.lk.",
+        ".........mk.mk..",
+        "................",
+        "..............lw",
+        ".............mkk",
+        ".....kkkk.......",
+        "....klwmk.......",
+        "...klwmdk.......",
+        "..kllmddk.......",
+        ".kllmddk........",
+        ".klmddk.........",
+        ".kmddk..........",
+        ".kkkk...........",
+        "................",
+    ]),
+    # Chain Lightning: a jagged bolt.
+    "spell/chain_lightning": ({
+        "k": 0x5A4A00, "y": 0xFFE14D, "w": 0xFFFFE0, "o": 0xE0A020,
+    }, [
+        "................",
+        ".........kkkk...",
+        "........kwyyk...",
+        ".......kwyyk....",
+        "......kwyyk.....",
+        ".....kwyyykkk...",
+        "....kwyyyyyyk...",
+        "...kkkkwyyyk....",
+        "......kwyyk.....",
+        ".....kwyyk......",
+        "....kwyok.......",
+        "...kwyok........",
+        "...kyok.........",
+        "..kyok..........",
+        "..kok...........",
+        "..kk............",
+    ]),
+    # Smite: a pillar of light striking the ground, rays thrown out where it lands.
+    "spell/smite": ({
+        "g": 0xB8862E, "o": 0xF2C860, "y": 0xFFE9A0, "w": 0xFFFFFF,
+    }, [
+        ".....gowwog.....",
+        ".....oywwyo.....",
+        ".....oywwyo.....",
+        ".....oywwyo.....",
+        ".....oywwyo.....",
+        ".....oywwyo.....",
+        ".y...oywwyo...y.",
+        "..y..oywwyo..y..",
+        "...y.oywwyo.y...",
+        "....oywwwwyo....",
+        "..yyywwwwwwyyy..",
+        "y..oywwwwwwyo..y",
+        ".gooyywwwwyyoog.",
+        "..ggooyyyyoogg..",
+        "....gggggggg....",
+        "................",
+    ]),
     "particle/ember_0": ({"w": 0xFFFFFFFF, "y": 0xFFFFE89A, "o": 0x90FFB040}, [
         "........",
         "........",
@@ -1125,7 +1188,11 @@ def main():
         "ice": ((255, 255, 255), (160, 225, 255), (70, 140, 200)),
         "wind": ((245, 255, 250), (150, 225, 195), (60, 140, 110)),
         "earth": ((250, 235, 205), (190, 140, 85), (95, 62, 38)),
+        "crystal": ((250, 235, 255), (200, 130, 255), (90, 40, 150)),
+        "lightning": ((255, 255, 230), (255, 220, 60), (150, 110, 10)),
+        "radiance": ((255, 255, 250), (255, 235, 170), (190, 150, 70)),
     }
+    derived = {"ice", "crystal", "lightning", "radiance"}
     for path, make in ((ASSETS / "spell/bubble_prison.png", bubble_icon),):
         make().save(path)
         print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
@@ -1159,7 +1226,7 @@ def main():
         stone_texture(seed, base, light, dark).save(stone_path)
         print("wrote", stone_path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
     for name, colors in essences.items():
-        if name != "ice":
+        if name not in derived:  # derived elements have no Catalyst
             catalyst_path = ASSETS / f"item/{name}_catalyst.png"
             catalyst(*colors).save(catalyst_path)
             print("wrote", catalyst_path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))

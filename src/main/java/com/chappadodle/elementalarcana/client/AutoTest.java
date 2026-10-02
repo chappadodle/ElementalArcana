@@ -81,6 +81,7 @@ public final class AutoTest {
     private static List<String> steps;
     private static int index;
     private static int waitTicks;
+    private static int respawnCooldown;
     private static boolean finished;
 
     private AutoTest() {
@@ -93,6 +94,15 @@ public final class AutoTest {
         }
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || minecraft.level == null || minecraft.getSingleplayerServer() == null) {
+            return;
+        }
+        if (minecraft.player.isDeadOrDying()) {
+            // A player who died (in this run, or in the saved world) comes back first: steps need one alive.
+            if (respawnCooldown-- <= 0) {
+                LOGGER.info("[autotest] respawning");
+                minecraft.player.respawn();
+                respawnCooldown = 20;
+            }
             return;
         }
         if (steps == null) {

@@ -5,6 +5,9 @@
     "elementalarcana:water_spell",
     "elementalarcana:ice_spell",
     "elementalarcana:wind_spell",
-    "elementalarcana:earth_spell"
+    "elementalarcana:earth_spell",
+    "elementalarcana:crystal_spell",
+    "elementalarcana:lightning_spell",
+    "elementalarcana:radiance_spell"
   ]
 }

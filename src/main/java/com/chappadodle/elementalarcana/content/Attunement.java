@@ -214,6 +214,9 @@ public final class Attunement {
             case ICE -> ParticleTypes.SNOWFLAKE;
             case WIND -> ModContent.WIND_STREAK.get();
             case EARTH -> new BlockParticleOption(ParticleTypes.FALLING_DUST, Blocks.DIRT.defaultBlockState());
+            case CRYSTAL -> new BlockParticleOption(ParticleTypes.FALLING_DUST, Blocks.AMETHYST_BLOCK.defaultBlockState());
+            case LIGHTNING -> ParticleTypes.ELECTRIC_SPARK;
+            case RADIANCE -> ParticleTypes.END_ROD;
         };
     }
 }

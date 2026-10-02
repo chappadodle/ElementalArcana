@@ -77,7 +77,7 @@ public class MageTowerPiece extends StructurePiece {
 
     private Palette palette() {
         return switch (element) {
-            case FIRE -> new Palette(Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState(), Blocks.RED_NETHER_BRICKS.defaultBlockState(),
+            case FIRE, RADIANCE -> new Palette(Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState(), Blocks.RED_NETHER_BRICKS.defaultBlockState(),
                     Blocks.POLISHED_BLACKSTONE.defaultBlockState(), Blocks.POLISHED_BLACKSTONE_BRICK_STAIRS.defaultBlockState(),
                     Blocks.ORANGE_STAINED_GLASS_PANE.defaultBlockState(), Blocks.ORANGE_STAINED_GLASS.defaultBlockState(),
                     Blocks.SHROOMLIGHT.defaultBlockState(), Blocks.GILDED_BLACKSTONE.defaultBlockState(),
@@ -92,12 +92,12 @@ public class MageTowerPiece extends StructurePiece {
                     Blocks.LIGHT_BLUE_STAINED_GLASS_PANE.defaultBlockState(), Blocks.LIGHT_BLUE_STAINED_GLASS.defaultBlockState(),
                     Blocks.SEA_LANTERN.defaultBlockState(), Blocks.BLUE_ICE.defaultBlockState(),
                     Blocks.PACKED_ICE.defaultBlockState(), Blocks.PACKED_ICE.defaultBlockState());
-            case WIND -> new Palette(Blocks.CALCITE.defaultBlockState(), Blocks.SMOOTH_QUARTZ.defaultBlockState(),
+            case WIND, LIGHTNING -> new Palette(Blocks.CALCITE.defaultBlockState(), Blocks.SMOOTH_QUARTZ.defaultBlockState(),
                     Blocks.SMOOTH_QUARTZ.defaultBlockState(), Blocks.QUARTZ_STAIRS.defaultBlockState(),
                     Blocks.WHITE_STAINED_GLASS_PANE.defaultBlockState(), Blocks.WHITE_STAINED_GLASS.defaultBlockState(),
                     Blocks.PEARLESCENT_FROGLIGHT.defaultBlockState(), Blocks.CHISELED_QUARTZ_BLOCK.defaultBlockState(),
                     Blocks.QUARTZ_PILLAR.defaultBlockState(), Blocks.STONE.defaultBlockState());
-            case EARTH -> new Palette(Blocks.DEEPSLATE_BRICKS.defaultBlockState(), Blocks.MOSSY_STONE_BRICKS.defaultBlockState(),
+            case EARTH, CRYSTAL -> new Palette(Blocks.DEEPSLATE_BRICKS.defaultBlockState(), Blocks.MOSSY_STONE_BRICKS.defaultBlockState(),
                     Blocks.POLISHED_DEEPSLATE.defaultBlockState(), Blocks.DEEPSLATE_BRICK_STAIRS.defaultBlockState(),
                     Blocks.GREEN_STAINED_GLASS_PANE.defaultBlockState(), Blocks.GREEN_STAINED_GLASS.defaultBlockState(),
                     Blocks.VERDANT_FROGLIGHT.defaultBlockState(), Blocks.MOSS_BLOCK.defaultBlockState(),
@@ -281,7 +281,7 @@ public class MageTowerPiece extends StructurePiece {
     }
 
     private ShrineKind kind() {
-        return ShrineKind.valueOf(element.name());
+        return ShrineKind.of(element);
     }
 
     private static ResourceKey<LootTable> lootTable(String room) {

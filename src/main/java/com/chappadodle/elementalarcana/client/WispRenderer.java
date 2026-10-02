@@ -57,6 +57,9 @@ public class WispRenderer extends MobRenderer<WispEntity, WispModel> {
             case ICE -> 0xA8E4FF;
             case WIND -> 0x90F0C8;
             case EARTH -> 0xFFB650;
+            case CRYSTAL -> 0xD08CFF;
+            case LIGHTNING -> 0xFFE14D;
+            case RADIANCE -> 0xFFEBB0;
         };
     }
 

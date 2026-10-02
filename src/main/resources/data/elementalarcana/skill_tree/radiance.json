@@ -1,0 +1,129 @@
+{
+  "nodes": [
+    {
+      "id": "radiance_way_1",
+      "type": "small",
+      "x": 430,
+      "y": 170,
+      "stat": "affinity/fire",
+      "amount": 2,
+      "links": [
+        "flame_burst"
+      ],
+      "element": "fire"
+    },
+    {
+      "id": "radiance_way_2",
+      "type": "small",
+      "x": 458,
+      "y": 198,
+      "stat": "potency",
+      "amount": 2,
+      "links": [
+        "radiance_way_1"
+      ],
+      "element": "fire"
+    },
+    {
+      "id": "radiance_gate",
+      "type": "small",
+      "x": 486,
+      "y": 226,
+      "stat": "affinity/fire",
+      "amount": 2,
+      "links": [
+        "radiance_way_2"
+      ],
+      "element": "radiance",
+      "requires": {
+        "stat": "affinity/fire",
+        "min": 10
+      }
+    },
+    {
+      "id": "radiance_start",
+      "type": "start",
+      "x": 515,
+      "y": 255,
+      "element": "radiance",
+      "spell": "elementalarcana:smite",
+      "links": [
+        "radiance_gate"
+      ]
+    },
+    {
+      "id": "radiance_dawn_1",
+      "type": "small",
+      "x": 555,
+      "y": 255,
+      "stat": "vitality",
+      "amount": 2,
+      "links": [
+        "radiance_start"
+      ],
+      "element": "radiance"
+    },
+    {
+      "id": "radiance_dawn_2",
+      "type": "small",
+      "x": 595,
+      "y": 255,
+      "stat": "affinity/fire",
+      "amount": 2,
+      "links": [
+        "radiance_dawn_1"
+      ],
+      "element": "radiance"
+    },
+    {
+      "id": "radiance_dawn_3",
+      "type": "small",
+      "x": 635,
+      "y": 255,
+      "stat": "reservoir",
+      "amount": 2,
+      "links": [
+        "radiance_dawn_2"
+      ],
+      "element": "radiance"
+    },
+    {
+      "id": "radiance_inner_light",
+      "type": "notable",
+      "x": 675,
+      "y": 255,
+      "links": [
+        "radiance_dawn_3"
+      ],
+      "stats": {
+        "vitality": 6,
+        "affinity/fire": 4
+      },
+      "element": "radiance"
+    },
+    {
+      "id": "radiance_halo_1",
+      "type": "small",
+      "x": 515,
+      "y": 295,
+      "stat": "ward",
+      "amount": 2,
+      "links": [
+        "radiance_start"
+      ],
+      "element": "radiance"
+    },
+    {
+      "id": "radiance_halo_2",
+      "type": "small",
+      "x": 515,
+      "y": 335,
+      "stat": "affinity/fire",
+      "amount": 2,
+      "links": [
+        "radiance_halo_1"
+      ],
+      "element": "radiance"
+    }
+  ]
+}

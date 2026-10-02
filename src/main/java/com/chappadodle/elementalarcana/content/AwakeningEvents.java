@@ -88,16 +88,24 @@ public final class AwakeningEvents {
         BRUSH_AT.put(player.getUUID(), now + BRUSH_GAP_TICKS);
         int day = data.awakeningDay(player.serverLevel().getDayTime());
         if (player.getRandom().nextDouble() < AwakeningRules.brushChance(day)) {
-            Element element = AwakeningRules.pick(AwakeningRules.weights(family), player.getRandom().nextDouble());
+            // Lightning is rarer than its Wind kin, but whoever lives through a bolt of it wakes to it.
+            Element element = kind.equals("lightning") ? Element.LIGHTNING
+                    : AwakeningRules.pick(AwakeningRules.weights(family), player.getRandom().nextDouble());
             if (element != null) {
                 Awakenings.wake(player, element, Component.translatable("message.elementalarcana.awakening.brush." + kind));
             }
         }
     }
 
-    /** Which kind of brush a damage source is: fire, drowning, freezing, fall or earth (a falling block or suffocation); null for anything else. */
+    /**
+     * Which kind of brush a damage source is: lightning, fire, drowning, freezing, fall or earth (a
+     * falling block or suffocation); null for anything else.
+     */
     @Nullable
     private static String kindOf(DamageSource source) {
+        if (source.is(DamageTypes.LIGHTNING_BOLT)) {
+            return "lightning";
+        }
         if (source.is(DamageTypeTags.IS_FIRE)) {
             return "fire";
         }
@@ -123,7 +131,7 @@ public final class AwakeningEvents {
         return switch (kind) {
             case "fire" -> Element.FIRE;
             case "drowning", "freezing" -> Element.WATER;
-            case "fall" -> Element.WIND;
+            case "fall", "lightning" -> Element.WIND;
             case "earth" -> Element.EARTH;
             default -> null;
         };

@@ -77,6 +77,9 @@ public final class MobCasting {
             case ICE -> ModContent.FROST_SPARKLE.get();
             case WIND -> ModContent.WIND_STREAK.get();
             case EARTH -> new BlockParticleOption(ParticleTypes.BLOCK, Blocks.STONE.defaultBlockState());
+            case CRYSTAL -> new BlockParticleOption(ParticleTypes.BLOCK, Blocks.AMETHYST_BLOCK.defaultBlockState());
+            case LIGHTNING -> ParticleTypes.ELECTRIC_SPARK;
+            case RADIANCE -> ParticleTypes.END_ROD;
         };
     }
 }

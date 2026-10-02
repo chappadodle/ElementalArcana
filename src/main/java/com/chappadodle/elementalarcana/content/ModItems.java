@@ -16,7 +16,7 @@ import java.util.Map;
 
 /**
  * The mod's items, listed in the Ingredients creative tab: one Elemental Essence per element, and a
- * Catalyst for each element family that isn't derived (Fire, Water, Wind; see CatalystItem).
+ * Catalyst for each element family (Fire, Water, Wind, Earth; see CatalystItem).
  */
 public final class ModItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ElementalArcana.MODID);
@@ -44,7 +44,7 @@ public final class ModItems {
         return ESSENCES.get(element).get();
     }
 
-    /** The Catalyst for {@code family}'s base element (null for derived elements like Ice). */
+    /** The Catalyst for {@code family}'s base element (null for derived elements: Ice, Crystal, Lightning, Radiance). */
     public static Item catalyst(Element family) {
         DeferredItem<CatalystItem> item = CATALYSTS.get(family);
         return item == null ? null : item.get();

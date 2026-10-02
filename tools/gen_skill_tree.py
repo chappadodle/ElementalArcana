@@ -7,7 +7,10 @@ Layout (1 unit = 1 screen pixel at zoom 1, y grows downward):
 - Wind to the north, Fire to the east, Water to the south, Earth to the west: a spoke
   node, the element's start, and arms of small nodes and spells leaving it;
 - each leveled spell is one "path" entry, expanded by the game into its upgrade chain and forks;
-- Ice as a cluster off Water's outer edge, behind a gate that needs Water Affinity 10.
+- Ice as a cluster off Water's outer edge, behind a gate that needs Water Affinity 10;
+- the other derived elements the same way (docs/superpowers/specs/2026-10-03-derived-elements-design.md):
+  Lightning off Wind's Gale Dash, Radiance off Fire's Flame Burst, Crystal off Earth's quake arm,
+  each behind a gate that needs its family's Affinity 10.
 
 Run it after changing the layout: python3 tools/gen_skill_tree.py
 """
@@ -20,7 +23,7 @@ NS = "elementalarcana:"
 STEP = 40
 STATS = ["reservoir", "potency", "focus", "ward", "vitality", "insight"]
 
-files = {name: [] for name in ("core", "fire", "water", "wind", "earth", "ice")}
+files = {name: [] for name in ("core", "fire", "water", "wind", "earth", "ice", "crystal", "lightning", "radiance")}
 positions = {}
 
 
@@ -110,7 +113,7 @@ def region(file, element, angle, starter, arms):
 
 # Each region ends one arm in a notable (several stats at once) and a keystone (a rule of magic
 # changed, for better and worse; see docs/superpowers/specs/2026-10-02-notables-and-keystones-design.md).
-region("wind", "wind", -90, "wind_blade", [
+wind_ends = region("wind", "wind", -90, "wind_blade", [
     ("dash", 45, [("spell", "gale_dash")]),
     ("sky", -45, [("stat", "affinity/wind"), ("stat", "focus"), ("stat", "affinity/wind"), ("stat", "potency"),
                   ("spell", "updraft")]),
@@ -118,7 +121,7 @@ region("wind", "wind", -90, "wind_blade", [
                    ("notable", ("wind_tailwind", {"affinity/wind": 6, "focus": 4})),
                    ("keystone", ("wind_gale_step", "gale_step"))]),
 ])
-region("fire", "fire", 0, "fireball", [
+fire_ends = region("fire", "fire", 0, "fireball", [
     ("burst", 45, [("stat", "affinity/fire"), ("stat", "potency"), ("stat", "affinity/fire"), ("stat", "reservoir"),
                    ("spell", "flame_burst")]),
     ("ember", -45, [("stat", "affinity/fire"), ("stat", "focus"), ("stat", "potency"),
@@ -168,6 +171,41 @@ nova_id, nova_xy = arm("ice", "ice", "ice_start", ice_xy, 95, [("stat", "focus")
                                                                 ("stat", "potency"), ("spell", "frost_nova")], "ice_nova")
 arm("ice", "ice", nova_id, nova_xy, 95, [("notable", ("ice_winters_edge", {"affinity/water": 6, "potency": 4})),
                                          ("keystone", ("ice_winters_grasp", "winters_grasp"))], "ice_grasp")
+
+
+
+# ---- the other derived elements: clusters like Ice's, each off its family's region ----
+def cluster(element, family, origin, angle, starter, arms):
+    """Two of the family's nodes leading on from origin, the gate (the family's Affinity 10), then
+    the element's start and its arms."""
+    previous, xy = origin
+    for k, stat in enumerate((f"affinity/{family}", "potency"), start=1):
+        xy = polar(angle, STEP, xy)
+        previous = small(element, f"{element}_way_{k}", xy, stat, [previous], family)["id"]
+    xy = polar(angle, STEP, xy)
+    small(element, f"{element}_gate", xy, f"affinity/{family}", [previous], element, {"stat": f"affinity/{family}", "min": 10})
+    start_xy = polar(angle, STEP, xy)
+    add(element, {"id": f"{element}_start", "type": "start", "x": round(start_xy[0]), "y": round(start_xy[1]),
+                  "element": element, "spell": NS + starter, "links": [f"{element}_gate"]})
+    for name, offset, items in arms:
+        arm(element, element, f"{element}_start", start_xy, angle + offset, items, f"{element}_{name}")
+
+
+cluster("lightning", "wind", wind_ends["dash"], -45, "chain_lightning", [
+    ("storm", -45, [("stat", "potency"), ("stat", "affinity/wind"), ("stat", "focus"),
+                    ("notable", ("lightning_static_charge", {"potency": 6, "affinity/wind": 4}))]),
+    ("spark", 45, [("stat", "focus"), ("stat", "affinity/wind")]),
+])
+cluster("radiance", "fire", fire_ends["burst"], 45, "smite", [
+    ("dawn", -45, [("stat", "vitality"), ("stat", "affinity/fire"), ("stat", "reservoir"),
+                   ("notable", ("radiance_inner_light", {"vitality": 6, "affinity/fire": 4}))]),
+    ("halo", 45, [("stat", "ward"), ("stat", "affinity/fire")]),
+])
+cluster("crystal", "earth", earth_ends["quake"], 135, "prism_bolt", [
+    ("facet", 45, [("stat", "ward"), ("stat", "affinity/earth"), ("stat", "focus"),
+                   ("notable", ("crystal_prismatic_ward", {"ward": 6, "affinity/earth": 4}))]),
+    ("geode", 90, [("stat", "potency"), ("stat", "affinity/earth")]),
+])
 
 # ---- checks and output ----
 ids = list(positions)

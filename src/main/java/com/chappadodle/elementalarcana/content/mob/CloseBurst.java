@@ -91,6 +91,9 @@ final class CloseBurst implements MobSpell {
             case ICE -> level.sendParticles(ModContent.ICE_SHARD.get(), at.x, at.y, at.z, 16, 0.2, 0.2, 0.2, 0.2);
             case WIND -> level.sendParticles(ParticleTypes.GUST_EMITTER_SMALL, at.x, at.y, at.z, 1, 0, 0, 0, 0);
             case EARTH -> level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.STONE.defaultBlockState()), at.x, at.y, at.z, 18, 0.3, 0.3, 0.3, 0.1);
+            case CRYSTAL -> level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.AMETHYST_BLOCK.defaultBlockState()), at.x, at.y, at.z, 18, 0.3, 0.3, 0.3, 0.1);
+            case LIGHTNING -> level.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 24, 0.4, 0.4, 0.4, 0.3);
+            case RADIANCE -> level.sendParticles(ParticleTypes.FLASH, at.x, at.y, at.z, 1, 0, 0, 0, 0);
         }
         MobCasting.play(caster, sound(), 1f, 1.1f);
     }
@@ -102,6 +105,9 @@ final class CloseBurst implements MobSpell {
             case ICE -> SoundEvents.GLASS_BREAK;
             case WIND -> SoundEvents.WIND_CHARGE_BURST.value();
             case EARTH -> SoundEvents.STONE_BREAK;
+            case CRYSTAL -> SoundEvents.AMETHYST_CLUSTER_BREAK;
+            case LIGHTNING -> SoundEvents.TRIDENT_THUNDER.value();
+            case RADIANCE -> SoundEvents.BEACON_DEACTIVATE;
         };
     }
 }

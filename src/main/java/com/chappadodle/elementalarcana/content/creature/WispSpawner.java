@@ -35,12 +35,15 @@ import java.util.Map;
  * Brings wisps into the world (see the wisps spec). In the wild, a spawner of its own (not the mob
  * cap) checks around each player once a minute: with a 1 in 4 chance a wisp appears 16 to 32 blocks
  * away, over open ground, of an element the biome holds (the {@code wisps/<element>} biome tags),
- * unless 2 are already within 48 blocks. Shrines call their guardians through here too.
+ * unless 2 are already within 48 blocks. A thunderstorm stirs them up (a 1 in 2 chance), and under
+ * its open sky half of them are Lightning wisps whatever the biome: the storm is where they live.
+ * Shrines call their guardians through here too.
  */
 @EventBusSubscriber(modid = ElementalArcana.MODID)
 public final class WispSpawner {
     private static final int CHECK_TICKS = 20 * 60;
     private static final double CHANCE = 0.25;
+    private static final double STORM_CHANCE = 0.5;
     private static final int MIN_DISTANCE = 16;
     private static final int MAX_DISTANCE = 32;
     private static final int CROWD_RADIUS = 48;
@@ -65,7 +68,7 @@ public final class WispSpawner {
             return;
         }
         ServerLevel level = player.serverLevel();
-        if (canSpawn(level) && player.getRandom().nextDouble() < CHANCE) {
+        if (canSpawn(level) && player.getRandom().nextDouble() < (level.isThundering() ? STORM_CHANCE : CHANCE)) {
             trySpawnWild(level, player, null);
         }
     }
@@ -91,7 +94,9 @@ public final class WispSpawner {
             if (ground == null) {
                 continue;
             }
-            Element element = forced != null ? forced : biomeElement(level, ground, random);
+            Element element = forced != null ? forced
+                    : level.isThundering() && level.canSeeSky(ground) && random.nextBoolean() ? Element.LIGHTNING
+                    : biomeElement(level, ground, random);
             if (element == null) {
                 continue;
             }
