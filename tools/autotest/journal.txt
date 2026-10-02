@@ -1,0 +1,12 @@
+# A first awakening (the Journal is given), then the Journal's pages.
+hud on
+cmd clear @s
+cmd gamemode creative
+cmd arcana affinity reset
+cmd arcana awaken fire
+wait 40
+shot journal_awakened
+screen journal
+wait 5
+shot journal_page1
+quit

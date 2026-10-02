@@ -196,6 +196,26 @@ SPRITES = {
         "......kkkk......",
         "................",
     ]),
+    "item/arcanist_journal": ({
+        "k": 0x2A1630, "c": 0x5A2E6A, "l": 0x8A4FA0, "p": 0xEDE3C8, "g": 0xFFD84A, "w": 0xFFFFFF,
+    }, [
+        "................",
+        "..kkkkkkkkkkkk..",
+        "..kclllllllcpk..",
+        "..kclllllllcpk..",
+        "..kclllglllcpk..",
+        "..kcllgwgllcpk..",
+        "..kclgwwwglcpk..",
+        "..kcllgwgllcpk..",
+        "..kclllglllcpk..",
+        "..kclllllllcpk..",
+        "..kclllllllcpk..",
+        "..kclllllllcpk..",
+        "..kcccccccccpk..",
+        "..kkkkkkkkkkkk..",
+        "................",
+        "................",
+    ]),
     "spell/boulder": ({
         "k": 0x3A332C, "d": 0x6B6258, "b": 0x948A7C, "l": 0xBDB3A3, "w": 0xE6DED0,
     }, [

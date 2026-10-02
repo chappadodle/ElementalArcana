@@ -22,6 +22,9 @@ public final class ModItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ElementalArcana.MODID);
     private static final Map<Element, DeferredItem<ElementalEssenceItem>> ESSENCES = new EnumMap<>(Element.class);
     private static final Map<Element, DeferredItem<CatalystItem>> CATALYSTS = new EnumMap<>(Element.class);
+    /** The Arcanist's Journal: the guide given when your magic first wakes (see JournalItem). */
+    public static final DeferredItem<JournalItem> JOURNAL = ITEMS.register("arcanist_journal",
+            () -> new JournalItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)));
 
     static {
         for (Element element : Element.values()) {
@@ -56,6 +59,7 @@ public final class ModItems {
         if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             ESSENCES.values().forEach(event::accept);
             CATALYSTS.values().forEach(event::accept);
+            event.accept(JOURNAL);
         }
     }
 }

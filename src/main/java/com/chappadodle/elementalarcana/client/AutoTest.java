@@ -38,7 +38,7 @@ import java.util.Locale;
  * select elementalarcana:boulder   select a spell
  * press / release          the cast key going down / up
  * launch_one / launch_all  the conjuring launch keys
- * screen status|tree|stats|close   open one of the mod's screens
+ * screen status|tree [spell]|stats|journal|close   open one of the mod's screens
  * hud on|off               show or hide the HUD
  * camera first|back|front  the camera view
  * quit                     close the game
@@ -162,6 +162,7 @@ public final class AutoTest {
             case "status" -> minecraft.setScreen(new StatusScreen());
             case "stats" -> minecraft.setScreen(new StatsScreen(null));
             case "close" -> minecraft.setScreen(null);
+            case "journal" -> JournalBook.open(minecraft.player);
             default -> {
                 if (name.startsWith("tree")) {
                     String[] parts = name.split("\\s+");

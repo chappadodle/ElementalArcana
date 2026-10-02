@@ -16,6 +16,7 @@ import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.ChatFormatting;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
@@ -77,6 +78,16 @@ public final class Awakenings {
         player.playNotifySound(ModContent.AWAKEN_SOUND.get(), SoundSource.PLAYERS, 1f, 1f);
         player.serverLevel().sendParticles(ParticleTypes.TOTEM_OF_UNDYING, player.getX(), player.getY(1.0), player.getZ(), 40, 0.4, 0.8, 0.4, 0.3);
         dust(player, element, 24);
+        if (!data.awakening().journalGiven()) {
+            // The first time: a journal to make sense of it all.
+            data.awakening().setJournalGiven(true);
+            ItemStack journal = new ItemStack(ModItems.JOURNAL.get());
+            if (!player.getInventory().add(journal)) {
+                player.drop(journal, false);
+            }
+            player.sendSystemMessage(Component.translatable("message.elementalarcana.journal_given").withStyle(ChatFormatting.LIGHT_PURPLE));
+            MagicAttachments.sync(player);
+        }
     }
 
     /** A puff of the element's colour around the player. */
