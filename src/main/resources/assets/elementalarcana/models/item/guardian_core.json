@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "elementalarcana:item/guardian_core",
+    "layer1": "elementalarcana:item/guardian_core_gem"
+  }
+}

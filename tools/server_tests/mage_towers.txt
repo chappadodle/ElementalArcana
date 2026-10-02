@@ -1,0 +1,23 @@
+# A tower builds with its Tower Heart (the fill re-tints the heart, so "Successfully filled 1
+# block(s)" counts it), natural generation finds towers, towers never stand near the world's centre
+# ("Failed to place" there), and the Acolyte and Magister summon, level and die cleanly.
+time set noon
+forceload add 976 800 1023 847
+place structure elementalarcana:mage_tower 1000 70 824
+fill 1000 60 824 1000 160 824 elementalarcana:tower_heart[kind=ice,lit=true] replace elementalarcana:tower_heart
+forceload remove all
+forceload add 96 -240 111 -225
+place structure elementalarcana:mage_tower 104 70 -232
+forceload remove all
+locate structure elementalarcana:mage_tower
+forceload add 0 0 15 15
+summon elementalarcana:tower_acolyte 8 100 8
+summon elementalarcana:tower_magister 4 100 8
+sleep 2
+arcana creaturelevel @e[type=elementalarcana:tower_acolyte]
+arcana creaturelevel @e[type=elementalarcana:tower_magister]
+kill @e[type=elementalarcana:tower_acolyte]
+kill @e[type=elementalarcana:tower_magister]
+sleep 1
+kill @e[type=minecraft:item]
+forceload remove all

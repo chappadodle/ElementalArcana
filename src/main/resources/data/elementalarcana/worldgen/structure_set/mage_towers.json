@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "elementalarcana:mage_tower",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 56,
+    "separation": 20,
+    "salt": 512937
+  }
+}

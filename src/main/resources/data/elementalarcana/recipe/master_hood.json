@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "GCG",
+    " P "
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "C": {
+      "item": "elementalarcana:guardian_core"
+    },
+    "P": {
+      "item": "elementalarcana:adept_hood"
+    }
+  },
+  "result": {
+    "id": "elementalarcana:master_hood",
+    "count": 1
+  }
+}

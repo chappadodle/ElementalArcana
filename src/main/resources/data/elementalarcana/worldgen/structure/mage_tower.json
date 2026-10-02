@@ -1,0 +1,7 @@
+{
+  "type": "elementalarcana:mage_tower",
+  "biomes": "#elementalarcana:has_structure/mage_tower",
+  "step": "top_layer_modification",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_thin"
+}

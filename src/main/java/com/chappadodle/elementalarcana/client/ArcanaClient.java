@@ -30,6 +30,8 @@ import com.chappadodle.elementalarcana.content.BubblePrisons;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.content.ModSpells;
 import com.chappadodle.elementalarcana.content.creature.ModCreatures;
+import com.chappadodle.elementalarcana.content.tower.ModTowers;
+import com.chappadodle.elementalarcana.content.tower.TowerHeartBlock;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.core.MagicData;
 import com.chappadodle.elementalarcana.network.CastSpellPayload;
@@ -277,6 +279,15 @@ public final class ArcanaClient {
     public static void registerBlockColors(RegisterColorHandlersEvent.Block event) {
         event.register((state, level, pos, tintIndex) -> tintIndex == 0
                 ? FastColor.ARGB32.opaque(state.getValue(ShrineCoreBlock.KIND).element().color()) : -1, ModWorld.SHRINE_CORE.get());
+        // A tower's heart: its element's colour, dimmed once the tower is conquered.
+        event.register((state, level, pos, tintIndex) -> {
+            if (tintIndex != 0) {
+                return -1;
+            }
+            int color = state.getValue(TowerHeartBlock.KIND).element().color();
+            return FastColor.ARGB32.opaque(state.getValue(TowerHeartBlock.LIT) ? color
+                    : FastColor.ARGB32.color(0, (color >> 16 & 0xFF) / 3, (color >> 8 & 0xFF) / 3, (color & 0xFF) / 3));
+        }, ModTowers.TOWER_HEART.get());
     }
 
     /** A focus's gem (its second texture layer) takes its element's colour. */
@@ -285,7 +296,7 @@ public final class ArcanaClient {
         event.register((stack, tintIndex) -> {
             Element element = FocusItem.elementOf(stack);
             return tintIndex == 1 && element != null ? FastColor.ARGB32.opaque(element.color()) : -1;
-        }, ModGear.APPRENTICE_WAND.get(), ModGear.ADEPT_STAFF.get());
+        }, ModGear.APPRENTICE_WAND.get(), ModGear.ADEPT_STAFF.get(), ModGear.MASTER_STAFF.get(), ModTowers.GUARDIAN_CORE.get());
     }
 
     @SubscribeEvent
@@ -294,6 +305,8 @@ public final class ArcanaClient {
         for (Element element : Element.values()) {
             event.registerEntityRenderer(ModCreatures.wisp(element), WispRenderer::new);
         }
+        event.registerEntityRenderer(ModTowers.ACOLYTE.get(), TowerMageRenderer::new);
+        event.registerEntityRenderer(ModTowers.MAGISTER.get(), TowerMageRenderer::new);
     }
 
     @SubscribeEvent

@@ -61,11 +61,17 @@ public final class ModGear {
     public static final DeferredHolder<ArmorMaterial, ArmorMaterial> ADEPT_CLOTH = ARMOR_MATERIALS.register("adept", () -> new ArmorMaterial(
             defense(2, 4, 5, 1), 20, SoundEvents.ARMOR_EQUIP_CHAIN, () -> Ingredient.of(Items.AMETHYST_SHARD),
             List.of(new ArmorMaterial.Layer(ElementalArcana.id("adept"))), 0.5f, 0f));
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> MASTER_CLOTH = ARMOR_MATERIALS.register("master", () -> new ArmorMaterial(
+            defense(2, 5, 6, 2), 25, SoundEvents.ARMOR_EQUIP_GOLD, () -> Ingredient.of(Items.DIAMOND),
+            List.of(new ArmorMaterial.Layer(ElementalArcana.id("master"))), 1f, 0f));
 
     public static final DeferredItem<FocusItem> APPRENTICE_WAND = ITEMS.register("apprentice_wand",
             () -> new FocusItem(1, 0, Map.of("potency", 2), 3, new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)));
     public static final DeferredItem<FocusItem> ADEPT_STAFF = ITEMS.register("adept_staff",
             () -> new FocusItem(2, 15, Map.of("potency", 4, "focus", 2), 6, new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    /** The master tier (level 35): made with a Magister's Guardian Core (see the mage towers spec). */
+    public static final DeferredItem<FocusItem> MASTER_STAFF = ITEMS.register("master_staff",
+            () -> new FocusItem(3, 35, Map.of("potency", 7, "focus", 4), 10, new Item.Properties().stacksTo(1).rarity(Rarity.EPIC)));
 
     public static final DeferredItem<RobeItem> APPRENTICE_HOOD = robe("apprentice_hood", APPRENTICE_CLOTH, ArmorItem.Type.HELMET, 0, Map.of("insight", 1, "reservoir", 1));
     public static final DeferredItem<RobeItem> APPRENTICE_ROBE = robe("apprentice_robe", APPRENTICE_CLOTH, ArmorItem.Type.CHESTPLATE, 0, Map.of("reservoir", 3, "ward", 1));
@@ -75,6 +81,10 @@ public final class ModGear {
     public static final DeferredItem<RobeItem> ADEPT_ROBE = robe("adept_robe", ADEPT_CLOTH, ArmorItem.Type.CHESTPLATE, 15, Map.of("reservoir", 5, "ward", 3));
     public static final DeferredItem<RobeItem> ADEPT_TROUSERS = robe("adept_trousers", ADEPT_CLOTH, ArmorItem.Type.LEGGINGS, 15, Map.of("focus", 4, "ward", 1));
     public static final DeferredItem<RobeItem> ADEPT_BOOTS = robe("adept_boots", ADEPT_CLOTH, ArmorItem.Type.BOOTS, 15, Map.of("vitality", 2, "reservoir", 2));
+    public static final DeferredItem<RobeItem> MASTER_HOOD = robe("master_hood", MASTER_CLOTH, ArmorItem.Type.HELMET, 35, Map.of("insight", 3, "reservoir", 3));
+    public static final DeferredItem<RobeItem> MASTER_ROBE = robe("master_robe", MASTER_CLOTH, ArmorItem.Type.CHESTPLATE, 35, Map.of("reservoir", 8, "ward", 5));
+    public static final DeferredItem<RobeItem> MASTER_TROUSERS = robe("master_trousers", MASTER_CLOTH, ArmorItem.Type.LEGGINGS, 35, Map.of("focus", 6, "ward", 2));
+    public static final DeferredItem<RobeItem> MASTER_BOOTS = robe("master_boots", MASTER_CLOTH, ArmorItem.Type.BOOTS, 35, Map.of("vitality", 3, "reservoir", 3));
 
     private ModGear() {
     }
@@ -91,15 +101,21 @@ public final class ModGear {
 
     private static DeferredItem<RobeItem> robe(String name, DeferredHolder<ArmorMaterial, ArmorMaterial> material, ArmorItem.Type type,
                                                int requiredLevel, Map<String, Integer> stats) {
+        boolean master = requiredLevel >= 35;
         return ITEMS.register(name, () -> new RobeItem(material, type, requiredLevel, stats,
-                new Item.Properties().durability(type.getDurability(requiredLevel > 0 ? 20 : 12))
-                        .rarity(requiredLevel > 0 ? Rarity.RARE : Rarity.UNCOMMON)));
+                new Item.Properties().durability(type.getDurability(master ? 28 : requiredLevel > 0 ? 20 : 12))
+                        .rarity(master ? Rarity.EPIC : requiredLevel > 0 ? Rarity.RARE : Rarity.UNCOMMON)));
     }
 
-    /** Every gear item, in creative-tab order. */
-    public static List<DeferredItem<? extends Item>> all() {
-        return List.of(APPRENTICE_WAND, ADEPT_STAFF, APPRENTICE_HOOD, APPRENTICE_ROBE, APPRENTICE_TROUSERS, APPRENTICE_BOOTS,
-                ADEPT_HOOD, ADEPT_ROBE, ADEPT_TROUSERS, ADEPT_BOOTS);
+    /** The foci, lowest tier first. */
+    public static List<DeferredItem<FocusItem>> foci() {
+        return List.of(APPRENTICE_WAND, ADEPT_STAFF, MASTER_STAFF);
+    }
+
+    /** The robes, in creative-tab order. */
+    public static List<DeferredItem<RobeItem>> robes() {
+        return List.of(APPRENTICE_HOOD, APPRENTICE_ROBE, APPRENTICE_TROUSERS, APPRENTICE_BOOTS,
+                ADEPT_HOOD, ADEPT_ROBE, ADEPT_TROUSERS, ADEPT_BOOTS, MASTER_HOOD, MASTER_ROBE, MASTER_TROUSERS, MASTER_BOOTS);
     }
 
     public static void register(IEventBus modEventBus) {

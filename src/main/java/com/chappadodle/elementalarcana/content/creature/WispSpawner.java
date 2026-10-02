@@ -128,7 +128,7 @@ public final class WispSpawner {
 
     /** A wisp appearing at {@code at}, in a little burst of light, if there's room for it there. */
     @Nullable
-    private static WispEntity spawnAt(ServerLevel level, Element element, BlockPos at, MobSpawnType reason) {
+    public static WispEntity spawnAt(ServerLevel level, Element element, BlockPos at, MobSpawnType reason) {
         EntityType<WispEntity> type = ModCreatures.wisp(element);
         if (!level.hasChunkAt(at) || !level.noCollision(type.getSpawnAABB(at.getX() + 0.5, at.getY(), at.getZ() + 0.5))) {
             return null;

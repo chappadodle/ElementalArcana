@@ -5,6 +5,8 @@ import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.content.creature.ModCreatures;
 import com.chappadodle.elementalarcana.content.gear.ModGear;
 import com.chappadodle.elementalarcana.content.people.ModPeople;
+import com.chappadodle.elementalarcana.content.tower.GuardianCoreItem;
+import com.chappadodle.elementalarcana.content.tower.ModTowers;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -31,15 +33,20 @@ public final class ModTabs {
                         output.accept(catalyst);
                     }
                 }
-                for (Item focus : new Item[]{ModGear.APPRENTICE_WAND.get(), ModGear.ADEPT_STAFF.get()}) {
+                for (var focus : ModGear.foci()) {
                     for (Element element : Element.values()) {
-                        output.accept(focusOf(focus, element));
+                        output.accept(focusOf(focus.get(), element));
                     }
                 }
-                ModGear.all().stream().skip(2).forEach(item -> output.accept(item.get()));
+                ModGear.robes().forEach(item -> output.accept(item.get()));
                 output.accept(ModPeople.ARCANE_LECTERN_ITEM.get());
                 output.accept(ModPeople.SCROLL_OF_UNBINDING.get());
                 output.accept(ModPeople.TOME_OF_INSIGHT.get());
+                for (Element element : Element.values()) {
+                    output.accept(GuardianCoreItem.of(element));
+                }
+                output.accept(ModTowers.ACOLYTE_EGG.get());
+                output.accept(ModTowers.MAGISTER_EGG.get());
                 for (Element element : Element.values()) {
                     output.accept(ModCreatures.wispEgg(element));
                 }

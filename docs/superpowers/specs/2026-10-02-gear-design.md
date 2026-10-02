@@ -29,7 +29,18 @@ gem takes the element's colour.
 
 Below the required level, a piece does nothing (its tooltip says what it needs).
 
+## The master tier (level 35)
+
+Made with the Guardian Cores that tower Magisters drop (see `2026-10-02-mage-towers-design.md`).
+
+| Item | Recipe | Adds |
+|---|---|---|
+| Master Staff | an Adept Staff, a Guardian Core, 2 diamonds and 2 Essence, all of one element (the core and staff matched by their element component) | +7 Potency, +4 Focus, +10 Affinity of its element |
+| Master's hood / robe / trousers / boots | the adept piece, a Guardian Core of any element and 2 gold ingots | Insight +3 Reservoir +3 / Reservoir +8 Ward +5 / Focus +6 Ward +2 / Vitality +3 Reservoir +3 |
+
+Master robes are midnight blue with gold, with armor 2, 5, 6, 2 (boots, trousers, robe, hood) and
+toughness 1.
+
 ## Later
 
-A master tier (level 35), made with what tower guardians drop (milestone 7), and archmage gear from
-the Sovereigns (milestone 11).
+Archmage gear from the Sovereigns (milestone 11).

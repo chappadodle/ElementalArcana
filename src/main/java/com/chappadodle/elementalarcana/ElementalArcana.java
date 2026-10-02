@@ -9,6 +9,7 @@ import com.chappadodle.elementalarcana.content.ModTabs;
 import com.chappadodle.elementalarcana.content.gear.ModGear;
 import com.chappadodle.elementalarcana.content.creature.ModCreatures;
 import com.chappadodle.elementalarcana.content.people.ModPeople;
+import com.chappadodle.elementalarcana.content.tower.ModTowers;
 import com.chappadodle.elementalarcana.content.world.ModWorld;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.network.ModNetwork;
@@ -41,6 +42,7 @@ public class ElementalArcana {
         ModWorld.register(modEventBus);
         ModCreatures.register(modEventBus);
         ModPeople.register(modEventBus);
+        ModTowers.register(modEventBus);
         ModTabs.TABS.register(modEventBus);
     }
 }

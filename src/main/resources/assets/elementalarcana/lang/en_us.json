@@ -544,5 +544,21 @@
   "message.elementalarcana.unbinding.nothing": "There's nothing to unbind: you haven't taken any tree nodes",
   "message.elementalarcana.unbinding.done": "The scroll crumbles to dust, and your skill tree comes unbound: %s nodes given back.",
   "message.elementalarcana.insight.dormant": "The words mean nothing to you yet",
-  "message.elementalarcana.insight.done": "The tome's insight settles in you: +1 tree point."
+  "message.elementalarcana.insight.done": "The tome's insight settles in you: +1 tree point.",
+  "journal.elementalarcana.page.15": "§5§lMage towers§r\n\nFar from where the world began stand towers of elemental stone. In each a Magister hoards a stolen piece of an element, served by acolytes.\n\nClimb to the sanctum and defeat it: its Guardian Core is the key to master gear.",
+  "entity.elementalarcana.tower_acolyte": "Acolyte",
+  "entity.elementalarcana.tower_magister": "Magister",
+  "item.elementalarcana.tower_acolyte_spawn_egg": "Acolyte Spawn Egg",
+  "item.elementalarcana.tower_magister_spawn_egg": "Magister Spawn Egg",
+  "block.elementalarcana.tower_heart": "Tower Heart",
+  "item.elementalarcana.guardian_core": "Guardian Core",
+  "item.elementalarcana.guardian_core.desc": "A Magister's stolen power, the key to master gear",
+  "bossbar.elementalarcana.magister": "Magister of %s",
+  "message.elementalarcana.tower.magister": "The Magister appears: \"You climbed my tower. You won't climb down.\"",
+  "message.elementalarcana.tower.conquered": "The Magister falls, and the tower's heart goes dark.",
+  "item.elementalarcana.master_staff": "Master Staff",
+  "item.elementalarcana.master_hood": "Master's Hood",
+  "item.elementalarcana.master_robe": "Master's Robe",
+  "item.elementalarcana.master_trousers": "Master's Trousers",
+  "item.elementalarcana.master_boots": "Master's Boots"
 }

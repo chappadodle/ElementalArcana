@@ -1,0 +1,97 @@
+# World II: mage towers
+
+Date: 2026-10-02
+Status: built (milestone 7 of `2026-10-02-fantasy-adventure-roadmap.md`).
+
+The first dungeons. Far from where the world began stand tall towers of elemental stone. In each, a
+Magister (a mage who went too far, hoarding a stolen piece of an element) rules a handful of
+acolytes. Climb it floor by floor, loot its rooms, and take the Magister's Guardian Core: the key to
+master gear.
+
+## Where they are
+
+- One structure set (`worldgen/structure_set/mage_towers.json`): a random spread with spacing 56
+  and separation 20 chunks, so about one tower every 900 blocks.
+- Overworld land only (`has_structure/mage_tower`): plains, forests, taiga, savanna, desert,
+  badlands, snowy lands, mountains, windswept hills, jungles and swamps.
+- Never within 800 blocks of the world's centre, where new players start: a tower's Magister is an
+  Archmage, far too strong for them.
+- Like shrines, a tower needs level ground: the corners and middle of its 13x13 footprint may
+  differ by at most 8 blocks. It stands on dry land at or above sea level, and terrain blending
+  settles it into the ground.
+- Its element comes from the land: one of the biome's elements (the `attunes/<element>` tags, as
+  for Attuned creatures), or any element where the biome has none.
+
+## What it looks like
+
+A round tower 13 blocks across, built in code (`MageTowerPiece`) in its element's stone, with that
+element's coloured glass in the windows. It has five floors of 6 blocks each, then battlements and a
+crystal spire: about 40 blocks tall. A flight of stairs runs along the wall from each floor to the
+next, alternating sides.
+
+| Floor | Room | In it |
+|---|---|---|
+| 1 | Hall | the door, pillars, lanterns |
+| 2 | Library | bookshelves, an Arcane Lectern, a chest |
+| 3 | Laboratory | brewing stands, a cauldron, amethyst, a chest |
+| 4 | Armory | anvils and smithing tables, a chest |
+| 5 | Sanctum | a rune circle with the Tower Heart at its centre, and the reward chest |
+
+| Element | Walls | Trim | Windows |
+|---|---|---|---|
+| Fire | blackstone bricks | nether bricks, magma | orange glass |
+| Water | prismarine bricks | dark prismarine | cyan glass |
+| Ice | packed ice | blue ice, snow | light blue glass |
+| Wind | calcite | smooth quartz | white glass |
+| Earth | deepslate bricks | mossy stone bricks | green glass |
+
+## The Tower Heart
+
+An unbreakable crystal block that runs the tower:
+
+- When someone (not a spectator) first comes within 40 blocks, the tower wakes. Acolytes appear,
+  two on each of the first four floors.
+- When someone reaches the sanctum, the Magister appears there, once per tower.
+- When the Magister falls, the heart goes dark: the tower's power is spent, and no more acolytes
+  come. A dark heart still lights its room.
+
+## Its people
+
+Both are illager-like casters in robes of the tower's element. They use the vanilla illager model
+with our own textures, and they raise their arms to cast.
+
+- **Acolyte** (24 health at level 1): Attuned to the tower's element, an Adept or now and then a
+  Magus. It keeps 4 to 9 blocks from its target and casts its element's spells. Acolytes fight
+  anyone who isn't kin to their element (dormant players too: a tower is no place to wander into).
+- **Magister** (80 health at level 1): an Archmage of the tower's element, with three spells,
+  20 levels above the zone and a boss bar. When hurt it **blinks**: it teleports a few blocks away,
+  at most every 4 seconds. Below half health it **calls two wisps** of its element, once. It always
+  drops a **Guardian Core** of its element, plus the Archmage's Essence.
+
+Both despawn never (they're placed, not wandering) and give Attuned XP.
+
+## Loot
+
+Each room's chest has its own table (`chests/mage_tower_<room>`). The library has books, enchanted
+books, Scrolls of Unbinding and rarely a Tome of Insight. The laboratory has potions, glowstone,
+redstone, amethyst and Essence. The armory has adept gear, diamonds and iron. The sanctum has the
+best: diamonds, emeralds, lots of Essence, and sometimes a Catalyst or a Tome of Insight.
+
+## Guardian Cores and master gear
+
+A Guardian Core holds an element (the `elementalarcana:element` component, tinted). It's the key
+ingredient of the master tier (level 35):
+
+| Item | Recipe | Adds |
+|---|---|---|
+| Master Staff | an Adept Staff, a Guardian Core, 2 diamonds and 2 Essence (all of one element) | +7 Potency, +4 Focus, +10 Affinity of its element |
+| Master hood / robe / trousers / boots | the adept piece, a Guardian Core of any element and 2 gold ingots | Insight +3 Reservoir +3 / Reservoir +8 Ward +5 / Focus +6 Ward +2 / Vitality +3 Reservoir +3 |
+
+Master robes have armor 2, 5, 6, 2 (boots, trousers, robe, hood) with toughness 1.
+
+## Testing
+
+- `tools/server_tests/mage_towers.txt`: each element's tower builds, natural generation finds them,
+  and the Magister and acolytes summon and die cleanly.
+- `tools/autotest/mage_towers.txt`: towers far out (generated by the current code) from outside and
+  inside, the tower waking, and a fight with the Magister.
