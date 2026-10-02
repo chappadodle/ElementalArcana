@@ -25,7 +25,9 @@ if [[ ! -s "$CMDLINE" || "$ROOT/build.gradle" -nt "$CMDLINE" ]]; then
   timeout 180 bash -c "until grep -qE 'Done \(|Failed to start' '$CAPTURE_LOG'; do sleep 1; done"
   for pid in $(pgrep -x java); do
     if tr '\0' ' ' < "/proc/$pid/cmdline" | grep -q "devlaunch.Main"; then
-      cp "/proc/$pid/cmdline" "$CMDLINE"
+      # Not cp: it would copy /proc's read-only mode, and the next capture couldn't overwrite it.
+      chmod u+w "$CMDLINE" 2>/dev/null
+      cat "/proc/$pid/cmdline" > "$CMDLINE"
       kill "$pid"
       while kill -0 "$pid" 2>/dev/null; do sleep 0.5; done
     fi

@@ -5,12 +5,29 @@ import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.network.CastSpellPayload;
 import com.chappadodle.elementalarcana.network.SelectSpellPayload;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.SectionPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.StructurePiece;
+import net.minecraft.world.level.levelgen.structure.StructureStart;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -24,6 +41,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 /**
  * A scripted test run of the game client, for checking visuals without anyone at the keyboard
@@ -41,6 +59,10 @@ import java.util.Locale;
  * screen status|tree [spell]|stats|journal|close   open one of the mod's screens
  * hud on|off               show or hide the HUD
  * camera first|back|front  the camera view
+ * use                      right-click the block under the crosshair
+ * goto elementalarcana:fire_shrine 18 14 [2]   stand 18 blocks south of the nearest such structure
+ *                          and 14 above its base, looking at its middle, 2 blocks above the base
+ *                          (default 0); it's searched for from where the player is
  * quit                     close the game
  * </pre>
  */
@@ -130,6 +152,14 @@ public final class AutoTest {
             case "launch_all" -> PacketDistributor.sendToServer(CastSpellPayload.LAUNCH_ALL);
             case "screen" -> openScreen(minecraft, argument);
             case "hud" -> minecraft.options.hideGui = argument.equals("off");
+            case "use" -> {
+                if (minecraft.hitResult instanceof BlockHitResult hit && minecraft.gameMode != null) {
+                    minecraft.gameMode.useItemOn(minecraft.player, InteractionHand.MAIN_HAND, hit);
+                } else {
+                    LOGGER.warn("[autotest] use: not looking at a block");
+                }
+            }
+            case "goto" -> gotoStructure(minecraft, argument);
             case "camera" -> minecraft.options.setCameraType(switch (argument) {
                 case "back" -> CameraType.THIRD_PERSON_BACK;
                 case "front" -> CameraType.THIRD_PERSON_FRONT;
@@ -154,6 +184,55 @@ public final class AutoTest {
             if (player != null) {
                 server.getCommands().performPrefixedCommand(player.createCommandSourceStack().withPermission(4), command);
             }
+        });
+    }
+
+    /**
+     * Finds the nearest structure of a kind (like /locate, from where the player is) and puts the
+     * player {@code distance} blocks south of its middle and {@code height} above its base, looking
+     * at its middle, {@code aim} blocks above the base. The structure's chunks generate on the way,
+     * with the current code.
+     */
+    private static void gotoStructure(Minecraft minecraft, String argument) {
+        String[] parts = argument.split("\\s+");
+        ResourceKey<Structure> key = ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse(parts[0]));
+        double distance = parts.length > 1 ? Double.parseDouble(parts[1]) : 16;
+        double height = parts.length > 2 ? Double.parseDouble(parts[2]) : 12;
+        double aim = parts.length > 3 ? Double.parseDouble(parts[3]) : 0;
+        MinecraftServer server = minecraft.getSingleplayerServer();
+        java.util.UUID id = minecraft.player.getUUID();
+        server.execute(() -> {
+            ServerPlayer player = server.getPlayerList().getPlayer(id);
+            if (player == null) {
+                return;
+            }
+            ServerLevel level = player.serverLevel();
+            Optional<Holder.Reference<Structure>> structure = level.registryAccess().registryOrThrow(Registries.STRUCTURE).getHolder(key);
+            if (structure.isEmpty()) {
+                LOGGER.warn("[autotest] goto: no structure {}", key.location());
+                return;
+            }
+            Pair<BlockPos, Holder<Structure>> found = level.getChunkSource().getGenerator()
+                    .findNearestMapStructure(level, HolderSet.direct(structure.get()), player.blockPosition(), 100, false);
+            if (found == null) {
+                LOGGER.warn("[autotest] goto: no {} nearby", key.location());
+                return;
+            }
+            ChunkPos chunkPos = new ChunkPos(found.getFirst());
+            ChunkAccess chunk = level.getChunk(chunkPos.x, chunkPos.z, ChunkStatus.STRUCTURE_STARTS);
+            StructureStart start = level.structureManager().getStartForStructure(SectionPos.bottomOf(chunk), structure.get().value(), chunk);
+            // The pieces' own box: a start's box is padded for terrain blending.
+            BoundingBox box = (start != null && start.isValid()
+                    ? BoundingBox.encapsulatingBoxes(start.getPieces().stream().map(StructurePiece::getBoundingBox).toList())
+                    : Optional.<BoundingBox>empty())
+                    .orElse(BoundingBox.fromCorners(found.getFirst(), found.getFirst().offset(15, level.getSeaLevel(), 15)));
+            BlockPos middle = box.getCenter();
+            double x = middle.getX() + 0.5;
+            double y = box.minY() + height;
+            double z = middle.getZ() + 0.5 + distance;
+            float pitch = (float) Math.toDegrees(Math.atan2(height + player.getEyeHeight() - aim, distance));
+            player.teleportTo(level, x, y, z, 180f, pitch);
+            LOGGER.info("[autotest] goto {}: found at {} {} {}", key.location(), middle.getX(), box.minY(), middle.getZ());
         });
     }
 

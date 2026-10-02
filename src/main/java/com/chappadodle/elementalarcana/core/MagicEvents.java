@@ -6,6 +6,7 @@ import com.chappadodle.elementalarcana.content.gear.GearStats;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -43,6 +44,11 @@ public final class MagicEvents {
                         player.getX() + Mth.cos(angle) * 0.8, player.getY() + 1.2, player.getZ() + Mth.sin(angle) * 0.8,
                         3, 0.1, 0.3, 0.1, 0.4);
             }
+        }
+        MobEffectInstance place = player.getEffect(ModContent.PLACE_OF_POWER);
+        if (place != null) {
+            // A shrine nearby: half again as fast, twice as fast if it's your element's kin.
+            regen *= place.getAmplifier() >= 1 ? 2f : 1.5f;
         }
         if (player.hasEffect(ModContent.MANA_SICKNESS)) {
             regen *= SICKNESS_MULTIPLIER;

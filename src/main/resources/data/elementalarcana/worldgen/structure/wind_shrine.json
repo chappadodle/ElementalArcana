@@ -1,0 +1,8 @@
+{
+  "type": "elementalarcana:shrine",
+  "kind": "wind",
+  "biomes": "#elementalarcana:has_structure/wind_shrine",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_thin"
+}

@@ -1,0 +1,25 @@
+# Each kind builds, with its core: Water in the sea east of spawn, the others on dry land (the chunk
+# of the world's first Earth shrine, each one over the last). A shrine stands in the middle of its
+# chunk, so its core is in the chunk's middle column; the fill below re-tints it, which only works on
+# a core and so counts it ("Successfully filled 1 block(s)").
+# Then natural generation finds all five (biome permitting).
+time set noon
+forceload add 208 0 223 15
+forceload add 96 -240 111 -225
+sleep 3
+place structure elementalarcana:water_shrine 216 64 8
+fill 216 40 8 216 140 8 elementalarcana:shrine_core[kind=fire] replace elementalarcana:shrine_core
+place structure elementalarcana:fire_shrine 104 64 -232
+fill 104 40 -232 104 140 -232 elementalarcana:shrine_core[kind=water] replace elementalarcana:shrine_core
+place structure elementalarcana:ice_shrine 104 64 -232
+fill 104 40 -232 104 140 -232 elementalarcana:shrine_core[kind=fire] replace elementalarcana:shrine_core
+place structure elementalarcana:wind_shrine 104 64 -232
+fill 104 40 -232 104 140 -232 elementalarcana:shrine_core[kind=fire] replace elementalarcana:shrine_core
+place structure elementalarcana:earth_shrine 104 64 -232
+fill 104 40 -232 104 140 -232 elementalarcana:shrine_core[kind=fire] replace elementalarcana:shrine_core
+locate structure elementalarcana:earth_shrine
+locate structure elementalarcana:fire_shrine
+locate structure elementalarcana:ice_shrine
+locate structure elementalarcana:wind_shrine
+locate structure elementalarcana:water_shrine
+forceload remove all

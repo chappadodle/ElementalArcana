@@ -1,0 +1,8 @@
+{
+  "type": "elementalarcana:shrine",
+  "kind": "fire",
+  "biomes": "#elementalarcana:has_structure/fire_shrine",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_thin"
+}

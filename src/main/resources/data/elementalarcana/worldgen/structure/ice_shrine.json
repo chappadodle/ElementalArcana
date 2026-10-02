@@ -1,0 +1,8 @@
+{
+  "type": "elementalarcana:shrine",
+  "kind": "ice",
+  "biomes": "#elementalarcana:has_structure/ice_shrine",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_thin"
+}

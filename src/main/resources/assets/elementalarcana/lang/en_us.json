@@ -507,5 +507,17 @@
   "tooltip.elementalarcana.gear.held": "When held:",
   "tooltip.elementalarcana.gear.worn": "When worn:",
   "tooltip.elementalarcana.gear.stat": "+%s %s",
-  "tooltip.elementalarcana.gear.requires": "Requires level %s"
+  "tooltip.elementalarcana.gear.requires": "Requires level %s",
+  "block.elementalarcana.shrine_core": "Shrine Core",
+  "effect.elementalarcana.place_of_power": "Place of Power",
+  "effect.elementalarcana.fire_blessing": "Blessing of Fire",
+  "effect.elementalarcana.water_blessing": "Blessing of Water",
+  "effect.elementalarcana.wind_blessing": "Blessing of Wind",
+  "effect.elementalarcana.earth_blessing": "Blessing of Earth",
+  "message.elementalarcana.shrine.discovered": "You found a shrine of %s. (+%s XP)",
+  "message.elementalarcana.shrine.spent": "The shrine has given what it can today. Return tomorrow.",
+  "message.elementalarcana.shrine.stirs": "The shrine of %s hums, and something in you stirs, but does not wake. Return tomorrow.",
+  "message.elementalarcana.awakening.shrine": "The shrine of %s answered you, and your magic woke.",
+  "message.elementalarcana.shrine.blessed": "The shrine of %s blesses you: your mana is full, and its element runs strong in you.",
+  "journal.elementalarcana.page.12": "§5§lShrines§r\n\nShrines of the elements stand across the world. Near one, mana returns faster. Touch its core once a day: it blesses the awakened, and may wake the magic of one who still sleeps."
 }

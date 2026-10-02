@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "kind=fire": {
+      "model": "elementalarcana:block/shrine_core"
+    },
+    "kind=water": {
+      "model": "elementalarcana:block/shrine_core"
+    },
+    "kind=ice": {
+      "model": "elementalarcana:block/shrine_core"
+    },
+    "kind=wind": {
+      "model": "elementalarcana:block/shrine_core"
+    },
+    "kind=earth": {
+      "model": "elementalarcana:block/shrine_core"
+    }
+  }
+}

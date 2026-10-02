@@ -1,0 +1,35 @@
+# Visit shrines that generate during the test (far from anything explored, so they're built by the
+# current code), each seen from the south and above.
+hud on
+cmd kill @e[type=!player]
+cmd time set noon
+cmd gamerule doDaylightCycle false
+cmd weather clear
+cmd gamemode spectator
+cmd tp @s -20000 150 -20000
+wait 20
+goto elementalarcana:wind_shrine 14 14
+wait 200
+shot shrine_wind
+goto elementalarcana:fire_shrine 14 14
+wait 200
+shot shrine_fire
+goto elementalarcana:earth_shrine 14 14
+wait 200
+shot shrine_earth
+goto elementalarcana:water_shrine 14 14
+wait 200
+shot shrine_water
+goto elementalarcana:ice_shrine 14 14
+wait 200
+shot shrine_ice
+# Use one: stand on the platform facing the core (a spectator can't use blocks).
+cmd arcana awaken wind
+goto elementalarcana:wind_shrine 2.2 1 2.5
+wait 100
+cmd gamemode survival
+wait 40
+use
+wait 30
+shot shrine_used
+quit

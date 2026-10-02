@@ -38,6 +38,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import com.chappadodle.elementalarcana.content.gear.FocusItem;
 import com.chappadodle.elementalarcana.content.gear.ModGear;
+import com.chappadodle.elementalarcana.content.world.ModWorld;
+import com.chappadodle.elementalarcana.content.world.ShrineCoreBlock;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.minecraft.util.FastColor;
 import com.chappadodle.elementalarcana.api.Element;
@@ -267,6 +269,13 @@ public final class ArcanaClient {
             RenderSystem.enableCull();
             Bloom.renderParticles(event.getCamera(), event.getPartialTick().getGameTimeDeltaPartialTick(false));
         }
+    }
+
+    /** A Shrine Core's crystal takes its element's colour. */
+    @SubscribeEvent
+    public static void registerBlockColors(RegisterColorHandlersEvent.Block event) {
+        event.register((state, level, pos, tintIndex) -> tintIndex == 0
+                ? FastColor.ARGB32.opaque(state.getValue(ShrineCoreBlock.KIND).element().color()) : -1, ModWorld.SHRINE_CORE.get());
     }
 
     /** A focus's gem (its second texture layer) takes its element's colour. */

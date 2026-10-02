@@ -1,0 +1,30 @@
+{
+  "structures": [
+    {
+      "structure": "elementalarcana:fire_shrine",
+      "weight": 1
+    },
+    {
+      "structure": "elementalarcana:water_shrine",
+      "weight": 1
+    },
+    {
+      "structure": "elementalarcana:ice_shrine",
+      "weight": 1
+    },
+    {
+      "structure": "elementalarcana:wind_shrine",
+      "weight": 1
+    },
+    {
+      "structure": "elementalarcana:earth_shrine",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 20,
+    "separation": 7,
+    "salt": 728461
+  }
+}

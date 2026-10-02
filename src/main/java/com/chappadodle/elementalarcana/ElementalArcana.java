@@ -7,6 +7,7 @@ import com.chappadodle.elementalarcana.content.ModSchools;
 import com.chappadodle.elementalarcana.content.ModSpells;
 import com.chappadodle.elementalarcana.content.ModTabs;
 import com.chappadodle.elementalarcana.content.gear.ModGear;
+import com.chappadodle.elementalarcana.content.world.ModWorld;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.network.ModNetwork;
 import net.minecraft.resources.ResourceLocation;
@@ -35,6 +36,7 @@ public class ElementalArcana {
         ModContent.register(modEventBus);
         ModItems.register(modEventBus);
         ModGear.register(modEventBus);
+        ModWorld.register(modEventBus);
         ModTabs.TABS.register(modEventBus);
     }
 }

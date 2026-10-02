@@ -1,6 +1,7 @@
 package com.chappadodle.elementalarcana.content;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
+import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.particles.ColorParticleOption;
@@ -162,6 +163,31 @@ public final class ModContent {
 
     private static DeferredHolder<SoundEvent, SoundEvent> sound(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(ElementalArcana.id(name)));
+    }
+
+    /** Standing near a Shrine Core: faster mana (amplifier 1 when the shrine is your element's kin). */
+    public static final DeferredHolder<MobEffect, MobEffect> PLACE_OF_POWER = EFFECTS.register("place_of_power",
+            () -> new MobEffect(MobEffectCategory.BENEFICIAL, 0xB070FF) {
+            });
+    // A shrine's blessing, one per element family: +5 Affinity of that family and +2 Potency (see GearStats).
+    public static final DeferredHolder<MobEffect, MobEffect> BLESSING_FIRE = blessingEffect("fire_blessing", Element.FIRE);
+    public static final DeferredHolder<MobEffect, MobEffect> BLESSING_WATER = blessingEffect("water_blessing", Element.WATER);
+    public static final DeferredHolder<MobEffect, MobEffect> BLESSING_WIND = blessingEffect("wind_blessing", Element.WIND);
+    public static final DeferredHolder<MobEffect, MobEffect> BLESSING_EARTH = blessingEffect("earth_blessing", Element.EARTH);
+
+    private static DeferredHolder<MobEffect, MobEffect> blessingEffect(String name, Element element) {
+        return EFFECTS.register(name, () -> new MobEffect(MobEffectCategory.BENEFICIAL, element.color()) {
+        });
+    }
+
+    /** The blessing of {@code family} (an element family: Fire, Water, Wind or Earth). */
+    public static DeferredHolder<MobEffect, MobEffect> blessing(Element family) {
+        return switch (family.family()) {
+            case FIRE -> BLESSING_FIRE;
+            case WIND -> BLESSING_WIND;
+            case EARTH -> BLESSING_EARTH;
+            default -> BLESSING_WATER;
+        };
     }
 
     public static void register(IEventBus modEventBus) {

@@ -1,0 +1,8 @@
+{
+  "type": "elementalarcana:shrine",
+  "kind": "water",
+  "biomes": "#elementalarcana:has_structure/water_shrine",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_thin"
+}
