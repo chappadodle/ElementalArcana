@@ -1,0 +1,89 @@
+# The Arcanist: the cottage outside and in (on a platform in the sky, so nothing is in the way), an
+# Arcanist in its robes, its trades, the two items it sells, and real villages searched for a
+# cottage's lectern (about one village in four builds one).
+hud on
+cmd kill @e[type=!player]
+cmd time set noon
+cmd gamerule doDaylightCycle false
+cmd weather clear
+cmd gamemode creative
+cmd tp @s -30000 125 30000
+wait 60
+cmd fill -30012 119 29988 -29988 119 30012 minecraft:grass_block
+cmd fill -30012 120 29988 -29988 130 30012 minecraft:air
+cmd place template elementalarcana:village/plains/arcanist_cottage -30004 119 29997
+cmd tp @s -30013 125.5 30010 225 18
+wait 40
+shot cottage_outside
+cmd summon minecraft:villager -29999.5 120 29999.5 {VillagerData:{profession:"elementalarcana:arcanist",level:5,type:"minecraft:plains"},NoAI:1b,Rotation:[90f,0f]}
+cmd tp @s -30002 120 30001.5 245 8
+wait 40
+shot cottage_inside
+cmd tp @s -30001.5 120 29999.5 270 15
+wait 20
+use
+wait 20
+shot arcanist_trades
+screen close
+# The tome and the scroll, read under the open sky.
+cmd arcana awaken wind
+cmd arcana level set 20
+cmd arcana tree take wind_sky_1
+cmd arcana tree take wind_sky_2
+cmd tp @s -30008 120 30008 0 -80
+cmd item replace entity @s weapon.mainhand with elementalarcana:tome_of_insight
+wait 10
+use
+wait 10
+cmd item replace entity @s weapon.mainhand with elementalarcana:scroll_of_unbinding
+wait 5
+use
+wait 20
+look 0 10
+wait 5
+shot items_read
+# Villages, each searched for an Arcane Lectern.
+cmd gamemode spectator
+cmd tp @s 40000 100 40000
+wait 120
+cmd execute at @s run place structure minecraft:village_plains ~ 70 ~
+wait 40
+find elementalarcana:arcane_lectern 100
+wait 80
+shot village_1
+cmd tp @s 40500 100 40000
+wait 120
+cmd execute at @s run place structure minecraft:village_plains ~ 70 ~
+wait 40
+find elementalarcana:arcane_lectern 100
+wait 80
+shot village_2
+cmd tp @s 41000 100 40000
+wait 120
+cmd execute at @s run place structure minecraft:village_desert ~ 70 ~
+wait 40
+find elementalarcana:arcane_lectern 100
+wait 80
+shot village_3
+cmd tp @s 41500 100 40000
+wait 120
+cmd execute at @s run place structure minecraft:village_taiga ~ 70 ~
+wait 40
+find elementalarcana:arcane_lectern 100
+wait 80
+shot village_4
+cmd tp @s 42000 100 40000
+wait 120
+cmd execute at @s run place structure minecraft:village_savanna ~ 70 ~
+wait 40
+find elementalarcana:arcane_lectern 100
+wait 80
+shot village_5
+cmd tp @s 42500 100 40000
+wait 120
+cmd execute at @s run place structure minecraft:village_snowy ~ 70 ~
+wait 40
+find elementalarcana:arcane_lectern 100
+wait 80
+shot village_6
+quit

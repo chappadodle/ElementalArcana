@@ -1,0 +1,23 @@
+# Every village's Arcanist's cottage builds, each with its lectern ("Test passed" five times), and a
+# villager next to an Arcane Lectern takes the job (its VillagerData shows elementalarcana:arcanist).
+# The startup log also says the cottage joined the village house pools.
+time set noon
+forceload add 0 0 63 31
+fill 0 99 0 63 99 31 minecraft:stone
+fill 0 100 0 63 110 31 minecraft:air
+place template elementalarcana:village/plains/arcanist_cottage 2 100 2
+place template elementalarcana:village/desert/arcanist_cottage 12 100 2
+place template elementalarcana:village/savanna/arcanist_cottage 22 100 2
+place template elementalarcana:village/snowy/arcanist_cottage 32 100 2
+place template elementalarcana:village/taiga/arcanist_cottage 42 100 2
+execute if block 7 101 5 elementalarcana:arcane_lectern
+execute if block 17 101 5 elementalarcana:arcane_lectern
+execute if block 27 101 5 elementalarcana:arcane_lectern
+execute if block 37 101 5 elementalarcana:arcane_lectern
+execute if block 47 101 5 elementalarcana:arcane_lectern
+setblock 20 100 24 elementalarcana:arcane_lectern[facing=west]
+summon minecraft:villager 16 100 24 {VillagerData:{profession:"minecraft:none",level:1,type:"minecraft:plains"},PersistenceRequired:1b,Tags:["job_test"]}
+sleep 40
+data get entity @e[tag=job_test,limit=1] VillagerData
+kill @e[tag=job_test]
+forceload remove all

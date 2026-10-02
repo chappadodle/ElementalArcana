@@ -14,6 +14,8 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 
 **Wisps.** Small floating orbs of pure element, one kind per element, drift through their element's lands (the shrine biomes, plus oceans for Water and the Nether for Fire) and guard the shrines, two at each. They leave you alone while your magic sleeps, and they leave their kin alone (mages who hold their element's family). Any other mage is a rival: they circle 5 to 8 blocks away and cast their element's spells. Anyone who hurts one is fought back, and nearby wisps join in. Every wisp is Attuned (a rare one is a Magus or even an Archmage, and bigger), so it's worth Attuned XP, and it drops its element's Essence. Fire wisps fear water and rain. Spawn eggs are in the creative tab.
 
+**Arcanists.** A villager profession for magic, in purple robes and a wide-brimmed hat. Its workstation is the **Arcane Lectern** (a lectern, an amethyst shard and two Essence, shapeless). Any unemployed villager near one takes the job, and about one village in three already has an Arcanist's cottage. Arcanists buy Essence and amethyst. They sell the Journal, wands and staves, robes, Essence of any element and Catalysts. Only they sell two rarities: the **Scroll of Unbinding** (Expert), which gives back every skill tree node you bought for free, and the **Tome of Insight** (Master), worth one bonus tree point.
+
 **Controls** (rebindable under *Elemental Arcana* in Controls):
 
 | Key | |
@@ -126,6 +128,7 @@ python3 tools/gen_textures.py   # needs Pillow
 python3 tools/gen_gear.py       # wands, staves and robes; needs numpy and Pillow
 python3 tools/gen_world.py      # the Shrine Core and effect icons; needs numpy and Pillow
 python3 tools/gen_creatures.py  # the wisps; needs numpy and Pillow
+python3 tools/gen_people.py     # the Arcanist, its lectern and items, and its village cottages; needs numpy and Pillow
 bash tools/gen_sounds.sh        # needs sox
 python3 tools/gen_spell_sounds.py  # needs numpy, scipy and sox
 ```

@@ -14,10 +14,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.SectionPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -25,6 +27,8 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -59,10 +63,13 @@ import java.util.Optional;
  * screen status|tree [spell]|stats|journal|close   open one of the mod's screens
  * hud on|off               show or hide the HUD
  * camera first|back|front  the camera view
- * use                      right-click the block under the crosshair
+ * use                      right-click the creature or block under the crosshair (or, with
+ *                          neither, use the held item)
  * goto elementalarcana:fire_shrine 18 14 [2]   stand 18 blocks south of the nearest such structure
  *                          and 14 above its base, looking at its middle, 2 blocks above the base
  *                          (default 0); it's searched for from where the player is
+ * find elementalarcana:arcane_lectern 80   look for that block within 80 blocks (and 60 below to
+ *                          20 above); log where, and view the first from 8 blocks south, 5 up
  * quit                     close the game
  * </pre>
  */
@@ -153,13 +160,20 @@ public final class AutoTest {
             case "screen" -> openScreen(minecraft, argument);
             case "hud" -> minecraft.options.hideGui = argument.equals("off");
             case "use" -> {
-                if (minecraft.hitResult instanceof BlockHitResult hit && minecraft.gameMode != null) {
-                    minecraft.gameMode.useItemOn(minecraft.player, InteractionHand.MAIN_HAND, hit);
+                if (minecraft.gameMode == null) {
+                    LOGGER.warn("[autotest] use: no game mode");
+                } else if (minecraft.hitResult instanceof EntityHitResult hit) {
+                    minecraft.gameMode.interact(minecraft.player, hit.getEntity(), InteractionHand.MAIN_HAND);
+                } else if (minecraft.hitResult instanceof BlockHitResult hit && hit.getType() == HitResult.Type.BLOCK
+                        && minecraft.gameMode.useItemOn(minecraft.player, InteractionHand.MAIN_HAND, hit).consumesAction()) {
+                    LOGGER.info("[autotest] use: used the block");
                 } else {
-                    LOGGER.warn("[autotest] use: not looking at a block");
+                    // Like a right click: if the block didn't take it, the item is used.
+                    minecraft.gameMode.useItem(minecraft.player, InteractionHand.MAIN_HAND);
                 }
             }
             case "goto" -> gotoStructure(minecraft, argument);
+            case "find" -> findBlock(minecraft, argument);
             case "camera" -> minecraft.options.setCameraType(switch (argument) {
                 case "back" -> CameraType.THIRD_PERSON_BACK;
                 case "front" -> CameraType.THIRD_PERSON_FRONT;
@@ -233,6 +247,45 @@ public final class AutoTest {
             float pitch = (float) Math.toDegrees(Math.atan2(height + player.getEyeHeight() - aim, distance));
             player.teleportTo(level, x, y, z, 180f, pitch);
             LOGGER.info("[autotest] goto {}: found at {} {} {}", key.location(), middle.getX(), box.minY(), middle.getZ());
+        });
+    }
+
+    /** Scans the loaded world around the player for a block; logs up to five and views the first one. */
+    private static void findBlock(Minecraft minecraft, String argument) {
+        String[] parts = argument.split("\\s+");
+        Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(parts[0]));
+        int radius = parts.length > 1 ? Integer.parseInt(parts[1]) : 64;
+        MinecraftServer server = minecraft.getSingleplayerServer();
+        java.util.UUID id = minecraft.player.getUUID();
+        server.execute(() -> {
+            ServerPlayer player = server.getPlayerList().getPlayer(id);
+            if (player == null) {
+                return;
+            }
+            ServerLevel level = player.serverLevel();
+            BlockPos center = player.blockPosition();
+            List<BlockPos> found = new java.util.ArrayList<>();
+            BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+            for (int x = -radius; x <= radius && found.size() < 5; x++) {
+                for (int z = -radius; z <= radius && found.size() < 5; z++) {
+                    if (!level.hasChunkAt(center.offset(x, 0, z))) {
+                        continue;
+                    }
+                    for (int y = -60; y <= 20; y++) {
+                        pos.set(center.getX() + x, center.getY() + y, center.getZ() + z);
+                        if (level.getBlockState(pos).is(block)) {
+                            found.add(pos.immutable());
+                            break;
+                        }
+                    }
+                }
+            }
+            LOGGER.info("[autotest] find {}: {}", parts[0], found.isEmpty() ? "none" : found);
+            if (!found.isEmpty()) {
+                BlockPos first = found.get(0);
+                player.teleportTo(level, first.getX() + 0.5, first.getY() + 5, first.getZ() + 8.5, 180f,
+                        (float) Math.toDegrees(Math.atan2(5 + player.getEyeHeight() - 0.5, 8)));
+            }
         });
     }
 

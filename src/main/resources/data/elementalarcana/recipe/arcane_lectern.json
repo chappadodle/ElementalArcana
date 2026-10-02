@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:lectern"
+    },
+    {
+      "item": "minecraft:amethyst_shard"
+    },
+    {
+      "tag": "elementalarcana:essences"
+    },
+    {
+      "tag": "elementalarcana:essences"
+    }
+  ],
+  "result": {
+    "id": "elementalarcana:arcane_lectern",
+    "count": 1
+  }
+}

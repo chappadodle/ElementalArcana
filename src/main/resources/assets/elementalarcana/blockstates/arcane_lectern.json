@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "elementalarcana:block/arcane_lectern"
+    },
+    "facing=west": {
+      "model": "elementalarcana:block/arcane_lectern",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "elementalarcana:block/arcane_lectern",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "elementalarcana:block/arcane_lectern",
+      "y": 270
+    }
+  }
+}

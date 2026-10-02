@@ -4,6 +4,7 @@ import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.content.creature.ModCreatures;
 import com.chappadodle.elementalarcana.content.gear.ModGear;
+import com.chappadodle.elementalarcana.content.people.ModPeople;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -12,7 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-/** The mod's own creative tab: Essence, Catalysts, the Journal, gear (a focus of every element) and wisp eggs. */
+/** The mod's own creative tab: Essence, Catalysts, the Journal, gear (a focus of every element), the Arcanist's goods and wisp eggs. */
 public final class ModTabs {
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ElementalArcana.MODID);
 
@@ -36,6 +37,9 @@ public final class ModTabs {
                     }
                 }
                 ModGear.all().stream().skip(2).forEach(item -> output.accept(item.get()));
+                output.accept(ModPeople.ARCANE_LECTERN_ITEM.get());
+                output.accept(ModPeople.SCROLL_OF_UNBINDING.get());
+                output.accept(ModPeople.TOME_OF_INSIGHT.get());
                 for (Element element : Element.values()) {
                     output.accept(ModCreatures.wispEgg(element));
                 }

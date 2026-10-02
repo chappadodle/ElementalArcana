@@ -532,5 +532,17 @@
   "item.elementalarcana.wind_wisp_spawn_egg": "Wind Wisp Spawn Egg",
   "item.elementalarcana.earth_wisp_spawn_egg": "Earth Wisp Spawn Egg",
   "commands.elementalarcana.wisp_spawned": "Called a %s at %s, %s, %s",
-  "commands.elementalarcana.wisp_none": "No wisp could come here (no open ground nearby, or a biome without wisps)"
+  "commands.elementalarcana.wisp_none": "No wisp could come here (no open ground nearby, or a biome without wisps)",
+  "journal.elementalarcana.page.14": "§5§lArcanists§r\n\nSome villagers study magic. Give one an Arcane Lectern (a lectern, an amethyst shard and two Essence) and they'll trade in Essence, wands, robes, even Catalysts.\n\nSome villages already have an Arcanist's cottage.",
+  "block.elementalarcana.arcane_lectern": "Arcane Lectern",
+  "item.elementalarcana.scroll_of_unbinding": "Scroll of Unbinding",
+  "item.elementalarcana.scroll_of_unbinding.desc": "Read it to give back every skill tree node you bought, for free",
+  "item.elementalarcana.tome_of_insight": "Tome of Insight",
+  "item.elementalarcana.tome_of_insight.desc": "Read it for one more skill tree point",
+  "entity.minecraft.villager.elementalarcana.arcanist": "Arcanist",
+  "entity.minecraft.villager.arcanist": "Arcanist",
+  "message.elementalarcana.unbinding.nothing": "There's nothing to unbind: you haven't taken any tree nodes",
+  "message.elementalarcana.unbinding.done": "The scroll crumbles to dust, and your skill tree comes unbound: %s nodes given back.",
+  "message.elementalarcana.insight.dormant": "The words mean nothing to you yet",
+  "message.elementalarcana.insight.done": "The tome's insight settles in you: +1 tree point."
 }
