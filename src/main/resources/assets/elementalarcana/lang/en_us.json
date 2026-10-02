@@ -519,5 +519,18 @@
   "message.elementalarcana.shrine.stirs": "The shrine of %s hums, and something in you stirs, but does not wake. Return tomorrow.",
   "message.elementalarcana.awakening.shrine": "The shrine of %s answered you, and your magic woke.",
   "message.elementalarcana.shrine.blessed": "The shrine of %s blesses you: your mana is full, and its element runs strong in you.",
-  "journal.elementalarcana.page.12": "§5§lShrines§r\n\nShrines of the elements stand across the world. Near one, mana returns faster. Touch its core once a day: it blesses the awakened, and may wake the magic of one who still sleeps."
+  "journal.elementalarcana.page.12": "§5§lShrines§r\n\nShrines of the elements stand across the world. Near one, mana returns faster. Touch its core once a day: it blesses the awakened, and may wake the magic of one who still sleeps.",
+  "journal.elementalarcana.page.13": "§5§lWisps§r\n\nWisps are drops of pure element, drawn to mana. They guard the shrines and drift through their element's lands.\n\nThey leave the sleeping be, and their own kin. Any other mage they take for a rival. Each one holds Essence.",
+  "entity.elementalarcana.fire_wisp": "Fire Wisp",
+  "entity.elementalarcana.water_wisp": "Water Wisp",
+  "entity.elementalarcana.ice_wisp": "Ice Wisp",
+  "entity.elementalarcana.wind_wisp": "Wind Wisp",
+  "entity.elementalarcana.earth_wisp": "Earth Wisp",
+  "item.elementalarcana.fire_wisp_spawn_egg": "Fire Wisp Spawn Egg",
+  "item.elementalarcana.water_wisp_spawn_egg": "Water Wisp Spawn Egg",
+  "item.elementalarcana.ice_wisp_spawn_egg": "Ice Wisp Spawn Egg",
+  "item.elementalarcana.wind_wisp_spawn_egg": "Wind Wisp Spawn Egg",
+  "item.elementalarcana.earth_wisp_spawn_egg": "Earth Wisp Spawn Egg",
+  "commands.elementalarcana.wisp_spawned": "Called a %s at %s, %s, %s",
+  "commands.elementalarcana.wisp_none": "No wisp could come here (no open ground nearby, or a biome without wisps)"
 }

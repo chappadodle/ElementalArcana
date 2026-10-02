@@ -22,9 +22,12 @@ the land suits one). Each cell picks one of the five kinds whose biomes match:
 | Earth | plains and forests |
 
 The shrine needs fairly level ground: the four corners and the middle of its 11x11 footprint may
-differ by at most 6 blocks, and only Water shrines stand in water. The platform sits at the average
+differ by at most 6 blocks, and only Water shrines stand in water or below sea level (elsewhere the
+ground carved around the platform would flood into a moat). The platform sits at the average
 height, and the game's terrain blending (`beard_thin`) fills the ground below it and slopes the
-ground above it away, so it settles into the land.
+ground above it away, so it settles into the land. Shrines generate in the last decoration step
+(`top_layer_modification`), after trees, and clear the air above the platform, so no tree grows
+through one.
 
 ## What they look like
 

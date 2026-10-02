@@ -3,6 +3,7 @@
     "minecraft:blaze",
     "minecraft:magma_cube",
     "minecraft:ghast",
-    "minecraft:strider"
+    "minecraft:strider",
+    "elementalarcana:fire_wisp"
   ]
 }

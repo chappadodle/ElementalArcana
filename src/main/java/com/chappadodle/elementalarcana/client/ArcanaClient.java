@@ -29,6 +29,7 @@ import com.chappadodle.elementalarcana.client.visual.WindSlashRenderer;
 import com.chappadodle.elementalarcana.content.BubblePrisons;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.content.ModSpells;
+import com.chappadodle.elementalarcana.content.creature.ModCreatures;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.core.MagicData;
 import com.chappadodle.elementalarcana.network.CastSpellPayload;
@@ -290,6 +291,14 @@ public final class ArcanaClient {
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModContent.SPELL_PROJECTILE.get(), SpellProjectileRenderer::new);
+        for (Element element : Element.values()) {
+            event.registerEntityRenderer(ModCreatures.wisp(element), WispRenderer::new);
+        }
+    }
+
+    @SubscribeEvent
+    public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
+        event.registerLayerDefinition(WispModel.LAYER, WispModel::createLayer);
     }
 
     // Load every projectile spell's 3D model, including models from addon spells.

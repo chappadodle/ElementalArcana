@@ -2,7 +2,7 @@
   "type": "elementalarcana:shrine",
   "kind": "earth",
   "biomes": "#elementalarcana:has_structure/earth_shrine",
-  "step": "surface_structures",
+  "step": "top_layer_modification",
   "spawn_overrides": {},
   "terrain_adaptation": "beard_thin"
 }

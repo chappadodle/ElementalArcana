@@ -1,0 +1,24 @@
+# Shrine guardians. First the Earth shrine the wisp test visits: its saved guardian timer against the
+# game time. Then a shrine no one has been near: guardians should appear once a (non-spectator)
+# player is within 32 blocks.
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamemode spectator
+cmd tp @s -20792 90 -19110
+wait 100
+cmd data get block -20792 65 -19128 next_guardians_at
+cmd time query gametime
+cmd arcana creaturelevel @e[type=#elementalarcana:wisps]
+cmd tp @s 25000 150 25000
+wait 20
+goto elementalarcana:fire_shrine 12 6
+wait 120
+cmd arcana creaturelevel @e[type=#elementalarcana:wisps]
+cmd gamemode creative
+wait 30
+cmd arcana creaturelevel @e[type=#elementalarcana:wisps]
+wait 40
+cmd arcana creaturelevel @e[type=#elementalarcana:wisps]
+shot guardians_fire
+quit

@@ -2,6 +2,7 @@
   "values": [
     "minecraft:stray",
     "minecraft:polar_bear",
-    "minecraft:snow_golem"
+    "minecraft:snow_golem",
+    "elementalarcana:ice_wisp"
   ]
 }

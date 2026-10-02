@@ -5,6 +5,7 @@ import com.chappadodle.elementalarcana.api.ProjectileSpell;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
 import com.chappadodle.elementalarcana.content.ModContent;
+import com.chappadodle.elementalarcana.content.creature.WispEntity;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -50,9 +51,14 @@ public final class MobCasting {
         at.level().playSound(null, at.getX(), at.getY(), at.getZ(), sound, SoundSource.HOSTILE, volume, pitch);
     }
 
-    /** One tick of the wind-up: the element gathers at the caster's hands. */
+    /** One tick of the wind-up: the element gathers at the caster's hands (a wisp's core flares). */
     public static void windup(Mob caster, Element element) {
         if (!(caster.level() instanceof ServerLevel level)) {
+            return;
+        }
+        if (caster instanceof WispEntity) {
+            Vec3 core = caster.getBoundingBox().getCenter();
+            level.sendParticles(handsParticle(element), core.x, core.y, core.z, 2, 0.15, 0.15, 0.15, 0.01);
             return;
         }
         float yaw = caster.getYRot() * Mth.DEG_TO_RAD;

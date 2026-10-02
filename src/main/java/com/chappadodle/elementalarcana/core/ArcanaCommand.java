@@ -12,6 +12,8 @@ import com.chappadodle.elementalarcana.content.Awakenings;
 import com.chappadodle.elementalarcana.content.BubblePrisons;
 import com.chappadodle.elementalarcana.content.CreatureLevels;
 import com.chappadodle.elementalarcana.content.SkillTreeLoader;
+import com.chappadodle.elementalarcana.content.creature.WispEntity;
+import com.chappadodle.elementalarcana.content.creature.WispSpawner;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -33,6 +35,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Locale;
@@ -117,7 +120,29 @@ public final class ArcanaCommand {
                                 .executes(ctx -> setLevels(ctx.getSource(), EntityArgument.getEntities(ctx, "targets"),
                                         IntegerArgumentType.getInteger(ctx, "level")))))))
                 .then(Commands.literal("bubble").then(Commands.argument("targets", EntityArgument.entities())
-                        .executes(ctx -> bubble(ctx.getSource(), EntityArgument.getEntities(ctx, "targets"))))));
+                        .executes(ctx -> bubble(ctx.getSource(), EntityArgument.getEntities(ctx, "targets")))))
+                .then(Commands.literal("wisp").then(wispSpawn())));
+    }
+
+    /** /arcana wisp spawn [element]: calls a wisp near you now, the way the wild spawner would (for testing). */
+    private static LiteralArgumentBuilder<CommandSourceStack> wispSpawn() {
+        LiteralArgumentBuilder<CommandSourceStack> spawn = Commands.literal("spawn").executes(ctx -> spawnWisp(ctx.getSource(), null));
+        for (Element element : Element.values()) {
+            spawn.then(Commands.literal(element.name().toLowerCase(Locale.ROOT)).executes(ctx -> spawnWisp(ctx.getSource(), element)));
+        }
+        return spawn;
+    }
+
+    private static int spawnWisp(CommandSourceStack source, @Nullable Element element) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        WispEntity wisp = WispSpawner.trySpawnWild(player.serverLevel(), player, element);
+        if (wisp == null) {
+            source.sendFailure(Component.translatable("commands.elementalarcana.wisp_none"));
+            return 0;
+        }
+        source.sendSuccess(() -> Component.translatable("commands.elementalarcana.wisp_spawned", wisp.getDisplayName(),
+                wisp.getBlockX(), wisp.getBlockY(), wisp.getBlockZ()), false);
+        return 1;
     }
 
     /** /arcana attune <targets> <element> <rank>, or /arcana attune <targets> none. Mobs only. */

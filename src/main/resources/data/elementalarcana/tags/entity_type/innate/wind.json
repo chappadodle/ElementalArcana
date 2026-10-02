@@ -2,6 +2,7 @@
   "values": [
     "minecraft:breeze",
     "minecraft:phantom",
-    "minecraft:vex"
+    "minecraft:vex",
+    "elementalarcana:wind_wisp"
   ]
 }

@@ -1,0 +1,9 @@
+{
+  "values": [
+    "#elementalarcana:has_structure/fire_shrine",
+    {
+      "id": "#minecraft:is_nether",
+      "required": false
+    }
+  ]
+}

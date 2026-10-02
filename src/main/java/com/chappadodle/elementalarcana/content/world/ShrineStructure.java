@@ -17,7 +17,7 @@ import java.util.Optional;
 /**
  * An elemental shrine (see ShrinePiece for what it looks like). It needs fairly level ground: the
  * corners of its 11x11 footprint may differ by at most 6 blocks, and its platform sits at their
- * average height. Only Water shrines stand in water.
+ * average height. Only Water shrines stand in water or below sea level.
  */
 public class ShrineStructure extends Structure {
     public static final MapCodec<ShrineStructure> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -58,8 +58,12 @@ public class ShrineStructure extends Structure {
             return Optional.empty();
         }
         // Level with the average ground (the platform takes the place of the top block): terrain
-        // blending fills below the platform and carves above it.
+        // blending fills below the platform and carves above it, from the platform's own level up.
         int groundY = Math.round(sum / 5f);
+        if (kind != ShrineKind.WATER && groundY < generator.getSeaLevel()) {
+            // Below sea level, the carved ground around the platform would flood into a moat.
+            return Optional.empty();
+        }
         Direction facing = Direction.Plane.HORIZONTAL.getRandomDirection(context.random());
         BlockPos origin = new BlockPos(x, groundY, z);
         return Optional.of(new GenerationStub(origin, builder -> builder.addPiece(new ShrinePiece(kind, x, groundY, z, facing))));

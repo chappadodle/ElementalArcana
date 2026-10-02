@@ -1,0 +1,64 @@
+# The five wisps in a row, an Archmage wisp, a fight in the open (a Wind mage against a Fire wisp),
+# and an Earth shrine's guardians coming out. "arcana creaturelevel" lines list the wisps in the log.
+hud on
+cmd kill @e[type=!player]
+cmd time set noon
+cmd gamerule doDaylightCycle false
+cmd weather clear
+cmd gamemode spectator
+cmd tp @s -20000 150 -20000
+wait 20
+goto elementalarcana:wind_shrine 10 3 3
+wait 160
+cmd kill @e[type=!player]
+look 180 0
+cmd execute at @s anchored eyes run summon elementalarcana:fire_wisp ^2 ^-0.3 ^3 {NoAI:1b}
+cmd execute at @s anchored eyes run summon elementalarcana:water_wisp ^1 ^-0.3 ^3 {NoAI:1b}
+cmd execute at @s anchored eyes run summon elementalarcana:ice_wisp ^0 ^-0.3 ^3 {NoAI:1b}
+cmd execute at @s anchored eyes run summon elementalarcana:wind_wisp ^-1 ^-0.3 ^3 {NoAI:1b}
+cmd execute at @s anchored eyes run summon elementalarcana:earth_wisp ^-2 ^-0.3 ^3 {NoAI:1b}
+wait 40
+shot wisps_lineup
+cmd kill @e[type=!player]
+cmd execute at @s anchored eyes run summon elementalarcana:ice_wisp ^ ^-0.5 ^4 {NoAI:1b}
+cmd arcana attune @e[type=elementalarcana:ice_wisp] ice archmage
+wait 40
+shot wisp_archmage
+cmd kill @e[type=!player]
+# The fight, on open ground east of the shrine.
+cmd arcana awaken wind
+cmd spreadplayers ~40 ~ 0 1 false @s
+wait 60
+look 180 0
+cmd gamemode survival
+cmd effect give @s minecraft:resistance 120 4 true
+cmd effect give @s minecraft:regeneration 120 2 true
+cmd kill @e[type=!player]
+wait 20
+cmd execute at @s run summon elementalarcana:fire_wisp ~ ~3 ~-7
+camera back
+wait 20
+cmd arcana creaturelevel @e[type=#elementalarcana:wisps]
+shot wisp_fight_1
+wait 15
+shot wisp_fight_2
+wait 15
+shot wisp_fight_3
+wait 15
+shot wisp_fight_4
+cmd arcana creaturelevel @e[type=#elementalarcana:wisps]
+cmd data get entity @s Health
+camera first
+cmd kill @e[type=!player]
+# Guardians: they come out when someone (not a spectator) is near.
+cmd gamemode spectator
+goto elementalarcana:earth_shrine 12 6
+wait 120
+cmd arcana creaturelevel @e[type=#elementalarcana:wisps]
+cmd gamemode creative
+wait 60
+shot shrine_guardians
+cmd arcana creaturelevel @e[type=#elementalarcana:wisps]
+cmd arcana wisp spawn earth
+wait 20
+quit

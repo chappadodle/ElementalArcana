@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "elementalarcana:fire_wisp",
+    "elementalarcana:water_wisp",
+    "elementalarcana:ice_wisp",
+    "elementalarcana:wind_wisp",
+    "elementalarcana:earth_wisp"
+  ]
+}

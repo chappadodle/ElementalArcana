@@ -1,0 +1,29 @@
+# All five wisps summon (Attuned to their own element), get a level, can't be attuned to another
+# element, grow when they rank up, and die cleanly.
+time set noon
+forceload add 0 0 15 15
+summon elementalarcana:fire_wisp 8 100 8
+summon elementalarcana:water_wisp 6 100 8
+summon elementalarcana:ice_wisp 4 100 8
+summon elementalarcana:wind_wisp 2 100 8
+summon elementalarcana:earth_wisp 0 100 8
+sleep 2
+arcana creaturelevel @e[type=elementalarcana:fire_wisp]
+arcana creaturelevel @e[type=elementalarcana:water_wisp]
+arcana creaturelevel @e[type=elementalarcana:ice_wisp]
+arcana creaturelevel @e[type=elementalarcana:wind_wisp]
+arcana creaturelevel @e[type=elementalarcana:earth_wisp]
+# Refused: a wisp is innate to its element.
+arcana attune @e[type=elementalarcana:fire_wisp] water adept
+# A Magus wisp is 1.35 times the size.
+arcana attune @e[type=elementalarcana:fire_wisp] fire magus
+sleep 2
+attribute @e[type=elementalarcana:fire_wisp,limit=1] minecraft:generic.scale get
+arcana creaturelevel @e[type=elementalarcana:fire_wisp]
+kill @e[type=elementalarcana:fire_wisp]
+kill @e[type=elementalarcana:water_wisp]
+kill @e[type=elementalarcana:ice_wisp]
+kill @e[type=elementalarcana:wind_wisp]
+kill @e[type=elementalarcana:earth_wisp]
+sleep 1
+forceload remove all

@@ -4,6 +4,7 @@
     "minecraft:guardian",
     "minecraft:elder_guardian",
     "minecraft:squid",
-    "minecraft:glow_squid"
+    "minecraft:glow_squid",
+    "elementalarcana:water_wisp"
   ]
 }

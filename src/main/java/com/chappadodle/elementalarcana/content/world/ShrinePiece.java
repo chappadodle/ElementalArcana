@@ -24,11 +24,14 @@ import net.minecraft.world.level.storage.loot.LootTable;
  * foundation, with the Shrine Core on a pedestal at the middle, pillars (or, for Earth, a ring of
  * standing stones) and an offering chest. Local coordinates: the middle is (5, 5), the platform is
  * at local y 0, the bottom of the piece, so the game's terrain blending (beard_thin) fills the ground
- * below it and slopes the ground above it away, instead of leaving it in a pit.
+ * below it and slopes the ground above it away, instead of leaving it in a pit. Shrines generate in
+ * the last decoration step, after trees, and clear the air above the platform, so no tree grows
+ * through one.
  */
 public class ShrinePiece extends StructurePiece {
     private static final int GROUND = 0;
     private static final int MID = 5;
+    private static final int CLEAR_HEIGHT = 14;
 
     /** The blocks a shrine is made of. */
     private record Palette(BlockState floor, BlockState trim, BlockState inner, BlockState pillar, BlockState cap,
@@ -38,7 +41,7 @@ public class ShrinePiece extends StructurePiece {
     private final ShrineKind kind;
 
     public ShrinePiece(ShrineKind kind, int x, int groundY, int z, Direction facing) {
-        super(ModWorld.SHRINE_PIECE.get(), 0, new BoundingBox(x, groundY, z, x + 10, groundY + 8, z + 10));
+        super(ModWorld.SHRINE_PIECE.get(), 0, new BoundingBox(x, groundY, z, x + 10, groundY + CLEAR_HEIGHT, z + 10));
         this.kind = kind;
         setOrientation(facing);
     }
@@ -90,8 +93,8 @@ public class ShrinePiece extends StructurePiece {
                 if (r > 5.4) {
                     continue;
                 }
-                // Room above the platform, then the platform on a foundation.
-                for (int y = GROUND + 1; y <= GROUND + 8; y++) {
+                // Room above the platform (cutting away any tree), then the platform on a foundation.
+                for (int y = GROUND + 1; y <= GROUND + CLEAR_HEIGHT; y++) {
                     placeBlock(level, Blocks.AIR.defaultBlockState(), x, y, z, box);
                 }
                 fillColumnDown(level, palette.foundation(), x, GROUND - 1, z, box);

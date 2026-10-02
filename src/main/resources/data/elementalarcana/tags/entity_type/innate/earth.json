@@ -2,6 +2,7 @@
   "values": [
     "minecraft:iron_golem",
     "minecraft:silverfish",
-    "minecraft:armadillo"
+    "minecraft:armadillo",
+    "elementalarcana:earth_wisp"
   ]
 }

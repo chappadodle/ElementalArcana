@@ -1,0 +1,89 @@
+package com.chappadodle.elementalarcana.content.creature;
+
+import com.chappadodle.elementalarcana.ElementalArcana;
+import com.chappadodle.elementalarcana.api.Element;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.item.Item;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.common.DeferredSpawnEggItem;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredItem;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.EnumMap;
+import java.util.Locale;
+import java.util.Map;
+
+/** The mod's creatures (docs/superpowers/specs/2026-10-02-wisps-design.md): the five elemental wisps and their spawn eggs. */
+public final class ModCreatures {
+    private static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(Registries.ENTITY_TYPE, ElementalArcana.MODID);
+    private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ElementalArcana.MODID);
+    private static final Map<Element, DeferredHolder<EntityType<?>, EntityType<WispEntity>>> WISPS = new EnumMap<>(Element.class);
+    private static final Map<Element, DeferredItem<DeferredSpawnEggItem>> WISP_EGGS = new EnumMap<>(Element.class);
+
+    static {
+        for (Element element : Element.values()) {
+            String name = element.name().toLowerCase(Locale.ROOT) + "_wisp";
+            DeferredHolder<EntityType<?>, EntityType<WispEntity>> type = ENTITY_TYPES.register(name, () -> {
+                EntityType.Builder<WispEntity> builder = EntityType.Builder
+                        .<WispEntity>of((entityType, level) -> new WispEntity(entityType, level, element), MobCategory.MONSTER)
+                        .sized(0.6f, 0.6f)
+                        .eyeHeight(0.3f)
+                        .clientTrackingRange(8);
+                if (element == Element.FIRE) {
+                    builder.fireImmune();
+                }
+                return builder.build(ElementalArcana.MODID + ":" + name);
+            });
+            WISPS.put(element, type);
+            WISP_EGGS.put(element, ITEMS.register(name + "_spawn_egg",
+                    () -> new DeferredSpawnEggItem(type, eggColor(element), eggSpots(element), new Item.Properties())));
+        }
+    }
+
+    private ModCreatures() {
+    }
+
+    public static void register(IEventBus modEventBus) {
+        ENTITY_TYPES.register(modEventBus);
+        ITEMS.register(modEventBus);
+        modEventBus.addListener(ModCreatures::registerAttributes);
+    }
+
+    public static EntityType<WispEntity> wisp(Element element) {
+        return WISPS.get(element).get();
+    }
+
+    public static Item wispEgg(Element element) {
+        return WISP_EGGS.get(element).get();
+    }
+
+    private static void registerAttributes(EntityAttributeCreationEvent event) {
+        WISPS.values().forEach(type -> event.put(type.get(), WispEntity.createAttributes().build()));
+    }
+
+    /** The egg's shell: the wisp's shell colour. */
+    private static int eggColor(Element element) {
+        return switch (element) {
+            case FIRE -> 0xFF7020;
+            case WATER -> 0x3084FF;
+            case ICE -> 0x8CCDFA;
+            case WIND -> 0x78DEB2;
+            case EARTH -> 0x786450;
+        };
+    }
+
+    /** The egg's spots: the wisp's core. */
+    private static int eggSpots(Element element) {
+        return switch (element) {
+            case FIRE -> 0xFFE08A;
+            case WATER -> 0xD0F0FF;
+            case ICE -> 0xFFFFFF;
+            case WIND -> 0xF0FFF8;
+            case EARTH -> 0xFFC460;
+        };
+    }
+}

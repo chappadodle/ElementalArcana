@@ -6,7 +6,7 @@ cmd time set noon
 cmd gamerule doDaylightCycle false
 cmd weather clear
 cmd gamemode spectator
-cmd tp @s -20000 150 -20000
+cmd tp @s -30000 150 30000
 wait 20
 goto elementalarcana:wind_shrine 14 14
 wait 200

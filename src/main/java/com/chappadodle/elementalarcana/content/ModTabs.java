@@ -2,6 +2,7 @@ package com.chappadodle.elementalarcana.content;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Element;
+import com.chappadodle.elementalarcana.content.creature.ModCreatures;
 import com.chappadodle.elementalarcana.content.gear.ModGear;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -11,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-/** The mod's own creative tab: Essence, Catalysts, the Journal, and gear (a focus of every element). */
+/** The mod's own creative tab: Essence, Catalysts, the Journal, gear (a focus of every element) and wisp eggs. */
 public final class ModTabs {
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ElementalArcana.MODID);
 
@@ -35,6 +36,9 @@ public final class ModTabs {
                     }
                 }
                 ModGear.all().stream().skip(2).forEach(item -> output.accept(item.get()));
+                for (Element element : Element.values()) {
+                    output.accept(ModCreatures.wispEgg(element));
+                }
             })
             .build());
 
