@@ -1,0 +1,24 @@
+# Each brew brews: four brewing stands, each with an Awkward Potion, a brew's ingredient and blaze
+# powder; 20 seconds later the potion has become the brew (its potion_contents in the output).
+# The effects also apply to a creature without errors.
+time set noon
+forceload add 0 0 15 15
+fill 0 99 0 15 99 15 minecraft:stone
+fill 0 100 0 15 105 15 minecraft:air
+setblock 2 100 4 minecraft:brewing_stand{Items:[{Slot:0b,id:"minecraft:potion",count:1,components:{"minecraft:potion_contents":{potion:"minecraft:awkward"}}},{Slot:3b,id:"minecraft:amethyst_shard",count:1},{Slot:4b,id:"minecraft:blaze_powder",count:1}]}
+setblock 5 100 4 minecraft:brewing_stand{Items:[{Slot:0b,id:"minecraft:potion",count:1,components:{"minecraft:potion_contents":{potion:"minecraft:awkward"}}},{Slot:3b,id:"elementalarcana:wisp_mote",count:1},{Slot:4b,id:"minecraft:blaze_powder",count:1}]}
+setblock 8 100 4 minecraft:brewing_stand{Items:[{Slot:0b,id:"minecraft:potion",count:1,components:{"minecraft:potion_contents":{potion:"minecraft:awkward"}}},{Slot:3b,id:"minecraft:lapis_lazuli",count:1},{Slot:4b,id:"minecraft:blaze_powder",count:1}]}
+setblock 11 100 4 minecraft:brewing_stand{Items:[{Slot:0b,id:"minecraft:potion",count:1,components:{"minecraft:potion_contents":{potion:"minecraft:awkward"}}},{Slot:3b,id:"minecraft:prismarine_crystals",count:1},{Slot:4b,id:"minecraft:blaze_powder",count:1}]}
+summon minecraft:zombie 8 100 10 {NoAI:1b,PersistenceRequired:1b,Tags:["brew_test"]}
+effect give @e[tag=brew_test] elementalarcana:clarity 10 1
+effect give @e[tag=brew_test] elementalarcana:focus 10 0
+effect give @e[tag=brew_test] elementalarcana:warding 10 0
+effect give @e[tag=brew_test] elementalarcana:mana_restoration 1 0
+sleep 22
+data get block 2 100 4 Items[0].components
+data get block 5 100 4 Items[0].components
+data get block 8 100 4 Items[0].components
+data get block 11 100 4 Items[0].components
+kill @e[tag=brew_test]
+fill 0 100 0 15 105 15 minecraft:air
+forceload remove all

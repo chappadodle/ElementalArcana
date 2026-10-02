@@ -2,6 +2,7 @@ package com.chappadodle.elementalarcana.core;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.content.ModContent;
+import com.chappadodle.elementalarcana.content.brew.ModBrews;
 import com.chappadodle.elementalarcana.content.gear.GearStats;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
@@ -49,6 +50,11 @@ public final class MagicEvents {
         if (place != null) {
             // A shrine nearby: half again as fast, twice as fast if it's your element's kin.
             regen *= place.getAmplifier() >= 1 ? 2f : 1.5f;
+        }
+        MobEffectInstance clarity = player.getEffect(ModBrews.CLARITY);
+        if (clarity != null) {
+            // An Elixir of Clarity: twice as fast, three times if strong.
+            regen *= 2 + clarity.getAmplifier();
         }
         if (player.hasEffect(ModContent.MANA_SICKNESS)) {
             regen *= SICKNESS_MULTIPLIER;

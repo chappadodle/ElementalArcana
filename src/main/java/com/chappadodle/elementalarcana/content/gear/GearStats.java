@@ -3,9 +3,13 @@ package com.chappadodle.elementalarcana.content.gear;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.StatGear;
 import com.chappadodle.elementalarcana.content.ModContent;
+import com.chappadodle.elementalarcana.content.brew.ModBrews;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.core.MagicData;
 import com.chappadodle.elementalarcana.core.StatPoints;
+import net.minecraft.core.Holder;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -16,7 +20,8 @@ import java.util.Map;
 /**
  * The stat points a player's gear adds: every piece worn in its own slot, and the better of the
  * foci held in the two hands, as long as the player's level meets the item's requirement. A shrine's
- * blessing adds here too (+5 Affinity of its element family and +2 Potency).
+ * blessing adds here too (+5 Affinity of its element family and +2 Potency), and so do the Elixirs
+ * of Focus and Warding.
  */
 public final class GearStats {
     private static final int BLESSING_AFFINITY = 5;
@@ -54,6 +59,16 @@ public final class GearStats {
                 stats.merge("potency", BLESSING_POTENCY, Integer::sum);
             }
         }
+        elixir(player, ModBrews.FOCUS, "focus", stats);
+        elixir(player, ModBrews.WARDING, "ward", stats);
         return stats;
+    }
+
+    /** An elixir drunk (see ModBrews): its stat, more for a strong one. */
+    private static void elixir(Player player, Holder<MobEffect> effect, String stat, Map<String, Integer> stats) {
+        MobEffectInstance instance = player.getEffect(effect);
+        if (instance != null) {
+            stats.merge(stat, ModBrews.ELIXIR_STAT + ModBrews.ELIXIR_STAT_PER_LEVEL * instance.getAmplifier(), Integer::sum);
+        }
     }
 }

@@ -18,6 +18,8 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 
 **Mage towers.** Rare towers of elemental stone, about one every 900 blocks and never within 800 blocks of the world's centre: a round tower 13 blocks across and about 40 tall, its element from the land around it. Five floors (a hall, a library, a laboratory, an armory and the sanctum) each have loot. The first time someone comes near, the tower wakes and acolytes appear on every floor: robed casters of its element who keep their distance and fight anyone who isn't kin. Reach the sanctum and its **Magister** appears: an Archmage with a boss bar who blinks away when hurt and calls wisps at half health. When it falls, the Tower Heart goes dark and it leaves a **Guardian Core**, the key to master gear.
 
+**Brews.** Brewed from an Awkward Potion like any potion (and made splash, lingering or into arrows the same way): a **Mana Draught** (amethyst shard) refills 30% of your mana at once (60% with glowstone); an **Elixir of Clarity** (a Wisp Mote, which wisps drop) makes mana regenerate twice as fast for 3 minutes; an **Elixir of Focus** (lapis lazuli) gives +6 Focus and an **Elixir of Warding** (prismarine crystals) +6 Ward. Glowstone makes the elixirs stronger and redstone longer. Arcanists sell Mana Draughts and Elixirs of Clarity.
+
 **Controls** (rebindable under *Elemental Arcana* in Controls):
 
 | Key | |
@@ -132,6 +134,7 @@ python3 tools/gen_world.py      # the Shrine Core and effect icons; needs numpy 
 python3 tools/gen_creatures.py  # the wisps; needs numpy and Pillow
 python3 tools/gen_people.py     # the Arcanist, its lectern and items, and its village cottages; needs numpy and Pillow
 python3 tools/gen_towers.py     # the mage towers' Acolytes and Magisters, and the Guardian Core; needs numpy and Pillow
+python3 tools/gen_brews.py      # brew effect icons and the Wisp Mote; needs numpy and Pillow
 bash tools/gen_sounds.sh        # needs sox
 python3 tools/gen_spell_sounds.py  # needs numpy, scipy and sox
 ```

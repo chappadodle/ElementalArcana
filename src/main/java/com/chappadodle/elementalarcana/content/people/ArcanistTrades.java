@@ -4,6 +4,7 @@ import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.content.ModItems;
 import com.chappadodle.elementalarcana.content.ModTabs;
+import com.chappadodle.elementalarcana.content.brew.ModBrews;
 import com.chappadodle.elementalarcana.content.gear.ModGear;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.util.RandomSource;
@@ -11,6 +12,7 @@ import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -47,11 +49,13 @@ public final class ArcanistTrades {
         // Apprentice
         trades.get(2).add(buy(random -> new ItemCost(Items.GLOWSTONE_DUST, 4), 1, 16, 5));
         trades.get(2).add(sell(random -> new ItemStack(ModItems.essence(anyElement(random))), 5, null, 8, 5));
+        trades.get(2).add(sell(random -> PotionContents.createItemStack(Items.POTION, ModBrews.MANA_DRAUGHT), 2, null, 12, 5));
         trades.get(2).add(sell(random -> new ItemStack(oneOf(random, ModGear.APPRENTICE_HOOD.get(), ModGear.APPRENTICE_ROBE.get(),
                 ModGear.APPRENTICE_TROUSERS.get(), ModGear.APPRENTICE_BOOTS.get())), 6, null, 4, 5));
         // Journeyman
         trades.get(3).add(sell(random -> new ItemStack(ModItems.catalyst(anyFamily(random))), 20, new ItemCost(Items.DIAMOND, 1), 2, 15));
         trades.get(3).add(sell(random -> ModTabs.focusOf(ModGear.ADEPT_STAFF.get(), anyElement(random)), 18, null, 3, 10));
+        trades.get(3).add(sell(random -> PotionContents.createItemStack(Items.POTION, ModBrews.CLARITY_ELIXIR), 6, null, 6, 10));
         // Expert
         trades.get(4).add(sell(random -> new ItemStack(oneOf(random, ModGear.ADEPT_HOOD.get(), ModGear.ADEPT_ROBE.get(),
                 ModGear.ADEPT_TROUSERS.get(), ModGear.ADEPT_BOOTS.get())), 16, null, 3, 15));

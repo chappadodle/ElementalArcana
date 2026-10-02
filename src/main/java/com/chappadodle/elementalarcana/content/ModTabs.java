@@ -3,6 +3,7 @@ package com.chappadodle.elementalarcana.content;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.content.creature.ModCreatures;
+import com.chappadodle.elementalarcana.content.brew.ModBrews;
 import com.chappadodle.elementalarcana.content.gear.ModGear;
 import com.chappadodle.elementalarcana.content.people.ModPeople;
 import com.chappadodle.elementalarcana.content.tower.GuardianCoreItem;
@@ -12,6 +13,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -45,6 +48,8 @@ public final class ModTabs {
                 for (Element element : Element.values()) {
                     output.accept(GuardianCoreItem.of(element));
                 }
+                output.accept(ModBrews.WISP_MOTE.get());
+                ModBrews.potions().forEach(potion -> output.accept(PotionContents.createItemStack(Items.POTION, potion)));
                 output.accept(ModTowers.ACOLYTE_EGG.get());
                 output.accept(ModTowers.MAGISTER_EGG.get());
                 for (Element element : Element.values()) {

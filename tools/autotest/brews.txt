@@ -1,0 +1,28 @@
+# Brews: a Mana Draught's effect refilling an emptied pool (the HUD's mana numbers), the elixirs'
+# icons in the corner, and Focus and Warding showing in the Stats window.
+hud on
+cmd kill @e[type=!player]
+cmd time set noon
+cmd weather clear
+cmd gamemode creative
+cmd tp @s 60000 161 60100 180 8
+wait 40
+cmd arcana awaken wind
+cmd effect clear @s
+cmd arcana mana set 0
+wait 10
+shot mana_empty
+cmd effect give @s elementalarcana:mana_restoration 1 1
+wait 10
+shot mana_restored
+cmd effect give @s elementalarcana:clarity 60 0
+cmd effect give @s elementalarcana:focus 60 0
+cmd effect give @s elementalarcana:warding 60 1
+cmd item replace entity @s weapon.mainhand with minecraft:potion[minecraft:potion_contents={potion:"elementalarcana:strong_mana_draught"}]
+wait 30
+shot elixirs
+screen stats
+wait 10
+shot elixir_stats
+screen close
+quit
