@@ -12,6 +12,7 @@ import com.chappadodle.elementalarcana.client.particle.CinderParticle;
 import com.chappadodle.elementalarcana.client.particle.EmberParticle;
 import com.chappadodle.elementalarcana.client.particle.FireBlastEmitter;
 import com.chappadodle.elementalarcana.client.particle.PyronadoEmitter;
+import com.chappadodle.elementalarcana.client.particle.TremorEmitter;
 import com.chappadodle.elementalarcana.client.particle.TsunamiParticle;
 import com.chappadodle.elementalarcana.client.particle.GlowParticle;
 import com.chappadodle.elementalarcana.client.particle.HydroDropParticle;
@@ -267,6 +268,7 @@ public final class ArcanaClient {
         event.registerSpecial(ModContent.FIRE_BLAST.get(), new FireBlastEmitter.Provider());
         event.registerSpecial(ModContent.PYRONADO.get(), new PyronadoEmitter.Provider());
         event.registerSpecial(ModContent.TSUNAMI.get(), new TsunamiParticle.Provider());
+        event.registerSpecial(ModContent.TREMOR.get(), new TremorEmitter.Provider());
         event.registerSpecial(ModContent.ICE_SHATTER.get(), new IceShatterEmitter.Provider());
         event.registerSpecial(ModContent.WIND_CUT.get(), new WindCutEmitter.Provider());
         event.registerSpecial(ModContent.WATER_BURST.get(), new WaterBurstParticle.Provider());

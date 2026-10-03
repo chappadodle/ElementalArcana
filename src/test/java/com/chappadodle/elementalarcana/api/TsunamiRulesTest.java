@@ -10,7 +10,7 @@ class TsunamiRulesTest {
     private static final int FLOOR = 64;
 
     /** A wave rolling east from (0.5, 64, 0.5), its point i at x = 0.5 + 0.5 i. */
-    private static int[] eastward(TsunamiRules.Ground ground) {
+    private static int[] eastward(GroundPath.Ground ground) {
         return TsunamiRules.path(ground, 0.5, FLOOR, 0.5, 1, 0);
     }
 

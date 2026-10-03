@@ -599,6 +599,7 @@
   "spell.elementalarcana.smite.desc": "Marks the ground where you look. A moment later a pillar of light strikes it, burning all there. The undead suffer most.",
   "message.elementalarcana.chain_lightning.no_target": "No creature under your crosshair to strike",
   "message.elementalarcana.tsunami.no_room": "No room for a wave to rise",
+  "message.elementalarcana.tremor.no_ground": "No ground under you for a Tremor to run along",
   "message.elementalarcana.stormeye.no_ground": "No ground there for a storm",
   "message.elementalarcana.gale_dash.no_room": "No room to blink there",
   "spell.elementalarcana.prism_ward": "Prism Ward",

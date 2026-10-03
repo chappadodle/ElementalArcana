@@ -132,6 +132,9 @@ public final class ModContent {
     /** A fireball's whole explosion in one particle (see FireBlastOptions). */
     public static final DeferredHolder<ParticleType<?>, ParticleType<FireBlastOptions>> FIRE_BLAST =
             PARTICLES.register("fire_blast", FireBlastOptions::newType);
+    /** A Tremor's front, for as long as it runs, in one particle (see TremorOptions). */
+    public static final DeferredHolder<ParticleType<?>, ParticleType<TremorOptions>> TREMOR =
+            PARTICLES.register("tremor", TremorOptions::newType);
     /** A Tsunami's wave, for as long as it rolls, in one particle (see TsunamiOptions). */
     public static final DeferredHolder<ParticleType<?>, ParticleType<TsunamiOptions>> TSUNAMI =
             PARTICLES.register("tsunami", TsunamiOptions::newType);

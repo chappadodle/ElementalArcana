@@ -67,9 +67,10 @@ Fireball and Icicle. It arcs, bounces once and hits hard with a lot of knockback
 | 9 | Stonefist | An enemy that hits it three times is rooted for 2 s |
 | 10 | Capstone | **Fortress**: a dome that blocks projectiles and pushes enemies out. **Titan**: for 15 s (the shield's duration) you gain +4 hearts, +50% melee damage and no knockback; if the shield breaks first, Titan ends with it |
 
-**Tremor** (one level): a shockwave rolls along the ground for 10 blocks, throwing creatures up and
-slowing them for 3 s, with a small hit of damage. It sets off Crystallize on anything burning, wet or
-frozen. Mana 30, cooldown 6 s.
+**Tremor** (one level): a shockwave runs along the ground for 10 blocks, a block a tick, throwing
+creatures up and slowing them for 3 s, with a small hit of damage; jump it to dodge. It sets off
+Crystallize on anything burning, wet or frozen. Mana 30, cooldown 6 s. (Made to travel, with its
+rock spikes, in the Tremor pass: `2026-10-03-tremor-design.md`.)
 
 ## Creatures
 

@@ -14,13 +14,13 @@ import org.jetbrains.annotations.Nullable;
  * point lies exactly on a block's face, so some rays start inside that block; vanilla reports those
  * as instant hits facing the wrong way (it would take a ceiling for a floor), so they're ignored.
  */
-final class ImpactSurfaces {
+public final class ImpactSurfaces {
     private ImpactSurfaces() {
     }
 
     /** The ground right below an impact (within 1.5 blocks), or null in mid-air. */
     @Nullable
-    static BlockHitResult groundBelow(Level level, Vec3 at) {
+    public static BlockHitResult groundBelow(Level level, Vec3 at) {
         BlockHitResult hit = level.clip(new ClipContext(at.add(0, 0.3, 0), at.subtract(0, 1.5, 0),
                 ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
         return hit.getType() == HitResult.Type.BLOCK && !hit.isInside() && hit.getDirection() == Direction.UP ? hit : null;

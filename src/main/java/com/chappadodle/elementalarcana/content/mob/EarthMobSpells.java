@@ -4,8 +4,7 @@ import com.chappadodle.elementalarcana.api.AttunementRank;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.SpellTargets;
 import com.chappadodle.elementalarcana.content.ModSpells;
-import com.chappadodle.elementalarcana.content.spell.TremorSpell;
-import net.minecraft.server.level.ServerLevel;
+import com.chappadodle.elementalarcana.content.spell.Tremors;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.phys.Vec3;
@@ -61,8 +60,7 @@ public final class EarthMobSpells {
         @Override
         public void cast(Mob caster, LivingEntity target) {
             Vec3 toward = target.position().subtract(caster.position());
-            TremorSpell.shockwave((ServerLevel) caster.level(), caster, new Vec3(toward.x, 0, toward.z), MobSpells.POWER,
-                    entity -> SpellTargets.canAffect(caster, entity));
+            Tremors.start(caster, toward, MobSpells.POWER, entity -> SpellTargets.canAffect(caster, entity));
         }
     }
 
