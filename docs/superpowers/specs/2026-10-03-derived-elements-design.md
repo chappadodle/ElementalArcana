@@ -55,7 +55,8 @@ creature under the crosshair (up to 20 blocks), then on to the nearest creature 
 the last that the caster may hurt, up to 3 jumps, each a fifth weaker: 5, 4, 3.2, 2.6 damage. A wet
 creature conducts it: it takes half again as much, and the bolt can jump twice more from it (never
 more than 6 jumps in all). With no target the cast fails and costs nothing. It's drawn as a jagged
-line of sparks, and each hit cracks with a thunderclap.
+line of sparks, and each hit cracks with a thunderclap. (It levels to 10, with forks and a client-drawn bolt, since
+`2026-10-03-chain-lightning-design.md`.)
 
 **Smite** (Radiance, 30 mana, 4 s). Marks the ground where the caster looks (up to 24 blocks, or a
 creature's feet when one is under the crosshair) with a ring of rising light. Three quarters of a

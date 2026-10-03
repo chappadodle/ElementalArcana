@@ -132,6 +132,9 @@ public final class ModContent {
     /** A fireball's whole explosion in one particle (see FireBlastOptions). */
     public static final DeferredHolder<ParticleType<?>, ParticleType<FireBlastOptions>> FIRE_BLAST =
             PARTICLES.register("fire_blast", FireBlastOptions::newType);
+    /** A bolt of lightning, drawn on each client (see ArcOptions). */
+    public static final DeferredHolder<ParticleType<?>, ParticleType<ArcOptions>> ARC =
+            PARTICLES.register("arc", ArcOptions::newType);
     /** A Tremor's front, for as long as it runs, in one particle (see TremorOptions). */
     public static final DeferredHolder<ParticleType<?>, ParticleType<TremorOptions>> TREMOR =
             PARTICLES.register("tremor", TremorOptions::newType);

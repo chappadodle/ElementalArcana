@@ -2,68 +2,91 @@ package com.chappadodle.elementalarcana.content.spell;
 
 import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.CastResult;
-import com.chappadodle.elementalarcana.api.Element;
-import com.chappadodle.elementalarcana.api.ElementalReactions;
+import com.chappadodle.elementalarcana.api.ChainLightningRules;
 import com.chappadodle.elementalarcana.api.Spell;
-import com.chappadodle.elementalarcana.api.SpellDamage;
 import com.chappadodle.elementalarcana.api.SpellTargets;
 import com.chappadodle.elementalarcana.content.ModSchools;
-import net.minecraft.core.particles.DustParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import java.util.function.Predicate;
 
 /**
- * Lightning's first spell: a bolt leaps from the caster's hand to the creature under the crosshair
- * (up to 20 blocks), then on to up to 3 more creatures within 6 blocks of the last, each jump a
- * fifth weaker. A wet creature conducts it: it takes half again as much, and the bolt can jump
- * twice more from it (never more than 6 jumps in all). Drawn as a jagged line of electric-yellow
- * pixels with sparks at its kinks. No target: the cast fails and costs nothing. Lightning wisps
- * cast it too.
+ * Lightning's first spell: a bolt leaps from the caster's hand to the creature under the crosshair,
+ * then on from creature to creature, each jump a little weaker; a wet creature conducts it (harder,
+ * and further). No target: the cast fails and costs nothing. It levels to 10
+ * (ChainLightningRules has the numbers; ChainLightnings does the work):
+ * <pre>
+ * Lv1 Chain Lightning  3 jumps                      Lv6  Conductor      wet: double, 3 more jumps
+ * Lv2 Long Arc         longer jumps and reach       Lv7  Thunderstruck  a bolt from the sky first
+ * Lv3 Static           each strike stuns            Lv8  Live Wire      5 jumps; struck foes arc
+ * Lv4 Forked Chain     4 jumps, gentler falloff     Lv9  Supercharge    no falloff
+ * Lv5 Storm Fork | Overload                         Lv10 Ball Lightning | Thunder Lord
+ * </pre>
+ * Lightning wisps, Attuned creatures, Thunderclap and the Wind Sovereign use the Lv 1 chain
+ * ({@link #chain}) and its bolt ({@link #bolt}).
  */
 public class ChainLightningSpell extends Spell {
-    private static final double RANGE = 20;
     private static final double AIM_LEEWAY = 0.6;
-    private static final double JUMP_RANGE = 6;
-    private static final int JUMPS = 3;
-    private static final int MAX_JUMPS = 6;
-    private static final float DAMAGE = 5f;
-    private static final float FALLOFF = 0.8f;
-    private static final float CONDUCTED = 1.5f;
     /** The caster's own bolt is drawn from this far past the hand, so nothing balloons in front of their eyes. */
-    private static final double FIRST_PERSON_SKIP = 1.0;
-    private static final DustParticleOptions ARC = new DustParticleOptions(new Vector3f(1f, 0.92f, 0.45f), 0.7f);
-    private static final DustParticleOptions ARC_CORE = new DustParticleOptions(new Vector3f(1f, 1f, 0.9f), 0.45f);
+    static final double FIRST_PERSON_SKIP = 1.0;
 
     public ChainLightningSpell() {
         super(ModSchools.LIGHTNING, 28, 70);
     }
 
     @Override
+    public int maxLevel() {
+        return 10;
+    }
+
+    @Override
+    public List<String> branchOptions(int level) {
+        return switch (level) {
+            case 5 -> List.of(ChainLightningRules.STORM_FORK, ChainLightningRules.OVERLOAD);
+            case 10 -> List.of(ChainLightningRules.BALL_LIGHTNING, ChainLightningRules.THUNDER_LORD);
+            default -> List.of();
+        };
+    }
+
+    @Override
     public CastResult cast(CastContext context) {
-        LivingEntity first = SpellTargets.underCrosshair(context.caster(), RANGE, AIM_LEEWAY,
-                // The first strike may be aimed at anyone (like a projectile); the jumps spare players.
-                target -> SpellTargets.canAffect(context.caster(), target) || target instanceof Player);
-        if (first == null) {
+        ServerPlayer caster = context.caster();
+        int level = context.spellLevel();
+        String fork = level >= 5 ? context.branch(5) : null;
+        String capstone = level >= 10 ? context.branch(10) : null;
+        boolean ball = ChainLightningRules.BALL_LIGHTNING.equals(capstone);
+        LivingEntity first = aim(caster, level);
+        if (first == null && !ball) {
             return CastResult.fail(Component.translatable("message.elementalarcana.chain_lightning.no_target"));
         }
-        chain(context.level(), context.caster(), hand(context.caster()), FIRST_PERSON_SKIP, first, context.power(),
-                target -> SpellTargets.canAffect(context.caster(), target));
+        ChainLightnings.Chain chain = ChainLightnings.Chain.of(level, fork);
+        Predicate<LivingEntity> affects = target -> SpellTargets.canAffect(caster, target);
+        if (first != null) {
+            ChainLightnings.chain(context.level(), caster, hand(caster), FIRST_PERSON_SKIP, first, context.power(), chain, affects);
+        }
+        if (ball) {
+            ChainLightnings.loose(context.level(), caster, hand(caster), caster.getLookAngle(), context.power(), chain, affects);
+        }
+        if (ChainLightningRules.THUNDER_LORD.equals(capstone)) {
+            context.holdUntilRelease(ChainLightnings.lord(context, chain, affects));
+        }
+        ChainLightnings.thunder(context.level(), caster);
         return CastResult.SUCCESS;
+    }
+
+    /** The creature under the caster's crosshair within the first strike's reach (anyone, like a projectile), or null. */
+    @Nullable
+    static LivingEntity aim(LivingEntity caster, int level) {
+        return SpellTargets.underCrosshair(caster, ChainLightningRules.range(level), AIM_LEEWAY,
+                target -> SpellTargets.canAffect(caster, target) || target instanceof Player);
     }
 
     /** Where the bolt leaves a caster: a little in front of the right hand. */
@@ -74,82 +97,17 @@ public class ChainLightningSpell extends Spell {
     }
 
     /**
-     * The chain itself: from {@code from} to {@code first} (drawn from {@code skip} blocks along),
-     * then from creature to creature that {@code jumpsTo} allows (never back to one it already
-     * struck, never the caster).
+     * The Lv 1 chain, for other casters: from {@code from} to {@code first} (drawn from {@code skip}
+     * blocks along), then from creature to creature that {@code jumpsTo} allows.
      */
     public static void chain(ServerLevel level, LivingEntity caster, Vec3 from, double skip, LivingEntity first, float power,
                              Predicate<LivingEntity> jumpsTo) {
-        Set<Integer> struck = new HashSet<>();
-        struck.add(caster.getId());
-        LivingEntity target = first;
-        float damage = DAMAGE * power;
-        int jumpsLeft = JUMPS;
-        int jumps = 0;
-        Vec3 start = from;
-        while (target != null) {
-            Vec3 to = target.getBoundingBox().getCenter();
-            bolt(level, start, to, jumps == 0 ? skip : 0);
-            boolean wet = ElementalReactions.auraOf(target) == ElementalReactions.Aura.HYDRO;
-            SpellDamage.hurtMultiHit(target, SpellDamage.source(level, Element.LIGHTNING, caster, caster), damage * (wet ? CONDUCTED : 1f));
-            struck.add(target.getId());
-            level.sendParticles(ParticleTypes.ELECTRIC_SPARK, to.x, to.y, to.z, 12, 0.3, 0.4, 0.3, 0.2);
-            if (wet) {
-                jumpsLeft += 2;
-                level.sendParticles(ParticleTypes.SPLASH, to.x, to.y, to.z, 10, 0.3, 0.3, 0.3, 0.1);
-            }
-            level.playSound(null, to.x, to.y, to.z, SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.PLAYERS, 0.5f, 1.6f + level.random.nextFloat() * 0.3f);
-            if (jumpsLeft-- <= 0 || ++jumps > MAX_JUMPS) {
-                break;
-            }
-            damage *= FALLOFF;
-            start = to;
-            target = nextTarget(level, to, struck, jumpsTo);
-        }
-        level.playSound(null, caster.getX(), caster.getY(), caster.getZ(), SoundEvents.TRIDENT_THUNDER.value(), SoundSource.PLAYERS, 0.35f, 1.8f);
+        ChainLightnings.chain(level, caster, from, skip, first, power, ChainLightnings.Chain.BASE, jumpsTo);
+        ChainLightnings.thunder(level, caster);
     }
 
-    /** The nearest creature within reach of the last strike that hasn't been struck yet. */
-    @Nullable
-    private static LivingEntity nextTarget(ServerLevel level, Vec3 at, Set<Integer> struck, Predicate<LivingEntity> jumpsTo) {
-        LivingEntity best = null;
-        double bestDistance = JUMP_RANGE * JUMP_RANGE;
-        for (LivingEntity candidate : level.getEntitiesOfClass(LivingEntity.class, new AABB(at, at).inflate(JUMP_RANGE),
-                e -> e.isAlive() && !e.isSpectator() && !struck.contains(e.getId()) && jumpsTo.test(e))) {
-            double distance = candidate.getBoundingBox().getCenter().distanceToSqr(at);
-            if (distance < bestDistance) {
-                best = candidate;
-                bestDistance = distance;
-            }
-        }
-        return best;
-    }
-
-    /**
-     * The bolt: a jagged line of electric-yellow pixels from {@code a} to {@code b} (its kinks a
-     * little off the straight line, each throwing sparks), drawn from {@code skip} blocks past a.
-     */
+    /** A bolt from {@code a} to {@code b}, none of the first {@code skip} blocks drawn. */
     public static void bolt(ServerLevel level, Vec3 a, Vec3 b, double skip) {
-        Vec3 line = b.subtract(a);
-        int kinks = Math.max(3, (int) (line.length() * 1.2));
-        RandomSource random = level.random;
-        Vec3 previous = a;
-        for (int i = 1; i <= kinks; i++) {
-            Vec3 point = a.add(line.scale(i / (double) kinks));
-            if (i < kinks) {
-                point = point.add((random.nextDouble() - 0.5) * 0.6, (random.nextDouble() - 0.5) * 0.6, (random.nextDouble() - 0.5) * 0.6);
-            }
-            int steps = Math.max(2, (int) Math.ceil(previous.distanceTo(point) / 0.22));
-            for (int s = 0; s < steps; s++) {
-                Vec3 p = previous.lerp(point, s / (double) steps);
-                if (p.distanceTo(a) >= skip) {
-                    level.sendParticles(s % 2 == 0 ? ARC : ARC_CORE, p.x, p.y, p.z, 1, 0, 0, 0, 0);
-                }
-            }
-            if (point.distanceTo(a) >= skip) {
-                level.sendParticles(ParticleTypes.ELECTRIC_SPARK, point.x, point.y, point.z, 2, 0.05, 0.05, 0.05, 0.08);
-            }
-            previous = point;
-        }
+        ChainLightnings.bolt(level, a, b, skip, 1f);
     }
 }

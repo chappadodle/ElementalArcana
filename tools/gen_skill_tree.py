@@ -200,13 +200,16 @@ def cluster(element, family, origin, angle, starter, arms):
                   "element": element, "spell": NS + starter, "links": [f"{element}_gate"]})
     for name, offset, items in arms:
         arm(element, element, f"{element}_start", start_xy, angle + offset, items, f"{element}_{name}")
+    return start_xy
 
 
-cluster("lightning", "wind", wind_ends["dash"], -45, "chain_lightning", [
+lightning_xy = cluster("lightning", "wind", wind_ends["dash"], -45, "chain_lightning", [
     ("storm", -45, [("stat", "potency"), ("stat", "affinity/wind"), ("stat", "focus"),
                     ("notable", ("lightning_static_charge", {"potency": 6, "affinity/wind": 4}))]),
     ("spark", 45, [("stat", "focus"), ("stat", "affinity/wind"), ("spell", "thunderclap")]),
 ])
+# Chain Lightning levels on straight out from Lightning's start.
+path("lightning", "lightning", "lightning_chain_lightning", "chain_lightning", lightning_xy, -45, start_from="lightning_start")
 cluster("radiance", "fire", fire_ends["burst"], 45, "smite", [
     ("dawn", -45, [("stat", "vitality"), ("stat", "affinity/fire"), ("stat", "reservoir"),
                    ("notable", ("radiance_inner_light", {"vitality": 6, "affinity/fire": 4}))]),

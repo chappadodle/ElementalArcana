@@ -253,6 +253,29 @@ public final class CastingService {
     }
 
     /** Blood Magic's price: health, with a little red mist and none of the overcast's warning. */
+    /**
+     * Mana for keeping something going (held projectiles, a stream of lightning), paid now: false,
+     * and nothing paid, if it can't be. Blood Magic pays in health instead; creative and free
+     * casting pay nothing.
+     */
+    public static boolean payUpkeep(ServerPlayer player, MagicData data, int cost) {
+        if (isFree(player, data)) {
+            return true;
+        }
+        boolean blood = data.hasKeystone(Keystones.BLOOD_MAGIC);
+        if (blood ? player.getHealth() - bloodPrice(cost) < 1f : data.mana() < cost) {
+            return false;
+        }
+        if (blood) {
+            bleed(player, bloodPrice(cost));
+        } else {
+            data.setMana(data.mana() - cost);
+        }
+        data.interruptMeditation();
+        MagicAttachments.sync(player);
+        return true;
+    }
+
     static void bleed(ServerPlayer player, float healthCost) {
         player.setHealth(player.getHealth() - healthCost);
         player.serverLevel().sendParticles(new DustParticleOptions(new Vector3f(0.55f, 0.04f, 0.06f), 1f),

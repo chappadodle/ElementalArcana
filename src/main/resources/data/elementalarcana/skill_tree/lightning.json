@@ -135,6 +135,17 @@
       "links": [
         "lightning_spark_2"
       ]
+    },
+    {
+      "id": "lightning_chain_lightning",
+      "type": "path",
+      "spell": "elementalarcana:chain_lightning",
+      "x": 141,
+      "y": -401,
+      "dx": 28.284,
+      "dy": -28.284,
+      "element": "lightning",
+      "from": "lightning_start"
     }
   ]
 }

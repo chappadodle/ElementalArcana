@@ -1,0 +1,234 @@
+# Chain Lightning, Lv 1 to 10 (see the Chain Lightning spec), on husks that can't move (100 health
+# each; their health after each cast goes to the log, in the order they were summoned).
+# 1: Lv 1 down a row of six: four struck (5, 4, 3.2, 2.6). 2: Lv 4: five struck (5, 4.5, 4.05,
+# 3.65, 3.28). 3: Storm Fork into a block of nine: the chain forks through all of them. 4: Overload
+# into the same block: three struck, and bursts hurt their neighbours. 5: Lv 7: a bolt from the sky
+# on the first. 6: Lv 8: the struck stay charged and arc to each other (a shot a second later,
+# health before and after). 7: Ball Lightning loosed down an empty lane with husks to either side.
+# 8: Thunder Lord held for a second and a half on the row (the HUD's mana shows the pulses' cost).
+# (Husks are moved into the void before they're killed, so their death puffs don't cloud the shots.)
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamerule doMobLoot false
+cmd gamemode survival
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd effect give @s minecraft:resistance 900 4 true
+cmd tp @s 0.5 100 0.5 -90 4
+wait 40
+cmd kill @e[type=!player]
+cmd kill @e[type=item]
+cmd fill -6 99 -12 40 99 12 minecraft:grass_block
+cmd fill -6 100 -12 40 110 12 minecraft:air
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken lightning
+cmd arcana level set 40
+cmd arcana spell elementalarcana:chain_lightning 1
+cmd arcana mana fill
+cmd arcana cooldowns reset
+cmd title @s clear
+wait 20
+# 1: Lv 1.
+cmd summon husk 8.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 13.5 100 -1.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 18.5 100 1.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 23.5 100 -1.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 28.5 100 1.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 33.5 100 -1.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+wait 20
+select elementalarcana:chain_lightning
+press
+release
+wait 2
+shot chain_lv1
+wait 20
+cmd execute as @e[type=husk] run data get entity @s Health
+# 2: Lv 4.
+cmd tp @e[type=husk] 0.5 -100 0.5
+cmd kill @e[type=husk]
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 0.5 100 0.5 -90 4
+cmd arcana spell elementalarcana:chain_lightning 4
+cmd summon husk 8.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 13.5 100 -1.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 18.5 100 1.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 23.5 100 -1.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 28.5 100 1.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 33.5 100 -1.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+wait 20
+select elementalarcana:chain_lightning
+press
+release
+wait 2
+shot chain_lv4
+wait 20
+cmd execute as @e[type=husk] run data get entity @s Health
+# 3: Storm Fork.
+cmd tp @e[type=husk] 0.5 -100 0.5
+cmd kill @e[type=husk]
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 0.5 100 0.5 -90 4
+cmd arcana spell elementalarcana:chain_lightning 5 storm_fork
+cmd summon husk 9.5 100 -2.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 9.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 9.5 100 3.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 12.0 100 -2.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 12.0 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 12.0 100 3.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 14.5 100 -2.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 14.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 14.5 100 3.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+wait 20
+select elementalarcana:chain_lightning
+press
+release
+wait 2
+shot chain_storm_fork
+camera back
+wait 1
+shot chain_storm_fork_behind
+camera first
+wait 20
+cmd execute as @e[type=husk] run data get entity @s Health
+# 4: Overload.
+cmd tp @e[type=husk] 0.5 -100 0.5
+cmd kill @e[type=husk]
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 0.5 100 0.5 -90 4
+cmd arcana spell elementalarcana:chain_lightning 5 overload
+cmd summon husk 9.5 100 -2.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 9.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 9.5 100 3.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 12.0 100 -2.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 12.0 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 12.0 100 3.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 14.5 100 -2.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 14.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 14.5 100 3.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+wait 20
+select elementalarcana:chain_lightning
+press
+release
+wait 2
+shot chain_overload
+wait 20
+cmd execute as @e[type=husk] run data get entity @s Health
+# 5: Thunderstruck.
+cmd tp @e[type=husk] 0.5 -100 0.5
+cmd kill @e[type=husk]
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 0.5 100 0.5 -90 4
+cmd arcana spell elementalarcana:chain_lightning 7 storm_fork
+cmd summon husk 8.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 13.5 100 -1.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 18.5 100 1.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 23.5 100 -1.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 28.5 100 1.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 33.5 100 -1.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+wait 20
+select elementalarcana:chain_lightning
+press
+release
+wait 1
+shot chain_thunderstruck
+wait 1
+shot chain_thunderstruck_2
+wait 20
+cmd execute as @e[type=husk] run data get entity @s Health
+# 6: Live Wire.
+cmd tp @e[type=husk] 0.5 -100 0.5
+cmd kill @e[type=husk]
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 0.5 100 0.5 -90 4
+cmd arcana spell elementalarcana:chain_lightning 8 storm_fork
+cmd summon husk 9.5 100 -2.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 9.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 9.5 100 3.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 12.0 100 -2.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 12.0 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 12.0 100 3.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 14.5 100 -2.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 14.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 14.5 100 3.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+wait 20
+select elementalarcana:chain_lightning
+press
+release
+wait 2
+shot chain_live_wire
+wait 4
+cmd execute as @e[type=husk] run data get entity @s Health
+wait 5
+shot chain_live_wire_a
+wait 5
+shot chain_live_wire_b
+wait 5
+shot chain_live_wire_c
+wait 5
+shot chain_live_wire_d
+wait 46
+cmd execute as @e[type=husk] run data get entity @s Health
+# 7: Ball Lightning, loosed along an empty lane (z = 0.5) with husks 3 blocks to either side.
+cmd tp @e[type=husk] 0.5 -100 0.5
+cmd kill @e[type=husk]
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 0.5 100 0.5 -90 4
+cmd arcana spell elementalarcana:chain_lightning 10 storm_fork ball_lightning
+cmd summon husk 6.5 100 3.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 10.5 100 -2.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 14.5 100 3.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 18.5 100 -2.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd tp @s 0.5 100 0.5 -90 -2
+wait 20
+select elementalarcana:chain_lightning
+press
+release
+wait 10
+shot chain_ball_loosed
+wait 10
+shot chain_ball_drifting
+camera back
+wait 10
+shot chain_ball_behind
+camera first
+wait 60
+cmd execute as @e[type=husk] run data get entity @s Health
+# 8: Thunder Lord, held on the row.
+cmd tp @e[type=husk] 0.5 -100 0.5
+cmd kill @e[type=husk]
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 0.5 100 0.5 -90 4
+cmd arcana spell elementalarcana:chain_lightning 10 storm_fork thunder_lord
+cmd summon husk 8.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 13.5 100 -1.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 18.5 100 1.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 23.5 100 -1.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 28.5 100 1.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 33.5 100 -1.0 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+wait 20
+shot chain_lord_before
+select elementalarcana:chain_lightning
+press
+wait 15
+shot chain_lord_holding
+wait 20
+release
+wait 2
+shot chain_lord_after
+wait 10
+cmd execute as @e[type=husk] run data get entity @s Health
+cmd kill @e[type=husk]
+cmd gamerule doMobLoot true
+wait 10
+quit
