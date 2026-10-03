@@ -1,0 +1,139 @@
+# Skyward Leap. 1: the leap throws four husks around the player away and up; holding jump, the
+# player glides east (positions every second), and catches a Rising Current mid-glide (free: mana
+# before and after). 2: a plunge onto husks below (200 health each) sets off a shockwave (their
+# health, and the player's). 3: level 10 with Skyfall and Heaven's Descent plunges again (a bigger shockwave and a
+# whirlwind). 4: Wind Rider flies (abilities.flying 1b), then stops (0b).
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamerule doMobLoot false
+cmd gamemode survival
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd tp @s 0.5 100 0.5 -90 0
+wait 40
+cmd kill @e[type=!player]
+cmd kill @e[type=item]
+cmd fill -8 99 -12 40 99 12 minecraft:grass_block
+cmd fill -8 100 -12 40 120 12 minecraft:air
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken wind
+cmd arcana level set 40
+cmd arcana tree take wind_sky_1
+cmd arcana tree take wind_sky_2
+cmd arcana tree take wind_sky_3
+cmd arcana tree take wind_sky_4
+cmd arcana spell elementalarcana:updraft 4
+cmd arcana mana fill
+cmd arcana cooldowns reset
+cmd title @s clear
+wait 20
+cmd summon husk 2.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b}
+cmd summon husk -1.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b}
+cmd summon husk 0.5 100 2.5 {Tags:["eat"],PersistenceRequired:1b}
+cmd summon husk 0.5 100 -1.5 {Tags:["eat"],PersistenceRequired:1b}
+cmd effect give @e[type=husk] minecraft:slowness 120 255 true
+cmd effect give @e[type=husk] minecraft:weakness 120 255 true
+wait 10
+select elementalarcana:updraft
+press
+release
+wait 8
+shot skyward_leap
+cmd execute as @e[type=husk] run data get entity @s Pos
+key jump down
+camera back
+wait 22
+shot glide_behind
+cmd data get entity @s Pos
+wait 10
+cmd data get entity @s Pos
+camera front
+wait 4
+shot glide_front
+camera back
+cmd data get entity @s neoforge:attachments.elementalarcana:magic.mana
+press
+release
+wait 10
+shot rising_current
+cmd data get entity @s Pos
+cmd data get entity @s neoforge:attachments.elementalarcana:magic.mana
+wait 20
+cmd data get entity @s Pos
+key jump up
+wait 60
+cmd data get entity @s Pos
+cmd data get entity @s Health
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd kill @e[type=husk]
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 10.5 100 0.5 -90 60
+wait 10
+press
+release
+wait 14
+cmd summon husk 12.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 8.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 10.5 100 2.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 10.5 100 -1.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd effect give @e[type=husk] minecraft:slowness 120 255 true
+cmd effect give @e[type=husk] minecraft:weakness 120 255 true
+cmd data get entity @s Pos
+key sneak down
+wait 6
+shot plunge_dive
+wait 10
+shot plunge_landing
+key sneak up
+cmd data get entity @s Pos
+cmd execute as @e[type=husk] run data get entity @s Health
+cmd data get entity @s Health
+cmd kill @e[type=husk]
+cmd arcana spell elementalarcana:updraft 10 skyfall heavens_descent
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 20.5 100 0.5 -90 60
+wait 10
+press
+release
+wait 14
+cmd summon husk 23.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 17.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 20.5 100 3.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 20.5 100 -2.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd effect give @e[type=husk] minecraft:slowness 120 255 true
+cmd effect give @e[type=husk] minecraft:weakness 120 255 true
+key sneak down
+wait 16
+shot heavens_descent
+key sneak up
+wait 12
+shot heavens_descent_whirlwind
+cmd execute as @e[type=husk] run data get entity @s Health
+cmd data get entity @s Health
+cmd kill @e[type=husk]
+cmd arcana spell elementalarcana:updraft 5 wind_rider
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 0.5 100 0.5 -90 0
+wait 10
+press
+release
+wait 10
+cmd data get entity @s abilities.flying
+key jump down
+wait 20
+cmd data get entity @s Pos
+shot wind_rider
+key jump up
+wait 120
+cmd data get entity @s abilities.flying
+camera first
+cmd gamerule doMobLoot true
+wait 10
+quit

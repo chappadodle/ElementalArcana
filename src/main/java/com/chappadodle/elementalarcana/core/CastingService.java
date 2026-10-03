@@ -66,7 +66,7 @@ public final class CastingService {
             return null;
         }
         long remaining = data.cooldownRemaining(spell.id(), player.level().getGameTime());
-        if (remaining > 0) {
+        if (remaining > 0 && !(player instanceof ServerPlayer server && spell.hasFreeUse(server))) {
             return Component.translatable("message.elementalarcana.cooldown", spell.displayName(), String.format("%.1f", remaining / 20f));
         }
         return null;
@@ -106,13 +106,18 @@ public final class CastingService {
         }
 
         int spellLevel = data.spellLevel(spell);
-        SpellCastEvent.Pre pre = NeoForge.EVENT_BUS.post(new SpellCastEvent.Pre(player, spell, spell.manaCost(spellLevel)));
-        if (pre.isCanceled()) {
-            return;
-        }
-        int cost = pre.manaCost();
-        if (!canAfford(player, data, cost)) {
-            return;
+        // A free use (see Spell#hasFreeUse) costs nothing and leaves the cooldown as it is.
+        boolean free = spell.hasFreeUse(player);
+        int cost = 0;
+        if (!free) {
+            SpellCastEvent.Pre pre = NeoForge.EVENT_BUS.post(new SpellCastEvent.Pre(player, spell, spell.manaCost(spellLevel)));
+            if (pre.isCanceled()) {
+                return;
+            }
+            cost = pre.manaCost();
+            if (!canAfford(player, data, cost)) {
+                return;
+            }
         }
 
         CastContext context = new CastContext(player, player.serverLevel(), InteractionHand.MAIN_HAND, data.spellPower(spell) * ManaWeather.powerFactor(player),
@@ -125,9 +130,11 @@ public final class CastingService {
             return;
         }
 
-        pay(player, data, spell, cost);
-        if (context.hold() == null && !isFree(player, data)) {
-            data.startCooldown(spell.id(), player.level().getGameTime(), spell.cooldownTicks(data.spellLevel(spell), data.cooldownFactor()));
+        if (!free) {
+            pay(player, data, spell, cost);
+            if (context.hold() == null && !isFree(player, data)) {
+                data.startCooldown(spell.id(), player.level().getGameTime(), spell.cooldownTicks(data.spellLevel(spell), data.cooldownFactor()));
+            }
         }
         if (context.hold() != null) {
             HOLDS.put(player.getUUID(), new ActiveHold(spell, context.hold(), player.level().getGameTime()));

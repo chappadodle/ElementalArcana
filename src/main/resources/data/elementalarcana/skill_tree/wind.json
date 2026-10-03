@@ -152,6 +152,17 @@
       ],
       "keystone": "gale_step",
       "element": "wind"
+    },
+    {
+      "id": "wind_skyward_leap",
+      "type": "path",
+      "spell": "elementalarcana:updraft",
+      "x": -141,
+      "y": -401,
+      "dx": -28.284,
+      "dy": -28.284,
+      "element": "wind",
+      "from": "updraft"
     }
   ]
 }

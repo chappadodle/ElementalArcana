@@ -23,7 +23,7 @@ import com.chappadodle.elementalarcana.content.spell.StoneSkinSpell;
 import com.chappadodle.elementalarcana.content.spell.ThunderclapSpell;
 import com.chappadodle.elementalarcana.content.spell.TsunamiSpell;
 import com.chappadodle.elementalarcana.content.spell.TremorSpell;
-import com.chappadodle.elementalarcana.content.spell.UpdraftSpell;
+import com.chappadodle.elementalarcana.content.spell.SkywardLeapSpell;
 import com.chappadodle.elementalarcana.content.spell.WindBladeSpell;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -48,7 +48,8 @@ public final class ModSpells {
     // Wind Blade is registered first so it's wind's starter spell on the Awakening screen.
     public static final DeferredHolder<Spell, WindBladeSpell> WIND_BLADE = SPELLS.register("wind_blade", WindBladeSpell::new);
     public static final DeferredHolder<Spell, GaleDashSpell> GALE_DASH = SPELLS.register("gale_dash", GaleDashSpell::new);
-    public static final DeferredHolder<Spell, UpdraftSpell> UPDRAFT = SPELLS.register("updraft", UpdraftSpell::new);
+    // Skyward Leap keeps the throw upward's id, so those who learned Updraft have it now.
+    public static final DeferredHolder<Spell, SkywardLeapSpell> SKYWARD_LEAP = SPELLS.register("updraft", SkywardLeapSpell::new);
 
     // Boulder is registered first so it's earth's starter spell.
     public static final DeferredHolder<Spell, BoulderSpell> BOULDER = SPELLS.register("boulder", BoulderSpell::new);

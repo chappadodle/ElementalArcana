@@ -12,6 +12,7 @@ import com.chappadodle.elementalarcana.network.SelectSpellPayload;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.CameraType;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.components.Button;
@@ -79,6 +80,7 @@ import java.util.Optional;
  * use                      right-click the creature or block under the crosshair (or, with
  *                          neither, use the held item)
  * hold_use 45              hold right click down for 45 ticks (items used over time)
+ * key jump down / key jump up   hold a movement key down (jump, sneak or forward), or let it go
  * goto elementalarcana:fire_shrine 18 14 [2]   stand 18 blocks south of the nearest such structure
  *                          and 14 above its base, looking at its middle, 2 blocks above the base
  *                          (default 0); it's searched for from where the player is
@@ -234,6 +236,16 @@ public final class AutoTest {
                 holdUseTicks = Integer.parseInt(argument);
                 waitTicks = holdUseTicks;
                 return false;
+            }
+            case "key" -> {
+                String[] words = argument.split("\\s+");
+                KeyMapping key = switch (words[0]) {
+                    case "jump" -> minecraft.options.keyJump;
+                    case "sneak" -> minecraft.options.keyShift;
+                    case "forward" -> minecraft.options.keyUp;
+                    default -> throw new IllegalArgumentException("unknown key: " + words[0]);
+                };
+                key.setDown(words.length > 1 && words[1].equals("down"));
             }
             case "goto" -> gotoStructure(minecraft, argument);
             case "find" -> findBlock(minecraft, argument);

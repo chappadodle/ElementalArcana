@@ -688,6 +688,34 @@ public final class MagicData {
         invalidateTree();
     }
 
+    /**
+     * Dev/admin: puts {@code spell} at {@code level} through its tree path for free: its node, then
+     * one node per level up to {@code level} (none past it), taking at each fork the first of
+     * {@code branches} it offers, or else its first.
+     */
+    public void setSpellPath(Spell spell, int level, List<String> branches) {
+        String spellId = spell.id().toString();
+        SkillTree tree = SkillTrees.current();
+        treeNodes.removeIf(id -> {
+            SkillTree.Node node = tree.node(id);
+            return node != null && spellId.equals(node.spell()) && node.spellLevel() >= 2;
+        });
+        for (SkillTree.Node node : tree.nodes()) {
+            if (node.type() == SkillTree.Type.SPELL && spellId.equals(node.spell())) {
+                treeNodes.add(node.id());
+            }
+        }
+        for (int target = 2; target <= Math.min(level, spell.maxLevel()); target++) {
+            int spellLevel = target;
+            List<SkillTree.Node> choices = tree.nodes().stream()
+                    .filter(node -> spellId.equals(node.spell()) && node.spellLevel() == spellLevel).toList();
+            choices.stream().filter(node -> node.branch() != null && branches.contains(node.branch())).findFirst()
+                    .or(() -> choices.stream().findFirst())
+                    .ifPresent(node -> treeNodes.add(node.id()));
+        }
+        invalidateTree();
+    }
+
     @Nullable
     private static Spell spellOf(@Nullable String id) {
         ResourceLocation location = id == null ? null : ResourceLocation.tryParse(id);

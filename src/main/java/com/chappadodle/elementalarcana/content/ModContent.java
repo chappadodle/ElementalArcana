@@ -164,6 +164,11 @@ public final class ModContent {
             () -> new MobEffect(MobEffectCategory.HARMFUL, 0xCFEFE0) {
             });
 
+    /** Skyward Leap's wind under you: hold jump while you fall to glide (see SkywardLeaps, client/Gliding). */
+    public static final DeferredHolder<MobEffect, MobEffect> SKYWARD = EFFECTS.register("skyward",
+            () -> new MobEffect(MobEffectCategory.BENEFICIAL, 0xBFF0DC) {
+            });
+
     /** Soaked by water (the Hydro aura): drips, can't stay on fire, and sets up Vaporize and Freeze. */
     public static final DeferredHolder<MobEffect, WetEffect> WET = EFFECTS.register("wet", WetEffect::new);
 
@@ -177,11 +182,11 @@ public final class ModContent {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(ElementalArcana.id(name)));
     }
 
-    /** Standing near a Shrine Core: faster mana (amplifier 1 when the shrine is your element's kin). */
     // A creature far above you weighs on your magic (see ManaWeather): less spell power and regeneration.
     public static final DeferredHolder<MobEffect, MobEffect> PRESSURE = EFFECTS.register("pressure",
             () -> new MobEffect(MobEffectCategory.HARMFUL, 0x6A2A8A) {
             });
+    /** Standing near a Shrine Core: faster mana (amplifier 1 when the shrine is your element's kin). */
     public static final DeferredHolder<MobEffect, MobEffect> PLACE_OF_POWER = EFFECTS.register("place_of_power",
             () -> new MobEffect(MobEffectCategory.BENEFICIAL, 0xB070FF) {
             });

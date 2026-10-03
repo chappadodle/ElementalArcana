@@ -50,6 +50,13 @@ public final class MagicAttachments {
                     .sync(ByteBufCodecs.VAR_LONG)
                     .build());
 
+    // A player gliding on Skyward Leap's wind (see SkywardLeaps; client/Gliding steers it). Synced to
+    // everyone who can see them, so they're drawn leaning into the glide; never saved.
+    public static final Supplier<AttachmentType<Boolean>> GLIDING = ATTACHMENT_TYPES.register("gliding",
+            () -> AttachmentType.builder(() -> false)
+                    .sync(ByteBufCodecs.BOOL)
+                    .build());
+
     // An Attuned creature's element and rank. Only Attuned creatures have it (check hasData; the
     // default below is never read). Saved, and synced to everyone who can see the creature, so the
     // Jade tooltip can show its element.

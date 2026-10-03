@@ -156,6 +156,9 @@ add("core", {"id": "core_blood_magic", "type": "keystone", "x": round(polar(45, 
              "keystone": "blood_magic", "links": ["core_arcane_vigor"]})
 shield_id, shield_xy = earth_ends["shield"]
 path("earth", "earth", "earth_stone_skin", "stone_skin", shield_xy, 225, start_from="stone_skin")
+# Skyward Leap (its spell is still updraft) levels on along Wind's sky arm.
+sky_id, sky_xy = wind_ends["sky"]
+path("wind", "wind", "wind_skyward_leap", "updraft", sky_xy, -135, start_from="updraft")
 
 # ---- Ice: a cluster off Water's outer edge ----
 deep_end_id, deep_end = water_ends["deep"]

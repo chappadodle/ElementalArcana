@@ -3,6 +3,7 @@ package com.chappadodle.elementalarcana.core;
 import com.chappadodle.elementalarcana.api.AttunementRank;
 import com.chappadodle.elementalarcana.api.AwakeningRules;
 import com.chappadodle.elementalarcana.api.Element;
+import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.SkillTree;
 import com.chappadodle.elementalarcana.api.SkillTrees;
@@ -85,6 +86,14 @@ public final class ArcanaCommand {
                         .then(awakenElement(Element.ICE)).then(awakenElement(Element.WIND))
                         .then(awakenElement(Element.EARTH)).then(awakenElement(Element.CRYSTAL))
                         .then(awakenElement(Element.LIGHTNING)).then(awakenElement(Element.RADIANCE)))
+                .then(Commands.literal("spell").then(Commands.argument("spell", ResourceLocationArgument.id())
+                        .suggests((ctx, builder) -> SharedSuggestionProvider.suggestResource(SpellRegistries.SPELLS.keySet(), builder))
+                        .then(Commands.argument("level", IntegerArgumentType.integer(1, 10))
+                                .executes(ctx -> setSpellLevel(ctx.getSource(), ResourceLocationArgument.getId(ctx, "spell"),
+                                        IntegerArgumentType.getInteger(ctx, "level"), ""))
+                                .then(Commands.argument("branches", StringArgumentType.greedyString())
+                                        .executes(ctx -> setSpellLevel(ctx.getSource(), ResourceLocationArgument.getId(ctx, "spell"),
+                                                IntegerArgumentType.getInteger(ctx, "level"), StringArgumentType.getString(ctx, "branches")))))))
                 .then(Commands.literal("tree")
                         .then(Commands.literal("info").executes(ctx -> {
                             String info = SkillTreeLoader.describe(SkillTrees.current());
@@ -328,6 +337,23 @@ public final class ArcanaCommand {
     }
 
     /** /arcana tree take|refund <node>: like clicking it in the tree (refunds here cost no Essence). */
+    /** Dev/admin: a spell at a level, through its tree path for free, with the named branches at its forks. */
+    private static int setSpellLevel(CommandSourceStack source, ResourceLocation id, int level, String branches) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        Spell spell = SpellRegistries.SPELLS.get(id);
+        if (spell == null) {
+            source.sendFailure(Component.literal("No spell " + id));
+            return 0;
+        }
+        MagicData data = MagicAttachments.get(player);
+        data.setSpellPath(spell, level, branches.isBlank() ? List.of() : List.of(branches.trim().split("\\s+")));
+        PlayerStats.apply(player);
+        MagicAttachments.sync(player);
+        source.sendSuccess(() -> Component.empty().append(spell.displayName())
+                .append(": level " + data.spellLevel(spell) + " " + data.branches(spell).values()), false);
+        return 1;
+    }
+
     private static int treeChange(CommandSourceStack source, String node, boolean take) throws CommandSyntaxException {
         ServerPlayer player = source.getPlayerOrException();
         MagicData data = MagicAttachments.get(player);

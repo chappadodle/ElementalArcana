@@ -3,6 +3,7 @@ package com.chappadodle.elementalarcana.api;
 import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -95,6 +96,15 @@ public abstract class Spell {
     /** The branch choices offered on reaching {@code level}, or empty when that level has no choice. */
     public List<String> branchOptions(int level) {
         return List.of();
+    }
+
+    /**
+     * Whether pressing cast right now uses this spell for free (Skyward Leap's Rising Current: an
+     * updraft while gliding): no mana and no cooldown, even while it recharges. {@link #cast} is
+     * still what runs, and tells the two apart. Asked on the server.
+     */
+    public boolean hasFreeUse(ServerPlayer player) {
+        return false;
     }
 
     /** Mana cost at a given spell level. */

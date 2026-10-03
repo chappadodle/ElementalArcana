@@ -156,6 +156,7 @@ public class WindBladeSpell extends Spell implements ProjectileSpell, ConjureSpe
             // Slipstream: a burst of speed as the wind leaves your hands.
             caster.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, 1));
         }
+        SkywardLeaps.bladeThrown(caster);
     }
 
     @Override
