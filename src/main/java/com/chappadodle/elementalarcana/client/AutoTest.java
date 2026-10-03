@@ -1,8 +1,11 @@
 package com.chappadodle.elementalarcana.client;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
+import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
+import com.chappadodle.elementalarcana.compat.jei.JeiHooks;
+import com.chappadodle.elementalarcana.content.gear.ModGear;
 import com.chappadodle.elementalarcana.network.AuraPayload;
 import com.chappadodle.elementalarcana.network.CastSpellPayload;
 import com.chappadodle.elementalarcana.network.SelectSpellPayload;
@@ -14,6 +17,7 @@ import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.BackupConfirmScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
@@ -23,6 +27,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -40,6 +45,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -66,7 +72,8 @@ import java.util.Optional;
  * press / release          the cast key going down / up
  * aura                     hide the player's aura, or show it again (the H key)
  * launch_one / launch_all  the conjuring launch keys
- * screen status|tree [spell]|stats|journal|close   open one of the mod's screens
+ * screen status|tree [spell]|stats|journal|inventory|close   open one of the mod's screens (or the
+ *                          inventory)
  * hud on|off               show or hide the HUD
  * camera first|back|front  the camera view
  * use                      right-click the creature or block under the crosshair (or, with
@@ -77,6 +84,10 @@ import java.util.Optional;
  *                          (default 0); it's searched for from where the player is
  * find elementalarcana:arcane_lectern 80   look for that block within 80 blocks (and 60 below to
  *                          20 above); log where, and view the first from 8 blocks south, 5 up
+ * jei_filter @elementalarcana   filter JEI's item list, as if typed in its search box (when JEI
+ *                          is loaded; with nothing after it, show everything again)
+ * jei_show elementalarcana:sovereign_heart fire   open JEI's recipes and info for an item (of an
+ *                          element, for the items that come in one per element)
  * quit                     close the game
  * </pre>
  * A player who is dead (in this run, or in the saved world) is respawned before any step runs.
@@ -193,6 +204,16 @@ public final class AutoTest {
             case "launch_one" -> PacketDistributor.sendToServer(CastSpellPayload.LAUNCH_ONE);
             case "launch_all" -> PacketDistributor.sendToServer(CastSpellPayload.LAUNCH_ALL);
             case "screen" -> openScreen(minecraft, argument);
+            case "jei_filter" -> {
+                if (ModList.get().isLoaded("jei")) {
+                    JeiHooks.filter(argument);
+                }
+            }
+            case "jei_show" -> {
+                if (ModList.get().isLoaded("jei")) {
+                    JeiHooks.show(stackOf(argument));
+                }
+            }
             case "hud" -> minecraft.options.hideGui = argument.equals("off");
             case "use" -> {
                 if (minecraft.gameMode == null) {
@@ -331,12 +352,23 @@ public final class AutoTest {
         });
     }
 
+    /** An item from "namespace:item", or "namespace:item element" for the items that come in one per element. */
+    private static ItemStack stackOf(String argument) {
+        String[] parts = argument.split("\\s+");
+        ItemStack stack = new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.parse(parts[0])));
+        if (parts.length > 1) {
+            stack.set(ModGear.ELEMENT.get(), Element.valueOf(parts[1].toUpperCase(Locale.ROOT)));
+        }
+        return stack;
+    }
+
     private static void openScreen(Minecraft minecraft, String name) {
         switch (name) {
             case "status" -> minecraft.setScreen(new StatusScreen());
             case "stats" -> minecraft.setScreen(new StatsScreen(null));
             case "close" -> minecraft.setScreen(null);
             case "journal" -> JournalBook.open(minecraft.player);
+            case "inventory" -> minecraft.setScreen(new InventoryScreen(minecraft.player));
             default -> {
                 if (name.startsWith("tree")) {
                     String[] parts = name.split("\\s+");

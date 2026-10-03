@@ -113,6 +113,15 @@ A small, expandable magic framework with four elemental spells: wind, water, fir
     ordering="NONE"
     side="CLIENT"
 
+# Optional: with JEI installed, each element's wands, staves, Guardian Cores and Sovereign Hearts
+# show on their own (with their own recipes), and items found in the world have info pages.
+[[dependencies.${mod_id}]]
+    modId="jei"
+    type="optional"
+    versionRange="[19.0,)"
+    ordering="NONE"
+    side="BOTH"
+
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares
 # that your mod requires GL version 3.2 or higher. Other features will be added. They are side aware so declaring this won't
 # stop your mod loading on the server for example.

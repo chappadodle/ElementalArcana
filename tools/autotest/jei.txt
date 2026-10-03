@@ -1,0 +1,28 @@
+# JEI (an optional companion mod, loaded in the dev game): the mod's items in its list, each
+# element's wands and staves on their own; the info pages for a Sovereign Heart and Fire Essence;
+# the recipe for a Fire Archmage Staff.
+hud on
+cmd gamemode survival
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd time set noon
+wait 40
+screen inventory
+jei_filter @elementalarcana
+wait 20
+shot jei_items
+jei_filter staff
+wait 10
+shot jei_staves
+jei_show elementalarcana:sovereign_heart fire
+wait 20
+shot jei_heart_info
+jei_show elementalarcana:fire_essence
+wait 20
+shot jei_essence_info
+jei_show elementalarcana:archmage_staff fire
+wait 20
+shot jei_archmage_staff
+jei_filter
+screen close
+wait 5
+quit

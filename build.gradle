@@ -188,6 +188,12 @@ dependencies {
     compileOnly "maven.modrinth:jade:15.10.6+neoforge"
     localRuntime "maven.modrinth:jade:15.10.6+neoforge"
 
+    // JEI: compiled against for the optional integration (compat/jei), and loaded in the dev game.
+    // Not a required dependency: the mod runs without it. Pinned by Modrinth version id: Tn0dgwL0
+    // is JEI 19.57.0.450 for NeoForge 1.21.1 (the Forge and Fabric builds share that number).
+    compileOnly "maven.modrinth:jei:Tn0dgwL0"
+    localRuntime "maven.modrinth:jei:Tn0dgwL0"
+
     // Veil: compiled against for the optional bloom (compat/veil), and loaded in the dev game.
     // Not a required dependency: without it there's simply no bloom.
     compileOnly "foundry.veil:veil-neoforge-1.21.1:4.5.1"
