@@ -1,0 +1,32 @@
+# A Fire Rift opened by command on a stone floor (no player near; mob loot off): its three waves
+# climb out and are killed by command as they come ("Killed N entities": 4, 5, then 5 with the
+# Warden), then it collapses ("Test failed": no rift left) and throws out its cache, listed item by
+# item (a stack of Fire Essence and two to five finds) before it's cleared away. Then a Water Rift
+# cheated of its kills (the world turned peaceful) fades: no rift and no cache ("Test failed" twice).
+gamerule doMobSpawning false
+gamerule doMobLoot false
+forceload add -16 -16 16 16
+fill -12 99 -12 12 99 12 minecraft:stone
+fill -12 100 -12 12 106 12 minecraft:air
+kill @e[type=!player]
+execute positioned 0 100 0 run arcana rift fire
+sleep 5
+kill @e[tag=elementalarcana_rift]
+sleep 4
+kill @e[tag=elementalarcana_rift]
+sleep 4
+kill @e[tag=elementalarcana_rift]
+sleep 3
+execute if entity @e[type=elementalarcana:rift]
+execute as @e[type=item] run data get entity @s Item
+kill @e[type=minecraft:experience_orb]
+kill @e[type=item]
+difficulty peaceful
+execute positioned 0 100 0 run arcana rift water
+sleep 4
+execute if entity @e[type=elementalarcana:rift]
+execute if entity @e[type=item]
+difficulty easy
+gamerule doMobLoot true
+gamerule doMobSpawning true
+forceload remove all

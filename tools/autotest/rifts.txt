@@ -1,0 +1,63 @@
+# Elemental Rifts: a Fire Rift opened by command 10 blocks ahead at night (night vision on, so the
+# creatures show): the tear splitting open, its first wave climbing out with the boss bar, each
+# wave killed by command (the counts go to the log: 4, 5, 5), the Warden's wave, then the collapse,
+# the flash and the cache on the ground. Then a rift opened where one would open by itself
+# ("rift near"), in the land's element, seen from where the player stands.
+hud on
+cmd time set 18000
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamerule doMobLoot false
+cmd gamemode survival
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd effect give @s minecraft:resistance 900 4 true
+cmd effect give @s minecraft:night_vision 900 0 true
+cmd tp @s 0.5 100 0.5 -90 0
+wait 40
+cmd kill @e[type=!player]
+cmd kill @e[type=item]
+cmd fill -8 99 -16 60 99 16 minecraft:grass_block
+cmd fill -8 100 -16 60 112 16 minecraft:air
+cmd arcana awaken fire
+cmd title @s clear
+wait 20
+cmd execute positioned 4.5 100 0.5 run arcana rift fire
+wait 15
+shot rift_opening
+wait 30
+shot rift_first_creature
+wait 30
+shot rift_wave_1
+camera back
+wait 3
+shot rift_wave_1_behind
+camera first
+cmd kill @e[tag=elementalarcana_rift]
+wait 60
+shot rift_wave_2
+cmd kill @e[tag=elementalarcana_rift]
+wait 60
+shot rift_wave_3
+cmd kill @e[tag=elementalarcana_rift]
+wait 8
+shot rift_collapsing
+wait 13
+shot rift_flash
+wait 30
+shot rift_cache
+cmd execute as @e[type=item] run data get entity @s Item
+cmd kill @e[type=item]
+cmd kill @e[type=minecraft:experience_orb]
+cmd tp @s 0.5 100 0.5 -90 0
+wait 10
+cmd arcana rift near
+wait 60
+shot rift_near
+wait 10
+cmd kill @e[type=elementalarcana:rift]
+cmd kill @e[tag=elementalarcana_rift]
+cmd gamerule doMobLoot true
+wait 10
+quit

@@ -16,6 +16,7 @@ import com.chappadodle.elementalarcana.content.ManaTides;
 import com.chappadodle.elementalarcana.content.SkillTreeLoader;
 import com.chappadodle.elementalarcana.content.creature.WispEntity;
 import com.chappadodle.elementalarcana.content.creature.WispSpawner;
+import com.chappadodle.elementalarcana.content.rift.Rifts;
 import com.chappadodle.elementalarcana.content.sanctum.SanctumSealBlockEntity;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
@@ -36,11 +37,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -138,6 +142,7 @@ public final class ArcanaCommand {
                 .then(Commands.literal("bubble").then(Commands.argument("targets", EntityArgument.entities())
                         .executes(ctx -> bubble(ctx.getSource(), EntityArgument.getEntities(ctx, "targets")))))
                 .then(Commands.literal("wisp").then(wispSpawn()))
+                .then(riftOpen())
                 .then(Commands.literal("sanctum").then(Commands.literal("reset").executes(ctx -> resetSanctums(ctx.getSource()))))
                 .then(Commands.literal("tide")
                         .then(Commands.literal("start").executes(ctx -> {
@@ -174,6 +179,52 @@ public final class ArcanaCommand {
     }
 
     /** /arcana wisp spawn [element]: calls a wisp near you now, the way the wild spawner would (for testing). */
+    /**
+     * /arcana rift [element]: opens a rift 6 blocks ahead of whoever ran it (from the console, where
+     * it ran), on the ground. /arcana rift near: opens one where a rift would open by itself near
+     * there (24-40 blocks off, on open ground; see Rifts), in the land's element.
+     */
+    private static LiteralArgumentBuilder<CommandSourceStack> riftOpen() {
+        LiteralArgumentBuilder<CommandSourceStack> rift = Commands.literal("rift").executes(ctx -> openRift(ctx.getSource(), null));
+        for (Element element : Element.values()) {
+            rift.then(Commands.literal(element.name().toLowerCase(Locale.ROOT)).executes(ctx -> openRift(ctx.getSource(), element)));
+        }
+        rift.then(Commands.literal("near").executes(ctx -> {
+            CommandSourceStack source = ctx.getSource();
+            ServerLevel level = source.getLevel();
+            BlockPos pos = Rifts.findSpot(level, source.getPosition(), level.random);
+            if (pos == null) {
+                source.sendFailure(Component.translatable("commands.elementalarcana.rift_no_spot"));
+                return 0;
+            }
+            Element element = Attunement.landElement(level, pos, level.random);
+            Rifts.open(level, pos, element, AttunementRank.ARCHMAGE);
+            Component name = Component.translatable("school.elementalarcana." + element.name().toLowerCase(Locale.ROOT));
+            source.sendSuccess(() -> Component.translatable("commands.elementalarcana.rift_opened", name, pos.getX(), pos.getY(), pos.getZ()), true);
+            return 1;
+        }));
+        return rift;
+    }
+
+    private static int openRift(CommandSourceStack source, @Nullable Element element) {
+        ServerLevel level = source.getLevel();
+        Vec3 at = source.getPosition();
+        Entity runner = source.getEntity();
+        if (runner != null) {
+            at = at.add(Vec3.directionFromRotation(0, runner.getYRot()).scale(6));
+        }
+        int x = Mth.floor(at.x);
+        int z = Mth.floor(at.z);
+        BlockPos pos = new BlockPos(x, level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z), z);
+        Element chosen = element != null ? element : Attunement.landElement(level, pos, level.random);
+        if (Rifts.open(level, pos, chosen, AttunementRank.ARCHMAGE) == null) {
+            return 0;
+        }
+        Component name = Component.translatable("school.elementalarcana." + chosen.name().toLowerCase(Locale.ROOT));
+        source.sendSuccess(() -> Component.translatable("commands.elementalarcana.rift_opened", name, pos.getX(), pos.getY(), pos.getZ()), true);
+        return 1;
+    }
+
     private static LiteralArgumentBuilder<CommandSourceStack> wispSpawn() {
         LiteralArgumentBuilder<CommandSourceStack> spawn = Commands.literal("spawn").executes(ctx -> spawnWisp(ctx.getSource(), null));
         for (Element element : Element.values()) {

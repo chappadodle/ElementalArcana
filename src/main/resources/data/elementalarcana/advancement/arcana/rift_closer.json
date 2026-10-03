@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/awakening",
+  "display": {
+    "icon": {
+      "id": "minecraft:crying_obsidian"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.rift_closer.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.rift_closer.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "rift_closed": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "rift_closed"
+      }
+    }
+  }
+}

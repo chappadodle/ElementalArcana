@@ -107,6 +107,8 @@ ADVANCEMENTS = [
      "Defeat a creature Attuned to an element", magic("defeated"), None),
     ("archmage_slayer", "attuned_foe", item("radiance_essence"), "challenge", "Archmage Slayer",
      "Defeat an Attuned Archmage", magic("defeated", key="archmage"), None),
+    ("rift_closer", "awakening", item("minecraft:crying_obsidian"), "goal", "Rift Closer",
+     "Close an elemental rift: hold out against all three of its waves", magic("rift_closed"), None),
     ("the_arcanist", "awakening", item("arcane_lectern"), "task", "The Arcanist",
      "Buy something from an Arcanist, a villager who trades in magic", {
          "bought": {"trigger": "minecraft:villager_trade",

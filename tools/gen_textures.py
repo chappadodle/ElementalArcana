@@ -1320,6 +1320,79 @@ def wet(size=32, seed=170):
     return Image.fromarray((np.clip(rgba, 0, 1) * 255).astype(np.uint8), "RGBA")
 
 
+def rift_shape(width=32, height=48, seed=210):
+    """The tear's shape: for each pixel, how far inside the jagged lens it is (negative outside, in
+    pixels), widest in the middle and pinched to points at top and bottom, its edges knocked about."""
+    rng = np.random.default_rng(seed)
+    y, x = np.mgrid[0:height, 0:width]
+    t = (y + 0.5) / height
+    # A jagged half-width per row: a lens, roughened, with a few deep notches.
+    jag = np.interp(np.arange(height), np.linspace(0, height - 1, 16), rng.uniform(-2.0, 2.0, 16))
+    half = (width * 0.3) * np.clip(np.sin(np.pi * np.arange(height) / (height - 1)), 0, 1) ** 0.9 + jag
+    half = np.clip(half, 0, None)
+    # The tear leans and kinks a little from side to side.
+    middle = width / 2 + np.interp(np.arange(height), np.linspace(0, height - 1, 6), rng.uniform(-2.0, 2.0, 6))
+    return half[y] - np.abs(x + 0.5 - middle[y])
+
+
+def rift_void(width=32, height=48, seed=210):
+    """The inside of a rift, drawn see-through: near-black with a faint violet churn, solid inside the
+    tear and clear outside it, in hard pixel steps."""
+    inside = rift_shape(width, height, seed)
+    noise = tile_noise(max(width, height), seed + 1, periods=(4, 8))[:height, :width]
+    value = 0.05 + 0.12 * noise
+    rgba = np.zeros((height, width, 4))
+    rgba[..., 0] = value * 0.8
+    rgba[..., 1] = value * 0.35
+    rgba[..., 2] = value * 1.2
+    rgba[..., 3] = np.where(inside >= 0, 0.95, 0.0)
+    return Image.fromarray((np.clip(rgba, 0, 1) * 255).astype(np.uint8), "RGBA")
+
+
+def rift_edge(width=32, height=48, seed=210):
+    """A rift's burning edge, grey on black (drawn additively, tinted with the element): a bright rim
+    right at the tear's edge, glowing a couple of pixels out and a pixel in, in four steps."""
+    inside = rift_shape(width, height, seed)
+    rim = np.where(inside >= 0, np.clip(1.0 - inside / 1.5, 0, 1), np.clip(1.0 + inside / 2.5, 0, 1) * 0.8)
+    rim = np.round(rim * 4) / 4
+    rgba = np.zeros((height, width, 4))
+    rgba[..., 0] = rgba[..., 1] = rgba[..., 2] = rim
+    rgba[..., 3] = 1.0
+    return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA")
+
+
+def rift_swirl(size=32, seed=220):
+    """The churn inside a rift, grey on black (drawn additively, tinted): arms of light spiralling
+    into the middle, in four steps."""
+    y, x = np.mgrid[0:size, 0:size]
+    dx = (x + 0.5 - size / 2) / (size / 2)
+    dy = (y + 0.5 - size / 2) / (size / 2)
+    r = np.sqrt(dx * dx + dy * dy)
+    angle = np.arctan2(dy, dx)
+    noise = tile_noise(size, seed, periods=(4, 8))
+    arms = (np.sin(angle * 3 + r * 7 + noise * 2.5) + 1) / 2
+    value = arms ** 2 * np.clip(1.1 - r, 0, 1) * (0.7 + 0.3 * noise)
+    value = np.round(np.clip(value, 0, 1) * 4) / 4
+    rgba = np.zeros((size, size, 4))
+    rgba[..., 0] = rgba[..., 1] = rgba[..., 2] = value
+    rgba[..., 3] = 1.0
+    return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA")
+
+
+def rift_beam(width=8, height=32):
+    """The pillar of light over a rift, grey on black (drawn additively, tinted): brightest down its
+    middle and at its foot, fading out upward, in hard steps."""
+    y, x = np.mgrid[0:height, 0:width]
+    across = 1 - np.abs((x + 0.5) - width / 2) / (width / 2)
+    up = (y + 0.5) / height  # 0 at the top of the image, 1 at its foot
+    value = np.clip(across, 0, 1) ** 1.5 * up ** 1.6
+    value = np.round(value * 5) / 5
+    rgba = np.zeros((height, width, 4))
+    rgba[..., 0] = rgba[..., 1] = rgba[..., 2] = value
+    rgba[..., 3] = 1.0
+    return Image.fromarray((rgba * 255).astype(np.uint8), "RGBA")
+
+
 def main():
     for name, (palette, grid) in SPRITES.items():
         path = ASSETS / f"{name}.png"
@@ -1381,6 +1454,11 @@ def main():
         path = ASSETS / f"block/{name}.png"
         ice_strip(stops, 120 + i, alpha=alpha, style=style).save(path)
         path.with_suffix(".png.mcmeta").write_text('{"animation": {"frametime": 2, "interpolate": true}}\n')
+        print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
+    for name, make in (("rift_void", rift_void), ("rift_edge", rift_edge), ("rift_swirl", rift_swirl), ("rift_beam", rift_beam)):
+        path = ASSETS / f"entity/{name}.png"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        make().save(path)
         print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
     for path, make in ((ASSETS / "block/wind_funnel.png", wind_funnel), (ASSETS / "misc/wind_cut.png", wind_cut)):
         make().save(path)

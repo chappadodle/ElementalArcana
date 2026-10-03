@@ -19,6 +19,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -116,6 +117,11 @@ public final class Attunement {
         setBonus(mob, Attributes.KNOCKBACK_RESISTANCE, ARCHMAGE_KNOCKBACK, 0, AttributeModifier.Operation.ADD_VALUE);
         mob.setHealth(Math.min(mob.getHealth(), mob.getMaxHealth()));
         return true;
+    }
+
+    /** The element the land at {@code pos} leans to, as a creature Attuned there would take it. */
+    public static Element landElement(LevelReader level, BlockPos pos, RandomSource random) {
+        return AttunementRules.pickElement(biomeElements(level, pos), random::nextDouble);
     }
 
     /** Gives an Attuned mob its spellcasting goal, once. The goal does nothing if it isn't Attuned. */
