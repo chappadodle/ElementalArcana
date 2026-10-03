@@ -94,6 +94,29 @@
       ]
     },
     {
+      "id": "fire_sprite_1",
+      "type": "small",
+      "x": 260,
+      "y": 40,
+      "stat": "affinity/fire",
+      "amount": 2,
+      "links": [
+        "fire_start"
+      ],
+      "element": "fire"
+    },
+    {
+      "id": "ember_sprite",
+      "type": "spell",
+      "x": 260,
+      "y": 80,
+      "spell": "elementalarcana:ember_sprite",
+      "element": "fire",
+      "links": [
+        "fire_sprite_1"
+      ]
+    },
+    {
       "id": "fire_ember_1",
       "type": "small",
       "x": 288,

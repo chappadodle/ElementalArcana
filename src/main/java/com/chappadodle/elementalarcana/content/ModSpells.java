@@ -6,8 +6,8 @@ import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.content.spell.BoulderSpell;
 import com.chappadodle.elementalarcana.content.spell.BubblePrisonSpell;
 import com.chappadodle.elementalarcana.content.spell.ChainLightningSpell;
+import com.chappadodle.elementalarcana.content.spell.EmberSpriteSpell;
 import com.chappadodle.elementalarcana.content.spell.FireballSpell;
-import com.chappadodle.elementalarcana.content.spell.FlameBurstSpell;
 import com.chappadodle.elementalarcana.content.spell.FrostNovaSpell;
 import com.chappadodle.elementalarcana.content.spell.FrostShieldSpell;
 import com.chappadodle.elementalarcana.content.spell.GaleDashSpell;
@@ -16,6 +16,7 @@ import com.chappadodle.elementalarcana.content.spell.HydroJetSpell;
 import com.chappadodle.elementalarcana.content.spell.IcicleSpell;
 import com.chappadodle.elementalarcana.content.spell.PrismBoltSpell;
 import com.chappadodle.elementalarcana.content.spell.PrismWardSpell;
+import com.chappadodle.elementalarcana.content.spell.PyronadoSpell;
 import com.chappadodle.elementalarcana.content.spell.SanctuarySpell;
 import com.chappadodle.elementalarcana.content.spell.SmiteSpell;
 import com.chappadodle.elementalarcana.content.spell.StoneSkinSpell;
@@ -32,7 +33,9 @@ public final class ModSpells {
     public static final DeferredRegister<Spell> SPELLS = DeferredRegister.create(SpellRegistries.SPELL_KEY, ElementalArcana.MODID);
 
     public static final DeferredHolder<Spell, FireballSpell> FIREBALL = SPELLS.register("fireball", FireballSpell::new);
-    public static final DeferredHolder<Spell, FlameBurstSpell> FLAME_BURST = SPELLS.register("flame_burst", FlameBurstSpell::new);
+    // Pyronado keeps the ring of fire's id, so those who learned Flame Burst have it now.
+    public static final DeferredHolder<Spell, PyronadoSpell> PYRONADO = SPELLS.register("flame_burst", PyronadoSpell::new);
+    public static final DeferredHolder<Spell, EmberSpriteSpell> EMBER_SPRITE = SPELLS.register("ember_sprite", EmberSpriteSpell::new);
     // Hydro Jet is registered first so it's water's starter spell on the Awakening screen.
     public static final DeferredHolder<Spell, HydroJetSpell> HYDRO_JET = SPELLS.register("hydro_jet", HydroJetSpell::new);
     public static final DeferredHolder<Spell, TidalWaveSpell> TIDAL_WAVE = SPELLS.register("tidal_wave", TidalWaveSpell::new);

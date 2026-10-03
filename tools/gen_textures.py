@@ -96,26 +96,6 @@ SPRITES = {
         ".......ggg......",
         "................",
     ]),
-    "spell/flame_burst": ({
-        "r": 0xD83A1A, "o": 0xFF8A1F, "y": 0xFFD84A,
-    }, [
-        "................",
-        ".......y........",
-        "...y..yoy..y....",
-        "....yoorooy.....",
-        "...yor....roy...",
-        "..yor......roy..",
-        ".yor........roy.",
-        "..or........ro..",
-        "..or........ro..",
-        ".yor........roy.",
-        "..yor......roy..",
-        "...yor....roy...",
-        "....yoorrooy....",
-        "...y..yoy..y....",
-        ".......y........",
-        "................",
-    ]),
     "spell/healing_rain": ({
         "c": 0xE8F0FF, "g": 0xA8B8D8, "b": 0x3B8CF6, "l": 0x8EC8FF, "h": 0xFF5A7A,
     }, [
@@ -707,6 +687,57 @@ def sanctuary_icon(size=16):
     return img
 
 
+def pyronado_icon(size=16):
+    """Pyronado (its spell is still flame_burst): three wheels of flame orbiting a dark centre, a swept arc behind each."""
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    orange, yellow, white, deep = (255, 122, 31, 255), (255, 210, 90, 255), (255, 250, 220, 255), (170, 40, 10, 255)
+    import math
+    for k in range(3):
+        a = math.radians(-90 + 120 * k)
+        cx, cy = 7.5 + math.cos(a) * 4.6, 7.5 + math.sin(a) * 4.6
+        # The arc it swept: a fading trail along the orbit behind it.
+        for step in range(1, 6):
+            b = a - math.radians(10 * step)
+            x, y = round(7.5 + math.cos(b) * 4.6 - 0.5), round(7.5 + math.sin(b) * 4.6 - 0.5)
+            if 0 <= x < size and 0 <= y < size and img.getpixel((x, y))[3] == 0:
+                img.putpixel((x, y), deep if step > 3 else orange)
+        # The wheel: a ring of flame, white-hot at its heart.
+        for y in range(size):
+            for x in range(size):
+                r = math.hypot(x + 0.5 - cx, y + 0.5 - cy)
+                if r <= 1.0:
+                    img.putpixel((x, y), white)
+                elif r <= 1.9:
+                    img.putpixel((x, y), yellow)
+                elif r <= 2.6 and img.getpixel((x, y))[3] == 0:
+                    img.putpixel((x, y), orange)
+    return img
+
+
+def ember_sprite_icon(size=16):
+    """Ember Sprite: a little fire spirit, a hot core in a glowing shell with a flame crown, spitting a spark."""
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    import math
+    for y in range(size):
+        for x in range(size):
+            r = math.hypot(x + 0.5 - 7, y + 0.5 - 9)
+            if r <= 1.6:
+                img.putpixel((x, y), (255, 250, 220, 255))
+            elif r <= 3.0:
+                img.putpixel((x, y), (255, 190, 60, 255))
+            elif r <= 4.4:
+                img.putpixel((x, y), (255, 112, 32, 200))
+            elif r <= 5.0:
+                img.putpixel((x, y), (200, 60, 15, 255))
+    for x, y in ((5, 3), (7, 2), (9, 3), (6, 4), (8, 3), (7, 3)):
+        img.putpixel((x, y), (255, 160, 40, 255))
+    for x, y in ((7, 1), (5, 2), (9, 2)):
+        img.putpixel((x, y), (255, 230, 120, 255))
+    for x, y, c in ((12, 6, (255, 230, 120, 255)), (13, 5, (255, 160, 40, 255)), (14, 4, (255, 112, 32, 255))):
+        img.putpixel((x, y), c)
+    return img
+
+
 def frost_mist(frame, frames=4, size=16):
     """A soft, slightly lumpy cold puff; later frames are wider and fainter (smooth gradients
     can't be drawn as a character grid, so this one is procedural)."""
@@ -1291,7 +1322,8 @@ def main():
     }
     derived = {"ice", "crystal", "lightning", "radiance"}
     for path, make in ((ASSETS / "spell/bubble_prison.png", bubble_icon), (ASSETS / "spell/prism_ward.png", prism_ward_icon),
-                       (ASSETS / "spell/thunderclap.png", thunderclap_icon), (ASSETS / "spell/sanctuary.png", sanctuary_icon)):
+                       (ASSETS / "spell/thunderclap.png", thunderclap_icon), (ASSETS / "spell/sanctuary.png", sanctuary_icon),
+                       (ASSETS / "spell/flame_burst.png", pyronado_icon), (ASSETS / "spell/ember_sprite.png", ember_sprite_icon)):
         make().save(path)
         print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
     for i, (name, (stops, style)) in enumerate(FIREBALL_LOOKS.items()):

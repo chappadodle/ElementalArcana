@@ -62,7 +62,7 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 
 | Element | Lv 1 | Lv 5 |
 |---|---|---|
-| Fire | Fireball: press R to conjure fireballs that grow in your palm, click to throw one or all; explodes and ignites (sets blocks alight only with `mobGriefing`) | Flame Burst: ring of fire around you |
+| Fire | Fireball: press R to conjure fireballs that grow in your palm, click to throw one or all; explodes and ignites (sets blocks alight only with `mobGriefing`); Ember Sprite (level 3): a little fire spirit placed where you look spits fire bolts at the nearest hostile creature for 8 seconds | Pyronado (level 8): three wheels of flame orbit you for 8 seconds, burning and throwing back whatever they sweep through |
 | Water | Hydro Jet: hold R to spray a pressurized stream that pushes enemies back and soaks them; Tidal Wave: cone that pushes, extinguishes, hurts endermen/blazes | Healing Rain: Regeneration II for you and nearby players |
 | Ice | Icicle: press R to conjure icicles one at a time (they grow sharper while held, 1 mana/s each), click to launch one or all; a fully grown icicle freezes | Frost Nova: freezes everything around you |
 | Earth | Boulder: press R to conjure a heavy boulder, click to throw it; it arcs, crushes and shoves far, and bounces from Lv 2; Stone Skin: orbiting stones absorb damage, then burst outward (a shield spell like Frost Shield); Tremor: a shockwave along the ground that throws enemies up and slows them | |

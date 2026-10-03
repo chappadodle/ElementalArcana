@@ -3,6 +3,7 @@ package com.chappadodle.elementalarcana.content;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
+import com.chappadodle.elementalarcana.content.spell.EmberSprite;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.core.particles.ParticleType;
@@ -28,6 +29,11 @@ public final class ModContent {
     private static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(Registries.MOB_EFFECT, ElementalArcana.MODID);
     private static final DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister.create(Registries.PARTICLE_TYPE, ElementalArcana.MODID);
 
+    /** Fire's Ember Sprite (content/spell/EmberSprite): a little fire spirit that spits bolts. */
+    public static final DeferredHolder<EntityType<?>, EntityType<EmberSprite>> EMBER_SPRITE =
+            ENTITY_TYPES.register("ember_sprite", () -> EntityType.Builder.<EmberSprite>of(EmberSprite::new, MobCategory.MISC)
+                    .sized(0.4f, 0.4f).clientTrackingRange(8).updateInterval(4).fireImmune()
+                    .build(ElementalArcana.MODID + ":ember_sprite"));
     public static final DeferredHolder<EntityType<?>, EntityType<SpellProjectile>> SPELL_PROJECTILE =
             ENTITY_TYPES.register("spell_projectile", () -> EntityType.Builder.<SpellProjectile>of(SpellProjectile::new, MobCategory.MISC)
                     .sized(0.3f, 0.3f)
@@ -120,6 +126,9 @@ public final class ModContent {
     /** A fireball's whole explosion in one particle (see FireBlastOptions). */
     public static final DeferredHolder<ParticleType<?>, ParticleType<FireBlastOptions>> FIRE_BLAST =
             PARTICLES.register("fire_blast", FireBlastOptions::newType);
+    /** Pyronado's wheels, for as long as they spin, in one particle (see PyronadoOptions). */
+    public static final DeferredHolder<ParticleType<?>, ParticleType<PyronadoOptions>> PYRONADO =
+            PARTICLES.register("pyronado", PyronadoOptions::newType);
 
     /** An icicle's whole shatter in one particle (see IceShatterOptions). */
     public static final DeferredHolder<ParticleType<?>, ParticleType<IceShatterOptions>> ICE_SHATTER =

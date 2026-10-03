@@ -124,6 +124,7 @@ wind_ends = region("wind", "wind", -90, "wind_blade", [
 fire_ends = region("fire", "fire", 0, "fireball", [
     ("burst", 45, [("stat", "affinity/fire"), ("stat", "potency"), ("stat", "affinity/fire"), ("stat", "reservoir"),
                    ("spell", "flame_burst")]),
+    ("sprite", 90, [("stat", "affinity/fire"), ("spell", "ember_sprite")]),
     ("ember", -45, [("stat", "affinity/fire"), ("stat", "focus"), ("stat", "potency"),
                     ("notable", ("fire_kindled_soul", {"affinity/fire": 6, "potency": 4})),
                     ("keystone", ("fire_glass_cannon", "glass_cannon"))]),

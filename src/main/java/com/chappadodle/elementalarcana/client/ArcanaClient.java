@@ -11,6 +11,7 @@ import com.chappadodle.elementalarcana.client.decal.Decals;
 import com.chappadodle.elementalarcana.client.particle.CinderParticle;
 import com.chappadodle.elementalarcana.client.particle.EmberParticle;
 import com.chappadodle.elementalarcana.client.particle.FireBlastEmitter;
+import com.chappadodle.elementalarcana.client.particle.PyronadoEmitter;
 import com.chappadodle.elementalarcana.client.particle.GlowParticle;
 import com.chappadodle.elementalarcana.client.particle.HydroDropParticle;
 import com.chappadodle.elementalarcana.client.particle.IceShatterEmitter;
@@ -263,6 +264,7 @@ public final class ArcanaClient {
         event.registerSpriteSet(ModContent.SHOCKWAVE.get(), sprites -> new GlowParticle.Provider(GlowParticle.Kind.RING, sprites));
         event.registerSpriteSet(ModContent.CORONA.get(), sprites -> new GlowParticle.Provider(GlowParticle.Kind.CORONA, sprites));
         event.registerSpecial(ModContent.FIRE_BLAST.get(), new FireBlastEmitter.Provider());
+        event.registerSpecial(ModContent.PYRONADO.get(), new PyronadoEmitter.Provider());
         event.registerSpecial(ModContent.ICE_SHATTER.get(), new IceShatterEmitter.Provider());
         event.registerSpecial(ModContent.WIND_CUT.get(), new WindCutEmitter.Provider());
         event.registerSpecial(ModContent.WATER_BURST.get(), new WaterBurstParticle.Provider());
@@ -315,6 +317,7 @@ public final class ArcanaClient {
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModContent.SPELL_PROJECTILE.get(), SpellProjectileRenderer::new);
+        event.registerEntityRenderer(ModContent.EMBER_SPRITE.get(), EmberSpriteRenderer::new);
         for (Element element : Element.values()) {
             event.registerEntityRenderer(ModCreatures.wisp(element), WispRenderer::new);
         }
