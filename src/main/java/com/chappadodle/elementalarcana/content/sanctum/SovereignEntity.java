@@ -45,6 +45,7 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
@@ -112,6 +113,7 @@ public class SovereignEntity extends Monster {
                 .add(Attributes.ATTACK_DAMAGE, 8);
     }
 
+    /** Its element (a Sovereign's never changes; the Hollow's is its current form). */
     public Element element() {
         return element;
     }
@@ -128,6 +130,29 @@ public class SovereignEntity extends Monster {
     /** Whether it's in its second phase (synced, for its burning eyes). */
     public boolean isEnraged() {
         return entityData.get(ENRAGED);
+    }
+
+    protected void setEnraged(boolean enraged) {
+        entityData.set(ENRAGED, enraged);
+    }
+
+    /** How far it may stray from home, and whether it is held to it (a Sovereign by its seal). */
+    protected double leash() {
+        return SovereignRules.LEASH;
+    }
+
+    protected boolean leashed() {
+        return seal != null;
+    }
+
+    /** Its level before its rank's bonus, where the zone's is {@code zoneLevel}. */
+    protected int baseLevel(int zoneLevel) {
+        return SovereignRules.baseLevel(zoneLevel);
+    }
+
+    /** What it leaves when it falls: its Heart. */
+    protected ItemStack trophy() {
+        return SovereignHeartItem.of(element());
     }
 
     /** Runs {@code action} in {@code ticks} ticks, unless it falls first (its spells' later pulses). */
@@ -150,11 +175,11 @@ public class SovereignEntity extends Monster {
 
     /** The boss bar's title: "Vulkhar, Sovereign of Flame". */
     public Component bossTitle() {
-        return Component.translatable("bossbar.elementalarcana.sovereign." + element.name().toLowerCase(Locale.ROOT));
+        return Component.translatable("bossbar.elementalarcana.sovereign." + element().name().toLowerCase(Locale.ROOT));
     }
 
     public BossEvent.BossBarColor barColor() {
-        return switch (element) {
+        return switch (element()) {
             case FIRE, RADIANCE -> BossEvent.BossBarColor.RED;
             case WATER, ICE -> BossEvent.BossBarColor.BLUE;
             case WIND, LIGHTNING -> BossEvent.BossBarColor.WHITE;
@@ -179,16 +204,16 @@ public class SovereignEntity extends Monster {
 
     /** Anyone in its sanctum (or near it, with no sanctum): kin or not, every mage is tested. */
     private boolean inReach(LivingEntity target) {
-        return seal == null || target.position().distanceTo(home()) <= SovereignRules.LEASH + 8;
+        return !leashed() || target.position().distanceTo(home()) <= leash() + 8;
     }
 
     @Override
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
                                         @Nullable SpawnGroupData spawnData) {
         SpawnGroupData result = super.finalizeSpawn(level, difficulty, spawnType, spawnData);
-        Attunement.attune(this, element, AttunementRank.ARCHMAGE);
+        Attunement.attune(this, element(), AttunementRank.ARCHMAGE);
         CreatureLevels.levelOf(this);
-        CreatureLevels.setBaseLevel(this, SovereignRules.baseLevel(getData(MagicAttachments.CREATURE_LEVEL)));
+        CreatureLevels.setBaseLevel(this, baseLevel(getData(MagicAttachments.CREATURE_LEVEL)));
         setHealth(getMaxHealth());
         setPersistenceRequired();
         return result;
@@ -237,7 +262,7 @@ public class SovereignEntity extends Monster {
         if (target != null) {
             face(target);
         }
-        if (seal != null && position().distanceTo(home()) > SovereignRules.LEASH + 8) {
+        if (leashed() && position().distanceTo(home()) > leash() + 8) {
             // Thrown or dragged out of its sanctum: it returns at once.
             level.sendParticles(ParticleTypes.REVERSE_PORTAL, getX(), getY(0.5), getZ(), 40, 0.5, 1, 0.5, 0.1);
             Vec3 back = home().add(0, 3, 0);
@@ -258,10 +283,10 @@ public class SovereignEntity extends Monster {
         } else {
             goal = home.add(0, 3, 0);
         }
-        if (seal != null) {
+        if (leashed()) {
             Vec3 flat = new Vec3(goal.x - home.x, 0, goal.z - home.z);
-            if (flat.length() > SovereignRules.LEASH) {
-                flat = flat.normalize().scale(SovereignRules.LEASH);
+            if (flat.length() > leash()) {
+                flat = flat.normalize().scale(leash());
             }
             goal = new Vec3(home.x + flat.x, Mth.clamp(goal.y, home.y + 1.5, home.y + 10), home.z + flat.z);
         }
@@ -305,7 +330,7 @@ public class SovereignEntity extends Monster {
     }
 
     /** No one to fight: back to full health and its first phase. */
-    private void calm() {
+    protected void calm() {
         setHealth(getMaxHealth());
         entityData.set(ENRAGED, false);
         pending.clear();
@@ -359,15 +384,15 @@ public class SovereignEntity extends Monster {
         entityData.set(ENRAGED, true);
         for (int i = 0; i < 2; i++) {
             BlockPos at = BlockPos.containing(getX() + getRandom().nextInt(7) - 3, getY(), getZ() + getRandom().nextInt(7) - 3);
-            WispEntity wisp = WispSpawner.spawnAt(level, element, at, MobSpawnType.MOB_SUMMONED);
+            WispEntity wisp = WispSpawner.spawnAt(level, element(), at, MobSpawnType.MOB_SUMMONED);
             if (wisp != null && getTarget() != null) {
                 wisp.setTarget(getTarget());
             }
         }
-        level.sendParticles(MobCasting.handsParticle(element), getX(), getY(0.6), getZ(), 80, 1.2, 1.4, 1.2, 0.15);
+        level.sendParticles(MobCasting.handsParticle(element()), getX(), getY(0.6), getZ(), 80, 1.2, 1.4, 1.2, 0.15);
         level.sendParticles(ParticleTypes.FLASH, getX(), getY(0.6), getZ(), 1, 0, 0, 0, 0);
         level.playSound(null, getX(), getY(), getZ(), SoundEvents.ENDER_DRAGON_GROWL, SoundSource.HOSTILE, 2f, 1.2f);
-        Component message = Component.translatable("message.elementalarcana.sovereign.enraged." + element.name().toLowerCase(Locale.ROOT))
+        Component message = Component.translatable("message.elementalarcana.sovereign.enraged." + element().name().toLowerCase(Locale.ROOT))
                 .withStyle(ChatFormatting.RED);
         level.getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(48)).forEach(player -> player.sendSystemMessage(message));
     }
@@ -376,7 +401,7 @@ public class SovereignEntity extends Monster {
     public void die(DamageSource source) {
         super.die(source);
         if (level() instanceof ServerLevel level) {
-            level.sendParticles(MobCasting.handsParticle(element), getX(), getY(0.6), getZ(), 150, 1.2, 1.6, 1.2, 0.3);
+            level.sendParticles(MobCasting.handsParticle(element()), getX(), getY(0.6), getZ(), 150, 1.2, 1.6, 1.2, 0.3);
             level.sendParticles(ParticleTypes.FLASH, getX(), getY(0.6), getZ(), 1, 0, 0, 0, 0);
             level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, getX(), getY(0.6), getZ(), 1, 0, 0, 0, 0);
             if (seal != null && level.getBlockEntity(seal) instanceof SanctumSealBlockEntity block) {
@@ -388,10 +413,11 @@ public class SovereignEntity extends Monster {
     @Override
     protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean recentlyHit) {
         super.dropCustomDeathLoot(level, source, recentlyHit);
-        ItemEntity heart = spawnAtLocation(SovereignHeartItem.of(element));
-        if (heart != null) {
-            heart.setUnlimitedLifetime();
-            heart.setGlowingTag(true);
+        ItemStack trophy = trophy();
+        ItemEntity dropped = trophy.isEmpty() ? null : spawnAtLocation(trophy);
+        if (dropped != null) {
+            dropped.setUnlimitedLifetime();
+            dropped.setGlowingTag(true);
         }
     }
 
@@ -417,7 +443,7 @@ public class SovereignEntity extends Monster {
 
     @Override
     protected SoundEvent getAmbientSound() {
-        return switch (element) {
+        return switch (element()) {
             case FIRE, RADIANCE -> SoundEvents.BLAZE_AMBIENT;
             case WATER, ICE -> SoundEvents.ELDER_GUARDIAN_AMBIENT;
             case WIND, LIGHTNING -> SoundEvents.BREEZE_IDLE_AIR;
@@ -427,7 +453,7 @@ public class SovereignEntity extends Monster {
 
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
-        return switch (element) {
+        return switch (element()) {
             case FIRE, RADIANCE -> SoundEvents.BLAZE_HURT;
             case WATER, ICE -> SoundEvents.ELDER_GUARDIAN_HURT;
             case WIND, LIGHTNING -> SoundEvents.BREEZE_HURT;

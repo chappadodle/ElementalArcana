@@ -30,6 +30,7 @@ import com.chappadodle.elementalarcana.content.BubblePrisons;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.content.ModSpells;
 import com.chappadodle.elementalarcana.content.creature.ModCreatures;
+import com.chappadodle.elementalarcana.content.hollow.ModHollow;
 import com.chappadodle.elementalarcana.content.sanctum.ModSanctums;
 import com.chappadodle.elementalarcana.content.tower.ModTowers;
 import com.chappadodle.elementalarcana.content.tower.TowerHeartBlock;
@@ -313,6 +314,7 @@ public final class ArcanaClient {
         for (Element element : SovereignRules.ELEMENTS) {
             event.registerEntityRenderer(ModSanctums.sovereign(element), SovereignRenderer::new);
         }
+        event.registerEntityRenderer(ModHollow.HOLLOW.get(), HollowRenderer::new);
     }
 
     @SubscribeEvent

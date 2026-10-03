@@ -1,0 +1,49 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AFA",
+    "WEN",
+    "AGA"
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "F": {
+      "type": "neoforge:components",
+      "items": "elementalarcana:sovereign_heart",
+      "components": {
+        "elementalarcana:element": "fire"
+      }
+    },
+    "W": {
+      "type": "neoforge:components",
+      "items": "elementalarcana:sovereign_heart",
+      "components": {
+        "elementalarcana:element": "water"
+      }
+    },
+    "N": {
+      "type": "neoforge:components",
+      "items": "elementalarcana:sovereign_heart",
+      "components": {
+        "elementalarcana:element": "wind"
+      }
+    },
+    "G": {
+      "type": "neoforge:components",
+      "items": "elementalarcana:sovereign_heart",
+      "components": {
+        "elementalarcana:element": "earth"
+      }
+    },
+    "E": {
+      "item": "minecraft:ender_eye"
+    }
+  },
+  "result": {
+    "id": "elementalarcana:prime_key",
+    "count": 1
+  }
+}

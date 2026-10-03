@@ -1,0 +1,13 @@
+{
+  "type": "elementalarcana:the_hollow",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "elementalarcana:the_hollow",
+      "lakes": false,
+      "features": false,
+      "layers": [],
+      "structure_overrides": []
+    }
+  }
+}

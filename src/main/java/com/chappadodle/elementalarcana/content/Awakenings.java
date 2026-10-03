@@ -63,6 +63,34 @@ public final class Awakenings {
         return true;
     }
 
+    /**
+     * The Heart of the Prime: wakes every element {@code player} doesn't hold yet, opposites
+     * included, in one moment. Returns how many woke.
+     */
+    public static int wakeAll(ServerPlayer player) {
+        MagicData data = MagicAttachments.get(player);
+        int woke = 0;
+        for (Element element : Element.values()) {
+            SpellSchool school = schoolOf(element);
+            if (school != null && !data.hasAffinity(school)) {
+                data.forceAffinity(school);
+                dust(player, element, 12);
+                woke++;
+            }
+        }
+        if (data.selectedSpell() == null) {
+            data.castableSpells().stream().findFirst().ifPresent(spell -> data.select(spell.id()));
+        }
+        MagicAttachments.sync(player);
+        player.connection.send(new ClientboundSetTitlesAnimationPacket(10, 70, 20));
+        player.connection.send(new ClientboundSetTitleTextPacket(Component.translatable("title.elementalarcana.prime")
+                .withStyle(ChatFormatting.LIGHT_PURPLE)));
+        player.connection.send(new ClientboundSetSubtitleTextPacket(Component.translatable("title.elementalarcana.prime.sub")));
+        player.playNotifySound(ModContent.AWAKEN_SOUND.get(), SoundSource.PLAYERS, 1f, 0.8f);
+        player.serverLevel().sendParticles(ParticleTypes.TOTEM_OF_UNDYING, player.getX(), player.getY(1.0), player.getZ(), 80, 0.5, 1, 0.5, 0.4);
+        return woke;
+    }
+
     private static void moment(ServerPlayer player, Element element, SpellSchool school, Component cause) {
         MagicData data = MagicAttachments.get(player);
         if (data.selectedSpell() == null) {

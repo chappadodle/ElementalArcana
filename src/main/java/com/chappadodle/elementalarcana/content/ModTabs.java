@@ -6,6 +6,7 @@ import com.chappadodle.elementalarcana.api.SovereignRules;
 import com.chappadodle.elementalarcana.content.creature.ModCreatures;
 import com.chappadodle.elementalarcana.content.brew.ModBrews;
 import com.chappadodle.elementalarcana.content.gear.ModGear;
+import com.chappadodle.elementalarcana.content.hollow.ModHollow;
 import com.chappadodle.elementalarcana.content.people.ModPeople;
 import com.chappadodle.elementalarcana.content.sanctum.ModSanctums;
 import com.chappadodle.elementalarcana.content.sanctum.SovereignHeartItem;
@@ -55,6 +56,8 @@ public final class ModTabs {
                 for (Element element : SovereignRules.ELEMENTS) {
                     output.accept(SovereignHeartItem.of(element));
                 }
+                output.accept(ModHollow.PRIME_KEY.get());
+                output.accept(ModHollow.PRIME_HEART.get());
                 output.accept(ModBrews.WISP_MOTE.get());
                 ModBrews.potions().forEach(potion -> output.accept(PotionContents.createItemStack(Items.POTION, potion)));
                 output.accept(ModTowers.ACOLYTE_EGG.get());
@@ -65,6 +68,7 @@ public final class ModTabs {
                 for (Element element : SovereignRules.ELEMENTS) {
                     output.accept(ModSanctums.sovereignEgg(element));
                 }
+                output.accept(ModHollow.HOLLOW_EGG.get());
             })
             .build());
 

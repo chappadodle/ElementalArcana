@@ -1,0 +1,22 @@
+# The Hollow: its dimension loads and the Ruin is built (the maw's obsidian ring and its pit's floor; a restored seal on
+# the north-west pillar, whose height varies, so one of three checks passes). The Hollow summons
+# there at level 70 (about 1020 health) in its Fire form; 700 damage leaves it under a third, in its
+# Wind form (Attuned to Wind: see its creature_magic attachment). It dies cleanly.
+execute in elementalarcana:the_hollow run forceload add -32 -32 32 32
+sleep 3
+execute in elementalarcana:the_hollow if block 5 64 0 minecraft:obsidian
+execute in elementalarcana:the_hollow if block 0 61 0 minecraft:crying_obsidian
+execute in elementalarcana:the_hollow if block -12 69 -12 elementalarcana:sanctum_seal
+execute in elementalarcana:the_hollow if block -12 70 -12 elementalarcana:sanctum_seal
+execute in elementalarcana:the_hollow if block -12 71 -12 elementalarcana:sanctum_seal
+execute in elementalarcana:the_hollow run summon elementalarcana:the_hollow 0.5 70 0.5
+sleep 2
+arcana creaturelevel @e[type=elementalarcana:the_hollow]
+data get entity @e[type=elementalarcana:the_hollow,limit=1] neoforge:attachments
+damage @e[type=elementalarcana:the_hollow,limit=1] 700 minecraft:generic
+sleep 1
+data get entity @e[type=elementalarcana:the_hollow,limit=1] neoforge:attachments
+data get entity @e[type=elementalarcana:the_hollow,limit=1] Health
+kill @e[type=elementalarcana:the_hollow]
+sleep 2
+execute in elementalarcana:the_hollow run forceload remove all

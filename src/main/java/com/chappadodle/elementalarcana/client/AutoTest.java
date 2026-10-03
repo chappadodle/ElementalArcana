@@ -10,12 +10,16 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.BackupConfirmScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.ChunkPos;
@@ -65,6 +69,7 @@ import java.util.Optional;
  * camera first|back|front  the camera view
  * use                      right-click the creature or block under the crosshair (or, with
  *                          neither, use the held item)
+ * hold_use 45              hold right click down for 45 ticks (items used over time)
  * goto elementalarcana:fire_shrine 18 14 [2]   stand 18 blocks south of the nearest such structure
  *                          and 14 above its base, looking at its middle, 2 blocks above the base
  *                          (default 0); it's searched for from where the player is
@@ -72,6 +77,7 @@ import java.util.Optional;
  *                          20 above); log where, and view the first from 8 blocks south, 5 up
  * quit                     close the game
  * </pre>
+ * A player who is dead (in this run, or in the saved world) is respawned before any step runs.
  */
 @EventBusSubscriber(modid = ElementalArcana.MODID, value = Dist.CLIENT)
 public final class AutoTest {
@@ -82,6 +88,7 @@ public final class AutoTest {
     private static int index;
     private static int waitTicks;
     private static int respawnCooldown;
+    private static int holdUseTicks;
     private static boolean finished;
 
     private AutoTest() {
@@ -93,6 +100,18 @@ public final class AutoTest {
             return;
         }
         Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.player == null && minecraft.screen instanceof BackupConfirmScreen confirm) {
+            // A world with the mod's own dimension (the Hollow) asks once whether to load it without a
+            // backup: the test world needs none.
+            for (GuiEventListener child : confirm.children()) {
+                if (child instanceof Button button && button.getMessage().getContents() instanceof TranslatableContents text
+                        && text.getKey().equals("selectWorld.backupJoinSkipButton")) {
+                    LOGGER.info("[autotest] loading the world without a backup");
+                    button.onPress();
+                    return;
+                }
+            }
+        }
         if (minecraft.player == null || minecraft.level == null || minecraft.getSingleplayerServer() == null) {
             return;
         }
@@ -117,6 +136,9 @@ public final class AutoTest {
             LOGGER.info("[autotest] running {} ({} lines)", script, steps.size());
             // Give the world a moment to settle before the first step.
             waitTicks = 60;
+        }
+        if (holdUseTicks > 0 && --holdUseTicks == 0) {
+            minecraft.options.keyUse.setDown(false);
         }
         if (waitTicks > 0) {
             waitTicks--;
@@ -181,6 +203,13 @@ public final class AutoTest {
                     // Like a right click: if the block didn't take it, the item is used.
                     minecraft.gameMode.useItem(minecraft.player, InteractionHand.MAIN_HAND);
                 }
+            }
+            case "hold_use" -> {
+                // Right click held down (for items used over time, like the Prime Key), let go after the wait.
+                minecraft.options.keyUse.setDown(true);
+                holdUseTicks = Integer.parseInt(argument);
+                waitTicks = holdUseTicks;
+                return false;
             }
             case "goto" -> gotoStructure(minecraft, argument);
             case "find" -> findBlock(minecraft, argument);

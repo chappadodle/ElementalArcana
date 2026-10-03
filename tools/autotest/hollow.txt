@@ -1,0 +1,61 @@
+# The Hollow: the Prime Key turned in the Overworld takes the player to the Ruin; three seconds later
+# the Hollow rises from the maw; it is pushed through its four forms with /damage (each a Devouring);
+# its fall (the title, the epilogue, a Heart of the Prime) and, ten seconds later, the way home; then
+# the Heart of the Prime used. The player can't be hurt (Resistance V), but its hunger shows on the
+# mana bar. Forms, dimensions and items go to the log.
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken fire
+cmd arcana level set 60
+cmd arcana mana fill
+cmd gamemode survival
+cmd clear @s
+cmd tp @s 0.5 100 0.5 0 -10
+wait 40
+cmd effect give @s minecraft:resistance 900 4 true
+cmd item replace entity @s weapon.mainhand with elementalarcana:prime_key
+wait 10
+hold_use 50
+wait 20
+shot hollow_arrival
+cmd data get entity @s Dimension
+wait 70
+shot hollow_rise
+cmd arcana creaturelevel @e[type=elementalarcana:the_hollow]
+wait 80
+shot hollow_form_fire
+cmd damage @e[type=elementalarcana:the_hollow,limit=1] 260 minecraft:generic
+wait 30
+shot hollow_devour
+wait 50
+shot hollow_form_water
+cmd damage @e[type=elementalarcana:the_hollow,limit=1] 260 minecraft:generic
+wait 80
+shot hollow_form_wind
+cmd damage @e[type=elementalarcana:the_hollow,limit=1] 260 minecraft:generic
+wait 80
+shot hollow_form_earth
+cmd data get entity @e[type=elementalarcana:the_hollow,limit=1] neoforge:attachments
+cmd data get entity @s Health
+cmd kill @e[type=elementalarcana:the_hollow]
+wait 30
+shot hollow_bound
+cmd execute if items entity @s container.* elementalarcana:prime_heart
+wait 220
+shot hollow_home
+cmd data get entity @s Dimension
+cmd item replace entity @s weapon.mainhand with elementalarcana:prime_heart
+look 0 -90
+wait 5
+use
+wait 30
+shot prime_heart_used
+cmd arcana awaken clock
+wait 10
+quit

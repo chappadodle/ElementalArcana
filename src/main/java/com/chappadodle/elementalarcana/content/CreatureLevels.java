@@ -5,6 +5,7 @@ import com.chappadodle.elementalarcana.api.CreatureMagic;
 import com.chappadodle.elementalarcana.api.Progression;
 import com.chappadodle.elementalarcana.api.StatRules;
 import com.chappadodle.elementalarcana.api.ZoneLevels;
+import com.chappadodle.elementalarcana.content.hollow.ModHollow;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -96,8 +97,10 @@ public final class CreatureLevels {
 
     private static void assign(ServerLevel level, LivingEntity entity) {
         BlockPos pos = entity.blockPosition();
+        // The Hollow is as deadly as the End.
         ZoneLevels.Dimension dimension = level.dimension() == Level.NETHER ? ZoneLevels.Dimension.NETHER
-                : level.dimension() == Level.END ? ZoneLevels.Dimension.END : ZoneLevels.Dimension.OVERWORLD;
+                : level.dimension() == Level.END || level.dimension() == ModHollow.THE_HOLLOW ? ZoneLevels.Dimension.END
+                : ZoneLevels.Dimension.OVERWORLD;
         BlockPos center = dimension == ZoneLevels.Dimension.OVERWORLD ? level.getSharedSpawnPos() : BlockPos.ZERO;
         double distance = Math.hypot(pos.getX() - center.getX(), pos.getZ() - center.getZ());
         boolean inStructure = !level.structureManager().getAllStructuresAt(pos).isEmpty();
