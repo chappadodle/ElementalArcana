@@ -30,6 +30,7 @@ import com.chappadodle.elementalarcana.content.BubblePrisons;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.content.ModSpells;
 import com.chappadodle.elementalarcana.content.creature.ModCreatures;
+import com.chappadodle.elementalarcana.content.sanctum.ModSanctums;
 import com.chappadodle.elementalarcana.content.tower.ModTowers;
 import com.chappadodle.elementalarcana.content.tower.TowerHeartBlock;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
@@ -46,6 +47,7 @@ import com.chappadodle.elementalarcana.content.world.ShrineCoreBlock;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.minecraft.util.FastColor;
 import com.chappadodle.elementalarcana.api.Element;
+import com.chappadodle.elementalarcana.api.SovereignRules;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
@@ -296,7 +298,8 @@ public final class ArcanaClient {
         event.register((stack, tintIndex) -> {
             Element element = FocusItem.elementOf(stack);
             return tintIndex == 1 && element != null ? FastColor.ARGB32.opaque(element.color()) : -1;
-        }, ModGear.APPRENTICE_WAND.get(), ModGear.ADEPT_STAFF.get(), ModGear.MASTER_STAFF.get(), ModTowers.GUARDIAN_CORE.get());
+        }, ModGear.APPRENTICE_WAND.get(), ModGear.ADEPT_STAFF.get(), ModGear.MASTER_STAFF.get(), ModGear.ARCHMAGE_STAFF.get(),
+                ModTowers.GUARDIAN_CORE.get(), ModSanctums.SOVEREIGN_HEART.get());
     }
 
     @SubscribeEvent
@@ -307,11 +310,15 @@ public final class ArcanaClient {
         }
         event.registerEntityRenderer(ModTowers.ACOLYTE.get(), TowerMageRenderer::new);
         event.registerEntityRenderer(ModTowers.MAGISTER.get(), TowerMageRenderer::new);
+        for (Element element : SovereignRules.ELEMENTS) {
+            event.registerEntityRenderer(ModSanctums.sovereign(element), SovereignRenderer::new);
+        }
     }
 
     @SubscribeEvent
     public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(WispModel.LAYER, WispModel::createLayer);
+        event.registerLayerDefinition(SovereignModel.LAYER, SovereignModel::createLayer);
     }
 
     // Load every projectile spell's 3D model, including models from addon spells.

@@ -16,14 +16,15 @@ import java.util.Map;
 /**
  * An Attuned creature's spellcasting. When it has a target in sight, it picks the highest-rank
  * spell that is ready, stops, faces the target and winds up for half a second (hands glowing
- * with its element, a warning sound), then casts. Between casts it fights normally.
+ * with its element, a warning sound), then casts. Between casts it fights normally. Bosses (the
+ * Sovereigns) override the spell list, the wind-up, the gap and the cooldowns.
  */
 public class CastMobSpellGoal extends Goal {
     private static final int WINDUP_TICKS = 10;
     // At least this long between any two casts.
     private static final int MIN_GAP_TICKS = 40;
 
-    private final Mob mob;
+    protected final Mob mob;
     private final Map<MobSpell, Long> readyAt = new HashMap<>();
     private long nextCastAt;
     @Nullable
@@ -50,10 +51,27 @@ public class CastMobSpellGoal extends Goal {
         return casting != null;
     }
 
+    /** The spells this creature may cast, lowest rank first (the last ready one that fits wins). */
+    protected List<MobSpell> spells(CreatureMagic magic) {
+        return MobSpells.of(magic.element());
+    }
+
+    protected int windupTicks() {
+        return WINDUP_TICKS;
+    }
+
+    protected int minGapTicks() {
+        return MIN_GAP_TICKS;
+    }
+
+    protected int cooldownOf(MobSpell spell) {
+        return spell.cooldownTicks();
+    }
+
     /** The highest-rank spell this creature knows that is off cooldown and makes sense right now. */
     @Nullable
     private MobSpell pick(CreatureMagic magic, LivingEntity target, long now) {
-        List<MobSpell> spells = MobSpells.of(magic.element());
+        List<MobSpell> spells = spells(magic);
         for (int i = spells.size() - 1; i >= 0; i--) {
             MobSpell spell = spells.get(i);
             if (spell.rank().ordinal() <= magic.rank().ordinal() && now >= readyAt.getOrDefault(spell, 0L) && spell.canCast(mob, target)) {
@@ -65,7 +83,7 @@ public class CastMobSpellGoal extends Goal {
 
     @Override
     public void start() {
-        windup = WINDUP_TICKS;
+        windup = windupTicks();
         mob.getNavigation().stop();
         MobCasting.play(mob, SoundEvents.EVOKER_PREPARE_ATTACK, 1f, 1.2f);
     }
@@ -91,8 +109,8 @@ public class CastMobSpellGoal extends Goal {
         if (--windup == 0) {
             casting.cast(mob, target);
             long now = mob.level().getGameTime();
-            readyAt.put(casting, now + casting.cooldownTicks());
-            nextCastAt = now + MIN_GAP_TICKS;
+            readyAt.put(casting, now + cooldownOf(casting));
+            nextCastAt = now + minGapTicks();
         }
     }
 

@@ -1,0 +1,8 @@
+{
+  "type": "elementalarcana:sanctum",
+  "element": "water",
+  "biomes": "#elementalarcana:has_structure/water_sanctum",
+  "step": "top_layer_modification",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_thin"
+}

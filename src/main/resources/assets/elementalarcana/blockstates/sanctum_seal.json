@@ -1,0 +1,40 @@
+{
+  "variants": {
+    "kind=fire,state=sealed": {
+      "model": "elementalarcana:block/sanctum_seal_fire"
+    },
+    "kind=fire,state=awake": {
+      "model": "elementalarcana:block/sanctum_seal_fire_lit"
+    },
+    "kind=fire,state=restored": {
+      "model": "elementalarcana:block/sanctum_seal_fire_lit"
+    },
+    "kind=water,state=sealed": {
+      "model": "elementalarcana:block/sanctum_seal_water"
+    },
+    "kind=water,state=awake": {
+      "model": "elementalarcana:block/sanctum_seal_water_lit"
+    },
+    "kind=water,state=restored": {
+      "model": "elementalarcana:block/sanctum_seal_water_lit"
+    },
+    "kind=wind,state=sealed": {
+      "model": "elementalarcana:block/sanctum_seal_wind"
+    },
+    "kind=wind,state=awake": {
+      "model": "elementalarcana:block/sanctum_seal_wind_lit"
+    },
+    "kind=wind,state=restored": {
+      "model": "elementalarcana:block/sanctum_seal_wind_lit"
+    },
+    "kind=earth,state=sealed": {
+      "model": "elementalarcana:block/sanctum_seal_earth"
+    },
+    "kind=earth,state=awake": {
+      "model": "elementalarcana:block/sanctum_seal_earth_lit"
+    },
+    "kind=earth,state=restored": {
+      "model": "elementalarcana:block/sanctum_seal_earth_lit"
+    }
+  }
+}

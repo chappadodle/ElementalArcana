@@ -64,6 +64,9 @@ public final class ModGear {
     public static final DeferredHolder<ArmorMaterial, ArmorMaterial> MASTER_CLOTH = ARMOR_MATERIALS.register("master", () -> new ArmorMaterial(
             defense(2, 5, 6, 2), 25, SoundEvents.ARMOR_EQUIP_GOLD, () -> Ingredient.of(Items.DIAMOND),
             List.of(new ArmorMaterial.Layer(ElementalArcana.id("master"))), 1f, 0f));
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> ARCHMAGE_CLOTH = ARMOR_MATERIALS.register("archmage", () -> new ArmorMaterial(
+            defense(3, 6, 8, 3), 30, SoundEvents.ARMOR_EQUIP_NETHERITE, () -> Ingredient.of(Items.NETHERITE_SCRAP),
+            List.of(new ArmorMaterial.Layer(ElementalArcana.id("archmage"))), 2f, 0.05f));
 
     public static final DeferredItem<FocusItem> APPRENTICE_WAND = ITEMS.register("apprentice_wand",
             () -> new FocusItem(1, 0, Map.of("potency", 2), 3, new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)));
@@ -72,6 +75,9 @@ public final class ModGear {
     /** The master tier (level 35): made with a Magister's Guardian Core (see the mage towers spec). */
     public static final DeferredItem<FocusItem> MASTER_STAFF = ITEMS.register("master_staff",
             () -> new FocusItem(3, 35, Map.of("potency", 7, "focus", 4), 10, new Item.Properties().stacksTo(1).rarity(Rarity.EPIC)));
+    /** The archmage tier (level 50): made with a Sovereign's Heart (see the sanctums spec). */
+    public static final DeferredItem<FocusItem> ARCHMAGE_STAFF = ITEMS.register("archmage_staff",
+            () -> new FocusItem(4, 50, Map.of("potency", 10, "focus", 6), 15, new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
 
     public static final DeferredItem<RobeItem> APPRENTICE_HOOD = robe("apprentice_hood", APPRENTICE_CLOTH, ArmorItem.Type.HELMET, 0, Map.of("insight", 1, "reservoir", 1));
     public static final DeferredItem<RobeItem> APPRENTICE_ROBE = robe("apprentice_robe", APPRENTICE_CLOTH, ArmorItem.Type.CHESTPLATE, 0, Map.of("reservoir", 3, "ward", 1));
@@ -85,6 +91,10 @@ public final class ModGear {
     public static final DeferredItem<RobeItem> MASTER_ROBE = robe("master_robe", MASTER_CLOTH, ArmorItem.Type.CHESTPLATE, 35, Map.of("reservoir", 8, "ward", 5));
     public static final DeferredItem<RobeItem> MASTER_TROUSERS = robe("master_trousers", MASTER_CLOTH, ArmorItem.Type.LEGGINGS, 35, Map.of("focus", 6, "ward", 2));
     public static final DeferredItem<RobeItem> MASTER_BOOTS = robe("master_boots", MASTER_CLOTH, ArmorItem.Type.BOOTS, 35, Map.of("vitality", 3, "reservoir", 3));
+    public static final DeferredItem<RobeItem> ARCHMAGE_HOOD = robe("archmage_hood", ARCHMAGE_CLOTH, ArmorItem.Type.HELMET, 50, Map.of("insight", 5, "reservoir", 5));
+    public static final DeferredItem<RobeItem> ARCHMAGE_ROBE = robe("archmage_robe", ARCHMAGE_CLOTH, ArmorItem.Type.CHESTPLATE, 50, Map.of("reservoir", 12, "ward", 8));
+    public static final DeferredItem<RobeItem> ARCHMAGE_TROUSERS = robe("archmage_trousers", ARCHMAGE_CLOTH, ArmorItem.Type.LEGGINGS, 50, Map.of("focus", 9, "ward", 4));
+    public static final DeferredItem<RobeItem> ARCHMAGE_BOOTS = robe("archmage_boots", ARCHMAGE_CLOTH, ArmorItem.Type.BOOTS, 50, Map.of("vitality", 5, "reservoir", 5));
 
     private ModGear() {
     }
@@ -102,20 +112,23 @@ public final class ModGear {
     private static DeferredItem<RobeItem> robe(String name, DeferredHolder<ArmorMaterial, ArmorMaterial> material, ArmorItem.Type type,
                                                int requiredLevel, Map<String, Integer> stats) {
         boolean master = requiredLevel >= 35;
-        return ITEMS.register(name, () -> new RobeItem(material, type, requiredLevel, stats,
-                new Item.Properties().durability(type.getDurability(master ? 28 : requiredLevel > 0 ? 20 : 12))
-                        .rarity(master ? Rarity.EPIC : requiredLevel > 0 ? Rarity.RARE : Rarity.UNCOMMON)));
+        boolean archmage = requiredLevel >= 50;
+        Item.Properties properties = new Item.Properties()
+                .durability(type.getDurability(archmage ? 37 : master ? 28 : requiredLevel > 0 ? 20 : 12))
+                .rarity(master ? Rarity.EPIC : requiredLevel > 0 ? Rarity.RARE : Rarity.UNCOMMON);
+        return ITEMS.register(name, () -> new RobeItem(material, type, requiredLevel, stats, archmage ? properties.fireResistant() : properties));
     }
 
     /** The foci, lowest tier first. */
     public static List<DeferredItem<FocusItem>> foci() {
-        return List.of(APPRENTICE_WAND, ADEPT_STAFF, MASTER_STAFF);
+        return List.of(APPRENTICE_WAND, ADEPT_STAFF, MASTER_STAFF, ARCHMAGE_STAFF);
     }
 
     /** The robes, in creative-tab order. */
     public static List<DeferredItem<RobeItem>> robes() {
         return List.of(APPRENTICE_HOOD, APPRENTICE_ROBE, APPRENTICE_TROUSERS, APPRENTICE_BOOTS,
-                ADEPT_HOOD, ADEPT_ROBE, ADEPT_TROUSERS, ADEPT_BOOTS, MASTER_HOOD, MASTER_ROBE, MASTER_TROUSERS, MASTER_BOOTS);
+                ADEPT_HOOD, ADEPT_ROBE, ADEPT_TROUSERS, ADEPT_BOOTS, MASTER_HOOD, MASTER_ROBE, MASTER_TROUSERS, MASTER_BOOTS,
+                ARCHMAGE_HOOD, ARCHMAGE_ROBE, ARCHMAGE_TROUSERS, ARCHMAGE_BOOTS);
     }
 
     public static void register(IEventBus modEventBus) {

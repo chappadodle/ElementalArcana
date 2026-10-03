@@ -14,6 +14,7 @@ import com.chappadodle.elementalarcana.content.CreatureLevels;
 import com.chappadodle.elementalarcana.content.SkillTreeLoader;
 import com.chappadodle.elementalarcana.content.creature.WispEntity;
 import com.chappadodle.elementalarcana.content.creature.WispSpawner;
+import com.chappadodle.elementalarcana.content.sanctum.SanctumSealBlockEntity;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -28,16 +29,20 @@ import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.selector.EntitySelector;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 
@@ -122,7 +127,31 @@ public final class ArcanaCommand {
                                         IntegerArgumentType.getInteger(ctx, "level")))))))
                 .then(Commands.literal("bubble").then(Commands.argument("targets", EntityArgument.entities())
                         .executes(ctx -> bubble(ctx.getSource(), EntityArgument.getEntities(ctx, "targets")))))
-                .then(Commands.literal("wisp").then(wispSpawn())));
+                .then(Commands.literal("wisp").then(wispSpawn()))
+                .then(Commands.literal("sanctum").then(Commands.literal("reset").executes(ctx -> resetSanctums(ctx.getSource())))));
+    }
+
+    /** /arcana sanctum reset: seals again every sanctum seal within 3 chunks (its Sovereign, if out, is gone). */
+    private static int resetSanctums(CommandSourceStack source) {
+        ServerLevel level = source.getLevel();
+        BlockPos at = BlockPos.containing(source.getPosition());
+        int reset = 0;
+        for (int cx = (at.getX() >> 4) - 3; cx <= (at.getX() >> 4) + 3; cx++) {
+            for (int cz = (at.getZ() >> 4) - 3; cz <= (at.getZ() >> 4) + 3; cz++) {
+                if (!level.hasChunk(cx, cz)) {
+                    continue;
+                }
+                for (BlockEntity block : List.copyOf(level.getChunk(cx, cz).getBlockEntities().values())) {
+                    if (block instanceof SanctumSealBlockEntity seal) {
+                        seal.reset();
+                        reset++;
+                    }
+                }
+            }
+        }
+        int count = reset;
+        source.sendSuccess(() -> Component.literal("Reset " + count + " sanctum seal(s)"), true);
+        return count;
     }
 
     /** /arcana wisp spawn [element]: calls a wisp near you now, the way the wild spawner would (for testing). */

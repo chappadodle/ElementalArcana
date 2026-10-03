@@ -1,0 +1,26 @@
+{
+  "structures": [
+    {
+      "structure": "elementalarcana:fire_sanctum",
+      "weight": 1
+    },
+    {
+      "structure": "elementalarcana:water_sanctum",
+      "weight": 1
+    },
+    {
+      "structure": "elementalarcana:wind_sanctum",
+      "weight": 1
+    },
+    {
+      "structure": "elementalarcana:earth_sanctum",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 40,
+    "separation": 20,
+    "salt": 731905
+  }
+}

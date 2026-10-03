@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "side": "elementalarcana:block/sanctum_seal_earth_side_lit",
+    "top": "elementalarcana:block/sanctum_seal_earth_top_lit",
+    "bottom": "elementalarcana:block/sanctum_seal_earth_side"
+  }
+}

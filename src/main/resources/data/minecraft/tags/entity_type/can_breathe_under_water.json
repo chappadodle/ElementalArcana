@@ -8,6 +8,10 @@
     "elementalarcana:earth_wisp",
     "elementalarcana:crystal_wisp",
     "elementalarcana:lightning_wisp",
-    "elementalarcana:radiance_wisp"
+    "elementalarcana:radiance_wisp",
+    "elementalarcana:fire_sovereign",
+    "elementalarcana:water_sovereign",
+    "elementalarcana:wind_sovereign",
+    "elementalarcana:earth_sovereign"
   ]
 }

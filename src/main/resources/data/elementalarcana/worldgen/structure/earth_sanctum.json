@@ -1,0 +1,8 @@
+{
+  "type": "elementalarcana:sanctum",
+  "element": "earth",
+  "biomes": "#elementalarcana:has_structure/earth_sanctum",
+  "step": "top_layer_modification",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_thin"
+}

@@ -3,6 +3,7 @@ package com.chappadodle.elementalarcana.content;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.AttunementRank;
 import com.chappadodle.elementalarcana.api.CreatureMagic;
+import com.chappadodle.elementalarcana.content.sanctum.SovereignEntity;
 import com.chappadodle.elementalarcana.content.tower.TowerMageEntity;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
@@ -24,12 +25,15 @@ import java.util.UUID;
 
 /**
  * An Archmage announces itself with a boss bar ("Zombie Archmage") for players within 32 blocks,
- * like the Wither's. The bar is purple for every element, so it doesn't give the element away.
+ * like the Wither's. The bar is purple for every element, so it doesn't give the element away. A
+ * Sovereign's is its own: its name, in its element's colour, within 48 blocks, and it darkens the
+ * sky.
  */
 @EventBusSubscriber(modid = ElementalArcana.MODID)
 public final class ArchmageBossBars {
     private static final Map<UUID, ServerBossEvent> BARS = new HashMap<>();
     private static final double VIEW_DISTANCE = 32;
+    private static final double SOVEREIGN_VIEW_DISTANCE = 48;
     private static final int UPDATE_INTERVAL_TICKS = 5;
 
     private ArchmageBossBars() {
@@ -44,6 +48,15 @@ public final class ArchmageBossBars {
         return Component.translatable("bossbar.elementalarcana.archmage", mob.getType().getDescription());
     }
 
+    private static ServerBossEvent create(LivingEntity mob, CreatureMagic magic) {
+        if (mob instanceof SovereignEntity sovereign) {
+            ServerBossEvent bar = new ServerBossEvent(sovereign.bossTitle(), sovereign.barColor(), BossEvent.BossBarOverlay.NOTCHED_10);
+            bar.setDarkenScreen(true);
+            return bar;
+        }
+        return new ServerBossEvent(title(mob, magic), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS);
+    }
+
     @SubscribeEvent
     public static void onEntityTick(EntityTickEvent.Post event) {
         if (event.getEntity().tickCount % UPDATE_INTERVAL_TICKS != 0 || !(event.getEntity() instanceof LivingEntity mob)
@@ -54,16 +67,16 @@ public final class ArchmageBossBars {
         if (magic == null || magic.rank() != AttunementRank.ARCHMAGE) {
             return;
         }
-        ServerBossEvent bar = BARS.computeIfAbsent(mob.getUUID(), id -> new ServerBossEvent(title(mob, magic),
-                BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS));
+        ServerBossEvent bar = BARS.computeIfAbsent(mob.getUUID(), id -> create(mob, magic));
         bar.setProgress(mob.getHealth() / mob.getMaxHealth());
+        double view = mob instanceof SovereignEntity ? SOVEREIGN_VIEW_DISTANCE : VIEW_DISTANCE;
         for (ServerPlayer player : List.copyOf(bar.getPlayers())) {
-            if (player.level() != level || player.distanceTo(mob) > VIEW_DISTANCE) {
+            if (player.level() != level || player.distanceTo(mob) > view) {
                 bar.removePlayer(player);
             }
         }
         for (ServerPlayer player : level.players()) {
-            if (player.distanceTo(mob) <= VIEW_DISTANCE) {
+            if (player.distanceTo(mob) <= view) {
                 bar.addPlayer(player);
             }
         }

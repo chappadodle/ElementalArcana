@@ -3,11 +3,14 @@ package com.chappadodle.elementalarcana.content.people;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.AttunementRules;
 import com.chappadodle.elementalarcana.api.Element;
+import com.chappadodle.elementalarcana.api.SovereignRules;
 import com.chappadodle.elementalarcana.content.ModItems;
 import com.chappadodle.elementalarcana.content.ModTabs;
 import com.chappadodle.elementalarcana.content.brew.ModBrews;
 import com.chappadodle.elementalarcana.content.gear.ModGear;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.item.Item;
@@ -16,12 +19,14 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraft.world.level.saveddata.maps.MapDecorationTypes;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.village.VillagerTradesEvent;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -66,6 +71,13 @@ public final class ArcanistTrades {
         // Master
         trades.get(5).add(sell(random -> new ItemStack(ModPeople.TOME_OF_INSIGHT.get()), 32, new ItemCost(Items.DIAMOND, 1), 1, 30));
         trades.get(5).add(sell(random -> new ItemStack(ModItems.catalyst(anyFamily(random))), 12, new ItemCost(Items.DIAMOND, 1), 2, 30));
+        // A map to the nearest sanctum of one element (none if there's none within 1600 blocks).
+        trades.get(5).add((trader, random) -> {
+            Element element = SovereignRules.ELEMENTS.get(random.nextInt(SovereignRules.ELEMENTS.size()));
+            String name = element.name().toLowerCase(Locale.ROOT);
+            return new VillagerTrades.TreasureMapForEmeralds(24, TagKey.create(Registries.STRUCTURE, ElementalArcana.id("sanctum/" + name)),
+                    "filled_map.elementalarcana.sanctum." + name, MapDecorationTypes.RED_X, 1, 30).getOffer(trader, random);
+        });
     }
 
     /** The Arcanist buys {@code cost} for emeralds. */

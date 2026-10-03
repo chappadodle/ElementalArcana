@@ -1,0 +1,31 @@
+# The four Sovereigns: each summons as an Archmage of its element at level 50 or more; half health
+# sends it into its second phase (two wisps of its element each, so 8 in all); its death drops its
+# Heart (4 Hearts). The "execute if entity" lines print counts.
+time set midnight
+gamerule doMobSpawning false
+forceload add -32 -32 32 32
+fill -28 99 -28 28 99 28 minecraft:stone
+fill -28 100 -28 28 118 28 minecraft:air
+kill @e[type=item]
+summon elementalarcana:fire_sovereign -12 103 0
+summon elementalarcana:water_sovereign -4 103 0
+summon elementalarcana:wind_sovereign 4 103 0
+summon elementalarcana:earth_sovereign 12 103 0
+sleep 2
+arcana creaturelevel @e[type=#elementalarcana:sovereigns]
+data get entity @e[type=elementalarcana:fire_sovereign,limit=1] Health
+execute if entity @e[type=#elementalarcana:wisps]
+damage @e[type=elementalarcana:fire_sovereign,limit=1] 250 minecraft:generic
+damage @e[type=elementalarcana:water_sovereign,limit=1] 250 minecraft:generic
+damage @e[type=elementalarcana:wind_sovereign,limit=1] 250 minecraft:generic
+damage @e[type=elementalarcana:earth_sovereign,limit=1] 250 minecraft:generic
+sleep 2
+data get entity @e[type=elementalarcana:fire_sovereign,limit=1] Health
+execute if entity @e[type=#elementalarcana:wisps]
+kill @e[type=#elementalarcana:sovereigns]
+sleep 2
+execute if entity @e[type=item,nbt={Item:{id:"elementalarcana:sovereign_heart"}}]
+kill @e[type=#elementalarcana:wisps]
+kill @e[type=item]
+gamerule doMobSpawning true
+forceload remove all

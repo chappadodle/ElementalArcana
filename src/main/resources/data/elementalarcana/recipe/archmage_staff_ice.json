@@ -1,0 +1,38 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " HE",
+    "NSE",
+    "N  "
+  ],
+  "key": {
+    "H": {
+      "type": "neoforge:components",
+      "items": "elementalarcana:sovereign_heart",
+      "components": {
+        "elementalarcana:element": "water"
+      }
+    },
+    "E": {
+      "item": "elementalarcana:ice_essence"
+    },
+    "S": {
+      "type": "neoforge:components",
+      "items": "elementalarcana:master_staff",
+      "components": {
+        "elementalarcana:element": "ice"
+      }
+    },
+    "N": {
+      "item": "minecraft:netherite_scrap"
+    }
+  },
+  "result": {
+    "id": "elementalarcana:archmage_staff",
+    "count": 1,
+    "components": {
+      "elementalarcana:element": "ice"
+    }
+  }
+}

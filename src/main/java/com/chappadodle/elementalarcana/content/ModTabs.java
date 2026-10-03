@@ -2,10 +2,13 @@ package com.chappadodle.elementalarcana.content;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Element;
+import com.chappadodle.elementalarcana.api.SovereignRules;
 import com.chappadodle.elementalarcana.content.creature.ModCreatures;
 import com.chappadodle.elementalarcana.content.brew.ModBrews;
 import com.chappadodle.elementalarcana.content.gear.ModGear;
 import com.chappadodle.elementalarcana.content.people.ModPeople;
+import com.chappadodle.elementalarcana.content.sanctum.ModSanctums;
+import com.chappadodle.elementalarcana.content.sanctum.SovereignHeartItem;
 import com.chappadodle.elementalarcana.content.tower.GuardianCoreItem;
 import com.chappadodle.elementalarcana.content.tower.MageTowerStructure;
 import com.chappadodle.elementalarcana.content.tower.ModTowers;
@@ -49,12 +52,18 @@ public final class ModTabs {
                 for (Element element : MageTowerStructure.TOWER_ELEMENTS) {
                     output.accept(GuardianCoreItem.of(element));
                 }
+                for (Element element : SovereignRules.ELEMENTS) {
+                    output.accept(SovereignHeartItem.of(element));
+                }
                 output.accept(ModBrews.WISP_MOTE.get());
                 ModBrews.potions().forEach(potion -> output.accept(PotionContents.createItemStack(Items.POTION, potion)));
                 output.accept(ModTowers.ACOLYTE_EGG.get());
                 output.accept(ModTowers.MAGISTER_EGG.get());
                 for (Element element : Element.values()) {
                     output.accept(ModCreatures.wispEgg(element));
+                }
+                for (Element element : SovereignRules.ELEMENTS) {
+                    output.accept(ModSanctums.sovereignEgg(element));
                 }
             })
             .build());

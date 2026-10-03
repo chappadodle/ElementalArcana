@@ -1,0 +1,120 @@
+# The four sanctums, found far out on fresh land with goto, and a fight with each Sovereign: it
+# rises when the player comes near its seal (the seal is reset first, so the test can run again);
+# its fight, its second phase from half health, its fall, the Heart and the restored seal. The
+# player is in survival but can't be hurt (Resistance V). Levels and counts go to the log.
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobLoot true
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken fire
+cmd arcana level set 50
+cmd gamemode spectator
+cmd tp @s 30000 170 30000
+wait 40
+goto elementalarcana:fire_sanctum 34 16
+wait 200
+shot sanctum_fire
+cmd arcana sanctum reset
+cmd kill @e[type=!player]
+cmd gamemode survival
+cmd effect give @s minecraft:resistance 900 4 true
+cmd effect give @s minecraft:fire_resistance 900 0 true
+cmd effect give @s minecraft:water_breathing 900 0 true
+cmd tp @s ~ ~-15 ~-26 180 -28
+wait 60
+shot sovereign_fire_rise
+wait 80
+shot sovereign_fire_fight
+cmd arcana creaturelevel @e[type=#elementalarcana:sovereigns]
+cmd damage @e[type=elementalarcana:fire_sovereign,limit=1] 300 minecraft:generic
+wait 50
+shot sovereign_fire_enraged
+cmd execute if entity @e[type=#elementalarcana:wisps,distance=..40]
+cmd kill @e[type=elementalarcana:fire_sovereign]
+wait 60
+shot sanctum_fire_restored
+cmd execute if entity @e[type=item,nbt={Item:{id:"elementalarcana:sovereign_heart"}},distance=..40]
+cmd gamemode spectator
+cmd kill @e[type=!player]
+goto elementalarcana:water_sanctum 34 16
+wait 200
+shot sanctum_water
+cmd arcana sanctum reset
+cmd kill @e[type=!player]
+cmd gamemode survival
+cmd effect give @s minecraft:resistance 900 4 true
+cmd effect give @s minecraft:fire_resistance 900 0 true
+cmd effect give @s minecraft:water_breathing 900 0 true
+cmd tp @s ~ ~-15 ~-26 180 -28
+wait 60
+shot sovereign_water_rise
+wait 80
+shot sovereign_water_fight
+cmd arcana creaturelevel @e[type=#elementalarcana:sovereigns]
+cmd damage @e[type=elementalarcana:water_sovereign,limit=1] 300 minecraft:generic
+wait 50
+shot sovereign_water_enraged
+cmd execute if entity @e[type=#elementalarcana:wisps,distance=..40]
+cmd kill @e[type=elementalarcana:water_sovereign]
+wait 60
+shot sanctum_water_restored
+cmd execute if entity @e[type=item,nbt={Item:{id:"elementalarcana:sovereign_heart"}},distance=..40]
+cmd gamemode spectator
+cmd kill @e[type=!player]
+goto elementalarcana:wind_sanctum 34 16
+wait 200
+shot sanctum_wind
+cmd arcana sanctum reset
+cmd kill @e[type=!player]
+cmd gamemode survival
+cmd effect give @s minecraft:resistance 900 4 true
+cmd effect give @s minecraft:fire_resistance 900 0 true
+cmd effect give @s minecraft:water_breathing 900 0 true
+cmd tp @s ~ ~-15 ~-26 180 -28
+wait 60
+shot sovereign_wind_rise
+wait 80
+shot sovereign_wind_fight
+cmd arcana creaturelevel @e[type=#elementalarcana:sovereigns]
+cmd damage @e[type=elementalarcana:wind_sovereign,limit=1] 300 minecraft:generic
+wait 50
+shot sovereign_wind_enraged
+cmd execute if entity @e[type=#elementalarcana:wisps,distance=..40]
+cmd kill @e[type=elementalarcana:wind_sovereign]
+wait 60
+shot sanctum_wind_restored
+cmd execute if entity @e[type=item,nbt={Item:{id:"elementalarcana:sovereign_heart"}},distance=..40]
+cmd gamemode spectator
+cmd kill @e[type=!player]
+goto elementalarcana:earth_sanctum 34 16
+wait 200
+shot sanctum_earth
+cmd arcana sanctum reset
+cmd kill @e[type=!player]
+cmd gamemode survival
+cmd effect give @s minecraft:resistance 900 4 true
+cmd effect give @s minecraft:fire_resistance 900 0 true
+cmd effect give @s minecraft:water_breathing 900 0 true
+cmd tp @s ~ ~-15 ~-26 180 -28
+wait 60
+shot sovereign_earth_rise
+wait 80
+shot sovereign_earth_fight
+cmd arcana creaturelevel @e[type=#elementalarcana:sovereigns]
+cmd damage @e[type=elementalarcana:earth_sovereign,limit=1] 300 minecraft:generic
+wait 50
+shot sovereign_earth_enraged
+cmd execute if entity @e[type=#elementalarcana:wisps,distance=..40]
+cmd kill @e[type=elementalarcana:earth_sovereign]
+wait 60
+shot sanctum_earth_restored
+cmd execute if entity @e[type=item,nbt={Item:{id:"elementalarcana:sovereign_heart"}},distance=..40]
+cmd gamemode spectator
+cmd kill @e[type=!player]
+wait 10
+quit

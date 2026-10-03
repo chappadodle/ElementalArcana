@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "elementalarcana:item/archmage_staff",
+    "layer1": "elementalarcana:item/archmage_staff_gem"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "elementalarcana:item/sovereign_heart",
+    "layer1": "elementalarcana:item/sovereign_heart_gem"
+  }
+}

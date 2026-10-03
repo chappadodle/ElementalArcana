@@ -1,0 +1,8 @@
+{
+  "type": "elementalarcana:sanctum",
+  "element": "wind",
+  "biomes": "#elementalarcana:has_structure/wind_sanctum",
+  "step": "top_layer_modification",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_thin"
+}

@@ -1,0 +1,8 @@
+{
+  "type": "elementalarcana:sanctum",
+  "element": "fire",
+  "biomes": "#elementalarcana:has_structure/fire_sanctum",
+  "step": "top_layer_modification",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_thin"
+}

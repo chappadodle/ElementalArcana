@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "NHN",
+    " P "
+  ],
+  "key": {
+    "N": {
+      "item": "minecraft:netherite_scrap"
+    },
+    "H": {
+      "item": "elementalarcana:sovereign_heart"
+    },
+    "P": {
+      "item": "elementalarcana:master_boots"
+    }
+  },
+  "result": {
+    "id": "elementalarcana:archmage_boots",
+    "count": 1
+  }
+}

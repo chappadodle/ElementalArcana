@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Generates the gear art (docs/superpowers/specs/2026-10-02-gear-design.md) as pixel art:
 
-- foci: the Apprentice Wand, the Adept Staff and the Master Staff, each as two layers: the wood and
-  metal, and a grey gem that the game tints with the focus's element (tint index 1);
-- robe icons: hood, robe, trousers and boots for the apprentice, adept and master sets;
+- foci: the Apprentice Wand, the Adept Staff, the Master Staff and the Archmage Staff, each as two
+  layers: the wood and metal, and a grey gem that the game tints with the focus's element (tint
+  index 1);
+- robe icons: hood, robe, trousers and boots for the apprentice, adept, master and archmage sets;
 - the robes as worn: armor textures in the game's 64x32 player layout (layer 1: hood, robe and
   boots; layer 2: trousers).
 
@@ -147,9 +148,48 @@ MASTER_STAFF_GEM = [
     "................",
     "................",
 ]
+# The archmage tier (docs/superpowers/specs/2026-10-03-sanctums-and-sovereigns-design.md): pale wood,
+# a gold crown with two prongs, and a bigger gem.
+ARCHMAGE_STAFF_BODY = [
+    ".........k....k.",
+    "........kGk..kGk",
+    "........kgkkkkgk",
+    "........kg....gk",
+    "........kg....gk",
+    ".......kWkg..gk.",
+    "......kWwkkggk..",
+    ".....kWwk..kk...",
+    "....kGGk........",
+    "....kWwk........",
+    "...kWwk.........",
+    "...kGGk.........",
+    "..kWwk..........",
+    ".kWwk...........",
+    ".kGk............",
+    "..k.............",
+]
+ARCHMAGE_STAFF_GEM = [
+    "................",
+    "................",
+    "..........bwwb..",
+    ".........bwllwb.",
+    ".........bllmlb.",
+    "..........lmmb..",
+    "...........bb...",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+]
 WOOD = {"k": 0x2B1A10, "W": 0x8A5A32, "w": 0x5E3B1E, "g": 0xC9A23E, "G": 0xF2D774}
 DARK_WOOD = {"k": 0x1A0F14, "W": 0x5A3A4A, "w": 0x3A2230, "g": 0xC9A23E, "G": 0xF2D774}
 MASTER_WOOD = {"k": 0x120A1C, "W": 0x3A2A5A, "w": 0x24183A, "g": 0xC9A23E, "G": 0xF2D774}
+ARCHMAGE_WOOD = {"k": 0x2A2630, "W": 0xE8E2D4, "w": 0xB8AE9A, "g": 0xC9A23E, "G": 0xF2D774}
 GEM = {"b": 0x8A8A8A, "m": 0xB4B4B4, "l": 0xDCDCDC, "w": 0xFFFFFF}
 
 # ---- robe icons ----
@@ -229,6 +269,7 @@ TIERS = {
     "apprentice": {"k": 0x141C33, "c": 0x3D5A9E, "d": 0x27396B, "t": 0xB08040},
     "adept": {"k": 0x1E1033, "c": 0x6A3D9E, "d": 0x452670, "t": 0xE8C34A},
     "master": {"k": 0x0B0F24, "c": 0x26326E, "d": 0x172050, "t": 0xF2D774},
+    "archmage": {"k": 0x34323E, "c": 0xF2F2F7, "d": 0xC8CCD8, "t": 0xE8B84A},
 }
 
 
@@ -309,12 +350,15 @@ def main():
     save(grid_image(STAFF_GEM, GEM), ASSETS / "item/adept_staff_gem.png")
     save(grid_image(MASTER_STAFF_BODY, MASTER_WOOD), ASSETS / "item/master_staff.png")
     save(grid_image(MASTER_STAFF_GEM, GEM), ASSETS / "item/master_staff_gem.png")
+    save(grid_image(ARCHMAGE_STAFF_BODY, ARCHMAGE_WOOD), ASSETS / "item/archmage_staff.png")
+    save(grid_image(ARCHMAGE_STAFF_GEM, GEM), ASSETS / "item/archmage_staff_gem.png")
     for tier, palette in TIERS.items():
         for piece, grid in (("hood", HOOD), ("robe", ROBE), ("trousers", TROUSERS), ("boots", BOOTS)):
             save(grid_image(grid, palette), ASSETS / f"item/{tier}_{piece}.png")
     worn_layers("apprentice", 0x3D5A9E, 0x27396B, 0xB08040, 501)
     worn_layers("adept", 0x6A3D9E, 0x452670, 0xE8C34A, 502)
     worn_layers("master", 0x26326E, 0x172050, 0xF2D774, 503)
+    worn_layers("archmage", 0xF2F2F7, 0xC8CCD8, 0xE8B84A, 504)
 
 
 if __name__ == "__main__":
