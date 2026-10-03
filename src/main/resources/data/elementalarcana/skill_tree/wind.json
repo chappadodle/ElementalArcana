@@ -154,6 +154,41 @@
       "element": "wind"
     },
     {
+      "id": "wind_eye_1",
+      "type": "small",
+      "x": -39,
+      "y": -267,
+      "stat": "affinity/wind",
+      "amount": 2,
+      "links": [
+        "wind_start"
+      ],
+      "element": "wind"
+    },
+    {
+      "id": "wind_eye_2",
+      "type": "small",
+      "x": -79,
+      "y": -274,
+      "stat": "focus",
+      "amount": 2,
+      "links": [
+        "wind_eye_1"
+      ],
+      "element": "wind"
+    },
+    {
+      "id": "stormeye",
+      "type": "spell",
+      "x": -118,
+      "y": -281,
+      "spell": "elementalarcana:stormeye",
+      "element": "wind",
+      "links": [
+        "wind_eye_2"
+      ]
+    },
+    {
       "id": "wind_skyward_leap",
       "type": "path",
       "spell": "elementalarcana:updraft",
@@ -163,6 +198,17 @@
       "dy": -28.284,
       "element": "wind",
       "from": "updraft"
+    },
+    {
+      "id": "wind_stormeye",
+      "type": "path",
+      "spell": "elementalarcana:stormeye",
+      "x": -118,
+      "y": -281,
+      "dx": -39.392,
+      "dy": -6.946,
+      "element": "wind",
+      "from": "stormeye"
     }
   ]
 }

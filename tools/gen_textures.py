@@ -158,6 +158,27 @@ SPRITES = {
         ".pg....g....gp..",
         "..g....g....g...",
     ]),
+    # Stormeye: a tornado funnel, wide at the top, kicking up bits of ground at its foot.
+    "spell/stormeye": ({
+        "k": 0x2E5A4A, "g": 0x9FE0C8, "p": 0xD8F5EA, "w": 0xFFFFFF, "d": 0x6B5A3A,
+    }, [
+        "................",
+        ".kkkkkkkkkkkkkk.",
+        "kppwwwppggpwwppk",
+        ".kggpppwwppggpk.",
+        "..kpwwggppwwpk..",
+        "...kggppwwggk...",
+        "....kpwwggpk....",
+        "....kwggppk.....",
+        ".....kppwwk.....",
+        ".....kwwgk......",
+        "......kgpk......",
+        ".......kwk......",
+        "......kpk.......",
+        "......kgk..d....",
+        ".d.....kk....d..",
+        "...d........d...",
+    ]),
     "spell/frost_shield": ({
         "k": 0x1E4F7A, "d": 0x2F86C8, "b": 0x5FB8F0, "l": 0xA8E6FF, "w": 0xFFFFFF,
     }, [

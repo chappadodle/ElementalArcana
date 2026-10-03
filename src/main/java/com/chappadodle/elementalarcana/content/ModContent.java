@@ -4,6 +4,7 @@ import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
 import com.chappadodle.elementalarcana.content.spell.EmberSprite;
+import com.chappadodle.elementalarcana.content.spell.StormeyeEntity;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.core.particles.ParticleType;
@@ -34,6 +35,11 @@ public final class ModContent {
             ENTITY_TYPES.register("ember_sprite", () -> EntityType.Builder.<EmberSprite>of(EmberSprite::new, MobCategory.MISC)
                     .sized(0.4f, 0.4f).clientTrackingRange(8).updateInterval(4).fireImmune()
                     .build(ElementalArcana.MODID + ":ember_sprite"));
+    /** A Stormeye tornado (see StormeyeEntity): never saved. */
+    public static final DeferredHolder<EntityType<?>, EntityType<StormeyeEntity>> STORMEYE =
+            ENTITY_TYPES.register("stormeye", () -> EntityType.Builder.<StormeyeEntity>of(StormeyeEntity::new, MobCategory.MISC)
+                    .sized(1f, 2f).clientTrackingRange(10).updateInterval(2).fireImmune().noSave()
+                    .build(ElementalArcana.MODID + ":stormeye"));
     public static final DeferredHolder<EntityType<?>, EntityType<SpellProjectile>> SPELL_PROJECTILE =
             ENTITY_TYPES.register("spell_projectile", () -> EntityType.Builder.<SpellProjectile>of(SpellProjectile::new, MobCategory.MISC)
                     .sized(0.3f, 0.3f)

@@ -1,0 +1,112 @@
+# Stormeye. 1: a tornado among four husks (slowed, 200 health) drags them in and lifts them
+# (positions to the log a second in, health after). 2: Absorption (level 3): a burning husk turns
+# it orange and the others catch fire (their Fire to the log). 3: Twin Storms (level 5). 4: Great
+# Tempest with Scavenger Wind (level 10): diamonds dropped in it fly to the player ("Test passed").
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamerule doMobLoot false
+cmd gamemode survival
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd effect give @s minecraft:resistance 600 4 true
+cmd tp @s 0.5 100 0.5 -90 9
+wait 40
+cmd kill @e[type=!player]
+cmd kill @e[type=item]
+cmd clear @s
+cmd fill -8 99 -14 40 99 14 minecraft:grass_block
+cmd fill -8 100 -14 40 120 14 minecraft:air
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken wind
+cmd arcana level set 40
+cmd arcana spell elementalarcana:stormeye 1
+cmd arcana mana fill
+cmd arcana cooldowns reset
+cmd title @s clear
+wait 20
+cmd summon husk 13.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 7.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 10.5 100 3.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 10.5 100 -2.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd effect give @e[type=husk] minecraft:slowness 120 255 true
+cmd effect give @e[type=husk] minecraft:weakness 120 255 true
+wait 10
+select elementalarcana:stormeye
+press
+release
+wait 12
+camera back
+wait 8
+shot stormeye
+cmd execute as @e[type=husk] run data get entity @s Pos
+wait 40
+shot stormeye_late
+camera first
+wait 30
+cmd execute as @e[type=husk] run data get entity @s Health
+cmd kill @e[type=husk]
+cmd arcana spell elementalarcana:stormeye 3
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd summon husk 13.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b,Fire:400s,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 7.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 10.5 100 3.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 10.5 100 -2.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd effect give @e[type=husk] minecraft:slowness 120 255 true
+cmd effect give @e[type=husk] minecraft:weakness 120 255 true
+wait 10
+press
+release
+wait 30
+camera back
+shot stormeye_absorption
+camera first
+cmd execute as @e[type=husk] run data get entity @s Fire
+wait 60
+cmd kill @e[type=husk]
+cmd arcana spell elementalarcana:stormeye 5 twin_storms
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd summon husk 13.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 7.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 10.5 100 3.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 10.5 100 -2.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd effect give @e[type=husk] minecraft:slowness 120 255 true
+cmd effect give @e[type=husk] minecraft:weakness 120 255 true
+wait 10
+press
+release
+wait 20
+camera back
+shot stormeye_twin
+camera first
+wait 90
+cmd kill @e[type=husk]
+cmd arcana spell elementalarcana:stormeye 10 wandering_storm great_tempest
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd summon husk 13.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 7.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 10.5 100 3.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 10.5 100 -2.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd effect give @e[type=husk] minecraft:slowness 120 255 true
+cmd effect give @e[type=husk] minecraft:weakness 120 255 true
+cmd summon item 10.5 100.5 5.5 {Item:{id:"minecraft:diamond",count:3}}
+wait 10
+press
+release
+wait 20
+camera back
+shot stormeye_great_tempest
+camera first
+wait 60
+cmd execute if items entity @s container.* minecraft:diamond
+cmd execute as @e[type=husk] run data get entity @s Health
+cmd kill @e[type=husk]
+cmd gamerule doMobLoot true
+wait 10
+quit

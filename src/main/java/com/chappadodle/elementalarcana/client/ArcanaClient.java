@@ -320,6 +320,7 @@ public final class ArcanaClient {
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModContent.SPELL_PROJECTILE.get(), SpellProjectileRenderer::new);
         event.registerEntityRenderer(ModContent.EMBER_SPRITE.get(), EmberSpriteRenderer::new);
+        event.registerEntityRenderer(ModContent.STORMEYE.get(), StormeyeRenderer::new);
         for (Element element : Element.values()) {
             event.registerEntityRenderer(ModCreatures.wisp(element), WispRenderer::new);
         }

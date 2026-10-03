@@ -120,6 +120,7 @@ wind_ends = region("wind", "wind", -90, "wind_blade", [
     ("gust", 100, [("stat", "affinity/wind"), ("stat", "focus"),
                    ("notable", ("wind_tailwind", {"affinity/wind": 6, "focus": 4})),
                    ("keystone", ("wind_gale_step", "gale_step"))]),
+    ("eye", -80, [("stat", "affinity/wind"), ("stat", "focus"), ("spell", "stormeye")]),
 ])
 fire_ends = region("fire", "fire", 0, "fireball", [
     ("burst", 45, [("stat", "affinity/fire"), ("stat", "potency"), ("stat", "affinity/fire"), ("stat", "reservoir"),
@@ -159,6 +160,9 @@ path("earth", "earth", "earth_stone_skin", "stone_skin", shield_xy, 225, start_f
 # Skyward Leap (its spell is still updraft) levels on along Wind's sky arm.
 sky_id, sky_xy = wind_ends["sky"]
 path("wind", "wind", "wind_skyward_leap", "updraft", sky_xy, -135, start_from="updraft")
+# Stormeye levels on along Wind's eye arm.
+eye_id, eye_xy = wind_ends["eye"]
+path("wind", "wind", "wind_stormeye", "stormeye", eye_xy, -170, start_from="stormeye")
 
 # ---- Ice: a cluster off Water's outer edge ----
 deep_end_id, deep_end = water_ends["deep"]

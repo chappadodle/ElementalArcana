@@ -24,6 +24,7 @@ import com.chappadodle.elementalarcana.content.spell.ThunderclapSpell;
 import com.chappadodle.elementalarcana.content.spell.TsunamiSpell;
 import com.chappadodle.elementalarcana.content.spell.TremorSpell;
 import com.chappadodle.elementalarcana.content.spell.SkywardLeapSpell;
+import com.chappadodle.elementalarcana.content.spell.StormeyeSpell;
 import com.chappadodle.elementalarcana.content.spell.WindBladeSpell;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -50,6 +51,7 @@ public final class ModSpells {
     public static final DeferredHolder<Spell, GaleDashSpell> GALE_DASH = SPELLS.register("gale_dash", GaleDashSpell::new);
     // Skyward Leap keeps the throw upward's id, so those who learned Updraft have it now.
     public static final DeferredHolder<Spell, SkywardLeapSpell> SKYWARD_LEAP = SPELLS.register("updraft", SkywardLeapSpell::new);
+    public static final DeferredHolder<Spell, StormeyeSpell> STORMEYE = SPELLS.register("stormeye", StormeyeSpell::new);
 
     // Boulder is registered first so it's earth's starter spell.
     public static final DeferredHolder<Spell, BoulderSpell> BOULDER = SPELLS.register("boulder", BoulderSpell::new);

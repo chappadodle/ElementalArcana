@@ -93,23 +93,13 @@ public final class ElementalReactions {
         Entity source = attacker != null ? attacker : target;
         for (LivingEntity nearby : level.getEntitiesOfClass(LivingEntity.class, target.getBoundingBox().inflate(SWIRL_RADIUS),
                 e -> e != target && e != attacker && !(e instanceof Player) && e.isAlive() && e.distanceTo(target) <= SWIRL_RADIUS)) {
-            switch (aura) {
-                case CRYO -> {
-                    nearby.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 1));
-                    if (nearby.canFreeze()) {
-                        nearby.setTicksFrozen(Math.max(nearby.getTicksFrozen(), nearby.getTicksRequiredToFreeze() + 40));
-                    }
-                    SpellDamage.hurtMultiHit(nearby, SpellDamage.source(level, Element.ICE, source, source), SWIRL_DAMAGE * power);
-                }
-                case PYRO -> {
-                    nearby.igniteForTicks(80);
-                    SpellDamage.hurtMultiHit(nearby, SpellDamage.source(level, Element.FIRE, source, source), SWIRL_DAMAGE * power);
-                }
-                case HYDRO -> {
-                    nearby.addEffect(new MobEffectInstance(ModContent.WET, 100));
-                    SpellDamage.hurtMultiHit(nearby, SpellDamage.source(level, Element.WATER, source, source), SWIRL_DAMAGE * power);
-                }
-            }
+            inflict(nearby, aura);
+            Element element = switch (aura) {
+                case CRYO -> Element.ICE;
+                case PYRO -> Element.FIRE;
+                case HYDRO -> Element.WATER;
+            };
+            SpellDamage.hurtMultiHit(nearby, SpellDamage.source(level, element, source, source), SWIRL_DAMAGE * power);
         }
         ColorParticleOption color = ColorParticleOption.create(ModContent.SWIRL.get(), aura.color());
         for (int i = 0; i < 32; i++) {
@@ -122,6 +112,20 @@ public final class ElementalReactions {
         }
         level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.BREEZE_WIND_CHARGE_BURST.value(), SoundSource.PLAYERS, 0.8f, 1.3f);
         return true;
+    }
+
+    /** Gives {@code target} an element without a hit: frosted and slowed, set alight, or soaked. */
+    public static void inflict(LivingEntity target, Aura aura) {
+        switch (aura) {
+            case CRYO -> {
+                target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 1));
+                if (target.canFreeze()) {
+                    target.setTicksFrozen(Math.max(target.getTicksFrozen(), target.getTicksRequiredToFreeze() + 40));
+                }
+            }
+            case PYRO -> target.igniteForTicks(80);
+            case HYDRO -> target.addEffect(new MobEffectInstance(ModContent.WET, 100));
+        }
     }
 
     /**
