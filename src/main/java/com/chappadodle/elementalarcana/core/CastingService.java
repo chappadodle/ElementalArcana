@@ -9,6 +9,7 @@ import com.chappadodle.elementalarcana.api.SpellHold;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.event.SpellCastEvent;
 import com.chappadodle.elementalarcana.content.BubblePrisons;
+import com.chappadodle.elementalarcana.content.ManaWeather;
 import com.chappadodle.elementalarcana.content.ModContent;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -114,7 +115,7 @@ public final class CastingService {
             return;
         }
 
-        CastContext context = new CastContext(player, player.serverLevel(), InteractionHand.MAIN_HAND, data.spellPower(spell),
+        CastContext context = new CastContext(player, player.serverLevel(), InteractionHand.MAIN_HAND, data.spellPower(spell) * ManaWeather.powerFactor(player),
                 spellLevel, data.branches(spell));
         CastResult result = spell.cast(context);
         if (!result.success()) {

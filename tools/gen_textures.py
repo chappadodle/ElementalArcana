@@ -573,6 +573,29 @@ SPRITES = {
         "..................",
         "..................",
     ]),
+    # Pressure: a weight bearing down, two chevrons under it.
+    "mob_effect/pressure": ({
+        "k": 0x2A0F3A, "d": 0x8A3AB8, "l": 0xC79BFF,
+    }, [
+        "..................",
+        "..kkkkkkkkkkkkkk..",
+        "..kllllllllllllk..",
+        "..kddddddddddddk..",
+        "..kkkkkkkkkkkkkk..",
+        "..................",
+        "...kk........kk...",
+        "...kdk......kdk...",
+        "....kdk....kdk....",
+        ".....kdk..kdk.....",
+        "......kdkkdk......",
+        ".......kddk.......",
+        "...kk...kk...kk...",
+        "...kdk......kdk...",
+        "....kdk....kdk....",
+        ".....kdkkkkdk.....",
+        "......kddddk......",
+        ".......kkkk.......",
+    ]),
     "mob_effect/mana_sickness": ({
         "k": 0x2A1540, "d": 0x5A2A80, "p": 0x8A4FC0, "l": 0xC9A0F0,
     }, [

@@ -3,6 +3,7 @@ package com.chappadodle.elementalarcana.content;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.AwakeningRules;
 import com.chappadodle.elementalarcana.api.Element;
+import com.chappadodle.elementalarcana.api.ManaWeatherRules;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.core.MagicData;
 import net.minecraft.network.chat.Component;
@@ -59,7 +60,7 @@ public final class AwakeningEvents {
             return;
         }
         data.setLastRolledDay(day);
-        if (player.getRandom().nextDouble() < AwakeningRules.dailyChance(day)) {
+        if (player.getRandom().nextDouble() < AwakeningRules.dailyChance(day) * (ManaTides.active() ? ManaWeatherRules.TIDE_CHANCES : 1)) {
             Element element = AwakeningRules.pick(AwakeningRules.anyWeights(), player.getRandom().nextDouble());
             if (element != null) {
                 Awakenings.wake(player, element, Component.translatable("message.elementalarcana.awakening.timer"));

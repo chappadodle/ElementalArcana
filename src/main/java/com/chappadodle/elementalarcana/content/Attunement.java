@@ -6,6 +6,7 @@ import com.chappadodle.elementalarcana.api.AttunementRules;
 import com.chappadodle.elementalarcana.api.CreatureElements;
 import com.chappadodle.elementalarcana.api.CreatureMagic;
 import com.chappadodle.elementalarcana.api.Element;
+import com.chappadodle.elementalarcana.api.ManaWeatherRules;
 import com.chappadodle.elementalarcana.content.mob.CastMobSpellGoal;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import net.minecraft.core.BlockPos;
@@ -150,7 +151,8 @@ public final class Attunement {
         }
         BlockPos worldSpawn = level.getSharedSpawnPos();
         double distance = Math.hypot(event.getX() - worldSpawn.getX(), event.getZ() - worldSpawn.getZ());
-        AttunementRank rank = AttunementRules.rollRank(distance, mob.getRandom()::nextDouble);
+        AttunementRank rank = AttunementRules.rollRank(distance, ManaTides.active() ? ManaWeatherRules.TIDE_CHANCES : 1,
+                mob.getRandom()::nextDouble);
         if (rank == null) {
             return;
         }

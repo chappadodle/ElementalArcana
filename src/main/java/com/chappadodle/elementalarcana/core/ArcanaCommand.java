@@ -11,6 +11,7 @@ import com.chappadodle.elementalarcana.content.Attunement;
 import com.chappadodle.elementalarcana.content.Awakenings;
 import com.chappadodle.elementalarcana.content.BubblePrisons;
 import com.chappadodle.elementalarcana.content.CreatureLevels;
+import com.chappadodle.elementalarcana.content.ManaTides;
 import com.chappadodle.elementalarcana.content.SkillTreeLoader;
 import com.chappadodle.elementalarcana.content.creature.WispEntity;
 import com.chappadodle.elementalarcana.content.creature.WispSpawner;
@@ -128,7 +129,16 @@ public final class ArcanaCommand {
                 .then(Commands.literal("bubble").then(Commands.argument("targets", EntityArgument.entities())
                         .executes(ctx -> bubble(ctx.getSource(), EntityArgument.getEntities(ctx, "targets")))))
                 .then(Commands.literal("wisp").then(wispSpawn()))
-                .then(Commands.literal("sanctum").then(Commands.literal("reset").executes(ctx -> resetSanctums(ctx.getSource())))));
+                .then(Commands.literal("sanctum").then(Commands.literal("reset").executes(ctx -> resetSanctums(ctx.getSource()))))
+                .then(Commands.literal("tide")
+                        .then(Commands.literal("start").executes(ctx -> {
+                            ManaTides.force(ctx.getSource().getServer());
+                            return 1;
+                        }))
+                        .then(Commands.literal("stop").executes(ctx -> {
+                            ManaTides.calm(ctx.getSource().getServer());
+                            return 1;
+                        }))));
     }
 
     /** /arcana sanctum reset: seals again every sanctum seal within 3 chunks (its Sovereign, if out, is gone). */

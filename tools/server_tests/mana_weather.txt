@@ -1,0 +1,22 @@
+# Mana tides: forced by command, a tide rises (its message goes out to everyone) and ebbs again. A
+# zombie born in the tide is 5 levels stronger than one born outside it (each has a random 0 to 4
+# on top, so compare roughly).
+time set noon
+gamerule doMobSpawning false
+forceload add -16 -16 16 16
+fill -8 99 -8 8 99 8 minecraft:stone
+fill -8 100 -8 8 104 8 minecraft:air
+summon zombie 0.5 100 0.5 {NoAI:1b,Tags:["eacalm"],PersistenceRequired:1b}
+sleep 1
+arcana tide start
+sleep 2
+summon zombie 3.5 100 0.5 {NoAI:1b,Tags:["eatide"],PersistenceRequired:1b}
+sleep 1
+arcana creaturelevel @e[tag=eacalm]
+arcana creaturelevel @e[tag=eatide]
+arcana tide stop
+sleep 2
+kill @e[tag=eacalm]
+kill @e[tag=eatide]
+gamerule doMobSpawning true
+forceload remove all

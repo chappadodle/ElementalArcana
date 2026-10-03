@@ -1,6 +1,8 @@
 package com.chappadodle.elementalarcana.core;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
+import com.chappadodle.elementalarcana.api.ManaWeatherRules;
+import com.chappadodle.elementalarcana.content.ManaWeather;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.content.brew.ModBrews;
 import com.chappadodle.elementalarcana.content.gear.GearStats;
@@ -58,6 +60,11 @@ public final class MagicEvents {
         }
         if (player.hasEffect(ModContent.MANA_SICKNESS)) {
             regen *= SICKNESS_MULTIPLIER;
+        }
+        // The air (rich land, dead zones, comfort, a tide), a hidden aura, and Pressure (see ManaWeather).
+        regen *= data.weather() * ManaWeather.regenFactor(player);
+        if (data.auraHidden()) {
+            regen *= ManaWeatherRules.HIDDEN_REGEN;
         }
         changed |= data.regenerate(regen);
         // Once a second: what the player's gear adds to their stats (worn, held, level requirements).

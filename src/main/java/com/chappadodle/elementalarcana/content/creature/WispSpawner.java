@@ -2,6 +2,8 @@ package com.chappadodle.elementalarcana.content.creature;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Element;
+import com.chappadodle.elementalarcana.api.ManaWeatherRules;
+import com.chappadodle.elementalarcana.content.ManaTides;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
@@ -68,7 +70,8 @@ public final class WispSpawner {
             return;
         }
         ServerLevel level = player.serverLevel();
-        if (canSpawn(level) && player.getRandom().nextDouble() < (level.isThundering() ? STORM_CHANCE : CHANCE)) {
+        double chance = (level.isThundering() ? STORM_CHANCE : CHANCE) * (ManaTides.active() ? ManaWeatherRules.TIDE_CHANCES : 1);
+        if (canSpawn(level) && player.getRandom().nextDouble() < chance) {
             trySpawnWild(level, player, null);
         }
     }

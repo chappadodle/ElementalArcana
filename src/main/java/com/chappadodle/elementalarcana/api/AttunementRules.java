@@ -34,7 +34,12 @@ public final class AttunementRules {
      */
     @Nullable
     public static AttunementRank rollRank(double distanceFromSpawn, DoubleSupplier random) {
-        double multiplier = distanceMultiplier(distanceFromSpawn);
+        return rollRank(distanceFromSpawn, 1, random);
+    }
+
+    /** As above, with every rank's chance multiplied by {@code boost} (a mana tide doubles them). */
+    public static AttunementRank rollRank(double distanceFromSpawn, double boost, DoubleSupplier random) {
+        double multiplier = distanceMultiplier(distanceFromSpawn) * boost;
         for (AttunementRank rank : RAREST_FIRST) {
             if (random.getAsDouble() < rank.baseChance() * multiplier) {
                 return rank;

@@ -79,6 +79,8 @@ public final class MagicData {
                 buf.writeBoolean(data.meditating);
                 buf.writeVarInt(data.conjured);
                 buf.writeMap(data.gearStats, FriendlyByteBuf::writeUtf, FriendlyByteBuf::writeVarInt);
+                buf.writeBoolean(data.auraHidden);
+                buf.writeFloat(data.weather);
             },
             buf -> new MagicData(
                     buf.readFloat(),
@@ -96,7 +98,7 @@ public final class MagicData {
                     AwakeningState.read(buf),
                     buf.readBoolean(),
                     buf.readVarInt(),
-                    buf.readMap(FriendlyByteBuf::readUtf, FriendlyByteBuf::readVarInt)));
+                    buf.readMap(FriendlyByteBuf::readUtf, FriendlyByteBuf::readVarInt)).withAura(buf.readBoolean(), buf.readFloat()));
 
     private float mana;
     private int level;
@@ -131,6 +133,10 @@ public final class MagicData {
     // Stat points from worn and held gear (see content/gear/GearStats). Synced, never saved: the
     // server works it out from the equipment every second.
     private final Map<String, Integer> gearStats;
+    // Mana sense and weather (see content/ManaWeather). Synced, never saved: whether the player hides
+    // their aura, and how rich the air is where they stand (a multiplier on regeneration).
+    private boolean auraHidden;
+    private float weather = 1f;
     private int stillTicks;
     private double lastX;
     private double lastZ;
@@ -201,6 +207,32 @@ public final class MagicData {
             stats.clear();
         }
         this.mana = Math.min(mana, maxMana());
+    }
+
+    private MagicData withAura(boolean auraHidden, float weather) {
+        this.auraHidden = auraHidden;
+        this.weather = weather;
+        return this;
+    }
+
+    public boolean auraHidden() {
+        return auraHidden;
+    }
+
+    public void setAuraHidden(boolean auraHidden) {
+        this.auraHidden = auraHidden;
+    }
+
+    /** How rich the air is where the player stands: a multiplier on mana regeneration. */
+    public float weather() {
+        return weather;
+    }
+
+    /** Returns whether it changed enough to tell the client. */
+    public boolean setWeather(float weather) {
+        boolean changed = Math.abs(this.weather - weather) > 0.005f;
+        this.weather = weather;
+        return changed;
     }
 
     public float maxMana() {

@@ -3,6 +3,7 @@ package com.chappadodle.elementalarcana.client;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
+import com.chappadodle.elementalarcana.network.AuraPayload;
 import com.chappadodle.elementalarcana.network.CastSpellPayload;
 import com.chappadodle.elementalarcana.network.SelectSpellPayload;
 import com.mojang.datafixers.util.Pair;
@@ -63,6 +64,7 @@ import java.util.Optional;
  * look 90 10               face yaw 90, pitch 10
  * select elementalarcana:boulder   select a spell
  * press / release          the cast key going down / up
+ * aura                     hide the player's aura, or show it again (the H key)
  * launch_one / launch_all  the conjuring launch keys
  * screen status|tree [spell]|stats|journal|close   open one of the mod's screens
  * hud on|off               show or hide the HUD
@@ -185,6 +187,7 @@ public final class AutoTest {
                 minecraft.player.setYHeadRot(yaw);
             }
             case "select" -> PacketDistributor.sendToServer(new SelectSpellPayload(ResourceLocation.parse(argument)));
+            case "aura" -> PacketDistributor.sendToServer(AuraPayload.TOGGLE);
             case "press" -> PacketDistributor.sendToServer(CastSpellPayload.PRESS);
             case "release" -> PacketDistributor.sendToServer(CastSpellPayload.RELEASE);
             case "launch_one" -> PacketDistributor.sendToServer(CastSpellPayload.LAUNCH_ONE);

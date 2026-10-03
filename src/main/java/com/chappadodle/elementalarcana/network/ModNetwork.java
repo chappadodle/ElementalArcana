@@ -15,6 +15,8 @@ public final class ModNetwork {
                 .playToServer(EssencePayload.TYPE, EssencePayload.STREAM_CODEC, EssencePayload::handle)
                 .playToServer(StatPayload.TYPE, StatPayload.STREAM_CODEC, StatPayload::handle)
                 .playToServer(TreePayload.TYPE, TreePayload.STREAM_CODEC, TreePayload::handle)
+                .playToServer(AuraPayload.TYPE, AuraPayload.STREAM_CODEC, AuraPayload::handle)
+                .playToClient(ManaTidePayload.TYPE, ManaTidePayload.STREAM_CODEC, ManaTidePayload::handle)
                 .playToClient(SkillTreeSyncPayload.TYPE, SkillTreeSyncPayload.STREAM_CODEC, SkillTreeSyncPayload::handle);
     }
 }

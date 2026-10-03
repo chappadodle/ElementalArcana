@@ -36,6 +36,7 @@ import com.chappadodle.elementalarcana.content.tower.ModTowers;
 import com.chappadodle.elementalarcana.content.tower.TowerHeartBlock;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.core.MagicData;
+import com.chappadodle.elementalarcana.network.AuraPayload;
 import com.chappadodle.elementalarcana.network.CastSpellPayload;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -88,6 +89,7 @@ public final class ArcanaClient {
     public static final KeyMapping SPELL_WHEEL = key("spell_wheel", GLFW.GLFW_KEY_V);
     public static final KeyMapping STATUS = key("status", GLFW.GLFW_KEY_K);
     public static final KeyMapping DEV_MENU = key("dev_menu", GLFW.GLFW_KEY_F6);
+    public static final KeyMapping HIDE_AURA = key("hide_aura", GLFW.GLFW_KEY_H);
     // Launching conjured projectiles. They share the mouse buttons with attack/use on purpose: while
     // something is conjured, the click launches instead (see onInteraction). Never reported as a
     // conflict in the Controls menu.
@@ -132,6 +134,7 @@ public final class ArcanaClient {
         event.register(SPELL_WHEEL);
         event.register(STATUS);
         event.register(DEV_MENU);
+        event.register(HIDE_AURA);
         event.register(LAUNCH_ONE);
         event.register(LAUNCH_ALL);
     }
@@ -199,6 +202,11 @@ public final class ArcanaClient {
             }
         }
 
+        while (HIDE_AURA.consumeClick()) {
+            if (minecraft.player != null && MagicAttachments.get(minecraft.player).isAwakened()) {
+                PacketDistributor.sendToServer(AuraPayload.TOGGLE);
+            }
+        }
         while (DEV_MENU.consumeClick()) {
             if (minecraft.screen == null) {
                 openDevMenu(minecraft);
@@ -230,6 +238,7 @@ public final class ArcanaClient {
         event.registerAbove(VanillaGuiLayers.HOTBAR, ElementalArcana.id("magic_hud"), new SpellHudLayer());
         event.registerAbove(VanillaGuiLayers.PLAYER_HEALTH, ElementalArcana.id("shield_hearts"), new ShieldHeartsLayer());
         event.registerAboveAll(ElementalArcana.id("screen_flash"), ScreenEffects.FLASH_LAYER);
+        event.registerAbove(VanillaGuiLayers.CROSSHAIR, ElementalArcana.id("mana_sense"), new ManaSenseLayer());
     }
 
     @SubscribeEvent

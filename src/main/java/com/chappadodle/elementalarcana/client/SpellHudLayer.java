@@ -49,7 +49,7 @@ public class SpellHudLayer implements LayeredDraw.Layer {
         long gameTime = player.level().getGameTime();
         long cooldown = spell == null ? 0 : data.cooldownRemaining(spell.id(), gameTime);
         boolean sick = player.hasEffect(ModContent.MANA_SICKNESS);
-        boolean busy = data.mana() < data.maxMana() || cooldown > 0 || sick || data.meditating() || spell == null;
+        boolean busy = data.mana() < data.maxMana() || cooldown > 0 || sick || data.meditating() || spell == null || data.auraHidden();
         if (busy) {
             lastBusyTick = player.tickCount;
         }
@@ -90,7 +90,17 @@ public class SpellHudLayer implements LayeredDraw.Layer {
         ArcanaDraw.bar(graphics, barX, barY + 7, BAR_WIDTH, 1, xpFraction, ArcanaDraw.XP_COLOR, alpha);
 
         String manaText = (int) data.mana() + "/" + (int) data.maxMana();
-        graphics.drawString(font, manaText, barX + BAR_WIDTH + 4, barY - 1, ArcanaDraw.withAlpha(0xFF9FCBFF, alpha));
+        int textEnd = graphics.drawString(font, manaText, barX + BAR_WIDTH + 4, barY - 1, ArcanaDraw.withAlpha(0xFF9FCBFF, alpha));
+        // The air: its multiplier on regeneration when it isn't ordinary (ManaWeather), and a tide.
+        float weather = data.weather();
+        if (Math.abs(weather - 1f) > 0.02f) {
+            String multiplier = String.format(java.util.Locale.ROOT, "x%.1f", weather);
+            textEnd = graphics.drawString(font, multiplier, textEnd + 3, barY - 1,
+                    ArcanaDraw.withAlpha(weather > 1f ? 0xFF8FE3C0 : 0xFFC07070, alpha));
+        }
+        if (ManaTideClient.active()) {
+            graphics.drawString(font, Component.translatable("hud.elementalarcana.tide"), textEnd + 3, barY - 1, ArcanaDraw.withAlpha(0xFFC79BFF, alpha));
+        }
         graphics.drawString(font, Component.translatable("hud.elementalarcana.level", data.level()), barX + BAR_WIDTH + 4, barY + 7,
                 ArcanaDraw.withAlpha(0xFFC9A8FF, alpha));
 
@@ -99,6 +109,9 @@ public class SpellHudLayer implements LayeredDraw.Layer {
         }
         if (data.meditating()) {
             graphics.drawString(font, Component.translatable("hud.elementalarcana.meditating"), x, y - 13, ArcanaDraw.withAlpha(0xFFE0D0FF, alpha));
+        }
+        if (data.auraHidden()) {
+            graphics.drawString(font, Component.translatable("hud.elementalarcana.aura_hidden"), x, y - 35, ArcanaDraw.withAlpha(0xFF9A8FB8, alpha));
         }
     }
 }

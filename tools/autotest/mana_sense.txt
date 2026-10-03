@@ -1,0 +1,54 @@
+# Mana sense and weather: the readout under the crosshair at Insight 0, 5 and 15 (a mark, a level, a
+# level and element) on an Attuned husk; Pressure from a level-60 zombie (the effect icon); the
+# hidden aura on the mana bar; a mana tide's violet fog and the mana bar's multiplier.
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamemode survival
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd effect give @s minecraft:resistance 600 4 true
+cmd tp @s 0.5 100 0.5 -90 5
+wait 40
+cmd kill @e[type=!player]
+cmd kill @e[type=item]
+cmd fill -4 99 -8 30 99 8 minecraft:grass_block
+cmd fill -4 100 -8 30 108 8 minecraft:air
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken fire
+cmd arcana level set 30
+cmd arcana stats reset
+cmd arcana mana fill
+cmd title @s clear
+cmd summon husk 8.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b}
+wait 10
+cmd arcana attune @e[type=husk] water magus
+wait 40
+shot sense_danger
+cmd arcana stats spend 5 insight
+wait 20
+shot sense_level
+cmd arcana stats spend 10 insight
+wait 20
+shot sense_element
+cmd kill @e[type=husk]
+cmd summon zombie 6.5 100 3.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b}
+wait 5
+cmd arcana creaturelevel @e[type=zombie] set 60
+wait 50
+shot pressure
+cmd data get entity @s active_effects
+cmd kill @e[type=zombie]
+aura
+wait 20
+shot aura_hidden
+aura
+cmd arcana tide start
+wait 140
+shot tide_fog
+cmd arcana tide stop
+wait 10
+quit

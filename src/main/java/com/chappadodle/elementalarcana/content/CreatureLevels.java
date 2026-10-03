@@ -2,6 +2,7 @@ package com.chappadodle.elementalarcana.content;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.CreatureMagic;
+import com.chappadodle.elementalarcana.api.ManaWeatherRules;
 import com.chappadodle.elementalarcana.api.Progression;
 import com.chappadodle.elementalarcana.api.StatRules;
 import com.chappadodle.elementalarcana.api.ZoneLevels;
@@ -95,8 +96,12 @@ public final class CreatureLevels {
         entity.setHealth(entity.getMaxHealth() * share);
     }
 
-    private static void assign(ServerLevel level, LivingEntity entity) {
-        BlockPos pos = entity.blockPosition();
+    /** The zone level at {@code pos}, without the random spread: what creatures born there start from. */
+    public static int zoneLevelAt(ServerLevel level, BlockPos pos) {
+        return zone(level, pos, 0);
+    }
+
+    private static int zone(ServerLevel level, BlockPos pos, int spread) {
         // The Hollow is as deadly as the End.
         ZoneLevels.Dimension dimension = level.dimension() == Level.NETHER ? ZoneLevels.Dimension.NETHER
                 : level.dimension() == Level.END || level.dimension() == ModHollow.THE_HOLLOW ? ZoneLevels.Dimension.END
@@ -104,9 +109,16 @@ public final class CreatureLevels {
         BlockPos center = dimension == ZoneLevels.Dimension.OVERWORLD ? level.getSharedSpawnPos() : BlockPos.ZERO;
         double distance = Math.hypot(pos.getX() - center.getX(), pos.getZ() - center.getZ());
         boolean inStructure = !level.structureManager().getAllStructuresAt(pos).isEmpty();
-        int zone = ZoneLevels.level(dimension, distance, pos.getY(), !level.canSeeSky(pos), inStructure,
-                level.getBiome(pos).is(DANGEROUS), entity.getRandom().nextInt(ZoneLevels.SPREAD));
-        entity.setData(MagicAttachments.CREATURE_LEVEL, zone);
+        return ZoneLevels.level(dimension, distance, pos.getY(), !level.canSeeSky(pos), inStructure, level.getBiome(pos).is(DANGEROUS), spread);
+    }
+
+    private static void assign(ServerLevel level, LivingEntity entity) {
+        int zone = zone(level, entity.blockPosition(), entity.getRandom().nextInt(ZoneLevels.SPREAD));
+        if (ManaTides.active()) {
+            // Born in a mana tide: stronger.
+            zone += ManaWeatherRules.TIDE_LEVELS;
+        }
+        entity.setData(MagicAttachments.CREATURE_LEVEL, Math.clamp(zone, 1, Progression.MAX_LEVEL));
         refreshStats(entity);
     }
 

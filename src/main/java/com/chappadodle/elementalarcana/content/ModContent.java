@@ -166,6 +166,10 @@ public final class ModContent {
     }
 
     /** Standing near a Shrine Core: faster mana (amplifier 1 when the shrine is your element's kin). */
+    // A creature far above you weighs on your magic (see ManaWeather): less spell power and regeneration.
+    public static final DeferredHolder<MobEffect, MobEffect> PRESSURE = EFFECTS.register("pressure",
+            () -> new MobEffect(MobEffectCategory.HARMFUL, 0x6A2A8A) {
+            });
     public static final DeferredHolder<MobEffect, MobEffect> PLACE_OF_POWER = EFFECTS.register("place_of_power",
             () -> new MobEffect(MobEffectCategory.BENEFICIAL, 0xB070FF) {
             });
