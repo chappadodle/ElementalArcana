@@ -209,6 +209,17 @@
       "dy": -6.946,
       "element": "wind",
       "from": "stormeye"
+    },
+    {
+      "id": "wind_gale_dash",
+      "type": "path",
+      "spell": "elementalarcana:gale_dash",
+      "x": 28,
+      "y": -288,
+      "dx": 40.0,
+      "dy": 0.0,
+      "element": "wind",
+      "from": "gale_dash"
     }
   ]
 }

@@ -163,6 +163,9 @@ path("wind", "wind", "wind_skyward_leap", "updraft", sky_xy, -135, start_from="u
 # Stormeye levels on along Wind's eye arm.
 eye_id, eye_xy = wind_ends["eye"]
 path("wind", "wind", "wind_stormeye", "stormeye", eye_xy, -170, start_from="stormeye")
+# Gale Dash levels on eastward from its node (Lightning's cluster leaves it to the north-east).
+dash_id, dash_xy = wind_ends["dash"]
+path("wind", "wind", "wind_gale_dash", "gale_dash", dash_xy, 0, start_from="gale_dash")
 
 # ---- Ice: a cluster off Water's outer edge ----
 deep_end_id, deep_end = water_ends["deep"]

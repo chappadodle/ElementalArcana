@@ -107,6 +107,14 @@ public abstract class Spell {
         return false;
     }
 
+    /**
+     * How many uses this spell holds at {@code spellLevel}, each coming back a cooldown after the
+     * last (see SpellCharges). 1: an ordinary cooldown.
+     */
+    public int charges(int spellLevel) {
+        return 1;
+    }
+
     /** Mana cost at a given spell level. */
     public int manaCost(int spellLevel) {
         return manaCost();

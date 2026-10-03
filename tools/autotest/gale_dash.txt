@@ -1,0 +1,136 @@
+# Gale Dash. 1: level 2, two dashes back to back and a third refused (recharging), with positions
+# and a shot of the HUD's charges. 2: level 3, a dash in the air with a hit landing mid-dash (health
+# unchanged). 3: level 7 Gale Strike through three husks (200 health; theirs after). 4: level 10
+# Blink Storm (positions before and after; husks at both ends hurt). 5: level 10 Hurricane Rush
+# held for a second and a half along a line of husks (positions and health). 6: Phantom Step
+# leaves the player unseen ("Test passed").
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamerule doMobLoot false
+cmd gamemode survival
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd tp @s 0.5 100 0.5 -90 0
+wait 40
+cmd kill @e[type=!player]
+cmd kill @e[type=item]
+cmd fill -8 99 -12 60 99 12 minecraft:grass_block
+cmd fill -8 100 -12 60 115 12 minecraft:air
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken wind
+cmd arcana level set 40
+cmd arcana spell elementalarcana:gale_dash 2
+cmd arcana mana fill
+cmd arcana cooldowns reset
+cmd title @s clear
+wait 20
+select elementalarcana:gale_dash
+press
+release
+wait 3
+camera back
+wait 4
+shot gale_dash
+camera first
+wait 15
+cmd data get entity @s Pos
+press
+release
+wait 3
+shot gale_dash_charges
+wait 15
+cmd data get entity @s Pos
+press
+release
+wait 10
+cmd data get entity @s Pos
+cmd arcana spell elementalarcana:gale_dash 3
+cmd arcana cooldowns reset
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd tp @s 0.5 112 0.5 -90 30
+wait 4
+press
+release
+wait 2
+cmd damage @s 6 minecraft:generic
+cmd data get entity @s Health
+wait 40
+cmd data get entity @s Health
+cmd arcana spell elementalarcana:gale_dash 7 gale_strike
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 0.5 100 0.5 -90 0
+cmd summon husk 4.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 6.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 8.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd effect give @e[type=husk] minecraft:slowness 120 255 true
+cmd effect give @e[type=husk] minecraft:weakness 120 255 true
+wait 10
+press
+release
+wait 3
+camera back
+wait 3
+shot gale_strike
+camera first
+wait 20
+cmd execute as @e[type=husk] run data get entity @s Health
+cmd kill @e[type=husk]
+cmd arcana spell elementalarcana:gale_dash 10 gale_strike blink_storm
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 0.5 100 0.5 -90 0
+cmd summon husk 1.5 100 2.0 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 9.5 100 2.0 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd effect give @e[type=husk] minecraft:slowness 120 255 true
+cmd effect give @e[type=husk] minecraft:weakness 120 255 true
+wait 10
+press
+release
+wait 2
+camera back
+wait 2
+shot blink_storm
+camera first
+cmd data get entity @s Pos
+wait 20
+cmd execute as @e[type=husk] run data get entity @s Health
+cmd kill @e[type=husk]
+cmd arcana spell elementalarcana:gale_dash 10 gale_strike hurricane_rush
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 0.5 100 0.5 -90 0
+cmd summon husk 6.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 12.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd summon husk 18.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd effect give @e[type=husk] minecraft:slowness 120 255 true
+cmd effect give @e[type=husk] minecraft:weakness 120 255 true
+wait 10
+press
+wait 12
+camera back
+wait 3
+shot hurricane_rush
+wait 15
+release
+camera first
+wait 20
+cmd data get entity @s Pos
+cmd execute as @e[type=husk] run data get entity @s Health
+cmd kill @e[type=husk]
+cmd arcana spell elementalarcana:gale_dash 5 phantom_step
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 0.5 100 0.5 -90 0
+wait 10
+press
+release
+wait 4
+cmd execute if entity @s[nbt={active_effects:[{id:"minecraft:invisibility"}]}]
+cmd gamerule doMobLoot true
+wait 10
+quit

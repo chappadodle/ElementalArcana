@@ -2,48 +2,66 @@ package com.chappadodle.elementalarcana.content.spell;
 
 import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.CastResult;
+import com.chappadodle.elementalarcana.api.GaleDashRules;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.content.ModSchools;
-import com.chappadodle.elementalarcana.core.MagicAttachments;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
 
-/** Launches the caster where they're looking and blows nearby mobs away. No fall damage on landing. */
+import java.util.List;
+
+/**
+ * Wind's Gale Dash: a burst of wind that throws the caster the way they look, shoving away what's
+ * near where they started; their landing is safe. It holds several dashes (charges) and levels to
+ * 10 (GaleDashRules has the numbers; GaleDashes does the work):
+ * <pre>
+ * Lv1 Gale Dash         the dash                    Lv6  Tailwind        speed after, a quarter off the cooldown
+ * Lv2 Second Wind       2 charges                   Lv7  Triple Charge   3 charges
+ * Lv3 Air Step          any way mid-air, unharmed   Lv8  Featherfall     a slow drift down after
+ * Lv4 Slipstream Trail  shoves foes, quickens allies Lv9 Swirling Rush   Swirls what it passes
+ * Lv5 Phantom Step | Gale Strike                    Lv10 Blink Storm | Hurricane Rush
+ * </pre>
+ */
 public class GaleDashSpell extends Spell {
-    private static final double PUSH_RADIUS = 3.0;
 
     public GaleDashSpell() {
         super(ModSchools.WIND, 20, 60);
     }
 
     @Override
+    public int maxLevel() {
+        return 10;
+    }
+
+    @Override
+    public List<String> branchOptions(int level) {
+        return switch (level) {
+            case 5 -> List.of(GaleDashRules.PHANTOM_STEP, GaleDashRules.GALE_STRIKE);
+            case 10 -> List.of(GaleDashRules.BLINK_STORM, GaleDashRules.HURRICANE_RUSH);
+            default -> List.of();
+        };
+    }
+
+    @Override
+    public int charges(int spellLevel) {
+        return GaleDashRules.charges(spellLevel);
+    }
+
+    @Override
+    public int cooldownTicks(int spellLevel, float cooldownFactor) {
+        return Math.round(super.cooldownTicks(spellLevel, cooldownFactor) * GaleDashRules.cooldownFactor(spellLevel));
+    }
+
+    @Override
     public CastResult cast(CastContext context) {
-        ServerPlayer caster = context.caster();
-        ServerLevel level = context.level();
-        Vec3 look = context.look();
-
-        // Never aim straight down into the ground; always give a little lift.
-        Vec3 direction = new Vec3(look.x, Math.max(look.y, 0.1), look.z).normalize();
-        caster.setDeltaMovement(direction.scale(1.5 * context.power()).add(0, 0.35, 0));
-        caster.hurtMarked = true;
-        caster.resetFallDistance();
-        MagicAttachments.get(caster).setFallImmune(true);
-
-        for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, caster.getBoundingBox().inflate(PUSH_RADIUS),
-                entity -> entity != caster && entity.isAlive())) {
-            Vec3 away = target.position().subtract(caster.position()).normalize();
-            target.knockback(1.0 * context.power(), -away.x, -away.z);
-            target.hurtMarked = true;
+        if (context.spellLevel() >= 10 && GaleDashRules.HURRICANE_RUSH.equals(context.branch(10))) {
+            context.holdUntilRelease(GaleDashes.rush(context));
+            return CastResult.SUCCESS;
         }
-
-        level.sendParticles(ParticleTypes.GUST_EMITTER_SMALL, caster.getX(), caster.getY(), caster.getZ(), 1, 0, 0, 0, 0);
-        level.sendParticles(ParticleTypes.CLOUD, caster.getX(), caster.getY() + 0.2, caster.getZ(), 15, 0.4, 0.1, 0.4, 0.05);
-        level.playSound(null, caster.getX(), caster.getY(), caster.getZ(), SoundEvents.WIND_CHARGE_BURST.value(), SoundSource.PLAYERS, 1f, 1f);
+        if (context.spellLevel() >= 10 && GaleDashRules.BLINK_STORM.equals(context.branch(10))) {
+            return GaleDashes.blink(context) ? CastResult.SUCCESS
+                    : CastResult.fail(Component.translatable("message.elementalarcana.gale_dash.no_room"));
+        }
+        GaleDashes.dash(context);
         return CastResult.SUCCESS;
     }
 }

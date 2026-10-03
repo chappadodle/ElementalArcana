@@ -114,7 +114,7 @@ public class SpellWheelScreen extends Screen {
             graphics.fill(slotX - half, slotY - half, slotX + half, slotY + half, i == hovered ? FastColor.ARGB32.color(120, spell.school().color()) : 0xD0101018);
             int iconSize = i == hovered ? 20 : 16;
             ArcanaDraw.icon(graphics, spell, slotX - iconSize / 2, slotY - iconSize / 2, iconSize, 1f, 1f);
-            if (data.cooldownRemaining(spell.id(), gameTime) > 0) {
+            if (data.chargesReady(spell, gameTime) == 0) {
                 graphics.fill(slotX - half, slotY - half, slotX + half, slotY + half, 0x90000000);
             }
             if (spell == selected) {

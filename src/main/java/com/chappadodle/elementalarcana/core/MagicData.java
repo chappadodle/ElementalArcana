@@ -9,6 +9,7 @@ import com.chappadodle.elementalarcana.api.SchoolElements;
 import com.chappadodle.elementalarcana.api.SkillTree;
 import com.chappadodle.elementalarcana.api.SkillTrees;
 import com.chappadodle.elementalarcana.api.Spell;
+import com.chappadodle.elementalarcana.api.SpellCharges;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.SpellSchool;
 import com.chappadodle.elementalarcana.api.Stat;
@@ -775,6 +776,21 @@ public final class MagicData {
         if (ticks > 0) {
             cooldownEnds.put(spell, gameTime + ticks);
         }
+    }
+
+    /** A use of a spell with charges (see SpellCharges): its clock runs a charge's worth longer. */
+    public void useCharge(ResourceLocation spell, long gameTime, int perCharge) {
+        long remaining = cooldownRemaining(spell, gameTime);
+        cooldownEnds.values().removeIf(end -> end <= gameTime);
+        if (perCharge > 0) {
+            cooldownEnds.put(spell, gameTime + SpellCharges.afterUse(remaining, perCharge));
+        }
+    }
+
+    /** How many charges of {@code spell} are ready (1 or 0 for a spell without charges). */
+    public int chargesReady(Spell spell, long gameTime) {
+        int level = spellLevel(spell);
+        return SpellCharges.ready(spell.charges(level), cooldownRemaining(spell.id(), gameTime), spell.cooldownTicks(level, cooldownFactor()));
     }
 
     public void clearCooldowns() {

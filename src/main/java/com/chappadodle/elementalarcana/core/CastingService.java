@@ -5,6 +5,7 @@ import com.chappadodle.elementalarcana.api.CastResult;
 import com.chappadodle.elementalarcana.api.ConjureSpell;
 import com.chappadodle.elementalarcana.api.Keystones;
 import com.chappadodle.elementalarcana.api.Spell;
+import com.chappadodle.elementalarcana.api.SpellCharges;
 import com.chappadodle.elementalarcana.api.SpellHold;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.event.SpellCastEvent;
@@ -65,9 +66,11 @@ public final class CastingService {
         if (player.isCreative() || data.freeCast()) {
             return null;
         }
-        long remaining = data.cooldownRemaining(spell.id(), player.level().getGameTime());
-        if (remaining > 0 && !(player instanceof ServerPlayer server && spell.hasFreeUse(server))) {
-            return Component.translatable("message.elementalarcana.cooldown", spell.displayName(), String.format("%.1f", remaining / 20f));
+        int level = data.spellLevel(spell);
+        long wait = SpellCharges.untilReady(spell.charges(level), data.cooldownRemaining(spell.id(), player.level().getGameTime()),
+                spell.cooldownTicks(level, data.cooldownFactor()));
+        if (wait > 0 && !(player instanceof ServerPlayer server && spell.hasFreeUse(server))) {
+            return Component.translatable("message.elementalarcana.cooldown", spell.displayName(), String.format("%.1f", wait / 20f));
         }
         return null;
     }
@@ -133,7 +136,7 @@ public final class CastingService {
         if (!free) {
             pay(player, data, spell, cost);
             if (context.hold() == null && !isFree(player, data)) {
-                data.startCooldown(spell.id(), player.level().getGameTime(), spell.cooldownTicks(data.spellLevel(spell), data.cooldownFactor()));
+                data.useCharge(spell.id(), player.level().getGameTime(), spell.cooldownTicks(data.spellLevel(spell), data.cooldownFactor()));
             }
         }
         if (context.hold() != null) {
@@ -244,7 +247,7 @@ public final class CastingService {
     private static void endHold(ServerPlayer player, ActiveHold active) {
         MagicData data = MagicAttachments.get(player);
         if (!player.isCreative() && !data.freeCast()) {
-            data.startCooldown(active.spell().id(), player.level().getGameTime(), active.spell().cooldownTicks(data.spellLevel(active.spell()), data.cooldownFactor()));
+            data.useCharge(active.spell().id(), player.level().getGameTime(), active.spell().cooldownTicks(data.spellLevel(active.spell()), data.cooldownFactor()));
             MagicAttachments.sync(player);
         }
     }

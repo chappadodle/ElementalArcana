@@ -1,6 +1,7 @@
 package com.chappadodle.elementalarcana.client;
 
 import com.chappadodle.elementalarcana.api.Spell;
+import com.chappadodle.elementalarcana.api.SpellCharges;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.core.CastingService;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
@@ -61,12 +62,23 @@ public class SpellHudLayer implements LayeredDraw.Layer {
         graphics.fill(x - 2, y - 2, x + 18, y + 18, ArcanaDraw.withAlpha(0x90000000, alpha));
         if (spell != null) {
             ArcanaDraw.icon(graphics, spell, x, y, 16, 1f, alpha);
-            int fullCooldown = spell.cooldownTicks(data.spellLevel(spell), data.cooldownFactor());
+            int spellLevel = data.spellLevel(spell);
+            int fullCooldown = spell.cooldownTicks(spellLevel, data.cooldownFactor());
+            int charges = spell.charges(spellLevel);
+            int ready = SpellCharges.ready(charges, cooldown, fullCooldown);
             if (cooldown > 0 && fullCooldown > 0) {
-                int covered = (int) Math.min(16, Math.ceil(16 * cooldown / (double) fullCooldown));
-                graphics.fill(x, y + 16 - covered, x + 16, y + 16, ArcanaDraw.withAlpha(0xB0000000, alpha));
-                String seconds = String.valueOf((int) Math.ceil(cooldown / 20.0));
-                graphics.drawString(font, seconds, x + 8 - font.width(seconds) / 2, y + 4, ArcanaDraw.withAlpha(0xFFFFFFFF, alpha));
+                // The shade is the charge coming back; the seconds show only while none is ready.
+                long next = SpellCharges.untilNext(cooldown, fullCooldown);
+                int covered = (int) Math.min(16, Math.ceil(16 * next / (double) fullCooldown));
+                graphics.fill(x, y + 16 - covered, x + 16, y + 16, ArcanaDraw.withAlpha(ready > 0 ? 0x70000000 : 0xB0000000, alpha));
+                if (ready == 0) {
+                    String seconds = String.valueOf((int) Math.ceil(next / 20.0));
+                    graphics.drawString(font, seconds, x + 8 - font.width(seconds) / 2, y + 4, ArcanaDraw.withAlpha(0xFFFFFFFF, alpha));
+                }
+            }
+            if (charges > 1) {
+                String count = String.valueOf(ready);
+                graphics.drawString(font, count, x + 17 - font.width(count), y + 9, ArcanaDraw.withAlpha(ready > 0 ? 0xFFFFE680 : 0xFF908880, alpha));
             }
             int nameEnd = graphics.drawString(font, spell.displayName(), x + 22, y - 1,
                     ArcanaDraw.withAlpha(FastColor.ARGB32.opaque(spell.school().color()), alpha));
