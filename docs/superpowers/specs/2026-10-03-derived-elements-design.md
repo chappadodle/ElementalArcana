@@ -63,7 +63,7 @@ line of sparks, and each hit cracks with a thunderclap. (It levels to 10, with f
 creature's feet when one is under the crosshair) with a ring of rising light. Three quarters of a
 second later a pillar of light falls on it: 7 damage within 2.5 blocks, half again as much for the
 undead, 3 seconds alight and 5 seconds glowing. The delay is the counterplay: a moving target can
-step out.
+step out. (It levels to 10, with forks and client-drawn light, since `2026-10-04-smite-design.md`.)
 
 All three scale with Potency and their family's Affinity like every spell. Their damage types
 (`elementalarcana:<element>_spell`) are in the same tags as the others (magic, bypasses armour,

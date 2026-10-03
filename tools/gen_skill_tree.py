@@ -210,7 +210,7 @@ lightning_xy = cluster("lightning", "wind", wind_ends["dash"], -45, "chain_light
 ])
 # Chain Lightning levels on straight out from Lightning's start.
 path("lightning", "lightning", "lightning_chain_lightning", "chain_lightning", lightning_xy, -45, start_from="lightning_start")
-cluster("radiance", "fire", fire_ends["burst"], 45, "smite", [
+radiance_xy = cluster("radiance", "fire", fire_ends["burst"], 45, "smite", [
     ("dawn", -45, [("stat", "vitality"), ("stat", "affinity/fire"), ("stat", "reservoir"),
                    ("notable", ("radiance_inner_light", {"vitality": 6, "affinity/fire": 4}))]),
     ("halo", 45, [("stat", "ward"), ("stat", "affinity/fire"), ("spell", "sanctuary")]),
@@ -221,6 +221,8 @@ crystal_xy = cluster("crystal", "earth", earth_ends["quake"], 135, "prism_bolt",
     ("geode", 90, [("stat", "potency"), ("stat", "affinity/earth"), ("spell", "prism_ward")]),
 ])
 
+# Smite levels on straight out from Radiance's start.
+path("radiance", "radiance", "radiance_smite", "smite", radiance_xy, 45, start_from="radiance_start")
 # Prism Bolt levels on straight out from Crystal's start.
 path("crystal", "crystal", "crystal_prism_bolt", "prism_bolt", crystal_xy, 135, start_from="crystal_start")
 

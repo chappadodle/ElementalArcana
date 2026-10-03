@@ -135,6 +135,17 @@
       "links": [
         "radiance_halo_2"
       ]
+    },
+    {
+      "id": "radiance_smite",
+      "type": "path",
+      "spell": "elementalarcana:smite",
+      "x": 515,
+      "y": 255,
+      "dx": 28.284,
+      "dy": 28.284,
+      "element": "radiance",
+      "from": "radiance_start"
     }
   ]
 }

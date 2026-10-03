@@ -8,7 +8,6 @@ import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
@@ -139,37 +138,9 @@ public class LightningArcParticle extends Particle {
             Vector3f a = segment[0].subtract(cameraPos).toVector3f();
             Vector3f b = segment[1].subtract(cameraPos).toVector3f();
             thickness *= Mth.clamp(new Vector3f(a).add(b).mul(0.5f).length() / 4f, 0.35f, 1f);
-            bar(buffer, a, b, GLOW * thickness, 1f, 0.8f, 0.28f, alpha * 0.55f);
-            bar(buffer, a, b, CORE * thickness, 1f, 1f, 0.92f, alpha);
+            GlowMesh.bar(buffer, u, v, a, b, GLOW * thickness, 1f, 0.8f, 0.28f, alpha * 0.55f);
+            GlowMesh.bar(buffer, u, v, a, b, CORE * thickness, 1f, 1f, 0.92f, alpha);
         }
-    }
-
-    /** A thin square bar from a to b (camera-relative), {@code half} out from its axis each way, its faces drawn from both sides. */
-    private void bar(VertexConsumer buffer, Vector3f a, Vector3f b, float half, float red, float green, float blue, float alpha) {
-        Vector3f axis = new Vector3f(b).sub(a);
-        if (axis.lengthSquared() < 1.0e-8f) {
-            return;
-        }
-        axis.normalize();
-        Vector3f side = Math.abs(axis.y()) > 0.9f ? new Vector3f(1, 0, 0).cross(axis) : new Vector3f(0, 1, 0).cross(axis);
-        side.normalize().mul(half);
-        Vector3f up = new Vector3f(axis).cross(side).normalize().mul(half);
-        Vector3f[] around = {new Vector3f(side).add(up), new Vector3f(up).sub(side), new Vector3f(side).add(up).negate(), new Vector3f(side).sub(up)};
-        for (int k = 0; k < 4; k++) {
-            Vector3f p = around[k];
-            Vector3f q = around[(k + 1) % 4];
-            Vector3f[] quad = {new Vector3f(a).add(p), new Vector3f(a).add(q), new Vector3f(b).add(q), new Vector3f(b).add(p)};
-            for (int i = 0; i < 4; i++) {
-                vertex(buffer, quad[i], red, green, blue, alpha);
-            }
-            for (int i = 3; i >= 0; i--) {
-                vertex(buffer, quad[i], red, green, blue, alpha);
-            }
-        }
-    }
-
-    private void vertex(VertexConsumer buffer, Vector3f at, float red, float green, float blue, float alpha) {
-        buffer.addVertex(at.x(), at.y(), at.z()).setUv(u, v).setColor(red, green, blue, alpha).setLight(LightTexture.FULL_BRIGHT);
     }
 
     @Override

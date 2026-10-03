@@ -142,6 +142,9 @@ public final class ModContent {
     /** A fireball's whole explosion in one particle (see FireBlastOptions). */
     public static final DeferredHolder<ParticleType<?>, ParticleType<FireBlastOptions>> FIRE_BLAST =
             PARTICLES.register("fire_blast", FireBlastOptions::newType);
+    /** Smite's light: its mark, pillar, beam or holy ground, drawn on each client (see SmiteOptions). */
+    public static final DeferredHolder<ParticleType<?>, ParticleType<SmiteOptions>> SMITE =
+            PARTICLES.register("smite", SmiteOptions::newType);
     /** A bolt of lightning, drawn on each client (see ArcOptions). */
     public static final DeferredHolder<ParticleType<?>, ParticleType<ArcOptions>> ARC =
             PARTICLES.register("arc", ArcOptions::newType);
