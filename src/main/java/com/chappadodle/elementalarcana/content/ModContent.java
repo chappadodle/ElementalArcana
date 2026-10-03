@@ -5,6 +5,7 @@ import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
 import com.chappadodle.elementalarcana.content.spell.EmberSprite;
 import com.chappadodle.elementalarcana.content.rift.RiftEntity;
+import com.chappadodle.elementalarcana.content.spell.CrystalSpire;
 import com.chappadodle.elementalarcana.content.spell.StormeyeEntity;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.particles.ColorParticleOption;
@@ -41,6 +42,10 @@ public final class ModContent {
             ENTITY_TYPES.register("stormeye", () -> EntityType.Builder.<StormeyeEntity>of(StormeyeEntity::new, MobCategory.MISC)
                     .sized(1f, 2f).clientTrackingRange(10).updateInterval(2).fireImmune().noSave()
                     .build(ElementalArcana.MODID + ":stormeye"));
+    public static final DeferredHolder<EntityType<?>, EntityType<CrystalSpire>> CRYSTAL_SPIRE =
+            ENTITY_TYPES.register("crystal_spire", () -> EntityType.Builder.<CrystalSpire>of(CrystalSpire::new, MobCategory.MISC)
+                    .sized(1f, 1.8f).clientTrackingRange(8).updateInterval(20).fireImmune().noSave()
+                    .build(ElementalArcana.MODID + ":crystal_spire"));
     public static final DeferredHolder<EntityType<?>, EntityType<RiftEntity>> RIFT =
             ENTITY_TYPES.register("rift", () -> EntityType.Builder.<RiftEntity>of(RiftEntity::new, MobCategory.MISC)
                     .sized(2.4f, 4.4f).clientTrackingRange(10).updateInterval(20).fireImmune().noSave()

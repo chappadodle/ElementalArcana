@@ -48,7 +48,8 @@ together before level 50).
 6 damage. Whatever it strikes, it bursts into three shards fanned 25° apart that fly on, 2.5 damage
 each; off a wall the shards fly back out along the bolt's reflection. Like an Earth hit, the bolt
 Crystallizes a burning, wet or frozen creature: the aura goes out and leaves a shard that gives
-absorption hearts to whoever walks into it.
+absorption hearts to whoever walks into it. (It levels to 10, with forks and a Crystal Spire, since
+`2026-10-03-prism-bolt-design.md`.)
 
 **Chain Lightning** (Lightning, 28 mana, 3.5 s). The bolt leaps from the caster's hand to the
 creature under the crosshair (up to 20 blocks), then on to the nearest creature within 6 blocks of

@@ -135,6 +135,17 @@
       "links": [
         "crystal_geode_2"
       ]
+    },
+    {
+      "id": "crystal_prism_bolt",
+      "type": "path",
+      "spell": "elementalarcana:prism_bolt",
+      "x": -515,
+      "y": 255,
+      "dx": -28.284,
+      "dy": 28.284,
+      "element": "crystal",
+      "from": "crystal_start"
     }
   ]
 }

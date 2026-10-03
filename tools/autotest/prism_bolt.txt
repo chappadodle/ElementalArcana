@@ -1,0 +1,214 @@
+# Prism Bolt, Lv 1 to 10 (see the Prism Bolt spec), on husks that can't move (100 health each;
+# their health after each cast goes to the log, in the order they were summoned).
+# 1: Lv 1 into a husk with three behind it (the shards fan on into them).
+# 2: Lv 4 down a line of four: the bolt bursts through the first and on into the second.
+# 3: Prismatic Lance down the same line: all four pierced, no bursts.
+# 4: Geode Burst into a husk ringed by seven (none in front of it): shards all round.
+# 5: Lv 7: two bolts side by side (a shot in flight).
+# 6: Lv 6 Crystal Shell: the caster's absorption after three hits (6).
+# 7: Crystal Spire: a spire grows at the middle husk and picks off the ring.
+# 8: Prism Barrage held for a second and a half on the line, at husks of 400 health (the HUD's
+#    mana shows the cost).
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamerule doMobLoot false
+cmd gamemode survival
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd effect give @s minecraft:resistance 900 4 true
+cmd tp @s 0.5 100 0.5 -90 2
+wait 40
+cmd kill @e[type=!player]
+cmd kill @e[type=item]
+cmd fill -6 99 -12 40 99 12 minecraft:grass_block
+cmd fill -6 100 -12 40 110 12 minecraft:air
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken crystal
+cmd arcana level set 40
+cmd arcana spell elementalarcana:prism_bolt 1
+cmd arcana mana fill
+cmd arcana cooldowns reset
+cmd title @s clear
+wait 20
+# 1: Lv 1.
+cmd summon husk 8.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 13.5 100 -1.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 13.5 100 2.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 14.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+wait 20
+select elementalarcana:prism_bolt
+press
+release
+wait 3
+shot prism_lv1
+wait 20
+cmd execute as @e[type=husk] run data get entity @s Health
+# 2: Lv 4, Piercing Light.
+cmd tp @e[type=husk] 0.5 -100 0.5
+cmd kill @e[type=husk]
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 0.5 100 0.5 -90 2
+cmd arcana spell elementalarcana:prism_bolt 4
+cmd summon husk 7.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 11.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 15.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 19.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+wait 20
+select elementalarcana:prism_bolt
+press
+release
+wait 3
+shot prism_lv4
+wait 20
+cmd execute as @e[type=husk] run data get entity @s Health
+# 3: Prismatic Lance.
+cmd tp @e[type=husk] 0.5 -100 0.5
+cmd kill @e[type=husk]
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 0.5 100 0.5 -90 2
+cmd arcana spell elementalarcana:prism_bolt 5 prismatic_lance
+cmd summon husk 7.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 11.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 15.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 19.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+wait 20
+select elementalarcana:prism_bolt
+press
+release
+wait 2
+shot prism_lance
+wait 20
+cmd execute as @e[type=husk] run data get entity @s Health
+# 4: Geode Burst.
+cmd tp @e[type=husk] 0.5 -100 0.5
+cmd kill @e[type=husk]
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 0.5 100 0.5 -90 2
+cmd arcana spell elementalarcana:prism_bolt 5 geode_burst
+cmd summon husk 9.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 11.7 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 11.06 100 2.06 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 9.5 100 2.7 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 7.94 100 2.06 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 7.94 100 -1.06 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 9.5 100 -1.7 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 11.06 100 -1.06 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+wait 20
+select elementalarcana:prism_bolt
+press
+release
+wait 4
+shot prism_geode
+camera back
+wait 1
+shot prism_geode_behind
+camera first
+wait 20
+cmd execute as @e[type=husk] run data get entity @s Health
+# 5: Twin Prisms, in flight (aimed over the ring, at nothing).
+cmd tp @e[type=husk] 0.5 -100 0.5
+cmd kill @e[type=husk]
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 0.5 100 0.5 -90 -3
+cmd arcana spell elementalarcana:prism_bolt 7 prismatic_lance
+wait 10
+select elementalarcana:prism_bolt
+press
+release
+wait 1
+shot prism_twin
+wait 20
+# 6: Crystal Shell: three hits.
+cmd tp @e[type=husk] 0.5 -100 0.5
+cmd kill @e[type=husk]
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 0.5 100 0.5 -90 2
+cmd arcana spell elementalarcana:prism_bolt 6 geode_burst
+cmd effect clear @s minecraft:absorption
+cmd summon husk 8.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+wait 20
+select elementalarcana:prism_bolt
+press
+release
+wait 8
+cmd arcana cooldowns reset
+select elementalarcana:prism_bolt
+press
+release
+wait 8
+cmd arcana cooldowns reset
+select elementalarcana:prism_bolt
+press
+release
+wait 8
+cmd arcana cooldowns reset
+cmd data get entity @s AbsorptionAmount
+shot prism_shell
+# 7: Crystal Spire.
+cmd tp @e[type=husk] 0.5 -100 0.5
+cmd kill @e[type=husk]
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 0.5 100 0.5 -90 2
+cmd arcana spell elementalarcana:prism_bolt 10 geode_burst crystal_spire
+cmd summon husk 9.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 11.7 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 11.06 100 2.06 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 9.5 100 2.7 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 7.94 100 2.06 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 7.94 100 -1.06 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 9.5 100 -1.7 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+cmd summon husk 11.06 100 -1.06 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:100f,attributes:[{id:"minecraft:generic.max_health",base:100d}]}
+wait 20
+select elementalarcana:prism_bolt
+press
+release
+wait 8
+shot prism_spire_grows
+wait 20
+shot prism_spire_throwing
+camera back
+wait 10
+shot prism_spire_behind
+camera first
+wait 80
+cmd execute as @e[type=husk] run data get entity @s Health
+cmd execute if entity @e[type=elementalarcana:crystal_spire]
+# 8: Prism Barrage.
+cmd tp @e[type=husk] 0.5 -100 0.5
+cmd kill @e[type=husk]
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 0.5 100 0.5 -90 2
+cmd arcana spell elementalarcana:prism_bolt 10 prismatic_lance prism_barrage
+cmd summon husk 7.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:400f,attributes:[{id:"minecraft:generic.max_health",base:400d}]}
+cmd summon husk 11.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:400f,attributes:[{id:"minecraft:generic.max_health",base:400d}]}
+cmd summon husk 15.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:400f,attributes:[{id:"minecraft:generic.max_health",base:400d}]}
+cmd summon husk 19.5 100 0.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b,Health:400f,attributes:[{id:"minecraft:generic.max_health",base:400d}]}
+wait 20
+shot prism_barrage_before
+select elementalarcana:prism_bolt
+press
+wait 12
+shot prism_barrage_firing
+wait 18
+release
+wait 2
+shot prism_barrage_after
+wait 10
+cmd execute as @e[type=husk] run data get entity @s Health
+cmd tp @e[type=husk] 0.5 -100 0.5
+cmd kill @e[type=husk]
+cmd effect clear @s minecraft:absorption
+cmd gamerule doMobLoot true
+wait 10
+quit

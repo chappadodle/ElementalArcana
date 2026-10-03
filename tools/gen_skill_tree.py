@@ -215,11 +215,14 @@ cluster("radiance", "fire", fire_ends["burst"], 45, "smite", [
                    ("notable", ("radiance_inner_light", {"vitality": 6, "affinity/fire": 4}))]),
     ("halo", 45, [("stat", "ward"), ("stat", "affinity/fire"), ("spell", "sanctuary")]),
 ])
-cluster("crystal", "earth", earth_ends["quake"], 135, "prism_bolt", [
+crystal_xy = cluster("crystal", "earth", earth_ends["quake"], 135, "prism_bolt", [
     ("facet", 45, [("stat", "ward"), ("stat", "affinity/earth"), ("stat", "focus"),
                    ("notable", ("crystal_prismatic_ward", {"ward": 6, "affinity/earth": 4}))]),
     ("geode", 90, [("stat", "potency"), ("stat", "affinity/earth"), ("spell", "prism_ward")]),
 ])
+
+# Prism Bolt levels on straight out from Crystal's start.
+path("crystal", "crystal", "crystal_prism_bolt", "prism_bolt", crystal_xy, 135, start_from="crystal_start")
 
 # ---- checks and output ----
 ids = list(positions)
