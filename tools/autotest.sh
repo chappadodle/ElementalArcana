@@ -6,7 +6,19 @@
 #
 # The script's steps are read by client/AutoTest (see its Javadoc for the step list). The test
 # world is a copy of the dev server's world (run-server/world), made on first use.
+#
+# The hidden session is cut off from the desktop: everything here runs on a D-Bus session of its
+# own that can start no services (tools/autotest-dbus.conf), without the desktop's display, and
+# the hidden KWin reads an empty config directory. A second KWin on the desktop's bus, reading the
+# desktop's config, loads the desktop's KWin scripts and shortcuts and registers them with the
+# desktop's shortcut service; when it quits they're left switched off, and the desktop's own KWin
+# shortcuts stop working until the next login. A bus that can start services wakes portals and
+# file services of its own beside the desktop's.
 set -uo pipefail
+if [[ -z "${EA_AUTOTEST_ISOLATED:-}" ]]; then
+  exec env -u WAYLAND_DISPLAY -u DISPLAY EA_AUTOTEST_ISOLATED=1 \
+    dbus-run-session --config-file="$(dirname "$0")/autotest-dbus.conf" -- "$0" "$@"
+fi
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SCRIPT="$(realpath "$1")"
 GAME="$ROOT/run-autotest"
@@ -36,10 +48,13 @@ fi
 rm -f "$GAME/screenshots/"*.png
 cd "$ROOT"
 
-# A virtual (invisible) KDE compositor for the game to draw into.
+# A virtual (invisible) KDE compositor for the game to draw into, with a config of its own (see
+# the note at the top).
 SOCKET="ea-autotest"
-kwin_wayland --virtual --socket "$SOCKET" --width 1280 --height 720 --no-lockscreen --no-global-shortcuts \
-  > "$ROOT/build/autotest-kwin.log" 2>&1 &
+KWIN_CONFIG="$ROOT/build/autotest-kwin-config"
+mkdir -p "$KWIN_CONFIG"
+XDG_CONFIG_HOME="$KWIN_CONFIG" kwin_wayland --virtual --socket "$SOCKET" --width 1280 --height 720 --no-lockscreen \
+  --no-global-shortcuts > "$ROOT/build/autotest-kwin.log" 2>&1 &
 KWIN=$!
 for _ in $(seq 1 50); do [[ -S "$XDG_RUNTIME_DIR/$SOCKET" ]] && break; sleep 0.2; done
 # No DISPLAY: the game can only reach the hidden Wayland compositor, never the real screen. The
