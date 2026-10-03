@@ -1,0 +1,29 @@
+{
+  "parent": "elementalarcana:arcana/master",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:archmage_staff",
+      "components": {
+        "elementalarcana:element": "water"
+      }
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.archmage.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.archmage.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "level": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "level",
+        "min": 60
+      }
+    }
+  }
+}

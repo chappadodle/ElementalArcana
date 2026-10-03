@@ -1,0 +1,27 @@
+{
+  "parent": "elementalarcana:arcana/into_the_hollow",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:prime_heart"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.bound_again.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.bound_again.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "killed": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": {
+          "type": "elementalarcana:the_hollow"
+        }
+      }
+    }
+  }
+}

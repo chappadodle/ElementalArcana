@@ -1,0 +1,30 @@
+{
+  "parent": "elementalarcana:arcana/tower",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:guardian_core",
+      "components": {
+        "elementalarcana:element": "fire"
+      }
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.magister.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.magister.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "killed": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": {
+          "type": "elementalarcana:tower_magister"
+        }
+      }
+    }
+  }
+}

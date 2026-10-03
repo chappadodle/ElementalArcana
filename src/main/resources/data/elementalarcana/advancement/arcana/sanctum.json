@@ -1,0 +1,29 @@
+{
+  "parent": "elementalarcana:arcana/magister",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:sanctum_seal"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.sanctum.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.sanctum.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "found": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": {
+          "location": {
+            "structures": "#elementalarcana:sanctums"
+          }
+        }
+      }
+    }
+  }
+}

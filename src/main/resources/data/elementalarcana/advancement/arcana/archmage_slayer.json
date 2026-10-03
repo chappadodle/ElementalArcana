@@ -1,0 +1,26 @@
+{
+  "parent": "elementalarcana:arcana/attuned_foe",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:radiance_essence"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.archmage_slayer.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.archmage_slayer.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "defeated": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "defeated",
+        "key": "archmage"
+      }
+    }
+  }
+}

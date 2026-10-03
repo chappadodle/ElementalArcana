@@ -1,0 +1,26 @@
+{
+  "parent": "elementalarcana:arcana/root",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:wind_essence"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.awakening.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.awakening.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "elements": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "elements",
+        "min": 1
+      }
+    }
+  }
+}

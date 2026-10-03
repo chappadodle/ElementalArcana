@@ -11,6 +11,7 @@ import com.chappadodle.elementalarcana.network.CastSpellPayload;
 import com.chappadodle.elementalarcana.network.SelectSpellPayload;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.logging.LogUtils;
+import net.minecraft.advancements.AdvancementNode;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -18,6 +19,8 @@ import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.BackupConfirmScreen;
+import net.minecraft.client.multiplayer.ClientAdvancements;
+import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -73,8 +76,8 @@ import java.util.Optional;
  * press / release          the cast key going down / up
  * aura                     hide the player's aura, or show it again (the H key)
  * launch_one / launch_all  the conjuring launch keys
- * screen status|tree [spell]|stats|journal|inventory|close   open one of the mod's screens (or the
- *                          inventory)
+ * screen status|tree [spell]|stats|journal|inventory|advancements|close   open one of the mod's
+ *                          screens, the inventory, or the advancements on the mod's tab
  * hud on|off               show or hide the HUD
  * camera first|back|front  the camera view
  * use                      right-click the creature or block under the crosshair (or, with
@@ -381,6 +384,14 @@ public final class AutoTest {
             case "close" -> minecraft.setScreen(null);
             case "journal" -> JournalBook.open(minecraft.player);
             case "inventory" -> minecraft.setScreen(new InventoryScreen(minecraft.player));
+            case "advancements" -> {
+                ClientAdvancements advancements = minecraft.player.connection.getAdvancements();
+                AdvancementNode root = advancements.getTree().get(ElementalArcana.id("arcana/root"));
+                if (root != null) {
+                    advancements.setSelectedTab(root.holder(), true);
+                }
+                minecraft.setScreen(new AdvancementsScreen(advancements));
+            }
             default -> {
                 if (name.startsWith("tree")) {
                     String[] parts = name.split("\\s+");

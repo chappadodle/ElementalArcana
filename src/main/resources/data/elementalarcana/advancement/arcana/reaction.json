@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/first_spark",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:water_essence"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.reaction.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.reaction.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "reaction": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "reaction"
+      }
+    }
+  }
+}

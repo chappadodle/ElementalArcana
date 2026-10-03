@@ -1,0 +1,27 @@
+{
+  "parent": "elementalarcana:arcana/awakening",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:arcane_lectern"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.the_arcanist.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.the_arcanist.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "bought": {
+      "trigger": "minecraft:villager_trade",
+      "conditions": {
+        "item": {
+          "items": "#elementalarcana:arcanist_goods"
+        }
+      }
+    }
+  }
+}

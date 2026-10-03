@@ -1,0 +1,74 @@
+{
+  "parent": "elementalarcana:arcana/sovereign",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:sovereign_heart",
+      "components": {
+        "elementalarcana:element": "water"
+      }
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.four_hearts.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.four_hearts.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "sovereign_heart_fire": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "elementalarcana:sovereign_heart",
+            "components": {
+              "elementalarcana:element": "fire"
+            }
+          }
+        ]
+      }
+    },
+    "sovereign_heart_water": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "elementalarcana:sovereign_heart",
+            "components": {
+              "elementalarcana:element": "water"
+            }
+          }
+        ]
+      }
+    },
+    "sovereign_heart_wind": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "elementalarcana:sovereign_heart",
+            "components": {
+              "elementalarcana:element": "wind"
+            }
+          }
+        ]
+      }
+    },
+    "sovereign_heart_earth": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "elementalarcana:sovereign_heart",
+            "components": {
+              "elementalarcana:element": "earth"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

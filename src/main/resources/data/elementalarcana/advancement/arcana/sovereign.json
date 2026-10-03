@@ -1,0 +1,30 @@
+{
+  "parent": "elementalarcana:arcana/sanctum",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:sovereign_heart",
+      "components": {
+        "elementalarcana:element": "fire"
+      }
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.sovereign.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.sovereign.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "killed": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": {
+          "type": "#elementalarcana:sovereigns"
+        }
+      }
+    }
+  }
+}

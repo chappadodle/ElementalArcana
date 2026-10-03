@@ -1,0 +1,32 @@
+{
+  "parent": "elementalarcana:arcana/sovereign",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:archmage_staff",
+      "components": {
+        "elementalarcana:element": "earth"
+      }
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.archmage_staff.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.archmage_staff.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "archmage_staff": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "elementalarcana:archmage_staff"
+          }
+        ]
+      }
+    }
+  }
+}

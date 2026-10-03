@@ -27,6 +27,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 
+import java.util.Locale;
+
 /**
  * Pays out for creatures killed by a player. Every creature holds mana: its killer absorbs it as XP
  * (Progression#killXp: by the creature's level, size and rank, and the level gap). Elemental
@@ -45,6 +47,10 @@ public final class CreatureRewards {
         LivingEntity dead = event.getEntity();
         if (dead instanceof Player || !(event.getSource().getEntity() instanceof ServerPlayer player)) {
             return;
+        }
+        CreatureMagic attuned = Attunement.get(dead);
+        if (attuned != null) {
+            MagicTriggers.fire(player, "defeated", attuned.rank().name().toLowerCase(Locale.ROOT), attuned.rank().ordinal() + 1);
         }
         int xp = killXp(player, dead);
         if (xp > 0) {

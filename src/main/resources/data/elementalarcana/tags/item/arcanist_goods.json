@@ -1,0 +1,22 @@
+{
+  "values": [
+    "#elementalarcana:essences",
+    "elementalarcana:arcanist_journal",
+    "elementalarcana:apprentice_wand",
+    "elementalarcana:adept_staff",
+    "elementalarcana:fire_catalyst",
+    "elementalarcana:water_catalyst",
+    "elementalarcana:wind_catalyst",
+    "elementalarcana:earth_catalyst",
+    "elementalarcana:scroll_of_unbinding",
+    "elementalarcana:tome_of_insight",
+    "elementalarcana:apprentice_hood",
+    "elementalarcana:apprentice_robe",
+    "elementalarcana:apprentice_trousers",
+    "elementalarcana:apprentice_boots",
+    "elementalarcana:adept_hood",
+    "elementalarcana:adept_robe",
+    "elementalarcana:adept_trousers",
+    "elementalarcana:adept_boots"
+  ]
+}

@@ -1,0 +1,75 @@
+# The Elemental Arcana advancement tab. Revoked first; then, one by one: awakening (Wind), a cast,
+# magic level 25, a spell at level 5, Skyward, a second element (Water), a wisp killed by the
+# player (also an Attuned foe), a Swirl reaction (a level-9 Gale Dash through a burning husk) and
+# standing in a shrine. Each is checked with an advancements selector: "Test passed" or "Test
+# failed" in the log, in this order.
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamerule doMobLoot false
+cmd gamemode survival
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd effect give @s minecraft:resistance 600 4 true
+cmd tp @s 0.5 100 0.5 -90 0
+wait 40
+cmd kill @e[type=!player]
+cmd kill @e[type=item]
+cmd fill -8 99 -12 40 99 12 minecraft:grass_block
+cmd fill -8 100 -12 40 112 12 minecraft:air
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana level set 1
+cmd advancement revoke @s from elementalarcana:arcana/root
+wait 10
+cmd arcana awaken wind
+wait 50
+cmd execute if entity @s[advancements={elementalarcana:arcana/awakening=true}]
+cmd arcana mana fill
+cmd arcana cooldowns reset
+cmd arcana spell elementalarcana:gale_dash 1
+select elementalarcana:gale_dash
+press
+release
+wait 20
+cmd execute if entity @s[advancements={elementalarcana:arcana/first_spark=true}]
+cmd arcana level set 25
+wait 50
+cmd execute if entity @s[advancements={elementalarcana:arcana/adept=true}]
+cmd arcana spell elementalarcana:gale_dash 5 gale_strike
+wait 50
+cmd execute if entity @s[advancements={elementalarcana:arcana/crossroads=true}]
+cmd effect give @s elementalarcana:skyward 5 0 true
+wait 10
+cmd execute if entity @s[advancements={elementalarcana:arcana/skyward=true}]
+cmd arcana awaken water
+wait 50
+cmd execute if entity @s[advancements={elementalarcana:arcana/two_natures=true}]
+cmd tp @s 0.5 100 0.5 -90 0
+cmd summon elementalarcana:wind_wisp 4.5 101 0.5
+wait 5
+cmd damage @e[type=elementalarcana:wind_wisp,limit=1] 1000 minecraft:player_attack by @s
+wait 10
+cmd execute if entity @s[advancements={elementalarcana:arcana/wisp_hunter=true}]
+cmd execute if entity @s[advancements={elementalarcana:arcana/attuned_foe=true}]
+cmd arcana spell elementalarcana:gale_dash 9 gale_strike
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 0.5 100 0.5 -90 0
+cmd summon husk 5.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b,Fire:400s,Health:200f,attributes:[{id:"minecraft:generic.max_health",base:200d}]}
+cmd effect give @e[type=husk] minecraft:slowness 120 255 true
+cmd effect give @e[type=husk] minecraft:weakness 120 255 true
+wait 10
+press
+release
+wait 20
+cmd execute if entity @s[advancements={elementalarcana:arcana/reaction=true}]
+cmd kill @e[type=husk]
+goto elementalarcana:fire_shrine 0 1
+wait 60
+cmd execute if entity @s[advancements={elementalarcana:arcana/places_of_power=true}]
+cmd gamerule doMobLoot true
+wait 10
+quit

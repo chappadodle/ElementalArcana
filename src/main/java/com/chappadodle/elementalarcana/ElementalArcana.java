@@ -1,6 +1,7 @@
 package com.chappadodle.elementalarcana;
 
 import com.chappadodle.elementalarcana.api.SpellRegistries;
+import com.chappadodle.elementalarcana.content.MagicTriggers;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.content.ModItems;
 import com.chappadodle.elementalarcana.content.ModSchools;
@@ -40,6 +41,7 @@ public class ElementalArcana {
         ModSpells.SPELLS.register(modEventBus);
         MagicAttachments.ATTACHMENT_TYPES.register(modEventBus);
         ModContent.register(modEventBus);
+        MagicTriggers.register(modEventBus);
         ModItems.register(modEventBus);
         ModGear.register(modEventBus);
         ModWorld.register(modEventBus);

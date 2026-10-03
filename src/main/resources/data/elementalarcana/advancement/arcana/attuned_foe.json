@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/awakening",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:crystal_essence"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.attuned_foe.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.attuned_foe.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "defeated": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "defeated"
+      }
+    }
+  }
+}

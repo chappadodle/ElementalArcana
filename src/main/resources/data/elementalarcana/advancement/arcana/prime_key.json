@@ -1,0 +1,29 @@
+{
+  "parent": "elementalarcana:arcana/four_hearts",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:prime_key"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.prime_key.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.prime_key.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "prime_key": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "elementalarcana:prime_key"
+          }
+        ]
+      }
+    }
+  }
+}

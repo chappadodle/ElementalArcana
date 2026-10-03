@@ -1,0 +1,26 @@
+{
+  "parent": "elementalarcana:arcana/awakening",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:tome_of_insight"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.rule_breaker.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.rule_breaker.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "keystones": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "keystones",
+        "min": 1
+      }
+    }
+  }
+}

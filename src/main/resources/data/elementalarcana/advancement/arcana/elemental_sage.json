@@ -1,0 +1,26 @@
+{
+  "parent": "elementalarcana:arcana/two_natures",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:earth_catalyst"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.elemental_sage.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.elemental_sage.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "elements": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "elements",
+        "min": 4
+      }
+    }
+  }
+}

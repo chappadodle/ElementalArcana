@@ -1,0 +1,26 @@
+{
+  "parent": "elementalarcana:arcana/awakening",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:fire_catalyst"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.two_natures.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.two_natures.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "elements": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "elements",
+        "min": 2
+      }
+    }
+  }
+}

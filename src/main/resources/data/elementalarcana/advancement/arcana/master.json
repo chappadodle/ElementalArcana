@@ -1,0 +1,29 @@
+{
+  "parent": "elementalarcana:arcana/adept",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:master_staff",
+      "components": {
+        "elementalarcana:element": "water"
+      }
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.master.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.master.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "level": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "level",
+        "min": 40
+      }
+    }
+  }
+}

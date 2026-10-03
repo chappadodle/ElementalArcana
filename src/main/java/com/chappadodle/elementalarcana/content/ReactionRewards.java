@@ -39,6 +39,9 @@ public final class ReactionRewards {
                 && target.tickCount - target.getLastHurtByMobTimestamp() < XP_GAP_TICKS) {
             player = recent;
         }
+        if (player != null) {
+            MagicTriggers.fire(player, "reaction", null, 1);
+        }
         if (player == null || target instanceof Player || now < target.getPersistentData().getLong(TAG_XP_AT)) {
             return;
         }

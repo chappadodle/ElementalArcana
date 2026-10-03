@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/prime_key",
+  "display": {
+    "icon": {
+      "id": "minecraft:ender_eye"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.into_the_hollow.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.into_the_hollow.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "entered": {
+      "trigger": "minecraft:changed_dimension",
+      "conditions": {
+        "to": "elementalarcana:the_hollow"
+      }
+    }
+  }
+}

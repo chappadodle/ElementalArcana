@@ -1,0 +1,29 @@
+{
+  "parent": "elementalarcana:arcana/first_spark",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:adept_staff",
+      "components": {
+        "elementalarcana:element": "fire"
+      }
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.crossroads.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.crossroads.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "spell_level": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "spell_level",
+        "min": 5
+      }
+    }
+  }
+}

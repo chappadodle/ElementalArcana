@@ -1,0 +1,29 @@
+{
+  "parent": "elementalarcana:arcana/awakening",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:apprentice_wand",
+      "components": {
+        "elementalarcana:element": "water"
+      }
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.apprentice.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.apprentice.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "level": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "level",
+        "min": 10
+      }
+    }
+  }
+}

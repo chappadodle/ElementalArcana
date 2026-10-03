@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/awakening",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:fire_essence"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.first_spark.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.first_spark.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "cast": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "cast"
+      }
+    }
+  }
+}

@@ -26,6 +26,8 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 
 **Brews.** Brewed from an Awkward Potion like any potion (and made splash, lingering or into arrows the same way): a **Mana Draught** (amethyst shard) refills 30% of your mana at once (60% with glowstone); an **Elixir of Clarity** (a Wisp Mote, which wisps drop) makes mana regenerate twice as fast for 3 minutes; an **Elixir of Focus** (lapis lazuli) gives +6 Focus and an **Elixir of Warding** (prismarine crystals) +6 Ward. Glowstone makes the elixirs stronger and redstone longer. Arcanists sell Mana Draughts and Elixirs of Clarity.
 
+**The path.** An *Elemental Arcana* tab in the advancements screen (L) maps the adventure, from waking your magic through shrines, Arcanists, mage towers and sanctums to the Prime Key and the Hollow, with the side roads (reactions, keystones, a spell's capstone, gear) along the way. Each step says what to do next.
+
 **Companion mods** (all optional; the mod needs none of them): [JEI](https://modrinth.com/mod/jei) lists each element's wands, staves, Guardian Cores and Sovereign Hearts on their own, with their recipes, and gives the things found in the world (Essence, Catalysts, Wisp Motes, Cores, Hearts, the Prime Key, the Arcanist's goods) a page saying where they come from and what they do. [Jade](https://modrinth.com/mod/jade) shows creatures' levels and elements. [Veil](https://modrinth.com/mod/veil) gives glowing spell effects real bloom. LambDynamicLights or Sodium Dynamic Lights make spells light up their surroundings.
 
 **Controls** (rebindable under *Elemental Arcana* in Controls):

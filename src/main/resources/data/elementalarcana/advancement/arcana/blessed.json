@@ -1,0 +1,59 @@
+{
+  "parent": "elementalarcana:arcana/places_of_power",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:earth_essence"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.blessed.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.blessed.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "fire_blessing": {
+      "trigger": "minecraft:effects_changed",
+      "conditions": {
+        "effects": {
+          "elementalarcana:fire_blessing": {}
+        }
+      }
+    },
+    "water_blessing": {
+      "trigger": "minecraft:effects_changed",
+      "conditions": {
+        "effects": {
+          "elementalarcana:water_blessing": {}
+        }
+      }
+    },
+    "wind_blessing": {
+      "trigger": "minecraft:effects_changed",
+      "conditions": {
+        "effects": {
+          "elementalarcana:wind_blessing": {}
+        }
+      }
+    },
+    "earth_blessing": {
+      "trigger": "minecraft:effects_changed",
+      "conditions": {
+        "effects": {
+          "elementalarcana:earth_blessing": {}
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "fire_blessing",
+      "water_blessing",
+      "wind_blessing",
+      "earth_blessing"
+    ]
+  ]
+}

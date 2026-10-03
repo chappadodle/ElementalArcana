@@ -1,0 +1,32 @@
+{
+  "parent": "elementalarcana:arcana/magister",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:master_staff",
+      "components": {
+        "elementalarcana:element": "earth"
+      }
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.master_staff.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.master_staff.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "master_staff": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "elementalarcana:master_staff"
+          }
+        ]
+      }
+    }
+  }
+}
