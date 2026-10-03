@@ -1,0 +1,78 @@
+# Tsunami: a wave rolls east from the player across three husks (slowed so they can't walk) and a
+# fire, climbs a step and crashes; it's watched from the side. The husks' positions before and
+# after, their health, and whether the fire is still burning ("Test failed": it's out) go to the log.
+# Then a second wave, as its caster sees it: first person and from behind.
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamerule doMobLoot false
+cmd gamemode survival
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd effect give @s minecraft:resistance 600 4 true
+cmd tp @s 0.5 100 0.5 -90 10
+wait 40
+cmd kill @e[type=!player]
+cmd kill @e[type=item]
+cmd fill -8 99 -12 30 99 12 minecraft:grass_block
+cmd fill -8 100 -12 30 108 12 minecraft:air
+cmd fill 14 100 -6 30 100 6 minecraft:grass_block
+cmd setblock 9 99 -2 minecraft:netherrack
+cmd setblock 9 100 -2 minecraft:fire
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken water
+cmd arcana level set 20
+cmd arcana tree take tidal_wave
+cmd arcana mana fill
+cmd arcana cooldowns reset
+cmd title @s clear
+wait 20
+cmd summon husk 5.5 100 -1.0 {Tags:["eat"],PersistenceRequired:1b}
+cmd summon husk 7.5 100 1.5 {Tags:["eat"],PersistenceRequired:1b}
+cmd summon husk 10.5 100 0.5 {Tags:["eat"],PersistenceRequired:1b}
+cmd effect give @e[type=husk] minecraft:slowness 60 255 true
+cmd effect give @e[type=husk] minecraft:weakness 60 255 true
+wait 10
+cmd execute as @e[type=husk] run data get entity @s Pos
+select elementalarcana:tidal_wave
+press
+release
+wait 3
+cmd tp @s 8 102 -10 0 15
+wait 5
+shot tsunami_rising
+wait 8
+shot tsunami_rolling
+wait 8
+shot tsunami_step
+wait 9
+shot tsunami_crash
+wait 20
+cmd execute as @e[type=husk] run data get entity @s Pos
+cmd execute as @e[type=husk] run data get entity @s Health
+cmd execute if block 9 100 -2 minecraft:fire
+cmd kill @e[type=husk]
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd tp @s 0.5 100 0.5 -90 5
+cmd summon husk 9.5 100 -1.0 {Tags:["eat"],PersistenceRequired:1b}
+cmd summon husk 12.5 100 1.5 {Tags:["eat"],PersistenceRequired:1b}
+cmd effect give @e[type=husk] minecraft:slowness 60 255 true
+cmd effect give @e[type=husk] minecraft:weakness 60 255 true
+wait 20
+press
+release
+wait 10
+shot tsunami_caster_view
+camera back
+wait 6
+shot tsunami_from_behind
+camera first
+wait 30
+cmd kill @e[type=husk]
+cmd gamerule doMobLoot true
+wait 10
+quit

@@ -21,7 +21,7 @@ import com.chappadodle.elementalarcana.content.spell.SanctuarySpell;
 import com.chappadodle.elementalarcana.content.spell.SmiteSpell;
 import com.chappadodle.elementalarcana.content.spell.StoneSkinSpell;
 import com.chappadodle.elementalarcana.content.spell.ThunderclapSpell;
-import com.chappadodle.elementalarcana.content.spell.TidalWaveSpell;
+import com.chappadodle.elementalarcana.content.spell.TsunamiSpell;
 import com.chappadodle.elementalarcana.content.spell.TremorSpell;
 import com.chappadodle.elementalarcana.content.spell.UpdraftSpell;
 import com.chappadodle.elementalarcana.content.spell.WindBladeSpell;
@@ -38,7 +38,8 @@ public final class ModSpells {
     public static final DeferredHolder<Spell, EmberSpriteSpell> EMBER_SPRITE = SPELLS.register("ember_sprite", EmberSpriteSpell::new);
     // Hydro Jet is registered first so it's water's starter spell on the Awakening screen.
     public static final DeferredHolder<Spell, HydroJetSpell> HYDRO_JET = SPELLS.register("hydro_jet", HydroJetSpell::new);
-    public static final DeferredHolder<Spell, TidalWaveSpell> TIDAL_WAVE = SPELLS.register("tidal_wave", TidalWaveSpell::new);
+    // Tsunami keeps the cone of water's id, so those who learned Tidal Wave have it now.
+    public static final DeferredHolder<Spell, TsunamiSpell> TSUNAMI = SPELLS.register("tidal_wave", TsunamiSpell::new);
     public static final DeferredHolder<Spell, BubblePrisonSpell> BUBBLE_PRISON = SPELLS.register("bubble_prison", BubblePrisonSpell::new);
     public static final DeferredHolder<Spell, HealingRainSpell> HEALING_RAIN = SPELLS.register("healing_rain", HealingRainSpell::new);
     public static final DeferredHolder<Spell, IcicleSpell> ICICLE = SPELLS.register("icicle", IcicleSpell::new);
