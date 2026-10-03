@@ -12,6 +12,8 @@ import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
@@ -36,6 +38,9 @@ public class BubbleCastEmitter extends NoRenderParticle {
         Vec3 reference = Math.abs(dir.y) > 0.95 ? new Vec3(1, 0, 0) : new Vec3(0, 1, 0);
         Vec3 right = dir.cross(reference).normalize();
         Vec3 up = right.cross(dir).normalize();
+        // A watery whoosh as they go.
+        level.playLocalSound(x, y, z, SoundEvents.PLAYER_SWIM, SoundSource.PLAYERS, 0.6f, 1.4f, false);
+        level.playLocalSound(x, y, z, SoundEvents.TRIDENT_RIPTIDE_1.value(), SoundSource.PLAYERS, 0.35f, 1.8f, false);
         for (int i = 0; i < CUBES; i++) {
             Vec3 jitter = right.scale((random.nextDouble() - 0.5) * 0.14).add(up.scale((random.nextDouble() - 0.5) * 0.14));
             float size = 0.07f + random.nextFloat() * 0.05f - i * 0.004f;

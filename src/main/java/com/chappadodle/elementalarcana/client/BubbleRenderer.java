@@ -5,6 +5,7 @@ import com.chappadodle.elementalarcana.client.visual.WaterCubes;
 import com.chappadodle.elementalarcana.content.BubblePrisons;
 import com.chappadodle.elementalarcana.content.spell.BubblePrisonEffects;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
+import com.chappadodle.elementalarcana.client.sound.PointLoopSound;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
@@ -13,6 +14,7 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -91,7 +93,12 @@ final class BubbleRenderer {
         float radius = Math.max(entity.getBbWidth(), entity.getBbHeight()) * MARGIN / 2;
         float centerY = entity.getBbHeight() / 2;
         Vec3 feet = entity.getPosition(partialTick);
-        DRAWN.put(entity.getId(), new Drawn(feet, feet.add(0, centerY, 0), radius));
+        if (DRAWN.put(entity.getId(), new Drawn(feet, feet.add(0, centerY, 0), radius)) == null) {
+            // A new bubble: it gurgles for as long as it holds.
+            int id = entity.getId();
+            Minecraft.getInstance().getSoundManager().play(new PointLoopSound(SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT, 0.55f, 1.2f,
+                    () -> DRAWN.containsKey(id) ? DRAWN.get(id).center() : null, () -> 1f));
+        }
 
         float age = entity.level().getGameTime() - bubble.startTick() + partialTick;
         float formed = Mth.clamp(age / FORM_TICKS, 0f, 1f);

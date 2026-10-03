@@ -23,10 +23,14 @@ vanilla water texture, bright water blue), sized to the trapped creature:
 ## Steps
 
 1. **The bubble and its moments** (looks, cast, forming, popping).
-2. **Sounds:**
-   - A bubbly "bloop" as it forms, and a gurgling loop while it holds.
-   - A ★ pop (synthesized, with the A/B switch) with a splash when it bursts.
-   - A watery whoosh on the cast.
+2. **Sounds** (built 2026-10-03 with vanilla sounds only, as the user prefers simple vanilla
+   sounds to synthesized ones):
+   - A bubbly "bloop" as it forms (a bubble column's inside and a bottle filling), and a gurgling
+     loop while it holds (a bubble column's ambience, played by each client and following the
+     bubble until it pops, `BubbleRenderer`).
+   - A pop with a splash when it bursts: a full splash when a hit bursts it, a light one when it
+     runs out (`BubblePrisons#release`).
+   - A watery whoosh on the cast (a swim splash and a high riptide, `BubbleCastEmitter`).
 
 ## Step 1 structure
 

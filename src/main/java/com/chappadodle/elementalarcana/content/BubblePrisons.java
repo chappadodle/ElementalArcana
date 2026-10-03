@@ -69,7 +69,9 @@ public final class BubblePrisons {
         }
         target.setDeltaMovement(Vec3.ZERO);
         level.sendParticles(ParticleTypes.SPLASH, target.getX(), target.getY(0.5), target.getZ(), 12, 0.4, 0.5, 0.4, 0.1);
+        // A bloop as it closes round them (its gurgle while it holds is each client's, BubbleRenderer).
         level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.BUBBLE_COLUMN_UPWARDS_INSIDE, SoundSource.PLAYERS, 1f, 1.2f);
+        level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.BOTTLE_FILL, SoundSource.PLAYERS, 0.9f, 0.6f);
     }
 
     /** Ends the bubble: the creature drops (and a mob gets its AI back). */
@@ -82,8 +84,11 @@ public final class BubblePrisons {
         target.resetFallDistance();
         if (target.level() instanceof ServerLevel level) {
             // The burst itself is drawn by each client (BubbleRenderer, BubblePrisonEffects#pop).
-            level.playSound(null, target.getX(), target.getY(), target.getZ(),
-                    popped ? SoundEvents.GENERIC_SPLASH : SoundEvents.BUBBLE_COLUMN_BUBBLE_POP, SoundSource.PLAYERS, 1f, popped ? 1.1f : 1f);
+            // A pop and a splash: a full splash when a hit bursts it, a light one when it runs out.
+            level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.BUBBLE_COLUMN_BUBBLE_POP, SoundSource.PLAYERS,
+                    popped ? 1.2f : 1f, popped ? 0.8f : 1f);
+            level.playSound(null, target.getX(), target.getY(), target.getZ(), popped ? SoundEvents.GENERIC_SPLASH : SoundEvents.PLAYER_SPLASH,
+                    SoundSource.PLAYERS, popped ? 1f : 0.5f, popped ? 1.1f : 1.5f);
         }
     }
 
@@ -116,9 +121,6 @@ public final class BubblePrisons {
         if (now % 4 == 0) {
             double width = target.getBbWidth() * 0.6;
             level.sendParticles(ParticleTypes.FALLING_WATER, target.getX(), target.getY(), target.getZ(), 1, width * 0.6, 0, width * 0.6, 0);
-        }
-        if ((now - bubble.startTick()) % 20 == 10) {
-            level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT, SoundSource.PLAYERS, 0.6f, 1.3f);
         }
     }
 
