@@ -633,6 +633,80 @@ def render(palette, grid):
     return image
 
 
+def prism_ward_icon(size=16):
+    """Prism Ward: a faceted violet kite shield, light on its left, shaded on its right, a ridge down the middle."""
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    def inside(x, y):
+        if not 1 <= y <= 14:
+            return False
+        half = 6.0 if y <= 7 else 6.0 * (14.5 - y) / 7.5
+        return abs(x + 0.5 - 8) <= half
+    for y in range(size):
+        for x in range(size):
+            if not inside(x, y):
+                continue
+            edge = any(not inside(x + dx, y + dy) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+            if edge:
+                color = (58, 26, 90)
+            elif x in (7, 8) and y <= 10:
+                color = (255, 255, 255) if y <= 4 else (232, 208, 255)
+            elif x < 7:
+                color = (216, 176, 255) if y < 8 else (176, 112, 240)
+            else:
+                color = (150, 90, 210) if y < 8 else (122, 63, 184)
+            img.putpixel((x, y), (*color, 255))
+    for x, y in ((4, 3), (3, 4)):
+        img.putpixel((x, y), (255, 255, 255, 255))
+    return img
+
+
+def thunderclap_icon(size=16):
+    """Thunderclap: a white-hot burst in the middle, jagged bolts flying out of it in eight directions."""
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    yellow, deep, white = (255, 225, 77, 255), (224, 160, 32, 255), (255, 255, 224, 255)
+
+    def line(x0, y0, x1, y1, color):
+        steps = max(abs(x1 - x0), abs(y1 - y0), 1)
+        for i in range(steps + 1):
+            x = round(x0 + (x1 - x0) * i / steps)
+            y = round(y0 + (y1 - y0) * i / steps)
+            if 0 <= x < size and 0 <= y < size:
+                img.putpixel((x, y), color)
+
+    for dx, dy in ((1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)):
+        # Each bolt kinks sideways halfway out.
+        reach = 6 if dx == 0 or dy == 0 else 5
+        mid = (7.5 + dx * reach / 2 - dy * 1.2, 7.5 + dy * reach / 2 + dx * 1.2)
+        tip = (7.5 + dx * reach, 7.5 + dy * reach)
+        line(round(7.5 + dx * 1.5), round(7.5 + dy * 1.5), round(mid[0]), round(mid[1]), yellow)
+        line(round(mid[0]), round(mid[1]), round(tip[0]), round(tip[1]), deep)
+    for x in range(6, 10):
+        for y in range(6, 10):
+            img.putpixel((x, y), white if 7 <= x <= 8 and 7 <= y <= 8 else yellow)
+    return img
+
+
+def sanctuary_icon(size=16):
+    """Sanctuary: a ring of light on the ground with a beam falling into its middle."""
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    gold, pale, white = (242, 200, 96, 255), (255, 233, 160, 255), (255, 255, 255, 255)
+    for y in range(size):
+        for x in range(size):
+            # The ring, seen a little from above: an ellipse low in the icon.
+            r = ((x + 0.5 - 8) / 7) ** 2 + ((y + 0.5 - 11) / 3.6) ** 2
+            if 0.72 <= r <= 1.0:
+                img.putpixel((x, y), gold)
+            elif r < 0.72:
+                img.putpixel((x, y), (255, 214, 110, 200) if r > 0.3 else (255, 245, 200, 230))
+    for y in range(1, 12):
+        img.putpixel((7, y), white)
+        img.putpixel((8, y), white if y > 3 else pale)
+        if y > 5:
+            img.putpixel((6, y), pale)
+            img.putpixel((9, y), pale)
+    return img
+
+
 def frost_mist(frame, frames=4, size=16):
     """A soft, slightly lumpy cold puff; later frames are wider and fainter (smooth gradients
     can't be drawn as a character grid, so this one is procedural)."""
@@ -1216,7 +1290,8 @@ def main():
         "radiance": ((255, 255, 250), (255, 235, 170), (190, 150, 70)),
     }
     derived = {"ice", "crystal", "lightning", "radiance"}
-    for path, make in ((ASSETS / "spell/bubble_prison.png", bubble_icon),):
+    for path, make in ((ASSETS / "spell/bubble_prison.png", bubble_icon), (ASSETS / "spell/prism_ward.png", prism_ward_icon),
+                       (ASSETS / "spell/thunderclap.png", thunderclap_icon), (ASSETS / "spell/sanctuary.png", sanctuary_icon)):
         make().save(path)
         print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))
     for i, (name, (stops, style)) in enumerate(FIREBALL_LOOKS.items()):

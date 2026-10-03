@@ -124,6 +124,17 @@
         "crystal_geode_1"
       ],
       "element": "crystal"
+    },
+    {
+      "id": "prism_ward",
+      "type": "spell",
+      "x": -599,
+      "y": 170,
+      "spell": "elementalarcana:prism_ward",
+      "element": "crystal",
+      "links": [
+        "crystal_geode_2"
+      ]
     }
   ]
 }

@@ -194,17 +194,17 @@ def cluster(element, family, origin, angle, starter, arms):
 cluster("lightning", "wind", wind_ends["dash"], -45, "chain_lightning", [
     ("storm", -45, [("stat", "potency"), ("stat", "affinity/wind"), ("stat", "focus"),
                     ("notable", ("lightning_static_charge", {"potency": 6, "affinity/wind": 4}))]),
-    ("spark", 45, [("stat", "focus"), ("stat", "affinity/wind")]),
+    ("spark", 45, [("stat", "focus"), ("stat", "affinity/wind"), ("spell", "thunderclap")]),
 ])
 cluster("radiance", "fire", fire_ends["burst"], 45, "smite", [
     ("dawn", -45, [("stat", "vitality"), ("stat", "affinity/fire"), ("stat", "reservoir"),
                    ("notable", ("radiance_inner_light", {"vitality": 6, "affinity/fire": 4}))]),
-    ("halo", 45, [("stat", "ward"), ("stat", "affinity/fire")]),
+    ("halo", 45, [("stat", "ward"), ("stat", "affinity/fire"), ("spell", "sanctuary")]),
 ])
 cluster("crystal", "earth", earth_ends["quake"], 135, "prism_bolt", [
     ("facet", 45, [("stat", "ward"), ("stat", "affinity/earth"), ("stat", "focus"),
                    ("notable", ("crystal_prismatic_ward", {"ward": 6, "affinity/earth": 4}))]),
-    ("geode", 90, [("stat", "potency"), ("stat", "affinity/earth")]),
+    ("geode", 90, [("stat", "potency"), ("stat", "affinity/earth"), ("spell", "prism_ward")]),
 ])
 
 # ---- checks and output ----

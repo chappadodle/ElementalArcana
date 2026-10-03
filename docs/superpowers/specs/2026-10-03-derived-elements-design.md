@@ -67,6 +67,26 @@ All three scale with Potency and their family's Affinity like every spell. Their
 (`elementalarcana:<element>_spell`) are in the same tags as the others (magic, bypasses armour,
 witches resist it) and have their own death messages.
 
+## Second spells (milestone 12)
+
+Each cluster's short arm ends in a second spell (level 10). Their wisps of Magus rank cast them too.
+
+**Prism Ward** (Crystal, 35 mana, 20 s). Crystal facets circle the caster for 6 seconds (times its
+power). Every projectile that would hit them (arrows, fireballs, any spell) is turned back at
+whoever shot it, a tenth faster, and is the caster's now (`PrismWards`). A crystal wisp raises one
+when its foe keeps its distance.
+
+**Thunderclap** (Lightning, 30 mana, 12 s). Everything the caster may hurt within 5 blocks takes 4
+damage times its power, is thrown back and stunned for a second and a half (slowed to a crawl,
+weakened), a spark arcing out to each. A wet foe takes half again as much and stays stunned twice as
+long. A lightning wisp claps when its foe comes within 4 blocks.
+
+**Sanctuary** (Radiance, 40 mana, 30 s). A circle of light 4 blocks across at the caster's feet for
+8 seconds (`Sanctuaries`). Each second it mends everyone inside who isn't the caster's foe (the
+caster too) by a heart times its power, and sears the caster's undead foes inside (as much radiant
+damage, and 2 seconds alight). A radiance wisp raises one at its own feet once it's down to 70%
+health.
+
 ## Wisps
 
 A wisp of each, innate to its element, the same size and rank rules as the others, guarding nothing

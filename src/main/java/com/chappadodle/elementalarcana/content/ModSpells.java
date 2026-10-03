@@ -3,8 +3,8 @@ package com.chappadodle.elementalarcana.content;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
-import com.chappadodle.elementalarcana.content.spell.BubblePrisonSpell;
 import com.chappadodle.elementalarcana.content.spell.BoulderSpell;
+import com.chappadodle.elementalarcana.content.spell.BubblePrisonSpell;
 import com.chappadodle.elementalarcana.content.spell.ChainLightningSpell;
 import com.chappadodle.elementalarcana.content.spell.FireballSpell;
 import com.chappadodle.elementalarcana.content.spell.FlameBurstSpell;
@@ -15,9 +15,12 @@ import com.chappadodle.elementalarcana.content.spell.HealingRainSpell;
 import com.chappadodle.elementalarcana.content.spell.HydroJetSpell;
 import com.chappadodle.elementalarcana.content.spell.IcicleSpell;
 import com.chappadodle.elementalarcana.content.spell.PrismBoltSpell;
+import com.chappadodle.elementalarcana.content.spell.PrismWardSpell;
+import com.chappadodle.elementalarcana.content.spell.SanctuarySpell;
 import com.chappadodle.elementalarcana.content.spell.SmiteSpell;
-import com.chappadodle.elementalarcana.content.spell.TidalWaveSpell;
 import com.chappadodle.elementalarcana.content.spell.StoneSkinSpell;
+import com.chappadodle.elementalarcana.content.spell.ThunderclapSpell;
+import com.chappadodle.elementalarcana.content.spell.TidalWaveSpell;
 import com.chappadodle.elementalarcana.content.spell.TremorSpell;
 import com.chappadodle.elementalarcana.content.spell.UpdraftSpell;
 import com.chappadodle.elementalarcana.content.spell.WindBladeSpell;
@@ -52,6 +55,9 @@ public final class ModSpells {
     public static final DeferredHolder<Spell, PrismBoltSpell> PRISM_BOLT = SPELLS.register("prism_bolt", PrismBoltSpell::new);
     public static final DeferredHolder<Spell, ChainLightningSpell> CHAIN_LIGHTNING = SPELLS.register("chain_lightning", ChainLightningSpell::new);
     public static final DeferredHolder<Spell, SmiteSpell> SMITE = SPELLS.register("smite", SmiteSpell::new);
+    public static final DeferredHolder<Spell, PrismWardSpell> PRISM_WARD = SPELLS.register("prism_ward", PrismWardSpell::new);
+    public static final DeferredHolder<Spell, ThunderclapSpell> THUNDERCLAP = SPELLS.register("thunderclap", ThunderclapSpell::new);
+    public static final DeferredHolder<Spell, SanctuarySpell> SANCTUARY = SPELLS.register("sanctuary", SanctuarySpell::new);
 
     private ModSpells() {
     }

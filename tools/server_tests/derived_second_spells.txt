@@ -1,0 +1,24 @@
+# The derived elements' second spells, cast by Magus creatures: a lightning zombie claps the villager
+# 2 blocks from it (struck, slowed and weakened); a radiance zombie down to half health raises a
+# Sanctuary at its feet and is mended. Health and effects are printed.
+time set midnight
+gamerule doMobSpawning false
+forceload add -16 -16 16 32
+fill -12 99 -12 12 99 28 minecraft:stone
+fill -12 100 -12 12 104 28 minecraft:air
+summon villager 2.5 100 0.5 {NoAI:1b,Tags:["eatest","eaclapped"]}
+summon zombie 0.5 100 0.5 {Tags:["eatest","eaclapper"],attributes:[{id:"minecraft:generic.movement_speed",base:0.0},{id:"minecraft:generic.attack_damage",base:0.0}]}
+arcana attune @e[tag=eaclapper] lightning magus
+summon villager 8.5 100 20.5 {NoAI:1b,Tags:["eatest"]}
+summon zombie 0.5 100 20.5 {Tags:["eatest","eamender"],attributes:[{id:"minecraft:generic.movement_speed",base:0.0}]}
+arcana attune @e[tag=eamender] radiance magus
+sleep 1
+damage @e[tag=eamender,limit=1] 14 minecraft:generic
+data get entity @e[tag=eamender,limit=1] Health
+sleep 8
+data get entity @e[tag=eaclapped,limit=1] Health
+data get entity @e[tag=eaclapped,limit=1] active_effects
+data get entity @e[tag=eamender,limit=1] Health
+kill @e[tag=eatest]
+gamerule doMobSpawning true
+forceload remove all

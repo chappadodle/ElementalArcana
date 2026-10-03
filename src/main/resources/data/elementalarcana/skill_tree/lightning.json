@@ -124,6 +124,17 @@
         "lightning_spark_1"
       ],
       "element": "lightning"
+    },
+    {
+      "id": "thunderclap",
+      "type": "spell",
+      "x": 261,
+      "y": -401,
+      "spell": "elementalarcana:thunderclap",
+      "element": "lightning",
+      "links": [
+        "lightning_spark_2"
+      ]
     }
   ]
 }

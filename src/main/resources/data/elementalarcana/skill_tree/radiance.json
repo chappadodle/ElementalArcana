@@ -124,6 +124,17 @@
         "radiance_halo_1"
       ],
       "element": "radiance"
+    },
+    {
+      "id": "sanctuary",
+      "type": "spell",
+      "x": 515,
+      "y": 375,
+      "spell": "elementalarcana:sanctuary",
+      "element": "radiance",
+      "links": [
+        "radiance_halo_2"
+      ]
     }
   ]
 }
