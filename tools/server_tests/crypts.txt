@@ -1,0 +1,29 @@
+# Arcane Crypts: the crypt's loot tables rolled and listed (an urn, a storeroom, the library, a
+# reliquary), a Revenant summoned (its health and staff, then its own loot), and the nearest crypt
+# located from the world spawn (at -464, 64 in the test world) and built: its chunks loaded, so
+# the world generates it, every piece.
+gamerule doMobSpawning false
+forceload add -16 -16 16 16
+fill -12 99 -12 12 99 12 minecraft:stone
+fill -12 100 -12 12 106 12 minecraft:air
+kill @e[type=!player]
+execute positioned 0 101 0 run loot spawn ~ ~ ~ loot elementalarcana:chests/crypt_urn_fire
+execute positioned 0 101 0 run loot spawn ~ ~ ~ loot elementalarcana:chests/crypt_store_water
+execute positioned 0 101 0 run loot spawn ~ ~ ~ loot elementalarcana:chests/crypt_library
+execute positioned 0 101 0 run loot spawn ~ ~ ~ loot elementalarcana:chests/crypt_reliquary_lightning
+sleep 1
+execute as @e[type=item] run data get entity @s Item
+kill @e[type=item]
+summon elementalarcana:revenant 0 101 0
+sleep 1
+execute as @e[type=elementalarcana:revenant] run data get entity @s Health
+execute as @e[type=elementalarcana:revenant] run data get entity @s HandItems[0]
+loot spawn 0 101 0 kill @e[type=elementalarcana:revenant,limit=1]
+sleep 1
+execute as @e[type=item] run data get entity @s Item
+kill @e[type=!player]
+forceload remove all
+locate structure elementalarcana:crypt
+forceload add -592 -64 -337 191
+sleep 45
+forceload remove all

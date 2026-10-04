@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "element=fire": {
+      "model": "elementalarcana:block/glyph_fire"
+    },
+    "element=water": {
+      "model": "elementalarcana:block/glyph_water"
+    },
+    "element=ice": {
+      "model": "elementalarcana:block/glyph_ice"
+    },
+    "element=wind": {
+      "model": "elementalarcana:block/glyph_wind"
+    },
+    "element=earth": {
+      "model": "elementalarcana:block/glyph_earth"
+    },
+    "element=crystal": {
+      "model": "elementalarcana:block/glyph_crystal"
+    },
+    "element=lightning": {
+      "model": "elementalarcana:block/glyph_lightning"
+    },
+    "element=radiance": {
+      "model": "elementalarcana:block/glyph_radiance"
+    }
+  }
+}

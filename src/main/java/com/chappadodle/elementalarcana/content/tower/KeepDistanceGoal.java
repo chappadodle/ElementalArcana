@@ -13,14 +13,14 @@ import java.util.EnumSet;
  * farther than {@code max} or out of sight, and otherwise sidesteps around it. The casting itself
  * is CastMobSpellGoal's.
  */
-final class KeepDistanceGoal extends Goal {
+public final class KeepDistanceGoal extends Goal {
     private final PathfinderMob mob;
     private final double min;
     private final double max;
     private int repath;
     private int direction = 1;
 
-    KeepDistanceGoal(PathfinderMob mob, double min, double max) {
+    public KeepDistanceGoal(PathfinderMob mob, double min, double max) {
         this.mob = mob;
         this.min = min;
         this.max = max;

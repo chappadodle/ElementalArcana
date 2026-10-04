@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.content;
 
+import com.chappadodle.elementalarcana.content.crypt.ModCrypts;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.SovereignRules;
@@ -73,6 +74,8 @@ public final class ModTabs {
                     output.accept(ModSanctums.sovereignEgg(element));
                 }
                 output.accept(ModHollow.HOLLOW_EGG.get());
+                ModCrypts.items().forEach(item -> output.accept(item.get()));
+                output.accept(ModCrypts.REVENANT_EGG.get());
             })
             .build());
 

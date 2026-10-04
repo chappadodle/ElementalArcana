@@ -1,0 +1,7 @@
+{
+  "type": "elementalarcana:crypt",
+  "biomes": "#elementalarcana:has_structure/crypts",
+  "step": "underground_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none"
+}

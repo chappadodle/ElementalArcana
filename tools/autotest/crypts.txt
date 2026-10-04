@@ -1,0 +1,139 @@
+# Arcane Crypts (see the spec): a crypt found far out in fresh land (night vision for the shots), then
+# 1: its mausoleum from outside, and inside, down the stair; 2: the entry hall;
+# 3: the warded hall: walking across it in survival (health before and after: the glyphs' bursts);
+# 4: the hall of tombs: walking up to the coffins in one wall, which burst open (who stepped out);
+# 5: the first rune gate: the crypt's element woken (crypt_kit), a rune lit with Essence, one with a
+#    spell, the last with Essence again: the keystone's notches, the seal gone, the gate's coffins open;
+# 6: the burial chamber: the Revenant rising, brought below half (its health set low, then a small
+#    hit: the chamber's dead raised), killed,
+#    and the grave flame out; 7: the library and storeroom, if the crypt has them.
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd difficulty normal
+cmd gamemode creative
+cmd effect clear @s
+cmd effect give @s minecraft:night_vision 99999 0 true
+cmd effect give @s minecraft:slow_falling 99999 0 true
+cmd arcana tree reset
+cmd tp @s 79000 200 -79000
+wait 80
+# 1: The mausoleum, and its stair.
+crypt mausoleum 12 4 0 -4
+wait 200
+shot crypt_mausoleum
+crypt mausoleum 8 2 0 5
+wait 20
+shot crypt_mausoleum_door
+crypt mausoleum 2 0 0 35
+wait 30
+shot crypt_stair
+# 2: The entry hall.
+crypt entry 4 0 0 10
+wait 30
+shot crypt_entry
+# 3: The warded hall.
+crypt glyphs 4 0 0 45
+wait 30
+shot crypt_glyphs
+cmd gamemode survival
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd effect give @s minecraft:resistance 900 3 true
+wait 10
+cmd execute as @s run data get entity @s Health
+key forward down
+wait 8
+shot crypt_glyph_walk_a
+wait 6
+shot crypt_glyph_walk_b
+wait 6
+key forward up
+shot crypt_glyph_walk_c
+wait 6
+shot crypt_glyph_walk_d
+wait 20
+cmd execute as @s run data get entity @s Health
+# 4: The hall of tombs.
+cmd effect give @s minecraft:instant_health 1 10 true
+crypt tombs 2 0 0 0
+wait 20
+cmd tp @s ^4 ^ ^2 ~-90 0
+wait 20
+crypt tombs 2 0 -90 5
+wait 6
+shot crypt_coffins_open
+cmd execute as @e[distance=..12,type=!player,type=!item] run say risen from the coffin
+wait 20
+shot crypt_dead
+cmd kill @e[type=!player,distance=..40]
+# 5: The first rune gate.
+cmd gamemode creative
+crypt gate 0 0 0 5
+crypt_kit 4
+cmd title @s clear
+wait 30
+shot crypt_gate
+use
+wait 10
+shot crypt_rune_lit
+crypt gate 0 0 -123.7 3
+wait 10
+press
+wait 4
+release
+wait 4
+launch_all
+wait 10
+crypt gate 0 0 123.7 3
+wait 10
+use
+wait 20
+crypt gate 0 0 0 0
+wait 20
+shot crypt_gate_open
+cmd execute as @e[distance=..14,type=!player,type=!item] run say out of the gate's coffins
+cmd kill @e[type=!player,distance=..40]
+# 6: The burial chamber.
+cmd gamemode survival
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd effect give @s minecraft:resistance 900 3 true
+crypt chamber 10 0 0 5
+wait 30
+shot crypt_chamber
+crypt chamber 0 0 0 -6
+wait 12
+shot crypt_revenant_rising
+wait 40
+shot crypt_revenant
+crypt chamber -2 0 0 -20
+wait 6
+shot crypt_revenant_close
+crypt chamber 0 0 0 -6
+cmd execute as @e[type=elementalarcana:revenant] run data get entity @s Health
+cmd data modify entity @e[type=elementalarcana:revenant,limit=1] Health set value 2.0f
+cmd execute as @e[type=elementalarcana:revenant] run damage @s 0.5 minecraft:magic by @p
+wait 4
+cmd execute as @e[type=elementalarcana:revenant] run data get entity @s Health
+wait 16
+shot crypt_raise_dead
+crypt chamber 0 0 -70 0
+wait 10
+shot crypt_raise_dead_side
+cmd execute as @e[distance=..30,type=!player,type=!item] run say in the chamber
+cmd kill @e[type=elementalarcana:revenant]
+crypt chamber 0 0 0 -6
+wait 30
+shot crypt_flame_out
+cmd kill @e[type=!player,type=!item,distance=..40]
+# 7: The side rooms.
+cmd gamemode creative
+crypt library 4 0 0 10
+wait 30
+shot crypt_library
+crypt store 4 0 0 10
+wait 30
+shot crypt_store
+cmd effect clear @s
+quit

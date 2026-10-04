@@ -31,6 +31,10 @@ import com.chappadodle.elementalarcana.client.visual.ProjectileVisuals;
 import com.chappadodle.elementalarcana.client.visual.WaterBeams;
 import com.chappadodle.elementalarcana.client.visual.WaterSpearRenderer;
 import com.chappadodle.elementalarcana.client.visual.WindSlashRenderer;
+import com.chappadodle.elementalarcana.content.crypt.GlyphBlock;
+import com.chappadodle.elementalarcana.content.crypt.GraveFlameBlock;
+import com.chappadodle.elementalarcana.content.crypt.ModCrypts;
+import com.chappadodle.elementalarcana.content.crypt.RunestoneBlock;
 import com.chappadodle.elementalarcana.content.BubblePrisons;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.content.ModSpells;
@@ -310,6 +314,22 @@ public final class ArcanaClient {
             return FastColor.ARGB32.opaque(state.getValue(TowerHeartBlock.LIT) ? color
                     : FastColor.ARGB32.color(0, (color >> 16 & 0xFF) / 3, (color >> 8 & 0xFF) / 3, (color & 0xFF) / 3));
         }, ModTowers.TOWER_HEART.get());
+        // A crypt's sigils and grave flame: its element's colour, dim where the rune is unlit or the glyph spent.
+        event.register((state, level, pos, tintIndex) -> tintIndex != 0 ? -1
+                : FastColor.ARGB32.opaque(state.getValue(RunestoneBlock.LIT) ? RunestoneBlock.element(state).color()
+                : dimmed(RunestoneBlock.element(state).color(), 0.35f)), ModCrypts.RUNESTONE.get());
+        event.register((state, level, pos, tintIndex) -> tintIndex != 0 ? -1
+                : FastColor.ARGB32.opaque(dimmed(GlyphBlock.element(state).color(), switch (state.getValue(GlyphBlock.STAGE)) {
+                    case ARMED -> 0.5f;
+                    case FLARING -> 1f;
+                    case RESTING -> 0.15f;
+                })), ModCrypts.GLYPH.get());
+        event.register((state, level, pos, tintIndex) -> tintIndex != 0 ? -1
+                : FastColor.ARGB32.opaque(state.getValue(GraveFlameBlock.ELEMENT).element().color()), ModCrypts.GRAVE_FLAME.get());
+    }
+
+    private static int dimmed(int color, float share) {
+        return FastColor.ARGB32.color(0, (int) ((color >> 16 & 0xFF) * share), (int) ((color >> 8 & 0xFF) * share), (int) ((color & 0xFF) * share));
     }
 
     /** A focus's gem (its second texture layer) takes its element's colour. */
@@ -342,6 +362,7 @@ public final class ArcanaClient {
             event.registerEntityRenderer(ModSanctums.sovereign(element), SovereignRenderer::new);
         }
         event.registerEntityRenderer(ModHollow.HOLLOW.get(), HollowRenderer::new);
+        event.registerEntityRenderer(ModCrypts.REVENANT.get(), RevenantRenderer::new);
     }
 
     @SubscribeEvent
@@ -349,6 +370,8 @@ public final class ArcanaClient {
         event.registerLayerDefinition(WispModel.LAYER, WispModel::createLayer);
         event.registerLayerDefinition(GolemModel.LAYER, GolemModel::createLayer);
         event.registerLayerDefinition(SovereignModel.LAYER, SovereignModel::createLayer);
+        event.registerLayerDefinition(RevenantModel.LAYER, RevenantModel::createBodyLayer);
+        event.registerLayerDefinition(RevenantModel.ROBE, RevenantModel::createRobeLayer);
     }
 
     // Load every projectile spell's 3D model, including models from addon spells.

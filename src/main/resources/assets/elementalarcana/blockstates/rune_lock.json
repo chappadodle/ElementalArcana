@@ -1,0 +1,84 @@
+{
+  "variants": {
+    "facing=north,open=true": {
+      "model": "elementalarcana:block/rune_lock_open",
+      "y": 0
+    },
+    "facing=north,open=false,progress=0": {
+      "model": "elementalarcana:block/rune_lock_0",
+      "y": 0
+    },
+    "facing=north,open=false,progress=1": {
+      "model": "elementalarcana:block/rune_lock_1",
+      "y": 0
+    },
+    "facing=north,open=false,progress=2": {
+      "model": "elementalarcana:block/rune_lock_2",
+      "y": 0
+    },
+    "facing=north,open=false,progress=3": {
+      "model": "elementalarcana:block/rune_lock_3",
+      "y": 0
+    },
+    "facing=east,open=true": {
+      "model": "elementalarcana:block/rune_lock_open",
+      "y": 90
+    },
+    "facing=east,open=false,progress=0": {
+      "model": "elementalarcana:block/rune_lock_0",
+      "y": 90
+    },
+    "facing=east,open=false,progress=1": {
+      "model": "elementalarcana:block/rune_lock_1",
+      "y": 90
+    },
+    "facing=east,open=false,progress=2": {
+      "model": "elementalarcana:block/rune_lock_2",
+      "y": 90
+    },
+    "facing=east,open=false,progress=3": {
+      "model": "elementalarcana:block/rune_lock_3",
+      "y": 90
+    },
+    "facing=south,open=true": {
+      "model": "elementalarcana:block/rune_lock_open",
+      "y": 180
+    },
+    "facing=south,open=false,progress=0": {
+      "model": "elementalarcana:block/rune_lock_0",
+      "y": 180
+    },
+    "facing=south,open=false,progress=1": {
+      "model": "elementalarcana:block/rune_lock_1",
+      "y": 180
+    },
+    "facing=south,open=false,progress=2": {
+      "model": "elementalarcana:block/rune_lock_2",
+      "y": 180
+    },
+    "facing=south,open=false,progress=3": {
+      "model": "elementalarcana:block/rune_lock_3",
+      "y": 180
+    },
+    "facing=west,open=true": {
+      "model": "elementalarcana:block/rune_lock_open",
+      "y": 270
+    },
+    "facing=west,open=false,progress=0": {
+      "model": "elementalarcana:block/rune_lock_0",
+      "y": 270
+    },
+    "facing=west,open=false,progress=1": {
+      "model": "elementalarcana:block/rune_lock_1",
+      "y": 270
+    },
+    "facing=west,open=false,progress=2": {
+      "model": "elementalarcana:block/rune_lock_2",
+      "y": 270
+    },
+    "facing=west,open=false,progress=3": {
+      "model": "elementalarcana:block/rune_lock_3",
+      "y": 270
+    }
+  }
+}

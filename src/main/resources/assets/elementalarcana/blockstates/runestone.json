@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "element=fire": {
+      "model": "elementalarcana:block/runestone_fire"
+    },
+    "element=water": {
+      "model": "elementalarcana:block/runestone_water"
+    },
+    "element=ice": {
+      "model": "elementalarcana:block/runestone_ice"
+    },
+    "element=wind": {
+      "model": "elementalarcana:block/runestone_wind"
+    },
+    "element=earth": {
+      "model": "elementalarcana:block/runestone_earth"
+    },
+    "element=crystal": {
+      "model": "elementalarcana:block/runestone_crystal"
+    },
+    "element=lightning": {
+      "model": "elementalarcana:block/runestone_lightning"
+    },
+    "element=radiance": {
+      "model": "elementalarcana:block/runestone_radiance"
+    }
+  }
+}

@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana;
 
+import com.chappadodle.elementalarcana.content.crypt.ModCrypts;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.content.MagicTriggers;
 import com.chappadodle.elementalarcana.content.ModContent;
@@ -50,6 +51,7 @@ public class ElementalArcana {
         ModTowers.register(modEventBus);
         ModSanctums.register(modEventBus);
         ModHollow.register(modEventBus);
+        ModCrypts.register(modEventBus);
         ModBrews.register(modEventBus);
         ModTabs.TABS.register(modEventBus);
     }

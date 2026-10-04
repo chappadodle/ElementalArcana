@@ -1,5 +1,10 @@
 package com.chappadodle.elementalarcana.client;
 
+import net.minecraft.core.Direction;
+import com.chappadodle.elementalarcana.core.MagicAttachments;
+import com.chappadodle.elementalarcana.content.ModItems;
+import com.chappadodle.elementalarcana.content.crypt.CryptRoomPiece;
+import com.chappadodle.elementalarcana.content.crypt.CryptEntrancePiece;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.Spell;
@@ -91,6 +96,14 @@ import java.util.Optional;
  *                          script waits for the search
  * find elementalarcana:arcane_lectern 80   look for that block within 80 blocks (and 60 below to
  *                          20 above); log where, and view the first from 8 blocks south, 5 up
+ * crypt gate:1 3 0 0 10    stand in a room of the nearest crypt (searched for like goto the first
+ *                          time, then the same crypt for the rest of the run): the second
+ *                          (index 1, default 0) rune gate; 3 blocks back from its middle, 0 up,
+ *                          turned 0 degrees from its way out, pitch 10. Rooms: entry, tombs,
+ *                          glyphs, gate, library, store, chamber; "mausoleum" stands outside the
+ *                          mausoleum's door, facing it
+ * crypt_kit 4              wake the nearest crypt's element in the player (alone, level 20), teach
+ *                          and select its first spell, and put 4 of its Essence in the held slot
  * jei_filter @elementalarcana   filter JEI's item list, as if typed in its search box (when JEI
  *                          is loaded; with nothing after it, show everything again)
  * jei_show elementalarcana:sovereign_heart fire   open JEI's recipes and info for an item (of an
@@ -112,6 +125,8 @@ public final class AutoTest {
     private static boolean finished;
     /** A step's work running on the server (a structure search can take seconds), which the script waits for. */
     private static volatile boolean serverBusy;
+    /** The chunk of the crypt the crypt steps use, once one is found: the search's nearest changes as the player moves. */
+    private static ChunkPos cryptChunk;
 
     private AutoTest() {
     }
@@ -260,6 +275,8 @@ public final class AutoTest {
             }
             case "goto" -> gotoStructure(minecraft, argument);
             case "find" -> findBlock(minecraft, argument);
+            case "crypt" -> cryptRoom(minecraft, argument);
+            case "crypt_kit" -> cryptKit(minecraft, argument);
             case "camera" -> minecraft.options.setCameraType(switch (argument) {
                 case "back" -> CameraType.THIRD_PERSON_BACK;
                 case "front" -> CameraType.THIRD_PERSON_FRONT;
@@ -342,6 +359,120 @@ public final class AutoTest {
         float pitch = (float) Math.toDegrees(Math.atan2(height + player.getEyeHeight() - aim, distance));
         player.teleportTo(level, x, y, z, 180f, pitch);
         LOGGER.info("[autotest] goto {}: found at {} {} {}", key.location(), middle.getX(), box.minY(), middle.getZ());
+    }
+
+    /** Runs {@code task} on the server as the player; the script waits for it. */
+    private static void onServer(Minecraft minecraft, java.util.function.Consumer<ServerPlayer> task) {
+        MinecraftServer server = minecraft.getSingleplayerServer();
+        java.util.UUID id = minecraft.player.getUUID();
+        serverBusy = true;
+        server.execute(() -> {
+            try {
+                ServerPlayer player = server.getPlayerList().getPlayer(id);
+                if (player != null) {
+                    task.accept(player);
+                }
+            } finally {
+                serverBusy = false;
+            }
+        });
+    }
+
+    /**
+     * The start of the crypt the crypt steps use: the first one found near the player (generating it
+     * if need be), kept for the rest of the run. Null if there's none.
+     */
+    private static StructureStart nearestCrypt(ServerPlayer player) {
+        ServerLevel level = player.serverLevel();
+        Optional<Holder.Reference<Structure>> crypt = level.registryAccess().registryOrThrow(Registries.STRUCTURE)
+                .getHolder(ResourceKey.create(Registries.STRUCTURE, ElementalArcana.id("crypt")));
+        if (crypt.isEmpty()) {
+            return null;
+        }
+        if (cryptChunk == null) {
+            Pair<BlockPos, Holder<Structure>> found = level.getChunkSource().getGenerator()
+                    .findNearestMapStructure(level, HolderSet.direct(crypt.get()), player.blockPosition(), 100, false);
+            if (found == null) {
+                LOGGER.warn("[autotest] crypt: none nearby");
+                return null;
+            }
+            cryptChunk = new ChunkPos(found.getFirst());
+        }
+        ChunkPos chunkPos = cryptChunk;
+        ChunkAccess chunk = level.getChunk(chunkPos.x, chunkPos.z, ChunkStatus.STRUCTURE_STARTS);
+        StructureStart start = level.structureManager().getStartForStructure(SectionPos.bottomOf(chunk), crypt.get().value(), chunk);
+        return start != null && start.isValid() ? start : null;
+    }
+
+    private static void cryptRoom(Minecraft minecraft, String argument) {
+        String[] parts = argument.split("\\s+");
+        String[] room = parts[0].split(":");
+        String kind = room[0].toUpperCase(Locale.ROOT);
+        int index = room.length > 1 ? Integer.parseInt(room[1]) : 0;
+        double back = parts.length > 1 ? Double.parseDouble(parts[1]) : 0;
+        double up = parts.length > 2 ? Double.parseDouble(parts[2]) : 0;
+        float turn = parts.length > 3 ? Float.parseFloat(parts[3]) : 0;
+        float pitch = parts.length > 4 ? Float.parseFloat(parts[4]) : 10;
+        onServer(minecraft, player -> {
+            StructureStart start = nearestCrypt(player);
+            if (start == null) {
+                return;
+            }
+            ServerLevel level = player.serverLevel();
+            int seen = 0;
+            for (StructurePiece piece : start.getPieces()) {
+                if (kind.equals("MAUSOLEUM") && piece instanceof CryptEntrancePiece entrance) {
+                    Direction heading = entrance.heading();
+                    BlockPos middle = entrance.mausoleum();
+                    player.teleportTo(level, middle.getX() + 0.5 - heading.getStepX() * back, middle.getY() + 1 + up,
+                            middle.getZ() + 0.5 - heading.getStepZ() * back, heading.toYRot() + turn, pitch);
+                    LOGGER.info("[autotest] crypt mausoleum: {} heading {}, a crypt of {}", middle, heading, entrance.element());
+                    return;
+                }
+                if (piece instanceof CryptRoomPiece crypt && crypt.kind().name().equals(kind) && seen++ == index) {
+                    Direction out = crypt.wayOut();
+                    BlockPos middle = crypt.middle();
+                    player.teleportTo(level, middle.getX() + 0.5 - out.getStepX() * back, middle.getY() + up,
+                            middle.getZ() + 0.5 - out.getStepZ() * back, out.toYRot() + turn, pitch);
+                    LOGGER.info("[autotest] crypt {}: {} facing {}", parts[0], middle, out);
+                    return;
+                }
+            }
+            LOGGER.warn("[autotest] crypt: no {} room", parts[0]);
+        });
+    }
+
+    private static void cryptKit(Minecraft minecraft, String argument) {
+        int count = argument.isBlank() ? 4 : Integer.parseInt(argument.trim());
+        onServer(minecraft, player -> {
+            StructureStart start = nearestCrypt(player);
+            if (start == null) {
+                return;
+            }
+            Element element = start.getPieces().stream().filter(piece -> piece instanceof CryptEntrancePiece)
+                    .map(piece -> ((CryptEntrancePiece) piece).element()).findFirst().orElse(Element.FIRE);
+            String spell = switch (element) {
+                case FIRE -> "fireball";
+                case WATER -> "hydro_jet";
+                case ICE -> "icicle";
+                case WIND -> "wind_blade";
+                case EARTH -> "boulder";
+                case CRYSTAL -> "prism_bolt";
+                case LIGHTNING -> "chain_lightning";
+                case RADIANCE -> "smite";
+            };
+            String name = element.name().toLowerCase(Locale.ROOT);
+            MinecraftServer server = player.getServer();
+            for (String command : List.of("arcana affinity reset", "arcana awaken " + name, "arcana level set 20",
+                    "arcana spell elementalarcana:" + spell + " 1", "arcana mana fill", "arcana cooldowns reset")) {
+                server.getCommands().performPrefixedCommand(player.createCommandSourceStack().withPermission(4), command);
+            }
+            if (MagicAttachments.get(player).select(ElementalArcana.id(spell))) {
+                MagicAttachments.sync(player);
+            }
+            player.getInventory().setItem(player.getInventory().selected, new ItemStack(ModItems.essence(element), count));
+            LOGGER.info("[autotest] crypt_kit: a crypt of {}; {} selected, {} Essence in hand", element, spell, count);
+        });
     }
 
     /** Scans the loaded world around the player for a block; logs up to five and views the first one. */

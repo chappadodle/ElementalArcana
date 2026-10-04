@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=true": {
+      "model": "elementalarcana:block/grave_flame"
+    },
+    "lit=false": {
+      "model": "elementalarcana:block/grave_flame_out"
+    }
+  }
+}

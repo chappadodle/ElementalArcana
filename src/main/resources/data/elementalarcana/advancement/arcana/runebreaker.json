@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/crypt",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:runestone"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.runebreaker.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.runebreaker.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "rune_gate": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "rune_gate"
+      }
+    }
+  }
+}

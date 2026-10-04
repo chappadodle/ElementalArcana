@@ -1,0 +1,88 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "minecraft:block/polished_deepslate",
+    "side": "minecraft:block/polished_deepslate",
+    "top": "minecraft:block/deepslate_tiles",
+    "rune": "elementalarcana:block/rune_crystal"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#side",
+          "cullface": "north"
+        },
+        "east": {
+          "texture": "#side",
+          "cullface": "east"
+        },
+        "south": {
+          "texture": "#side",
+          "cullface": "south"
+        },
+        "west": {
+          "texture": "#side",
+          "cullface": "west"
+        },
+        "up": {
+          "texture": "#top",
+          "cullface": "up"
+        },
+        "down": {
+          "texture": "#top",
+          "cullface": "down"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      },
+      "faces": {
+        "north": {
+          "texture": "#rune",
+          "cullface": "north",
+          "tintindex": 0
+        },
+        "east": {
+          "texture": "#rune",
+          "cullface": "east",
+          "tintindex": 0
+        },
+        "south": {
+          "texture": "#rune",
+          "cullface": "south",
+          "tintindex": 0
+        },
+        "west": {
+          "texture": "#rune",
+          "cullface": "west",
+          "tintindex": 0
+        }
+      }
+    }
+  ]
+}

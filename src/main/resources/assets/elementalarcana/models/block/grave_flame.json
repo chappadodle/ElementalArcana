@@ -1,0 +1,163 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "minecraft:block/polished_deepslate",
+    "stone": "minecraft:block/polished_deepslate",
+    "rim": "minecraft:block/chiseled_deepslate",
+    "coals": "elementalarcana:block/grave_flame_coals",
+    "flame": "elementalarcana:block/grave_flame"
+  },
+  "elements": [
+    {
+      "from": [
+        2,
+        0,
+        2
+      ],
+      "to": [
+        14,
+        2,
+        14
+      ],
+      "faces": {
+        "north": {
+          "texture": "#stone",
+          "cullface": "north"
+        },
+        "east": {
+          "texture": "#stone",
+          "cullface": "east"
+        },
+        "south": {
+          "texture": "#stone",
+          "cullface": "south"
+        },
+        "west": {
+          "texture": "#stone",
+          "cullface": "west"
+        },
+        "up": {
+          "texture": "#stone",
+          "cullface": "up"
+        },
+        "down": {
+          "texture": "#stone",
+          "cullface": "down"
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        2,
+        4
+      ],
+      "to": [
+        12,
+        6,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#stone"
+        },
+        "east": {
+          "texture": "#stone"
+        },
+        "south": {
+          "texture": "#stone"
+        },
+        "west": {
+          "texture": "#stone"
+        }
+      }
+    },
+    {
+      "from": [
+        2,
+        6,
+        2
+      ],
+      "to": [
+        14,
+        10,
+        14
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rim"
+        },
+        "east": {
+          "texture": "#rim"
+        },
+        "south": {
+          "texture": "#rim"
+        },
+        "west": {
+          "texture": "#rim"
+        },
+        "down": {
+          "texture": "#rim"
+        },
+        "up": {
+          "texture": "#coals"
+        }
+      }
+    },
+    {
+      "from": [
+        8,
+        9,
+        2
+      ],
+      "to": [
+        8,
+        25,
+        14
+      ],
+      "shade": false,
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      },
+      "faces": {
+        "east": {
+          "texture": "#flame",
+          "tintindex": 0
+        },
+        "west": {
+          "texture": "#flame",
+          "tintindex": 0
+        }
+      }
+    },
+    {
+      "from": [
+        2,
+        9,
+        8
+      ],
+      "to": [
+        14,
+        25,
+        8
+      ],
+      "shade": false,
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      },
+      "faces": {
+        "north": {
+          "texture": "#flame",
+          "tintindex": 0
+        },
+        "south": {
+          "texture": "#flame",
+          "tintindex": 0
+        }
+      }
+    }
+  ]
+}

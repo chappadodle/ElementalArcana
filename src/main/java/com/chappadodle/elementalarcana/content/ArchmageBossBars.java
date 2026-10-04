@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.content;
 
+import com.chappadodle.elementalarcana.content.crypt.RevenantEntity;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.AttunementRank;
 import com.chappadodle.elementalarcana.api.CreatureMagic;
@@ -40,8 +41,12 @@ public final class ArchmageBossBars {
     private ArchmageBossBars() {
     }
 
-    /** "Zombie Archmage", or for a tower's Magister "Magister of Fire". */
+    /** "Zombie Archmage", or for a tower's Magister "Magister of Fire", for a crypt's Revenant "Revenant of Fire". */
     private static Component title(LivingEntity mob, CreatureMagic magic) {
+        if (mob instanceof RevenantEntity) {
+            return Component.translatable("bossbar.elementalarcana.revenant",
+                    Component.translatable("school.elementalarcana." + magic.element().name().toLowerCase(Locale.ROOT)));
+        }
         if (mob instanceof TowerMageEntity mage && mage.isMagister()) {
             return Component.translatable("bossbar.elementalarcana.magister",
                     Component.translatable("school.elementalarcana." + magic.element().name().toLowerCase(Locale.ROOT)));
