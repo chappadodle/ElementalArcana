@@ -10,6 +10,7 @@ import com.chappadodle.elementalarcana.content.MagicTriggers;
 import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.content.ModItems;
 import com.chappadodle.elementalarcana.content.creature.WispSpawner;
+import com.chappadodle.elementalarcana.content.people.Bounties;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
@@ -313,6 +314,7 @@ public class RiftEntity extends Entity {
         for (ServerPlayer player : level.players()) {
             if (player.distanceToSqr(this) < RiftRules.PRESENCE * RiftRules.PRESENCE) {
                 MagicTriggers.fire(player, "rift_closed", element().name().toLowerCase(Locale.ROOT), 1);
+                Bounties.riftClosed(player);
             }
         }
     }

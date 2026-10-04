@@ -1,0 +1,74 @@
+# Arcanist Bounties: a contract for creatures Attuned to Fire (given by command), eight Fire husks
+# of 1 health struck down by the player's Chain Lightning (the contract's terms before and after go
+# to the log, and a word when it's done), the finished contract glinting in hand, then handed in at
+# an Arcane Lectern: the reward (emeralds and Fire Essence) pops out on top of it (the items go to
+# the log). An unfinished contract is turned away at the lectern (a word on the action bar).
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamerule doMobLoot false
+cmd gamemode survival
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd effect give @s minecraft:resistance 900 4 true
+cmd tp @s 0.5 100 0.5 -90 5
+wait 40
+cmd kill @e[type=!player]
+cmd kill @e[type=item]
+cmd clear @s
+cmd fill -6 99 -12 30 99 12 minecraft:grass_block
+cmd fill -6 100 -12 30 110 12 minecraft:air
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken lightning
+cmd arcana level set 40
+cmd arcana spell elementalarcana:chain_lightning 9 storm_fork
+cmd arcana mana fill
+cmd arcana cooldowns reset
+cmd title @s clear
+wait 20
+cmd arcana bounty attuned fire
+cmd arcana bounty rift
+cmd data get entity @s Inventory[0].components
+cmd data get entity @s Inventory[1].components
+cmd summon husk 7.5 100 -2.5 {NoAI:1b,Tags:["eat"],Health:1f}
+cmd summon husk 7.5 100 0.5 {NoAI:1b,Tags:["eat"],Health:1f}
+cmd summon husk 7.5 100 3.5 {NoAI:1b,Tags:["eat"],Health:1f}
+cmd summon husk 10.5 100 -1.0 {NoAI:1b,Tags:["eat"],Health:1f}
+cmd summon husk 10.5 100 2.0 {NoAI:1b,Tags:["eat"],Health:1f}
+cmd summon husk 13.5 100 -2.5 {NoAI:1b,Tags:["eat"],Health:1f}
+cmd summon husk 13.5 100 0.5 {NoAI:1b,Tags:["eat"],Health:1f}
+cmd summon husk 13.5 100 3.5 {NoAI:1b,Tags:["eat"],Health:1f}
+cmd arcana attune @e[tag=eat] fire adept
+cmd execute as @e[tag=eat] run data merge entity @s {Health:1f}
+wait 10
+select elementalarcana:chain_lightning
+press
+release
+wait 30
+cmd data get entity @s Inventory[0].components
+cmd data get entity @s Inventory[1].components
+cmd execute if entity @e[tag=eat]
+slot 0
+wait 5
+shot bounty_done_in_hand
+cmd setblock 2 100 0 elementalarcana:arcane_lectern
+cmd tp @s 0.5 100 0.5 -90 30
+wait 10
+use
+wait 20
+shot bounty_handed_in
+cmd execute as @e[type=item] run data get entity @s Item
+cmd data get entity @s Inventory[0].components
+cmd data get entity @s Inventory[1].components
+slot 1
+wait 5
+use
+wait 10
+shot bounty_unfinished
+cmd setblock 2 100 0 minecraft:air
+cmd gamerule doMobLoot true
+wait 10
+quit

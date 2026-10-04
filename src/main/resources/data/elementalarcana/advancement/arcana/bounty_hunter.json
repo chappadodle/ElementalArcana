@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/the_arcanist",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:bounty_contract"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.bounty_hunter.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.bounty_hunter.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "bounty": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "bounty"
+      }
+    }
+  }
+}

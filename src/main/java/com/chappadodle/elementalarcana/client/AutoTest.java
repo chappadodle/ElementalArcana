@@ -79,6 +79,7 @@ import java.util.Optional;
  * screen status|tree [spell]|stats|journal|inventory|advancements|close   open one of the mod's
  *                          screens, the inventory, or the advancements on the mod's tab
  * hud on|off               show or hide the HUD
+ * slot 2                   hold what's in hotbar slot 2 (0 to 8)
  * camera first|back|front  the camera view
  * use                      right-click the creature or block under the crosshair (or, with
  *                          neither, use the held item)
@@ -220,6 +221,7 @@ public final class AutoTest {
                 }
             }
             case "hud" -> minecraft.options.hideGui = argument.equals("off");
+            case "slot" -> minecraft.player.getInventory().selected = Integer.parseInt(argument.trim());
             case "use" -> {
                 if (minecraft.gameMode == null) {
                     LOGGER.warn("[autotest] use: no game mode");

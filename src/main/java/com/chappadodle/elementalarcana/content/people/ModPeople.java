@@ -2,6 +2,7 @@ package com.chappadodle.elementalarcana.content.people;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.google.common.collect.ImmutableSet;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
@@ -21,13 +22,20 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 /**
  * The Arcanist (docs/superpowers/specs/2026-10-02-arcanist-design.md): its workstation, the Arcane
- * Lectern, the job site and profession, and the two items only Arcanists sell.
+ * Lectern, the job site and profession, the two items only Arcanists sell, and their Bounty
+ * Contracts (docs/superpowers/specs/2026-10-04-bounties-design.md).
  */
 public final class ModPeople {
     private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(ElementalArcana.MODID);
     private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ElementalArcana.MODID);
     private static final DeferredRegister<PoiType> POI_TYPES = DeferredRegister.create(Registries.POINT_OF_INTEREST_TYPE, ElementalArcana.MODID);
     private static final DeferredRegister<VillagerProfession> PROFESSIONS = DeferredRegister.create(Registries.VILLAGER_PROFESSION, ElementalArcana.MODID);
+    private static final DeferredRegister.DataComponents COMPONENTS =
+            DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, ElementalArcana.MODID);
+
+    /** A Bounty Contract's terms (see Bounty). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Bounty>> BOUNTY =
+            COMPONENTS.registerComponentType("bounty", builder -> builder.persistent(Bounty.CODEC).networkSynchronized(Bounty.STREAM_CODEC));
 
     public static final DeferredBlock<ArcaneLecternBlock> ARCANE_LECTERN = BLOCKS.register("arcane_lectern", () -> new ArcaneLecternBlock(
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_PURPLE).strength(2.5f).sound(SoundType.WOOD)
@@ -38,6 +46,8 @@ public final class ModPeople {
             () -> new ScrollOfUnbindingItem(new Item.Properties().stacksTo(16).rarity(Rarity.UNCOMMON)));
     public static final DeferredItem<TomeOfInsightItem> TOME_OF_INSIGHT = ITEMS.register("tome_of_insight",
             () -> new TomeOfInsightItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    public static final DeferredItem<BountyContractItem> BOUNTY_CONTRACT = ITEMS.register("bounty_contract",
+            () -> new BountyContractItem(new Item.Properties().stacksTo(1)));
 
     public static final ResourceKey<PoiType> ARCANIST_POI = ResourceKey.create(Registries.POINT_OF_INTEREST_TYPE, ElementalArcana.id("arcanist"));
     public static final DeferredHolder<PoiType, PoiType> ARCANIST_JOB_SITE = POI_TYPES.register("arcanist",
@@ -54,5 +64,6 @@ public final class ModPeople {
         ITEMS.register(modEventBus);
         POI_TYPES.register(modEventBus);
         PROFESSIONS.register(modEventBus);
+        COMPONENTS.register(modEventBus);
     }
 }

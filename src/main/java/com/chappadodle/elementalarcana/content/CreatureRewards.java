@@ -21,6 +21,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameRules;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -73,7 +74,9 @@ public final class CreatureRewards {
     public static void onDrops(LivingDropsEvent event) {
         LivingEntity dead = event.getEntity();
         if (dead instanceof Player || !(dead.level() instanceof ServerLevel level)
-                || !(event.getSource().getEntity() instanceof ServerPlayer player)) {
+                || !(event.getSource().getEntity() instanceof ServerPlayer player)
+                // Like any loot, Essence follows the doMobLoot rule.
+                || !level.getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT)) {
             return;
         }
         CreatureMagic magic = Attunement.get(dead);

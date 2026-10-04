@@ -2,6 +2,7 @@ package com.chappadodle.elementalarcana.core;
 
 import com.chappadodle.elementalarcana.api.AttunementRank;
 import com.chappadodle.elementalarcana.api.AwakeningRules;
+import com.chappadodle.elementalarcana.api.BountyRules;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
@@ -16,6 +17,7 @@ import com.chappadodle.elementalarcana.content.ManaTides;
 import com.chappadodle.elementalarcana.content.SkillTreeLoader;
 import com.chappadodle.elementalarcana.content.creature.WispEntity;
 import com.chappadodle.elementalarcana.content.creature.WispSpawner;
+import com.chappadodle.elementalarcana.content.people.Bounties;
 import com.chappadodle.elementalarcana.content.rift.Rifts;
 import com.chappadodle.elementalarcana.content.sanctum.SanctumSealBlockEntity;
 import com.mojang.brigadier.CommandDispatcher;
@@ -42,6 +44,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
@@ -143,6 +146,7 @@ public final class ArcanaCommand {
                         .executes(ctx -> bubble(ctx.getSource(), EntityArgument.getEntities(ctx, "targets")))))
                 .then(Commands.literal("wisp").then(wispSpawn()))
                 .then(riftOpen())
+                .then(bountyGive())
                 .then(Commands.literal("sanctum").then(Commands.literal("reset").executes(ctx -> resetSanctums(ctx.getSource()))))
                 .then(Commands.literal("tide")
                         .then(Commands.literal("start").executes(ctx -> {
@@ -222,6 +226,32 @@ public final class ArcanaCommand {
         }
         Component name = Component.translatable("school.elementalarcana." + chosen.name().toLowerCase(Locale.ROOT));
         source.sendSuccess(() -> Component.translatable("commands.elementalarcana.rift_opened", name, pos.getX(), pos.getY(), pos.getZ()), true);
+        return 1;
+    }
+
+    /** /arcana bounty <task> [element]: gives the player a Bounty Contract for that task, rolled for the land they stand in (or that element). */
+    private static LiteralArgumentBuilder<CommandSourceStack> bountyGive() {
+        LiteralArgumentBuilder<CommandSourceStack> bounty = Commands.literal("bounty");
+        for (BountyRules.Task task : BountyRules.Task.values()) {
+            LiteralArgumentBuilder<CommandSourceStack> kind = Commands.literal(task.id()).executes(ctx -> giveBounty(ctx.getSource(), task, null));
+            // For testing: the element it's rolled for, instead of the land's.
+            for (Element element : Element.values()) {
+                kind.then(Commands.literal(element.name().toLowerCase(Locale.ROOT)).executes(ctx -> giveBounty(ctx.getSource(), task, element)));
+            }
+            bounty.then(kind);
+        }
+        return bounty;
+    }
+
+    private static int giveBounty(CommandSourceStack source, BountyRules.Task task, @Nullable Element element) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        Element land = element != null ? element : Attunement.landElement(player.level(), player.blockPosition(), player.getRandom());
+        ItemStack contract = Bounties.contract(task, land, player.getRandom());
+        Component name = contract.getHoverName();
+        if (!player.getInventory().add(contract)) {
+            player.drop(contract, false);
+        }
+        source.sendSuccess(() -> Component.translatable("commands.elementalarcana.bounty_given", name), true);
         return 1;
     }
 

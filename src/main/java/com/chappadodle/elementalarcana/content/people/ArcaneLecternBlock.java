@@ -4,6 +4,13 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -12,13 +19,15 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * The Arcanist's workstation: a lectern with an open book of glowing runes and a small crystal
- * floating over it. It faces whoever placed it, and enchanting glyphs drift in to its book.
+ * floating over it. It faces whoever placed it, and enchanting glyphs drift in to its book. Bounty
+ * Contracts are handed in here.
  */
 public class ArcaneLecternBlock extends HorizontalDirectionalBlock {
     public static final MapCodec<ArcaneLecternBlock> CODEC = simpleCodec(ArcaneLecternBlock::new);
@@ -55,6 +64,21 @@ public class ArcaneLecternBlock extends HorizontalDirectionalBlock {
     @Override
     protected boolean useShapeForLightOcclusion(BlockState state) {
         return true;
+    }
+
+    /** A Bounty Contract handed in here pays out (see Bounties); an unfinished one is turned away. */
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
+                                              InteractionHand hand, BlockHitResult hit) {
+        Bounty bounty = stack.get(ModPeople.BOUNTY.get());
+        if (bounty == null) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+        if (level instanceof ServerLevel serverLevel && player instanceof ServerPlayer serverPlayer
+                && !Bounties.handIn(serverLevel, pos, serverPlayer, stack)) {
+            serverPlayer.displayClientMessage(Component.translatable("message.elementalarcana.bounty.unfinished"), true);
+        }
+        return ItemInteractionResult.sidedSuccess(level.isClientSide());
     }
 
     @Override

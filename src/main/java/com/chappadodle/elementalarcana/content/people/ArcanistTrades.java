@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.content.people;
 
+import com.chappadodle.elementalarcana.content.Attunement;
+import com.chappadodle.elementalarcana.api.BountyRules;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.AttunementRules;
 import com.chappadodle.elementalarcana.api.Element;
@@ -47,6 +49,14 @@ public final class ArcanistTrades {
             return;
         }
         Int2ObjectMap<List<VillagerTrades.ItemListing>> trades = event.getTrades();
+        // Bounties: a contract at every level (often two early on), its task rolled when offered.
+        trades.get(1).add(bounty(BountyRules.Task.ATTUNED));
+        trades.get(1).add(bounty(BountyRules.Task.ATTUNED));
+        trades.get(2).add(bounty(BountyRules.Task.WISPS));
+        trades.get(2).add(bounty(BountyRules.Task.ATTUNED));
+        trades.get(3).add(bounty(BountyRules.Task.MAGUS));
+        trades.get(4).add(bounty(BountyRules.Task.RIFT));
+        trades.get(5).add(bounty(BountyRules.Task.ARCHMAGE));
         // Novice
         trades.get(1).add(buy(random -> new ItemCost(ModItems.essence(anyElement(random)), 2), 1, 12, 2));
         trades.get(1).add(buy(random -> new ItemCost(Items.AMETHYST_SHARD, 4), 1, 16, 2));
@@ -78,6 +88,12 @@ public final class ArcanistTrades {
             return new VillagerTrades.TreasureMapForEmeralds(24, TagKey.create(Registries.STRUCTURE, ElementalArcana.id("sanctum/" + name)),
                     "filled_map.elementalarcana.sanctum." + name, MapDecorationTypes.RED_X, 1, 30).getOffer(trader, random);
         });
+    }
+
+    /** A Bounty Contract for {@code task}, rolled for the land the Arcanist lives in. */
+    private static VillagerTrades.ItemListing bounty(BountyRules.Task task) {
+        return (trader, random) -> new MerchantOffer(new ItemCost(Items.EMERALD, BountyRules.PRICE),
+                Bounties.contract(task, Attunement.landElement(trader.level(), trader.blockPosition(), random), random), 1, 5, PRICE_MULTIPLIER);
     }
 
     /** The Arcanist buys {@code cost} for emeralds. */

@@ -16,6 +16,27 @@ SPARKLE = {"W": 0xFFFFFFFF, "c": 0xFFCFF4FF, "b": 0xC0A8E6FF, "f": 0x7090D8FF}
 SHARD = {"w": 0xFFFFFFFF, "l": 0xFFC8F0FF, "b": 0xFF7CC4F0, "d": 0xFF3C80C0}
 
 SPRITES = {
+    # An Arcanist's bounty: a sheet between two rolls, a red wax seal on a violet ribbon.
+    "item/bounty_contract": ({
+        "k": 0x4A2E14, "d": 0xB89A62, "l": 0xF3E6C0, "p": 0xE6D4A2, "r": 0xA8222A, "s": 0xE45656, "v": 0x7B3FA8,
+    }, [
+        "................",
+        ".kkkkkkkkkkkkkk.",
+        ".kdlllllllllldk.",
+        ".kkkkkkkkkkkkkk.",
+        "...kppppppppk...",
+        "...kpddddddpk...",
+        "...kppppppppk...",
+        "...kpdddddppk...",
+        "...kppppppppk...",
+        "...kpddrrddpk...",
+        "...kpprssrppk...",
+        "...kpprrrrppk...",
+        "...kppvrrvppk...",
+        ".kkkkkvkkvkkkkk.",
+        ".kdllvllllvlldk.",
+        ".kkkkkkkkkkkkkk.",
+    ]),
     "spell/fireball": ({
         "k": 0x5A1A00, "r": 0xD83A1A, "o": 0xFF8A1F, "y": 0xFFD84A, "w": 0xFFF6C8,
     }, [
