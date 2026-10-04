@@ -80,6 +80,18 @@ public class ShrinePiece extends StructurePiece {
             case EARTH -> new Palette(Blocks.MOSS_BLOCK.defaultBlockState(), Blocks.MOSSY_COBBLESTONE.defaultBlockState(),
                     Blocks.ROOTED_DIRT.defaultBlockState(), Blocks.MOSSY_STONE_BRICKS.defaultBlockState(), Blocks.CHISELED_STONE_BRICKS.defaultBlockState(),
                     Blocks.CHISELED_STONE_BRICKS.defaultBlockState(), Blocks.STONE.defaultBlockState());
+            // A geode opened to the sky: calcite and basalt round amethyst, crystals crowning the pillars.
+            case CRYSTAL -> new Palette(Blocks.CALCITE.defaultBlockState(), Blocks.SMOOTH_BASALT.defaultBlockState(),
+                    Blocks.AMETHYST_BLOCK.defaultBlockState(), Blocks.AMETHYST_BLOCK.defaultBlockState(), Blocks.AMETHYST_CLUSTER.defaultBlockState(),
+                    Blocks.POLISHED_BASALT.defaultBlockState(), Blocks.SMOOTH_BASALT.defaultBlockState());
+            // Copper and tuff that call the storm: lightning rods on its pillars.
+            case LIGHTNING -> new Palette(Blocks.WAXED_CUT_COPPER.defaultBlockState(), Blocks.WAXED_OXIDIZED_CUT_COPPER.defaultBlockState(),
+                    Blocks.TUFF_BRICKS.defaultBlockState(), Blocks.WAXED_EXPOSED_COPPER.defaultBlockState(), Blocks.LIGHTNING_ROD.defaultBlockState(),
+                    Blocks.CHISELED_TUFF_BRICKS.defaultBlockState(), Blocks.TUFF.defaultBlockState());
+            // White quartz round a ring of light, glowstone burning on its pillars.
+            case RADIANCE -> new Palette(Blocks.QUARTZ_BRICKS.defaultBlockState(), Blocks.CHISELED_QUARTZ_BLOCK.defaultBlockState(),
+                    Blocks.SHROOMLIGHT.defaultBlockState(), Blocks.QUARTZ_PILLAR.defaultBlockState(), Blocks.GLOWSTONE.defaultBlockState(),
+                    Blocks.CHISELED_QUARTZ_BLOCK.defaultBlockState(), Blocks.SMOOTH_SANDSTONE.defaultBlockState());
         };
     }
 

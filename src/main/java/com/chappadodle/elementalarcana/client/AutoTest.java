@@ -87,7 +87,8 @@ import java.util.Optional;
  * key jump down / key jump up   hold a movement key down (jump, sneak or forward), or let it go
  * goto elementalarcana:fire_shrine 18 14 [2]   stand 18 blocks south of the nearest such structure
  *                          and 14 above its base, looking at its middle, 2 blocks above the base
- *                          (default 0); it's searched for from where the player is
+ *                          (default 0); it's searched for from where the player is, and the
+ *                          script waits for the search
  * find elementalarcana:arcane_lectern 80   look for that block within 80 blocks (and 60 below to
  *                          20 above); log where, and view the first from 8 blocks south, 5 up
  * jei_filter @elementalarcana   filter JEI's item list, as if typed in its search box (when JEI
@@ -109,6 +110,8 @@ public final class AutoTest {
     private static int respawnCooldown;
     private static int holdUseTicks;
     private static boolean finished;
+    /** A step's work running on the server (a structure search can take seconds), which the script waits for. */
+    private static volatile boolean serverBusy;
 
     private AutoTest() {
     }
@@ -158,6 +161,9 @@ public final class AutoTest {
         }
         if (holdUseTicks > 0 && --holdUseTicks == 0) {
             minecraft.options.keyUse.setDown(false);
+        }
+        if (serverBusy) {
+            return;
         }
         if (waitTicks > 0) {
             waitTicks--;
@@ -295,39 +301,47 @@ public final class AutoTest {
         double aim = parts.length > 3 ? Double.parseDouble(parts[3]) : 0;
         MinecraftServer server = minecraft.getSingleplayerServer();
         java.util.UUID id = minecraft.player.getUUID();
+        serverBusy = true;
         server.execute(() -> {
-            ServerPlayer player = server.getPlayerList().getPlayer(id);
-            if (player == null) {
-                return;
+            try {
+                gotoStructure(server.getPlayerList().getPlayer(id), key, distance, height, aim);
+            } finally {
+                serverBusy = false;
             }
-            ServerLevel level = player.serverLevel();
-            Optional<Holder.Reference<Structure>> structure = level.registryAccess().registryOrThrow(Registries.STRUCTURE).getHolder(key);
-            if (structure.isEmpty()) {
-                LOGGER.warn("[autotest] goto: no structure {}", key.location());
-                return;
-            }
-            Pair<BlockPos, Holder<Structure>> found = level.getChunkSource().getGenerator()
-                    .findNearestMapStructure(level, HolderSet.direct(structure.get()), player.blockPosition(), 100, false);
-            if (found == null) {
-                LOGGER.warn("[autotest] goto: no {} nearby", key.location());
-                return;
-            }
-            ChunkPos chunkPos = new ChunkPos(found.getFirst());
-            ChunkAccess chunk = level.getChunk(chunkPos.x, chunkPos.z, ChunkStatus.STRUCTURE_STARTS);
-            StructureStart start = level.structureManager().getStartForStructure(SectionPos.bottomOf(chunk), structure.get().value(), chunk);
-            // The pieces' own box: a start's box is padded for terrain blending.
-            BoundingBox box = (start != null && start.isValid()
-                    ? BoundingBox.encapsulatingBoxes(start.getPieces().stream().map(StructurePiece::getBoundingBox).toList())
-                    : Optional.<BoundingBox>empty())
-                    .orElse(BoundingBox.fromCorners(found.getFirst(), found.getFirst().offset(15, level.getSeaLevel(), 15)));
-            BlockPos middle = box.getCenter();
-            double x = middle.getX() + 0.5;
-            double y = box.minY() + height;
-            double z = middle.getZ() + 0.5 + distance;
-            float pitch = (float) Math.toDegrees(Math.atan2(height + player.getEyeHeight() - aim, distance));
-            player.teleportTo(level, x, y, z, 180f, pitch);
-            LOGGER.info("[autotest] goto {}: found at {} {} {}", key.location(), middle.getX(), box.minY(), middle.getZ());
         });
+    }
+
+    private static void gotoStructure(ServerPlayer player, ResourceKey<Structure> key, double distance, double height, double aim) {
+        if (player == null) {
+            return;
+        }
+        ServerLevel level = player.serverLevel();
+        Optional<Holder.Reference<Structure>> structure = level.registryAccess().registryOrThrow(Registries.STRUCTURE).getHolder(key);
+        if (structure.isEmpty()) {
+            LOGGER.warn("[autotest] goto: no structure {}", key.location());
+            return;
+        }
+        Pair<BlockPos, Holder<Structure>> found = level.getChunkSource().getGenerator()
+                .findNearestMapStructure(level, HolderSet.direct(structure.get()), player.blockPosition(), 100, false);
+        if (found == null) {
+            LOGGER.warn("[autotest] goto: no {} nearby", key.location());
+            return;
+        }
+        ChunkPos chunkPos = new ChunkPos(found.getFirst());
+        ChunkAccess chunk = level.getChunk(chunkPos.x, chunkPos.z, ChunkStatus.STRUCTURE_STARTS);
+        StructureStart start = level.structureManager().getStartForStructure(SectionPos.bottomOf(chunk), structure.get().value(), chunk);
+        // The pieces' own box: a start's box is padded for terrain blending.
+        BoundingBox box = (start != null && start.isValid()
+                ? BoundingBox.encapsulatingBoxes(start.getPieces().stream().map(StructurePiece::getBoundingBox).toList())
+                : Optional.<BoundingBox>empty())
+                .orElse(BoundingBox.fromCorners(found.getFirst(), found.getFirst().offset(15, level.getSeaLevel(), 15)));
+        BlockPos middle = box.getCenter();
+        double x = middle.getX() + 0.5;
+        double y = box.minY() + height;
+        double z = middle.getZ() + 0.5 + distance;
+        float pitch = (float) Math.toDegrees(Math.atan2(height + player.getEyeHeight() - aim, distance));
+        player.teleportTo(level, x, y, z, 180f, pitch);
+        LOGGER.info("[autotest] goto {}: found at {} {} {}", key.location(), middle.getX(), box.minY(), middle.getZ());
     }
 
     /** Scans the loaded world around the player for a block; logs up to five and views the first one. */

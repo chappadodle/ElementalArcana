@@ -10,7 +10,10 @@ public enum ShrineKind implements StringRepresentable {
     WATER(Element.WATER),
     ICE(Element.ICE),
     WIND(Element.WIND),
-    EARTH(Element.EARTH);
+    EARTH(Element.EARTH),
+    CRYSTAL(Element.CRYSTAL),
+    LIGHTNING(Element.LIGHTNING),
+    RADIANCE(Element.RADIANCE);
 
     public static final Codec<ShrineKind> CODEC = StringRepresentable.fromEnum(ShrineKind::values);
 

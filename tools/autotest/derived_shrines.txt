@@ -1,0 +1,28 @@
+# The kin elements' shrines: a Crystal, a Lightning and a Radiance shrine found far out in fresh land,
+# a shot of each (goto: from the south, looking at the core; from above where the land round them is
+# wooded or steep).
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamemode creative
+cmd effect clear @s
+cmd effect give @s minecraft:slow_falling 99999 0 true
+cmd tp @s 41000 200 -37000
+wait 80
+goto elementalarcana:crystal_shrine 9 18 1
+wait 60
+shot shrine_crystal
+cmd tp @s 37000 200 -41000
+wait 80
+goto elementalarcana:lightning_shrine 14 9 2
+wait 60
+shot shrine_lightning
+cmd tp @s 43000 200 -43000
+wait 80
+goto elementalarcana:radiance_shrine 9 18 1
+wait 60
+shot shrine_radiance
+cmd effect clear @s
+quit

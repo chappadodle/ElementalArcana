@@ -19,6 +19,18 @@
     {
       "structure": "elementalarcana:earth_shrine",
       "weight": 1
+    },
+    {
+      "structure": "elementalarcana:crystal_shrine",
+      "weight": 1
+    },
+    {
+      "structure": "elementalarcana:lightning_shrine",
+      "weight": 1
+    },
+    {
+      "structure": "elementalarcana:radiance_shrine",
+      "weight": 1
     }
   ],
   "placement": {

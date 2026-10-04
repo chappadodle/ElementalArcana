@@ -1,0 +1,8 @@
+{
+  "type": "elementalarcana:shrine",
+  "kind": "lightning",
+  "biomes": "#elementalarcana:has_structure/lightning_shrine",
+  "step": "top_layer_modification",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_thin"
+}

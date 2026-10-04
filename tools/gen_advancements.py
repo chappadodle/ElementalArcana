@@ -153,7 +153,7 @@ ADVANCEMENTS = [
 ]
 
 TAGS = {
-    "worldgen/structure/shrines": [NS + f"{e}_shrine" for e in ("fire", "water", "ice", "wind", "earth")],
+    "worldgen/structure/shrines": [NS + f"{e}_shrine" for e in ("fire", "water", "ice", "wind", "earth", "crystal", "lightning", "radiance")],
     "worldgen/structure/sanctums": [NS + f"{e}_sanctum" for e in ("fire", "water", "wind", "earth")],
     "item/arcanist_goods": ["#" + NS + "essences", NS + "arcanist_journal", NS + "apprentice_wand", NS + "adept_staff",
                             NS + "fire_catalyst", NS + "water_catalyst", NS + "wind_catalyst", NS + "earth_catalyst",

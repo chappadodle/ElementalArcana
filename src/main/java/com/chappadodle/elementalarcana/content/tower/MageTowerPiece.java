@@ -280,8 +280,13 @@ public class MageTowerPiece extends StructurePiece {
         placeBlock(level, Blocks.END_ROD.defaultBlockState().setValue(EndRodBlock.FACING, Direction.UP), MID, ROOF + 7, MID, box);
     }
 
+    /**
+     * The tower heart's kind, and so its acolytes' and Magister's element: Ice its own, Crystal,
+     * Lightning and Radiance their family's (their Guardian Cores, and so the master staffs' recipes,
+     * are their family's).
+     */
     private ShrineKind kind() {
-        return ShrineKind.of(element);
+        return element == Element.ICE ? ShrineKind.ICE : ShrineKind.of(element.family());
     }
 
     private static ResourceKey<LootTable> lootTable(String room) {

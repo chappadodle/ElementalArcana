@@ -4,6 +4,9 @@
     "elementalarcana:water_shrine",
     "elementalarcana:ice_shrine",
     "elementalarcana:wind_shrine",
-    "elementalarcana:earth_shrine"
+    "elementalarcana:earth_shrine",
+    "elementalarcana:crystal_shrine",
+    "elementalarcana:lightning_shrine",
+    "elementalarcana:radiance_shrine"
   ]
 }
