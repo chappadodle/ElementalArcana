@@ -12,6 +12,10 @@
     "elementalarcana:fire_sovereign",
     "elementalarcana:water_sovereign",
     "elementalarcana:wind_sovereign",
-    "elementalarcana:earth_sovereign"
+    "elementalarcana:earth_sovereign",
+    "elementalarcana:fire_golem",
+    "elementalarcana:water_golem",
+    "elementalarcana:wind_golem",
+    "elementalarcana:earth_golem"
   ]
 }

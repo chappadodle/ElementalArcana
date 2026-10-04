@@ -21,7 +21,7 @@ else.
 - **Its element** comes from the land, like an Attuned creature's (the biome's lean, so deserts
   give Fire and snowfields Ice; derived elements too, rarely).
 - **It's announced**: everyone within 64 blocks hears the tear and reads "The air tears open
-  nearby: a Fire Rift!" in the element's colour.
+  nearby: a rift of Fire!" in the element's colour.
 - `/arcana rift [element]` opens one in front of the player, for testing.
 
 ## The fight

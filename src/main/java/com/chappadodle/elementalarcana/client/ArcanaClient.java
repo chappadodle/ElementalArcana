@@ -328,6 +328,9 @@ public final class ArcanaClient {
         event.registerEntityRenderer(ModContent.EMBER_SPRITE.get(), EmberSpriteRenderer::new);
         event.registerEntityRenderer(ModContent.STORMEYE.get(), StormeyeRenderer::new);
         event.registerEntityRenderer(ModContent.RIFT.get(), RiftRenderer::new);
+        for (Element element : ModCreatures.GOLEM_ELEMENTS) {
+            event.registerEntityRenderer(ModCreatures.golem(element), GolemRenderer::new);
+        }
         event.registerEntityRenderer(ModContent.CRYSTAL_SPIRE.get(), CrystalSpireRenderer::new);
         for (Element element : Element.values()) {
             event.registerEntityRenderer(ModCreatures.wisp(element), WispRenderer::new);
@@ -344,6 +347,7 @@ public final class ArcanaClient {
     @SubscribeEvent
     public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(WispModel.LAYER, WispModel::createLayer);
+        event.registerLayerDefinition(GolemModel.LAYER, GolemModel::createLayer);
         event.registerLayerDefinition(SovereignModel.LAYER, SovereignModel::createLayer);
     }
 

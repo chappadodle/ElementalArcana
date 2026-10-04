@@ -15,6 +15,7 @@ import com.chappadodle.elementalarcana.content.BubblePrisons;
 import com.chappadodle.elementalarcana.content.CreatureLevels;
 import com.chappadodle.elementalarcana.content.ManaTides;
 import com.chappadodle.elementalarcana.content.SkillTreeLoader;
+import com.chappadodle.elementalarcana.content.creature.ModCreatures;
 import com.chappadodle.elementalarcana.content.creature.WispEntity;
 import com.chappadodle.elementalarcana.content.creature.WispSpawner;
 import com.chappadodle.elementalarcana.content.people.Bounties;
@@ -43,6 +44,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -147,6 +149,7 @@ public final class ArcanaCommand {
                 .then(Commands.literal("wisp").then(wispSpawn()))
                 .then(riftOpen())
                 .then(bountyGive())
+                .then(golemSpawn())
                 .then(Commands.literal("sanctum").then(Commands.literal("reset").executes(ctx -> resetSanctums(ctx.getSource()))))
                 .then(Commands.literal("tide")
                         .then(Commands.literal("start").executes(ctx -> {
@@ -253,6 +256,22 @@ public final class ArcanaCommand {
         }
         source.sendSuccess(() -> Component.translatable("commands.elementalarcana.bounty_given", name), true);
         return 1;
+    }
+
+    /** /arcana golem <element>: summons an Elemental Golem 5 blocks ahead of whoever ran it (or where it ran). */
+    private static LiteralArgumentBuilder<CommandSourceStack> golemSpawn() {
+        LiteralArgumentBuilder<CommandSourceStack> golem = Commands.literal("golem");
+        for (Element element : ModCreatures.GOLEM_ELEMENTS) {
+            golem.then(Commands.literal(element.name().toLowerCase(Locale.ROOT)).executes(ctx -> {
+                CommandSourceStack source = ctx.getSource();
+                Vec3 at = source.getPosition();
+                if (source.getEntity() != null) {
+                    at = at.add(Vec3.directionFromRotation(0, source.getEntity().getYRot()).scale(5));
+                }
+                return ModCreatures.golem(element).spawn(source.getLevel(), BlockPos.containing(at), MobSpawnType.COMMAND) == null ? 0 : 1;
+            }));
+        }
+        return golem;
     }
 
     private static LiteralArgumentBuilder<CommandSourceStack> wispSpawn() {

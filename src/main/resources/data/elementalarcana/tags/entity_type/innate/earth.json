@@ -3,6 +3,7 @@
     "minecraft:iron_golem",
     "minecraft:silverfish",
     "minecraft:armadillo",
-    "elementalarcana:earth_wisp"
+    "elementalarcana:earth_wisp",
+    "elementalarcana:earth_golem"
   ]
 }

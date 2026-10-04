@@ -1,0 +1,24 @@
+# The four Elemental Golems summoned by command on a stone floor ("Test passed" each), then killed by
+# command with mob loot on: no player killed them, so no Essence, but their stuff drops (magma
+# blocks, prismarine shards, quartz, mossy cobblestone: the items go to the log).
+gamerule doMobSpawning false
+gamerule doMobLoot true
+forceload add -16 -16 16 16
+fill -12 99 -12 12 99 12 minecraft:stone
+fill -12 100 -12 12 106 12 minecraft:air
+kill @e[type=!player]
+execute positioned -6 100 0 run arcana golem fire
+execute positioned -2 100 0 run arcana golem water
+execute positioned 2 100 0 run arcana golem wind
+execute positioned 6 100 0 run arcana golem earth
+sleep 2
+execute if entity @e[type=elementalarcana:fire_golem]
+execute if entity @e[type=elementalarcana:water_golem]
+execute if entity @e[type=elementalarcana:wind_golem]
+execute if entity @e[type=elementalarcana:earth_golem]
+kill @e[type=!player,type=!item]
+sleep 2
+execute as @e[type=item] run data get entity @s Item
+kill @e[type=item]
+kill @e[type=minecraft:experience_orb]
+forceload remove all

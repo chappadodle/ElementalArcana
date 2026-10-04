@@ -1,0 +1,173 @@
+# Elemental Golems: each of the four summoned 5 blocks in front of the player, who strikes it (by
+# command) to make it a foe; it walks up, raises its arms (the warning) and slams: shots every 4
+# ticks through the fight, third person. A villager stands beside the player (golems hurt anyone
+# but monsters): its health and the player's position after each slam go to the log (Water throws
+# back, Wind throws up, Fire burns, Earth sends a Tremor).
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamerule doMobLoot false
+cmd gamemode survival
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd effect give @s minecraft:resistance 900 4 true
+cmd effect give @s minecraft:fire_resistance 900 0 true
+cmd tp @s 0.5 100 0.5 -90 10
+wait 40
+cmd kill @e[type=!player]
+cmd kill @e[type=item]
+cmd fill -10 99 -14 30 99 14 minecraft:grass_block
+cmd fill -10 100 -14 30 110 14 minecraft:air
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd title @s clear
+wait 20
+# The fire golem.
+cmd tp @s 0.5 100 0.5 -90 10
+cmd arcana golem fire
+cmd summon villager 0.5 100 2.5 {NoAI:1b,Tags:["eat"]}
+wait 10
+cmd damage @e[type=elementalarcana:fire_golem,limit=1] 1 minecraft:player_attack by @s
+camera back
+wait 4
+shot golem_fire_0
+wait 4
+shot golem_fire_1
+wait 4
+shot golem_fire_2
+wait 4
+shot golem_fire_3
+wait 4
+shot golem_fire_4
+wait 4
+shot golem_fire_5
+wait 4
+shot golem_fire_6
+wait 4
+shot golem_fire_7
+wait 4
+shot golem_fire_8
+wait 4
+shot golem_fire_9
+wait 10
+cmd execute as @e[tag=eat] run data get entity @s Health
+cmd data get entity @s Pos
+camera first
+cmd tp @e[type=elementalarcana:fire_golem] 0.5 -100 0.5
+cmd kill @e[type=elementalarcana:fire_golem]
+cmd kill @e[tag=eat]
+cmd effect give @s minecraft:instant_health 1 10 true
+wait 20
+# The water golem.
+cmd tp @s 0.5 100 0.5 -90 10
+cmd arcana golem water
+cmd summon villager 0.5 100 2.5 {NoAI:1b,Tags:["eat"]}
+wait 10
+cmd damage @e[type=elementalarcana:water_golem,limit=1] 1 minecraft:player_attack by @s
+camera back
+wait 4
+shot golem_water_0
+wait 4
+shot golem_water_1
+wait 4
+shot golem_water_2
+wait 4
+shot golem_water_3
+wait 4
+shot golem_water_4
+wait 4
+shot golem_water_5
+wait 4
+shot golem_water_6
+wait 4
+shot golem_water_7
+wait 4
+shot golem_water_8
+wait 4
+shot golem_water_9
+wait 10
+cmd execute as @e[tag=eat] run data get entity @s Health
+cmd data get entity @s Pos
+camera first
+cmd tp @e[type=elementalarcana:water_golem] 0.5 -100 0.5
+cmd kill @e[type=elementalarcana:water_golem]
+cmd kill @e[tag=eat]
+cmd effect give @s minecraft:instant_health 1 10 true
+wait 20
+# The wind golem.
+cmd tp @s 0.5 100 0.5 -90 10
+cmd arcana golem wind
+cmd summon villager 0.5 100 2.5 {NoAI:1b,Tags:["eat"]}
+wait 10
+cmd damage @e[type=elementalarcana:wind_golem,limit=1] 1 minecraft:player_attack by @s
+camera back
+wait 4
+shot golem_wind_0
+wait 4
+shot golem_wind_1
+wait 4
+shot golem_wind_2
+wait 4
+shot golem_wind_3
+wait 4
+shot golem_wind_4
+wait 4
+shot golem_wind_5
+wait 4
+shot golem_wind_6
+wait 4
+shot golem_wind_7
+wait 4
+shot golem_wind_8
+wait 4
+shot golem_wind_9
+wait 10
+cmd execute as @e[tag=eat] run data get entity @s Health
+cmd data get entity @s Pos
+camera first
+cmd tp @e[type=elementalarcana:wind_golem] 0.5 -100 0.5
+cmd kill @e[type=elementalarcana:wind_golem]
+cmd kill @e[tag=eat]
+cmd effect give @s minecraft:instant_health 1 10 true
+wait 20
+# The earth golem.
+cmd tp @s 0.5 100 0.5 -90 10
+cmd arcana golem earth
+cmd summon villager 0.5 100 2.5 {NoAI:1b,Tags:["eat"]}
+wait 10
+cmd damage @e[type=elementalarcana:earth_golem,limit=1] 1 minecraft:player_attack by @s
+camera back
+wait 4
+shot golem_earth_0
+wait 4
+shot golem_earth_1
+wait 4
+shot golem_earth_2
+wait 4
+shot golem_earth_3
+wait 4
+shot golem_earth_4
+wait 4
+shot golem_earth_5
+wait 4
+shot golem_earth_6
+wait 4
+shot golem_earth_7
+wait 4
+shot golem_earth_8
+wait 4
+shot golem_earth_9
+wait 10
+cmd execute as @e[tag=eat] run data get entity @s Health
+cmd data get entity @s Pos
+camera first
+cmd tp @e[type=elementalarcana:earth_golem] 0.5 -100 0.5
+cmd kill @e[type=elementalarcana:earth_golem]
+cmd kill @e[tag=eat]
+cmd effect give @s minecraft:instant_health 1 10 true
+wait 20
+cmd gamerule doMobLoot true
+wait 10
+quit

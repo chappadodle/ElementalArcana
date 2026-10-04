@@ -105,6 +105,8 @@ ADVANCEMENTS = [
      "Defeat a wisp", killed("#" + NS + "wisps"), None),
     ("kindred_spirit", "wisp_hunter", item("binding_charm"), "goal", "Kindred Spirit",
      "Bind a wisp as your familiar", magic("familiar"), None),
+    ("golem_breaker", "awakening", item("minecraft:mossy_cobblestone"), "task", "Golem Breaker",
+     "Defeat an Elemental Golem", killed("#" + NS + "golems"), None),
     ("attuned_foe", "awakening", item("crystal_essence"), "task", "Attuned Foe",
      "Defeat a creature Attuned to an element", magic("defeated"), None),
     ("archmage_slayer", "attuned_foe", item("radiance_essence"), "challenge", "Archmage Slayer",

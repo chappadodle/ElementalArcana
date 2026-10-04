@@ -66,6 +66,9 @@ public final class ModTabs {
                 for (Element element : Element.values()) {
                     output.accept(ModCreatures.wispEgg(element));
                 }
+                for (Element element : ModCreatures.GOLEM_ELEMENTS) {
+                    output.accept(ModCreatures.golemEgg(element));
+                }
                 for (Element element : SovereignRules.ELEMENTS) {
                     output.accept(ModSanctums.sovereignEgg(element));
                 }
