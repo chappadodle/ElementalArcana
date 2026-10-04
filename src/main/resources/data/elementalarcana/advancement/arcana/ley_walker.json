@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/places_of_power",
+  "display": {
+    "icon": {
+      "id": "minecraft:ender_pearl"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.ley_walker.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.ley_walker.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "ley": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "ley"
+      }
+    }
+  }
+}

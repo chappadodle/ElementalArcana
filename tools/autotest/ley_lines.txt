@@ -1,0 +1,58 @@
+# Ley Lines: two shrines' cores set on small platforms 600 blocks apart, the player (a fire mage)
+# touching both (remembered), the ley menu opened at the first (sneak + use: the chat lines), a
+# journey to the second (the player's position and mana before and after: a 16-mana trip), then a
+# second journey refused while the lines settle (a word on the action bar).
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamemode survival
+cmd effect clear @s
+cmd clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd effect give @s minecraft:resistance 900 4 true
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken fire
+cmd arcana level set 20
+cmd tp @s 600.5 100 0.5 90 30
+wait 60
+cmd fill 597 99 -3 603 99 3 minecraft:polished_blackstone_bricks
+cmd fill 597 100 -3 603 106 3 minecraft:air
+cmd setblock 600 100 0 minecraft:chiseled_polished_blackstone
+cmd setblock 600 101 0 elementalarcana:shrine_core[kind=water]
+cmd tp @s 600.5 100 2.5 180 10
+wait 10
+use
+wait 10
+cmd tp @s 0.5 100 0.5 90 30
+wait 60
+cmd fill -3 99 -3 3 99 3 minecraft:polished_blackstone_bricks
+cmd fill -3 100 -3 3 106 3 minecraft:air
+cmd setblock 0 100 0 minecraft:chiseled_polished_blackstone
+cmd setblock 0 101 0 elementalarcana:shrine_core[kind=fire]
+cmd tp @s 0.5 100 2.5 180 10
+wait 10
+use
+wait 10
+look 180 -8
+key sneak down
+wait 3
+use
+wait 2
+key sneak up
+wait 10
+shot ley_menu
+cmd arcana mana fill
+cmd data get entity @s Pos
+cmd ley 600 101 0
+wait 30
+shot ley_arrived
+cmd data get entity @s Pos
+cmd ley 0 101 0
+wait 10
+shot ley_settling
+cmd data get entity @s Pos
+wait 5
+quit

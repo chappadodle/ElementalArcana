@@ -56,5 +56,6 @@ public final class ModWorld {
         BLOCK_ENTITIES.register(modEventBus);
         STRUCTURE_TYPES.register(modEventBus);
         STRUCTURE_PIECES.register(modEventBus);
+        LeyLines.ATTACHMENTS.register(modEventBus);
     }
 }

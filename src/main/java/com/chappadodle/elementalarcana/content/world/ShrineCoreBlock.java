@@ -76,7 +76,13 @@ public class ShrineCoreBlock extends BaseEntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof ShrineCoreBlockEntity shrine) {
-            Shrines.use(serverPlayer, shrine, state.getValue(KIND));
+            // Every shrine touched joins the mage's ley lines; sneaking, they open the ley menu instead.
+            LeyLines.remember(serverPlayer, pos, state.getValue(KIND));
+            if (serverPlayer.isShiftKeyDown()) {
+                LeyLines.showMenu(serverPlayer, pos);
+            } else {
+                Shrines.use(serverPlayer, shrine, state.getValue(KIND));
+            }
         }
         return InteractionResult.sidedSuccess(level.isClientSide());
     }
