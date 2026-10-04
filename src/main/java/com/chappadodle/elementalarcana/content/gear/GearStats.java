@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.content.gear;
 
+import com.chappadodle.elementalarcana.content.relic.Relics;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.StatGear;
 import com.chappadodle.elementalarcana.content.ModContent;
@@ -21,7 +22,7 @@ import java.util.Map;
  * The stat points a player's gear adds: every piece worn in its own slot, and the better of the
  * foci held in the two hands, as long as the player's level meets the item's requirement. A shrine's
  * blessing adds here too (+5 Affinity of its element family and +2 Potency), and so do the Elixirs
- * of Focus and Warding.
+ * of Focus and Warding, and the relic the player bears (see Relics).
  */
 public final class GearStats {
     private static final int BLESSING_AFFINITY = 5;
@@ -61,6 +62,7 @@ public final class GearStats {
         }
         elixir(player, ModBrews.FOCUS, "focus", stats);
         elixir(player, ModBrews.WARDING, "ward", stats);
+        Relics.addStats(player, stats);
         return stats;
     }
 

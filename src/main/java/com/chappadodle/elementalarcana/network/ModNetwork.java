@@ -8,7 +8,7 @@ public final class ModNetwork {
     }
 
     public static void register(RegisterPayloadHandlersEvent event) {
-        event.registrar("6")
+        event.registrar("7")
                 .playToServer(CastSpellPayload.TYPE, CastSpellPayload.STREAM_CODEC, CastSpellPayload::handle)
                 .playToServer(SelectSpellPayload.TYPE, SelectSpellPayload.STREAM_CODEC, SelectSpellPayload::handle)
                 .playToServer(DevActionPayload.TYPE, DevActionPayload.STREAM_CODEC, DevActionPayload::handle)
@@ -17,6 +17,7 @@ public final class ModNetwork {
                 .playToServer(TreePayload.TYPE, TreePayload.STREAM_CODEC, TreePayload::handle)
                 .playToServer(AuraPayload.TYPE, AuraPayload.STREAM_CODEC, AuraPayload::handle)
                 .playToServer(GlidePayload.TYPE, GlidePayload.STREAM_CODEC, GlidePayload::handle)
+                .playToServer(RelicJumpPayload.TYPE, RelicJumpPayload.STREAM_CODEC, RelicJumpPayload::handle)
                 .playToClient(ManaTidePayload.TYPE, ManaTidePayload.STREAM_CODEC, ManaTidePayload::handle)
                 .playToClient(SkillTreeSyncPayload.TYPE, SkillTreeSyncPayload.STREAM_CODEC, SkillTreeSyncPayload::handle);
     }

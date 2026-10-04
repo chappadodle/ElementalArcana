@@ -134,6 +134,8 @@ ADVANCEMENTS = [
      "Light a rune gate's runes and break its seal", magic("rune_gate"), None),
     ("laid_to_rest", "runebreaker", item("grave_flame"), "goal", "Laid to Rest",
      "Defeat a crypt's Revenant", killed(NS + "revenant"), None),
+    ("relic", "crypt", item("ember_heart"), "goal", "Relic of the First Mages",
+     "Bind a relic from a crypt to yourself", magic("relic"), None),
     ("tower", "awakening", item("tower_heart"), "task", "The Tower Wakes",
      "Enter a mage tower", location(NS + "mage_tower"), None),
     ("magister", "tower", item("guardian_core", "fire"), "goal", "Magister's Fall",

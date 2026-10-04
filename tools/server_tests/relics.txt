@@ -1,0 +1,41 @@
+# Relics: every relic exists as an item (one of each dropped and listed), a Fire crypt's reliquary
+# rolled eight times (its Ember Heart now and then) and a Revenant's loot four times (its Phylactery
+# now and then).
+gamerule doMobSpawning false
+forceload add -16 -16 16 16
+fill -12 99 -12 12 99 12 minecraft:stone
+fill -12 100 -12 12 106 12 minecraft:air
+kill @e[type=!player]
+summon item 0 101 0 {Item:{id:"elementalarcana:ember_heart",count:1}}
+summon item 1 101 0 {Item:{id:"elementalarcana:tidecallers_pearl",count:1}}
+summon item 2 101 0 {Item:{id:"elementalarcana:rimeheart_locket",count:1}}
+summon item 3 101 0 {Item:{id:"elementalarcana:feather_of_the_gale",count:1}}
+summon item 4 101 0 {Item:{id:"elementalarcana:stoneheart_idol",count:1}}
+summon item 5 101 0 {Item:{id:"elementalarcana:prism_of_the_deep",count:1}}
+summon item 6 101 0 {Item:{id:"elementalarcana:storm_sigil",count:1}}
+summon item 7 101 0 {Item:{id:"elementalarcana:sunstone",count:1}}
+summon item 8 101 0 {Item:{id:"elementalarcana:revenants_phylactery",count:1}}
+sleep 1
+execute as @e[type=item] run data get entity @s Item.id
+kill @e[type=item]
+execute positioned 0 101 0 run loot spawn ~ ~ ~ loot elementalarcana:chests/crypt_reliquary_fire
+execute positioned 0 101 0 run loot spawn ~ ~ ~ loot elementalarcana:chests/crypt_reliquary_fire
+execute positioned 0 101 0 run loot spawn ~ ~ ~ loot elementalarcana:chests/crypt_reliquary_fire
+execute positioned 0 101 0 run loot spawn ~ ~ ~ loot elementalarcana:chests/crypt_reliquary_fire
+execute positioned 0 101 0 run loot spawn ~ ~ ~ loot elementalarcana:chests/crypt_reliquary_fire
+execute positioned 0 101 0 run loot spawn ~ ~ ~ loot elementalarcana:chests/crypt_reliquary_fire
+execute positioned 0 101 0 run loot spawn ~ ~ ~ loot elementalarcana:chests/crypt_reliquary_fire
+execute positioned 0 101 0 run loot spawn ~ ~ ~ loot elementalarcana:chests/crypt_reliquary_fire
+sleep 1
+execute as @e[type=item,nbt={Item:{id:"elementalarcana:ember_heart"}}] run say an Ember Heart in the reliquary
+kill @e[type=item]
+summon elementalarcana:revenant 0 101 0
+sleep 1
+loot spawn 0 101 0 kill @e[type=elementalarcana:revenant,limit=1]
+loot spawn 0 101 0 kill @e[type=elementalarcana:revenant,limit=1]
+loot spawn 0 101 0 kill @e[type=elementalarcana:revenant,limit=1]
+loot spawn 0 101 0 kill @e[type=elementalarcana:revenant,limit=1]
+sleep 1
+execute as @e[type=item,nbt={Item:{id:"elementalarcana:revenants_phylactery"}}] run say a Phylactery from the Revenant
+kill @e[type=!player]
+forceload remove all

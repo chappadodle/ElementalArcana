@@ -7,7 +7,7 @@
   eyes;
 - block models, blockstates and item models for the crypt's blocks;
 - the crypt's loot tables (urns, storeroom, library, reliquary, per element where they hold
-  Essence) and the Revenant's.
+  Essence and the element's relic) and the Revenant's (its Phylactery now and then).
 
 Run from the project root:  python3 tools/gen_crypts.py
 """
@@ -22,6 +22,8 @@ ASSETS = ROOT / "src/main/resources/assets/elementalarcana"
 DATA = ROOT / "src/main/resources/data/elementalarcana"
 NS = "elementalarcana:"
 ELEMENTS = ["fire", "water", "ice", "wind", "earth", "crystal", "lightning", "radiance"]
+RELICS = {"fire": "ember_heart", "water": "tidecallers_pearl", "ice": "rimeheart_locket", "wind": "feather_of_the_gale",
+          "earth": "stoneheart_idol", "crystal": "prism_of_the_deep", "lightning": "storm_sigil", "radiance": "sunstone"}
 FAMILY = {"fire": "fire", "water": "water", "ice": "water", "wind": "wind", "earth": "earth",
           "crystal": "earth", "lightning": "wind", "radiance": "fire"}
 
@@ -663,6 +665,7 @@ def loot():
             pool([entry(catalyst, 3), empty(7)], 1),
             pool([entry(f"{NS}scroll_of_unbinding", 1), empty(9)], 1),
             pool([entry(f"{NS}adept_staff", 1, functions=with_element(e)), empty(4)], 1),
+            pool([entry(f"{NS}{RELICS[e]}", 3), empty(7)], 1),
         ]))
     write_json(tables / "chests/crypt_library.json", chest([
         pool([
@@ -683,6 +686,7 @@ def loot():
                                                             "enchantment": "minecraft:looting", "count": {"type": "minecraft:uniform", "min": 0, "max": 1}}])], 1),
         pool([entry("minecraft:gold_ingot", 1, 1, 3)], 1),
         pool([entry(f"{NS}tome_of_insight", 7), empty(13)], 1),
+        pool([entry(f"{NS}revenants_phylactery", 1), empty(3)], 1),
     ]})
 
 

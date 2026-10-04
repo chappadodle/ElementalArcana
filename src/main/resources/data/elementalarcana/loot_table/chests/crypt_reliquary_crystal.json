@@ -178,6 +178,20 @@
           "weight": 4
         }
       ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "elementalarcana:prism_of_the_deep",
+          "weight": 3
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 7
+        }
+      ]
     }
   ]
 }

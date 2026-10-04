@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/crypt",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:ember_heart"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.relic.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.relic.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "relic": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "relic"
+      }
+    }
+  }
+}

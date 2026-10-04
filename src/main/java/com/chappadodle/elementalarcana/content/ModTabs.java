@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.content;
 
+import com.chappadodle.elementalarcana.api.Relic;
+import com.chappadodle.elementalarcana.content.relic.ModRelics;
 import com.chappadodle.elementalarcana.content.crypt.ModCrypts;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Element;
@@ -76,6 +78,9 @@ public final class ModTabs {
                 output.accept(ModHollow.HOLLOW_EGG.get());
                 ModCrypts.items().forEach(item -> output.accept(item.get()));
                 output.accept(ModCrypts.REVENANT_EGG.get());
+                for (Relic relic : Relic.values()) {
+                    output.accept(ModRelics.item(relic));
+                }
             })
             .build());
 
