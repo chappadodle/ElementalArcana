@@ -1,0 +1,27 @@
+{
+  "parent": "elementalarcana:arcana/awakening",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:fire_drake_scale"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.dragon_slayer.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.dragon_slayer.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "killed": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": {
+          "type": "#elementalarcana:drakes"
+        }
+      }
+    }
+  }
+}

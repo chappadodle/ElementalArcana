@@ -1,0 +1,7 @@
+{
+  "type": "elementalarcana:drake_nest",
+  "biomes": "#elementalarcana:has_structure/drake_nests",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none"
+}

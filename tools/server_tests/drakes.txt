@@ -1,0 +1,28 @@
+# Elemental Drakes: one of each summoned (health, with its level), then killed (its scales and
+# Essence listed), each hoard rolled, and the nearest nest located.
+gamerule doMobSpawning false
+gamerule doMobLoot true
+forceload add -16 -16 16 16
+fill -12 99 -12 12 99 12 minecraft:stone
+fill -12 100 -12 12 120 12 minecraft:air
+kill @e[type=!player]
+summon elementalarcana:fire_drake 0 105 0
+summon elementalarcana:ice_drake 6 105 0
+summon elementalarcana:lightning_drake -6 105 0
+summon elementalarcana:water_drake 0 105 6
+summon elementalarcana:wind_drake 0 105 -6
+sleep 2
+execute as @e[type=#elementalarcana:drakes] run data get entity @s Health
+kill @e[type=#elementalarcana:drakes]
+sleep 2
+execute as @e[type=item] run data get entity @s Item
+kill @e[type=item]
+execute positioned 0 101 0 run loot spawn ~ ~ ~ loot elementalarcana:chests/drake_hoard_fire
+execute positioned 0 101 0 run loot spawn ~ ~ ~ loot elementalarcana:chests/drake_hoard_ice
+execute positioned 0 101 0 run loot spawn ~ ~ ~ loot elementalarcana:chests/drake_hoard_lightning
+execute positioned 0 101 0 run loot spawn ~ ~ ~ loot elementalarcana:chests/drake_hoard_wind
+sleep 1
+execute as @e[type=item] run data get entity @s Item
+kill @e[type=!player]
+forceload remove all
+locate structure elementalarcana:drake_nest

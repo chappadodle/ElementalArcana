@@ -6,6 +6,7 @@
     "minecraft:squid",
     "minecraft:glow_squid",
     "elementalarcana:water_wisp",
-    "elementalarcana:water_golem"
+    "elementalarcana:water_golem",
+    "elementalarcana:water_drake"
   ]
 }

@@ -1,0 +1,92 @@
+# Elemental Drakes (see the spec), on a stone platform 60 blocks across at y 220 in fresh land:
+# 1: a Fire Drake summoned over the platform: soaring round its home (shots, the camera turned to it);
+# 2: in survival it hunts the player: a swoop and a breath (health and fire through it; shots);
+# 3: brought to a quarter health it can't fly: walking and breathing on the ground (shot);
+# 4: each other drake summoned and breathing at the player (a shot of each).
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamerule doMobLoot false
+cmd difficulty normal
+cmd gamemode creative
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd tp @s 90000.5 200 90000.5
+wait 80
+cmd fill 89970 219 89970 90030 219 90030 minecraft:stone
+cmd tp @s 90000.5 220 90000.5 0 0
+wait 40
+cmd kill @e[type=!player,distance=..100]
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd summon elementalarcana:fire_drake 90000.5 242 90000.5
+wait 60
+cmd execute as @s at @s run tp @s ~ ~ ~ facing entity @e[type=elementalarcana:fire_drake,limit=1]
+wait 2
+shot drake_soaring
+wait 40
+cmd execute as @s at @s run tp @s ~ ~ ~ facing entity @e[type=elementalarcana:fire_drake,limit=1]
+wait 2
+shot drake_soaring_2
+# 2: The hunt.
+cmd gamemode survival
+cmd effect give @s minecraft:resistance 900 3 true
+cmd effect give @s minecraft:fire_resistance 900 0 true
+cmd execute as @s run data get entity @s Health
+wait 60
+cmd execute as @s at @s run tp @s ~ ~ ~ facing entity @e[type=elementalarcana:fire_drake,limit=1]
+wait 2
+shot drake_hunting
+wait 60
+cmd execute as @s at @s run tp @s ~ ~ ~ facing entity @e[type=elementalarcana:fire_drake,limit=1]
+wait 2
+shot drake_attack
+cmd execute as @s run data get entity @s Health
+wait 80
+cmd execute as @s at @s run tp @s ~ ~ ~ facing entity @e[type=elementalarcana:fire_drake,limit=1]
+wait 2
+shot drake_attack_2
+cmd execute as @s run data get entity @s Health
+cmd effect give @s minecraft:instant_health 1 10 true
+# 3: Grounded.
+cmd data modify entity @e[type=elementalarcana:fire_drake,limit=1] Health set value 20.0f
+wait 80
+cmd execute as @s at @s run tp @s ~ ~ ~ facing entity @e[type=elementalarcana:fire_drake,limit=1]
+wait 2
+shot drake_grounded
+cmd execute as @e[type=elementalarcana:fire_drake] run data get entity @s Pos[1]
+cmd kill @e[type=elementalarcana:fire_drake]
+cmd effect give @s minecraft:instant_health 1 10 true
+# 4: The other drakes' breath.
+cmd summon elementalarcana:ice_drake 90000.5 236 90000.5
+wait 160
+cmd execute as @s at @s run tp @s ~ ~ ~ facing entity @e[type=elementalarcana:ice_drake,limit=1]
+wait 2
+shot drake_ice
+cmd kill @e[type=elementalarcana:ice_drake]
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd summon elementalarcana:lightning_drake 90000.5 236 90000.5
+wait 160
+cmd execute as @s at @s run tp @s ~ ~ ~ facing entity @e[type=elementalarcana:lightning_drake,limit=1]
+wait 2
+shot drake_lightning
+cmd kill @e[type=elementalarcana:lightning_drake]
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd summon elementalarcana:water_drake 90000.5 236 90000.5
+wait 160
+cmd execute as @s at @s run tp @s ~ ~ ~ facing entity @e[type=elementalarcana:water_drake,limit=1]
+wait 2
+shot drake_water
+cmd kill @e[type=elementalarcana:water_drake]
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd summon elementalarcana:wind_drake 90000.5 236 90000.5
+wait 160
+cmd execute as @s at @s run tp @s ~ ~ ~ facing entity @e[type=elementalarcana:wind_drake,limit=1]
+wait 2
+shot drake_wind
+cmd kill @e[type=#elementalarcana:drakes]
+cmd gamemode creative
+cmd effect clear @s
+quit

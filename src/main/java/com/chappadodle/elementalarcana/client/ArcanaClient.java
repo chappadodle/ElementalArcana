@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.client;
 
+import com.chappadodle.elementalarcana.api.DrakeRules;
+import com.chappadodle.elementalarcana.content.drake.ModDrakes;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Bubble;
 import com.chappadodle.elementalarcana.api.ProjectileSpell;
@@ -363,6 +365,9 @@ public final class ArcanaClient {
         }
         event.registerEntityRenderer(ModHollow.HOLLOW.get(), HollowRenderer::new);
         event.registerEntityRenderer(ModCrypts.REVENANT.get(), RevenantRenderer::new);
+        for (Element element : DrakeRules.ELEMENTS) {
+            event.registerEntityRenderer(ModDrakes.drake(element), DrakeRenderer::new);
+        }
     }
 
     @SubscribeEvent
@@ -372,6 +377,7 @@ public final class ArcanaClient {
         event.registerLayerDefinition(SovereignModel.LAYER, SovereignModel::createLayer);
         event.registerLayerDefinition(RevenantModel.LAYER, RevenantModel::createBodyLayer);
         event.registerLayerDefinition(RevenantModel.ROBE, RevenantModel::createRobeLayer);
+        event.registerLayerDefinition(DrakeModel.LAYER, DrakeModel::createLayer);
     }
 
     // Load every projectile spell's 3D model, including models from addon spells.

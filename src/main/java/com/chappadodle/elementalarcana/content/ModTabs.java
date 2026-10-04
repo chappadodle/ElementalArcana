@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.content;
 
+import com.chappadodle.elementalarcana.api.DrakeRules;
+import com.chappadodle.elementalarcana.content.drake.ModDrakes;
 import com.chappadodle.elementalarcana.api.Relic;
 import com.chappadodle.elementalarcana.content.relic.ModRelics;
 import com.chappadodle.elementalarcana.content.crypt.ModCrypts;
@@ -80,6 +82,15 @@ public final class ModTabs {
                 output.accept(ModCrypts.REVENANT_EGG.get());
                 for (Relic relic : Relic.values()) {
                     output.accept(ModRelics.item(relic));
+                }
+                for (Element element : DrakeRules.ELEMENTS) {
+                    output.accept(ModDrakes.scale(element));
+                }
+                for (Element element : DrakeRules.ELEMENTS) {
+                    output.accept(ModDrakes.charm(element));
+                }
+                for (Element element : DrakeRules.ELEMENTS) {
+                    output.accept(ModDrakes.egg(element));
                 }
             })
             .build());
