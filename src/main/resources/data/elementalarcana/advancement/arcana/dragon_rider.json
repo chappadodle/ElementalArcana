@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/hatchling",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:drake_saddle"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.dragon_rider.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.dragon_rider.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "drake_ride": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "drake_ride"
+      }
+    }
+  }
+}

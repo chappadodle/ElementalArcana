@@ -1,5 +1,8 @@
 package com.chappadodle.elementalarcana.content.drake;
 
+import com.chappadodle.elementalarcana.content.mob.MobCasting;
+import net.minecraft.world.entity.Entity;
+import java.util.function.Predicate;
 import com.chappadodle.elementalarcana.api.DrakeRules;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.ElementalReactions;
@@ -31,16 +34,20 @@ public final class DrakeBreath {
     private DrakeBreath() {
     }
 
-    /** One hit of the breath, from {@code mouth} along {@code facing} (a unit vector). */
+    /** One hit of a wild drake's breath, from {@code mouth} along {@code facing} (a unit vector): all but drakes. */
     public static void hit(ServerLevel level, DrakeEntity drake, Vec3 mouth, Vec3 facing) {
-        Element element = drake.element();
+        hit(level, drake, drake.element(), mouth, facing, entity -> !(entity instanceof DrakeEntity));
+    }
+
+    /** One hit of a breath of {@code element} from {@code breather}, on whatever {@code mayHit} allows (and never creative players). */
+    public static void hit(ServerLevel level, LivingEntity breather, Element element, Vec3 mouth, Vec3 facing, Predicate<LivingEntity> mayHit) {
         double reach = DrakeRules.BREATH_RANGE;
+        Predicate<LivingEntity> allowed = entity -> entity.isAlive() && entity != breather && mayHit.test(entity)
+                && !(entity instanceof Player player && (player.isCreative() || player.isSpectator()));
         AABB area = new AABB(mouth, mouth).inflate(reach + 1);
-        List<LivingEntity> caught = level.getEntitiesOfClass(LivingEntity.class, area, entity -> entity.isAlive()
-                && !(entity instanceof DrakeEntity) && !(entity instanceof Player player && (player.isCreative() || player.isSpectator()))
-                && inCone(mouth, facing, entity));
+        List<LivingEntity> caught = level.getEntitiesOfClass(LivingEntity.class, area, entity -> allowed.test(entity) && inCone(mouth, facing, entity));
         for (LivingEntity target : caught) {
-            touch(level, drake, target, element, facing, caught);
+            touch(level, breather, target, element, facing, caught, allowed);
         }
     }
 
@@ -49,7 +56,8 @@ public final class DrakeBreath {
         return DrakeRules.inBreath(to.x, to.y, to.z, facing.x, facing.y, facing.z);
     }
 
-    private static void touch(ServerLevel level, DrakeEntity drake, LivingEntity target, Element element, Vec3 facing, List<LivingEntity> caught) {
+    private static void touch(ServerLevel level, LivingEntity drake, LivingEntity target, Element element, Vec3 facing, List<LivingEntity> caught,
+                              Predicate<LivingEntity> allowed) {
         float damage = DrakeRules.BREATH_DAMAGE;
         switch (element) {
             case FIRE -> damage *= ElementalReactions.fireHit(target);
@@ -77,7 +85,7 @@ public final class DrakeBreath {
                 push(target, facing, 0.45, 0.0);
                 ElementalReactions.launchAirborne(target, 0.45);
             }
-            case LIGHTNING -> spark(level, drake, target, caught, damage);
+            case LIGHTNING -> spark(level, drake, target, caught, damage, allowed);
             default -> {
             }
         }
@@ -89,13 +97,13 @@ public final class DrakeBreath {
     }
 
     /** Lightning leaps from one caught by the breath to one more near it, for half. */
-    private static void spark(ServerLevel level, DrakeEntity drake, LivingEntity from, List<LivingEntity> caught, float damage) {
+    private static void spark(ServerLevel level, LivingEntity drake, LivingEntity from, List<LivingEntity> caught, float damage,
+                              Predicate<LivingEntity> allowed) {
         if (level.getRandom().nextInt(3) != 0) {
             return;
         }
         List<LivingEntity> near = level.getEntitiesOfClass(LivingEntity.class, from.getBoundingBox().inflate(4), entity -> entity != from
-                && entity.isAlive() && !(entity instanceof DrakeEntity) && !caught.contains(entity)
-                && !(entity instanceof Player player && (player.isCreative() || player.isSpectator())));
+                && allowed.test(entity) && !caught.contains(entity));
         if (near.isEmpty()) {
             return;
         }
@@ -109,38 +117,39 @@ public final class DrakeBreath {
         }
     }
 
-    /** The warning (a glow at its jaws) or the breath (a stream along the cone), drawn on the client. */
-    static void particles(DrakeEntity drake, boolean breathing) {
+    /**
+     * The warning (a glow at its jaws) or the breath (a stream from {@code mouth} along {@code ahead}),
+     * drawn on the client; {@code scale} for a young drake's smaller breath.
+     */
+    static void particles(Entity drake, Element element, Vec3 mouth, Vec3 ahead, float scale, boolean breathing) {
         Level level = drake.level();
         RandomSource random = drake.getRandom();
-        Vec3 mouth = drake.mouth();
         if (!breathing) {
             for (int i = 0; i < 2; i++) {
-                level.addParticle(drake.handsParticle(), mouth.x + (random.nextDouble() - 0.5) * 0.6, mouth.y + (random.nextDouble() - 0.5) * 0.6,
-                        mouth.z + (random.nextDouble() - 0.5) * 0.6, 0, 0.02, 0);
+                level.addParticle(MobCasting.handsParticle(element), mouth.x + (random.nextDouble() - 0.5) * 0.6 * scale,
+                        mouth.y + (random.nextDouble() - 0.5) * 0.6 * scale, mouth.z + (random.nextDouble() - 0.5) * 0.6 * scale, 0, 0.02, 0);
             }
             return;
         }
-        // Where it aims: its heading, and its pitch (the server turns it to its prey).
-        Vec3 ahead = Vec3.directionFromRotation(drake.getXRot(), drake.getYRot());
-        ParticleOptions main = switch (drake.element()) {
+        ParticleOptions main = switch (element) {
             case FIRE -> ParticleTypes.FLAME;
             case ICE -> ParticleTypes.SNOWFLAKE;
             case LIGHTNING -> ParticleTypes.ELECTRIC_SPARK;
             case WATER -> ModContent.HYDRO_DROP.get();
             default -> ParticleTypes.CLOUD;
         };
-        for (int i = 0; i < 8; i++) {
+        int count = Math.max(2, Math.round(8 * scale));
+        for (int i = 0; i < count; i++) {
             double spread = 0.22;
             Vec3 dir = ahead.add((random.nextDouble() - 0.5) * spread * 2, (random.nextDouble() - 0.5) * spread * 2,
                     (random.nextDouble() - 0.5) * spread * 2).normalize();
-            double speed = 0.6 + random.nextDouble() * 0.4;
+            double speed = (0.6 + random.nextDouble() * 0.4) * (0.4 + 0.6 * scale);
             level.addParticle(main, mouth.x, mouth.y, mouth.z, dir.x * speed, dir.y * speed, dir.z * speed);
         }
-        if (drake.element() == Element.FIRE && random.nextInt(2) == 0) {
+        if (element == Element.FIRE && random.nextInt(2) == 0) {
             level.addParticle(ParticleTypes.LARGE_SMOKE, mouth.x, mouth.y, mouth.z, ahead.x * 0.3, 0.05, ahead.z * 0.3);
         }
-        if (drake.element() == Element.ICE) {
+        if (element == Element.ICE) {
             level.addParticle(ModContent.FROST_MIST.get(), mouth.x, mouth.y, mouth.z, ahead.x * 0.5, ahead.y * 0.5, ahead.z * 0.5);
         }
     }

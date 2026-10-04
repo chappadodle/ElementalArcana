@@ -6,6 +6,7 @@
     "minecraft:strider",
     "elementalarcana:fire_wisp",
     "elementalarcana:fire_golem",
-    "elementalarcana:fire_drake"
+    "elementalarcana:fire_drake",
+    "elementalarcana:tamed_fire_drake"
   ]
 }

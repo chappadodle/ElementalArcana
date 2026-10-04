@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "cracks=0": {
+      "model": "elementalarcana:block/water_drake_egg"
+    },
+    "cracks=1": {
+      "model": "elementalarcana:block/water_drake_egg_cracked_1"
+    },
+    "cracks=2": {
+      "model": "elementalarcana:block/water_drake_egg_cracked_2"
+    }
+  }
+}

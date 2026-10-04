@@ -138,6 +138,16 @@
           "weight": 85
         }
       ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "elementalarcana:wind_drake_egg",
+          "weight": 1
+        }
+      ]
     }
   ]
 }

@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/drake_hoard",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:fire_drake_egg"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.hatchling.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.hatchling.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "drake_hatched": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "drake_hatched"
+      }
+    }
+  }
+}

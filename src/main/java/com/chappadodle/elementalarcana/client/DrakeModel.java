@@ -1,7 +1,8 @@
 package com.chappadodle.elementalarcana.client;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
-import com.chappadodle.elementalarcana.content.drake.DrakeEntity;
+import com.chappadodle.elementalarcana.content.drake.DrakeLike;
+import net.minecraft.world.entity.LivingEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;
@@ -22,10 +23,11 @@ import net.minecraft.util.Mth;
  * soars, hard as it climbs) and its legs tuck back; on the ground the wings fold along its sides and
  * it walks. Breathing, its jaw opens wide and its head reaches forward; resting, its head lies low.
  */
-public class DrakeModel extends EntityModel<DrakeEntity> {
+public class DrakeModel<T extends LivingEntity & DrakeLike> extends EntityModel<T> {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(ElementalArcana.id("drake"), "main");
 
     private final ModelPart body;
+    private final ModelPart saddle;
     private final ModelPart neck;
     private final ModelPart head;
     private final ModelPart jaw;
@@ -43,6 +45,7 @@ public class DrakeModel extends EntityModel<DrakeEntity> {
 
     public DrakeModel(ModelPart root) {
         body = root.getChild("body");
+        saddle = body.getChild("saddle");
         neck = body.getChild("neck");
         head = neck.getChild("head");
         jaw = head.getChild("jaw");
@@ -67,6 +70,8 @@ public class DrakeModel extends EntityModel<DrakeEntity> {
                         // A ridge of spines down its back.
                         .texOffs(96, 50).addBox(-1, -9, -12, 2, 3, 24),
                 PartPose.offset(0, 10, 0));
+        body.addOrReplaceChild("saddle", CubeListBuilder.create().texOffs(150, 36).addBox(-6, -7.5f, -8, 12, 2, 12)
+                .texOffs(150, 52).addBox(-7.5f, -6, -3, 1, 8, 2).texOffs(150, 52).addBox(6.5f, -6, -3, 1, 8, 2), PartPose.ZERO);
 
         PartDefinition neck = body.addOrReplaceChild("neck", CubeListBuilder.create()
                 .texOffs(0, 48).addBox(-4, -4, -14, 8, 8, 14), PartPose.offsetAndRotation(0, -2, -16, 0.35f, 0, 0));
@@ -116,8 +121,9 @@ public class DrakeModel extends EntityModel<DrakeEntity> {
     }
 
     @Override
-    public void setupAnim(DrakeEntity drake, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void setupAnim(T drake, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         float partial = ageInTicks - drake.tickCount;
+        saddle.visible = drake.isSaddled();
         boolean flying = drake.isFlyingPose();
         boolean resting = drake.isResting();
         float breath = drake.breathOpen(partial);

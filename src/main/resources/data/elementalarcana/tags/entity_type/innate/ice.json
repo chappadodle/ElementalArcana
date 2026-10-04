@@ -4,6 +4,7 @@
     "minecraft:polar_bear",
     "minecraft:snow_golem",
     "elementalarcana:ice_wisp",
-    "elementalarcana:ice_drake"
+    "elementalarcana:ice_drake",
+    "elementalarcana:tamed_ice_drake"
   ]
 }

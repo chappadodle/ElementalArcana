@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.network;
 
+import com.chappadodle.elementalarcana.content.drake.TamedDrakeEntity;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.core.CastingService;
 import com.chappadodle.elementalarcana.core.Conjuring;
@@ -38,7 +39,14 @@ public record CastSpellPayload(Action action) implements CustomPacketPayload {
             return;
         }
         switch (payload.action()) {
-            case PRESS -> CastingService.tryCast(player);
+            case PRESS -> {
+                // On a grown drake, the cast key is its breath.
+                if (player.getVehicle() instanceof TamedDrakeEntity drake && drake.isAdult()) {
+                    drake.riderBreath(player);
+                } else {
+                    CastingService.tryCast(player);
+                }
+            }
             case RELEASE -> CastingService.release(player);
             case LAUNCH_ONE -> Conjuring.launchOne(player);
             case LAUNCH_ALL -> Conjuring.launchAll(player);

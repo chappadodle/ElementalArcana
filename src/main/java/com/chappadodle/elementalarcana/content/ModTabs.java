@@ -92,6 +92,10 @@ public final class ModTabs {
                 for (Element element : DrakeRules.ELEMENTS) {
                     output.accept(ModDrakes.egg(element));
                 }
+                for (Element element : DrakeRules.ELEMENTS) {
+                    output.accept(ModDrakes.eggItem(element));
+                }
+                output.accept(ModDrakes.SADDLE.get());
             })
             .build());
 

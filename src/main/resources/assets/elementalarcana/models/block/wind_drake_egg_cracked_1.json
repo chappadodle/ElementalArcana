@@ -1,0 +1,194 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "elementalarcana:block/wind_drake_egg",
+    "shell": "elementalarcana:block/wind_drake_egg",
+    "cracks": "elementalarcana:block/drake_egg_cracks_1"
+  },
+  "elements": [
+    {
+      "from": [
+        4,
+        0,
+        4
+      ],
+      "to": [
+        12,
+        10,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#shell"
+        },
+        "east": {
+          "texture": "#shell"
+        },
+        "south": {
+          "texture": "#shell"
+        },
+        "west": {
+          "texture": "#shell"
+        },
+        "up": {
+          "texture": "#shell"
+        },
+        "down": {
+          "texture": "#shell"
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        10,
+        5
+      ],
+      "to": [
+        11,
+        13,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#shell"
+        },
+        "east": {
+          "texture": "#shell"
+        },
+        "south": {
+          "texture": "#shell"
+        },
+        "west": {
+          "texture": "#shell"
+        },
+        "up": {
+          "texture": "#shell"
+        },
+        "down": {
+          "texture": "#shell"
+        }
+      }
+    },
+    {
+      "from": [
+        6,
+        13,
+        6
+      ],
+      "to": [
+        10,
+        14,
+        10
+      ],
+      "faces": {
+        "north": {
+          "texture": "#shell"
+        },
+        "east": {
+          "texture": "#shell"
+        },
+        "south": {
+          "texture": "#shell"
+        },
+        "west": {
+          "texture": "#shell"
+        },
+        "up": {
+          "texture": "#shell"
+        },
+        "down": {
+          "texture": "#shell"
+        }
+      }
+    },
+    {
+      "from": [
+        3.98,
+        -0.02,
+        3.98
+      ],
+      "to": [
+        12.02,
+        10.02,
+        12.02
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cracks"
+        },
+        "east": {
+          "texture": "#cracks"
+        },
+        "south": {
+          "texture": "#cracks"
+        },
+        "west": {
+          "texture": "#cracks"
+        },
+        "up": {
+          "texture": "#cracks"
+        }
+      }
+    },
+    {
+      "from": [
+        4.98,
+        9.98,
+        4.98
+      ],
+      "to": [
+        11.02,
+        13.02,
+        11.02
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cracks"
+        },
+        "east": {
+          "texture": "#cracks"
+        },
+        "south": {
+          "texture": "#cracks"
+        },
+        "west": {
+          "texture": "#cracks"
+        },
+        "up": {
+          "texture": "#cracks"
+        }
+      }
+    },
+    {
+      "from": [
+        5.98,
+        12.98,
+        5.98
+      ],
+      "to": [
+        10.02,
+        14.02,
+        10.02
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cracks"
+        },
+        "east": {
+          "texture": "#cracks"
+        },
+        "south": {
+          "texture": "#cracks"
+        },
+        "west": {
+          "texture": "#cracks"
+        },
+        "up": {
+          "texture": "#cracks"
+        }
+      }
+    }
+  ]
+}

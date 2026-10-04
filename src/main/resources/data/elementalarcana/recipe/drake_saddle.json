@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "minecraft:saddle"
+    },
+    {
+      "tag": "elementalarcana:drake_scales"
+    },
+    {
+      "tag": "elementalarcana:drake_scales"
+    },
+    {
+      "tag": "elementalarcana:drake_scales"
+    },
+    {
+      "tag": "elementalarcana:drake_scales"
+    },
+    {
+      "item": "minecraft:gold_ingot"
+    },
+    {
+      "item": "minecraft:gold_ingot"
+    }
+  ],
+  "result": {
+    "id": "elementalarcana:drake_saddle",
+    "count": 1
+  }
+}

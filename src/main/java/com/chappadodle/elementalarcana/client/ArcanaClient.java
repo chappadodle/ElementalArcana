@@ -247,6 +247,7 @@ public final class ArcanaClient {
     @SubscribeEvent
     public static void registerGuiLayers(RegisterGuiLayersEvent event) {
         event.registerAbove(VanillaGuiLayers.HOTBAR, ElementalArcana.id("magic_hud"), new SpellHudLayer());
+        event.registerAbove(VanillaGuiLayers.EXPERIENCE_BAR, ElementalArcana.id("drake_stamina"), DrakeRiding.STAMINA);
         event.registerAbove(VanillaGuiLayers.PLAYER_HEALTH, ElementalArcana.id("shield_hearts"), new ShieldHeartsLayer());
         event.registerAboveAll(ElementalArcana.id("screen_flash"), ScreenEffects.FLASH_LAYER);
         event.registerAbove(VanillaGuiLayers.CROSSHAIR, ElementalArcana.id("mana_sense"), new ManaSenseLayer());
@@ -367,6 +368,7 @@ public final class ArcanaClient {
         event.registerEntityRenderer(ModCrypts.REVENANT.get(), RevenantRenderer::new);
         for (Element element : DrakeRules.ELEMENTS) {
             event.registerEntityRenderer(ModDrakes.drake(element), DrakeRenderer::new);
+            event.registerEntityRenderer(ModDrakes.tamedDrake(element), DrakeRenderer::new);
         }
     }
 

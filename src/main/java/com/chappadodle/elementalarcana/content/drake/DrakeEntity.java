@@ -4,10 +4,8 @@ import com.chappadodle.elementalarcana.api.DrakeRules;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.content.CreatureLevels;
 import com.chappadodle.elementalarcana.content.ModItems;
-import com.chappadodle.elementalarcana.content.mob.MobCasting;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -47,7 +45,7 @@ import org.jetbrains.annotations.Nullable;
  * flies by steering its own motion toward where it wants to be (no pathfinding in the air); on the
  * ground it walks like any creature.
  */
-public class DrakeEntity extends Monster {
+public class DrakeEntity extends Monster implements DrakeLike {
     public enum State { SOARING, HUNTING, SWOOPING, CLIMBING, HOVERING, BREATHING, LANDING, RESTING, GROUNDED }
 
     /** No breath, the warning (jaws open, glowing), or the breath itself. */
@@ -100,6 +98,7 @@ public class DrakeEntity extends Monster {
                 .add(Attributes.ATTACK_DAMAGE, DrakeRules.CLAW_DAMAGE);
     }
 
+    @Override
     public Element element() {
         return element;
     }
@@ -146,30 +145,36 @@ public class DrakeEntity extends Monster {
     }
 
     /** Whether it holds its flying pose (wings out), as the client sees it. */
+    @Override
     public boolean isFlyingPose() {
         return flies(state());
     }
 
+    @Override
     public boolean isResting() {
         return state() == State.RESTING;
     }
 
+    @Override
     public boolean isClimbing() {
         State state = state();
         return state == State.CLIMBING || state == State.SWOOPING && getDeltaMovement().y > 0.1 || getDeltaMovement().y > 0.2;
     }
 
     /** How far its jaws are open for a breath, 0 to 1. */
+    @Override
     public float breathOpen(float partialTick) {
         return Mth.lerp(partialTick, breathOpenO, breathOpen);
     }
 
     /** Its body's pitch in flight, degrees (nose down positive). */
+    @Override
     public float bodyPitch(float partialTick) {
         return Mth.lerp(partialTick, pitchO, pitch);
     }
 
     /** Its roll as it turns, degrees. */
+    @Override
     public float bank(float partialTick) {
         return Mth.lerp(partialTick, bankO, bank);
     }
@@ -551,7 +556,7 @@ public class DrakeEntity extends Monster {
             wingBeatO = beat;
         }
         if (phase != BREATH_NONE) {
-            DrakeBreath.particles(this, phase == BREATH_ON);
+            DrakeBreath.particles(this, element, mouth(), Vec3.directionFromRotation(getXRot(), getYRot()), 1f, phase == BREATH_ON);
         }
     }
 
@@ -571,6 +576,10 @@ public class DrakeEntity extends Monster {
         super.dropCustomDeathLoot(level, source, recentlyHit);
         spawnAtLocation(new ItemStack(ModDrakes.scale(element), 2 + getRandom().nextInt(3)));
         spawnAtLocation(new ItemStack(ModItems.essence(element), 2 + getRandom().nextInt(3)));
+        if (element == Element.WATER && getRandom().nextFloat() < 0.1f) {
+            // Tide drakes don't nest: now and then one leaves an egg.
+            spawnAtLocation(new ItemStack(ModDrakes.eggItem(element)));
+        }
     }
 
     @Override
@@ -628,10 +637,5 @@ public class DrakeEntity extends Monster {
         State saved = State.values()[Mth.clamp(tag.getByte("state"), 0, State.values().length - 1)];
         // Mid-attack states don't survive a reload: back to the sky (or the ground if it's down).
         setState(saved == State.RESTING || saved == State.GROUNDED ? saved : State.SOARING);
-    }
-
-    /** The particles of its warning and breath, drawn on each client (see DrakeBreath). */
-    ParticleOptions handsParticle() {
-        return MobCasting.handsParticle(element);
     }
 }

@@ -1,0 +1,30 @@
+# Drake Riding: eggs placed warm and cold (a fire egg on magma and one on stone, a frost egg on packed
+# ice, a gale egg low down), their warmth read after a few seconds (only the warm ones gain); then the
+# warm fire egg brought to the edge of hatching, hatching, and its hatchling grown to an adult
+# (stage, health).
+gamerule doMobSpawning false
+forceload add -16 -16 16 16
+fill -12 99 -12 12 99 12 minecraft:stone
+fill -12 100 -12 12 106 12 minecraft:air
+kill @e[type=!player]
+setblock 0 100 0 minecraft:magma_block
+setblock 0 101 0 elementalarcana:fire_drake_egg
+setblock 4 101 0 elementalarcana:fire_drake_egg
+setblock 8 100 0 minecraft:packed_ice
+setblock 8 101 0 elementalarcana:ice_drake_egg
+setblock -4 101 0 elementalarcana:wind_drake_egg
+sleep 6
+data get block 0 101 0 warmth
+data get block 4 101 0 warmth
+data get block 8 101 0 warmth
+data get block -4 101 0 warmth
+data merge block 0 101 0 {warmth:23990}
+sleep 3
+execute if block 0 101 0 minecraft:air run say the fire egg hatched
+execute as @e[type=elementalarcana:tamed_fire_drake] run data get entity @s growth
+execute as @e[type=elementalarcana:tamed_fire_drake] run data get entity @s Health
+execute as @e[type=elementalarcana:tamed_fire_drake] run data merge entity @s {growth:72000}
+sleep 1
+execute as @e[type=elementalarcana:tamed_fire_drake] run data get entity @s attributes
+kill @e[type=!player]
+forceload remove all

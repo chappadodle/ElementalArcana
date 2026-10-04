@@ -1,0 +1,83 @@
+# Drake Riding (see the spec), on a stone platform at y 220 in fresh land, in survival:
+# 1: a fire egg on magma beside the player, warmed almost through, hatching (theirs): a shot;
+# 2: grown to an adult (data), saddled and mounted (its passenger logged): shots;
+# 3: a take-off and climb (heights logged), flying forward (a shot from behind), a breath on the
+#    cast key (a shot), the stamina bar over the experience bar; then down and off.
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd difficulty normal
+cmd gamemode creative
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd tp @s 102000.5 230 102000.5
+wait 80
+cmd fill 101970 219 101970 102030 219 102030 minecraft:stone
+cmd tp @s 102000.5 220 102000.5 -90 20
+wait 40
+cmd kill @e[type=!player,distance=..100]
+cmd clear @s
+cmd gamemode survival
+cmd effect give @s minecraft:resistance 900 3 true
+cmd effect give @s minecraft:fire_resistance 900 0 true
+# 1: The egg.
+cmd setblock 102003 219 102000 minecraft:magma_block
+cmd setblock 102003 220 102000 elementalarcana:fire_drake_egg
+cmd data merge block 102003 220 102000 {warmth:23900}
+wait 20
+shot drake_egg_cracked
+wait 120
+shot drake_hatched
+cmd execute as @e[type=elementalarcana:tamed_fire_drake] run data get entity @s Owner
+# 2: Grown, saddled, mounted.
+cmd execute as @e[type=elementalarcana:tamed_fire_drake] run data merge entity @s {growth:72000,Sitting:1b}
+cmd tp @e[type=elementalarcana:tamed_fire_drake] 102003.5 220 102000.5
+wait 20
+cmd give @s elementalarcana:drake_saddle
+wait 10
+slot 0
+look -90 12
+wait 4
+use
+wait 10
+shot drake_saddled
+slot 8
+wait 2
+use
+wait 20
+cmd execute as @e[type=elementalarcana:tamed_fire_drake] run data get entity @s Passengers[0].id
+camera back
+wait 10
+shot drake_mounted
+# 3: Flight.
+cmd execute as @e[type=elementalarcana:tamed_fire_drake] run data get entity @s Pos[1]
+key jump down
+wait 30
+key jump up
+cmd execute as @e[type=elementalarcana:tamed_fire_drake] run data get entity @s Pos[1]
+key forward down
+wait 40
+shot drake_flying
+cmd execute as @e[type=elementalarcana:tamed_fire_drake] run data get entity @s Pos
+press
+wait 4
+release
+wait 16
+shot drake_rider_breath
+wait 40
+key forward up
+camera first
+wait 4
+shot drake_stamina_bar
+cmd execute as @e[type=elementalarcana:tamed_fire_drake] run data get entity @s Pos[1]
+key sneak down
+wait 4
+key sneak up
+wait 60
+cmd execute as @s run data get entity @s Pos[1]
+cmd kill @e[type=elementalarcana:tamed_fire_drake]
+cmd gamemode creative
+cmd effect clear @s
+quit

@@ -3,8 +3,10 @@
 
 - each drake's hide (256x128, laid out for client/DrakeModel) and its glowing eyes;
 - the scales' and charms' icons, and the item models (with the spawn eggs');
-- the hoards' loot tables, the charms' recipes, the tags (drakes, innate elements, the tide drake's
-  breathing, the drakes' lands and the nests' biomes) and the nests' worldgen.
+- the hoards' loot tables (each with its drake's egg), the charms' and saddle's recipes, the tags
+  (drakes, innate elements for wild and raised drakes, the tide drakes' breathing, the drakes' lands,
+  the nests' biomes, the scales) and the nests' worldgen;
+- the eggs (one block each, three stages of cracks) and the saddle (Drake Riding).
 
 Run from the project root:  python3 tools/gen_drakes.py
 """
@@ -140,6 +142,15 @@ def hide(element):
     for rect in box_faces(110, 90, 30, 2, 3).values():
         paint.fill(rect, p["bone"])
     paint.membrane(110, 96, 30, 1, 18)
+    # The saddle (drawn only on a saddled drake): leather with a gold edge, and its straps.
+    for name, rect in box_faces(150, 36, 12, 2, 12).items():
+        paint.fill(rect, (120, 74, 40) if name != "bottom" else (90, 54, 30), 8)
+        if name == "top":
+            x0, y0, x1, y1 = rect
+            paint.img[y0, x0:x1, :3] = (214, 168, 58)
+            paint.img[y1 - 1, x0:x1, :3] = (214, 168, 58)
+    for rect in box_faces(150, 52, 1, 8, 2).values():
+        paint.fill(rect, (90, 54, 30), 6)
     paint.creature_box(192, 0, 4, 6, 5)
     paint.creature_box(192, 12, 3, 4, 3, belly_rows=0)
     for rect in box_faces(192, 20, 4, 2, 5).values():
@@ -217,6 +228,89 @@ def entry(name, weight, low=None, high=None, functions=None):
     return e
 
 
+def egg_texture(element):
+    """A drake egg's shell: its scales' colour, speckled, a little light at the top."""
+    p = PALETTES[element]
+    rng = np.random.default_rng(4100 + ELEMENTS.index(element))
+    img = np.zeros((16, 16, 4))
+    for y in range(16):
+        for x in range(16):
+            shade = 1.15 - y / 40
+            color = np.array(p["scale"], dtype=float) * shade + (rng.random() - 0.5) * 12
+            if rng.random() < 0.12:
+                color = np.array(p["dark"], dtype=float)
+            if rng.random() < 0.05:
+                color = np.array(p["belly"], dtype=float)
+            img[y, x, :3] = np.clip(color, 0, 255)
+            img[y, x, 3] = 255
+    return Image.fromarray(img.astype(np.uint8), "RGBA")
+
+
+CRACKS = {
+    1: ["................", "................", ".......k........", "......kk........", ".......k........", "........k.......",
+        "................", "................", "................", "................", "................", "................",
+        "................", "................", "................", "................"],
+    2: ["................", "....k...........", ".....k.k........", "......kk....k...", ".......k...k....", "........k.k.....",
+        "...k.....k......", "....k...k.......", ".....kkk........", "......k.........", "................", "..........k.....",
+        ".........k......", "........k.......", "................", "................"],
+}
+
+
+def egg_model(element, cracks):
+    parts = [([4, 0, 4], [12, 10, 12]), ([5, 10, 5], [11, 13, 11]), ([6, 13, 6], [10, 14, 10])]
+    elements = []
+    for lo, hi in parts:
+        elements.append({"from": lo, "to": hi, "faces": {side: {"texture": "#shell"} for side in ("north", "east", "south", "west", "up", "down")}})
+    if cracks:
+        for lo, hi in parts:
+            elements.append({"from": [v - 0.02 for v in lo], "to": [v + 0.02 for v in hi],
+                             "faces": {side: {"texture": "#cracks"} for side in ("north", "east", "south", "west", "up")}})
+    textures = {"particle": f"{NS}block/{element}_drake_egg", "shell": f"{NS}block/{element}_drake_egg"}
+    if cracks:
+        textures["cracks"] = f"{NS}block/drake_egg_cracks_{cracks}"
+    return {"parent": "minecraft:block/block", "render_type": "minecraft:cutout", "textures": textures, "elements": elements}
+
+
+def saddle_icon():
+    img = np.zeros((16, 16, 4), dtype=np.uint8)
+    leather, dark, gold = (120, 74, 40, 255), (84, 50, 26, 255), (214, 168, 58, 255)
+    img[5:10, 3:13] = leather
+    img[5, 3:13] = gold
+    img[9, 3:13] = dark
+    img[4, 5:11] = leather
+    img[10:14, 4:5] = dark
+    img[10:14, 11:12] = dark
+    img[13, 3:6] = gold
+    img[13, 10:13] = gold
+    img[6:8, 7:9] = gold
+    return Image.fromarray(img, "RGBA")
+
+
+def eggs_and_saddle():
+    blocks = ASSETS / "textures/block"
+    for cracks, rows in CRACKS.items():
+        img = np.zeros((16, 16, 4), dtype=np.uint8)
+        for y, row in enumerate(rows):
+            for x, ch in enumerate(row):
+                if ch == "k":
+                    img[y, x] = (24, 18, 14, 255)
+        Image.fromarray(img, "RGBA").save(blocks / f"drake_egg_cracks_{cracks}.png")
+    for element in ELEMENTS:
+        egg_texture(element).save(blocks / f"{element}_drake_egg.png")
+        variants = {}
+        for cracks in range(3):
+            suffix = "" if cracks == 0 else f"_cracked_{cracks}"
+            write_json(ASSETS / f"models/block/{element}_drake_egg{suffix}.json", egg_model(element, cracks))
+            variants[f"cracks={cracks}"] = {"model": f"{NS}block/{element}_drake_egg{suffix}"}
+        write_json(ASSETS / f"blockstates/{element}_drake_egg.json", {"variants": variants})
+        write_json(ASSETS / f"models/item/{element}_drake_egg.json", {"parent": f"{NS}block/{element}_drake_egg"})
+        write_json(DATA / f"loot_table/blocks/{element}_drake_egg.json", {"type": "minecraft:block", "pools": [
+            {"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{NS}{element}_drake_egg"}],
+             "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+    saddle_icon().save(ASSETS / "textures/item/drake_saddle.png")
+    write_json(ASSETS / "models/item/drake_saddle.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{NS}item/drake_saddle"}})
+
+
 def main():
     for element in ELEMENTS:
         entity = ASSETS / "textures/entity/drake"
@@ -249,6 +343,7 @@ def main():
                     entry("minecraft:book", 3, functions=[{"function": "minecraft:enchant_randomly"}]),
                 ]},
                 {"rolls": 1, "entries": [entry(f"{NS}{RELICS[element]}", 15), {"type": "minecraft:empty", "weight": 85}]},
+                {"rolls": 1, "entries": [entry(f"{NS}{element}_drake_egg", 1)]},
             ]})
     nest_lands = [biome for element in ("fire", "ice", "lightning", "wind") for biome in LANDS[element]]
     write_json(DATA / "tags/worldgen/biome/has_structure/drake_nests.json", {"values": nest_lands})
@@ -259,18 +354,26 @@ def main():
     write_json(DATA / "worldgen/structure_set/drake_nests.json", {
         "structures": [{"structure": f"{NS}drake_nest", "weight": 1}],
         "placement": {"type": "minecraft:random_spread", "spacing": 64, "separation": 24, "salt": 773311}})
-    # Each drake is born to its element; the tide drake breathes under water.
+    # Each drake, wild or raised, is born to its element; tide drakes breathe under water.
     for element in ELEMENTS:
         path = DATA / f"tags/entity_type/innate/{element}.json"
         tag = json.loads(path.read_text()) if path.exists() else {"values": []}
-        if f"{NS}{element}_drake" not in tag["values"]:
-            tag["values"].append(f"{NS}{element}_drake")
+        for name in (f"{NS}{element}_drake", f"{NS}tamed_{element}_drake"):
+            if name not in tag["values"]:
+                tag["values"].append(name)
         write_json(path, tag)
     breathing = DATA.parent / "minecraft/tags/entity_type/can_breathe_under_water.json"
     tag = json.loads(breathing.read_text())
-    if f"{NS}water_drake" not in tag["values"]:
-        tag["values"].append(f"{NS}water_drake")
+    for name in (f"{NS}water_drake", f"{NS}tamed_water_drake"):
+        if name not in tag["values"]:
+            tag["values"].append(name)
     write_json(breathing, tag)
+    write_json(DATA / "tags/item/drake_scales.json", {"values": [f"{NS}{e}_drake_scale" for e in ELEMENTS]})
+    write_json(DATA / "recipe/drake_saddle.json", {
+        "type": "minecraft:crafting_shapeless", "category": "equipment",
+        "ingredients": [{"item": "minecraft:saddle"}] + [{"tag": f"{NS}drake_scales"}] * 4 + [{"item": "minecraft:gold_ingot"}] * 2,
+        "result": {"id": f"{NS}drake_saddle", "count": 1}})
+    eggs_and_saddle()
     print("drake art and data written")
 
 
