@@ -2,6 +2,7 @@ package com.chappadodle.elementalarcana.client;
 
 import com.chappadodle.elementalarcana.api.DrakeRules;
 import com.chappadodle.elementalarcana.content.drake.ModDrakes;
+import com.chappadodle.elementalarcana.content.wild.ModWild;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Bubble;
 import com.chappadodle.elementalarcana.api.ProjectileSpell;
@@ -370,6 +371,9 @@ public final class ArcanaClient {
             event.registerEntityRenderer(ModDrakes.drake(element), DrakeRenderer::new);
             event.registerEntityRenderer(ModDrakes.tamedDrake(element), DrakeRenderer::new);
         }
+        event.registerEntityRenderer(ModWild.TREANT.get(), TreantRenderer::new);
+        event.registerEntityRenderer(ModWild.FROST_WRAITH.get(), FrostWraithRenderer::new);
+        event.registerEntityRenderer(ModWild.SALAMANDER.get(), SalamanderRenderer::new);
     }
 
     @SubscribeEvent
@@ -380,6 +384,9 @@ public final class ArcanaClient {
         event.registerLayerDefinition(RevenantModel.LAYER, RevenantModel::createBodyLayer);
         event.registerLayerDefinition(RevenantModel.ROBE, RevenantModel::createRobeLayer);
         event.registerLayerDefinition(DrakeModel.LAYER, DrakeModel::createLayer);
+        event.registerLayerDefinition(TreantModel.LAYER, TreantModel::createLayer);
+        event.registerLayerDefinition(FrostWraithModel.LAYER, FrostWraithModel::createLayer);
+        event.registerLayerDefinition(SalamanderModel.LAYER, SalamanderModel::createLayer);
     }
 
     // Load every projectile spell's 3D model, including models from addon spells.

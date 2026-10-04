@@ -1,0 +1,53 @@
+# Creatures of the Wild, at midnight on a grass floor: one of each summoned (their health, the
+# treant asleep and its wood, the wraith Attuned to Ice); hurt (the treant wakes; fire burns the
+# treant and the wraith half again as hard: 80-6=74, and the wraith 6 under its max); Rooted
+# holding a zombie fast (speed 0); killed by command (their drops: logs, saplings and sticks;
+# snowballs; magma cream, maybe none); then the spawner bringing each in on a high platform.
+gamerule doMobSpawning false
+gamerule doMobLoot true
+gamerule doDaylightCycle false
+time set midnight
+weather clear
+forceload add -48 -48 48 48
+fill -12 99 -12 12 99 12 minecraft:grass_block
+fill -12 100 -12 12 110 12 minecraft:air
+kill @e[type=!player]
+summon elementalarcana:thornwood_treant 0 100 0
+summon elementalarcana:frost_wraith 6 103 0
+summon elementalarcana:ember_salamander -6 100 0
+summon minecraft:zombie 0 100 8
+sleep 2
+execute as @e[type=#elementalarcana:wild_creatures] run data get entity @s Health
+data get entity @e[type=elementalarcana:thornwood_treant,limit=1] awake
+data get entity @e[type=elementalarcana:thornwood_treant,limit=1] wood
+data get entity @e[type=elementalarcana:frost_wraith,limit=1] "neoforge:attachments"
+attribute @e[type=elementalarcana:frost_wraith,limit=1] minecraft:generic.max_health get
+attribute @e[type=elementalarcana:ember_salamander,limit=1] minecraft:generic.max_health get
+damage @e[type=elementalarcana:thornwood_treant,limit=1] 4 minecraft:on_fire
+damage @e[type=elementalarcana:frost_wraith,limit=1] 4 minecraft:on_fire
+sleep 1
+data get entity @e[type=elementalarcana:thornwood_treant,limit=1] awake
+data get entity @e[type=elementalarcana:thornwood_treant,limit=1] Health
+data get entity @e[type=elementalarcana:frost_wraith,limit=1] Health
+effect give @e[type=minecraft:zombie,limit=1] elementalarcana:rooted 5
+sleep 1
+attribute @e[type=minecraft:zombie,limit=1] minecraft:generic.movement_speed get
+attribute @e[type=minecraft:zombie,limit=1] minecraft:generic.jump_strength get
+kill @e[type=!player,type=!item]
+sleep 2
+execute as @e[type=item] run data get entity @s Item
+kill @e[type=item]
+kill @e[type=minecraft:experience_orb]
+fill -42 250 -42 42 250 42 minecraft:grass_block
+execute positioned 0 251 0 run arcana wild treant
+execute positioned 0 251 0 run arcana wild wraith
+execute positioned 0 251 0 run arcana wild salamander
+sleep 1
+execute if entity @e[type=elementalarcana:thornwood_treant]
+execute if entity @e[type=elementalarcana:frost_wraith]
+execute if entity @e[type=elementalarcana:ember_salamander]
+kill @e[type=!player]
+fill -42 250 -42 42 250 42 minecraft:air
+forceload remove all
+gamerule doDaylightCycle true
+time set day

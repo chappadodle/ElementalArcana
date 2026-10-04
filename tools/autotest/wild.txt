@@ -1,0 +1,169 @@
+# Creatures of the Wild (see the spec), in survival on a grass platform at y 220 in fresh land:
+# 1: a Thornwood Treant asleep among oak trees 10 blocks off (shots: which one is it?); the player
+#    steps within 5 blocks: it wakes and stamps (shots every 3 ticks, third person), the player is
+#    Rooted (awake and effects logged); struck, it comes on and grasps; then it's struck down (its
+#    drops logged).
+# 2: at midnight, a Frost Wraith circling the player and casting icicles; once they're frosted
+#    through, it swoops and freezes them (TicksFrozen and effects logged as it goes): shots.
+# 3: an Ember Salamander basking (a shot); the player steps up to it: it spits fire and bites
+#    (shots, the player's fire logged); then one on a lava pool, hurt, healing (health logged).
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamerule doMobLoot true
+cmd difficulty normal
+cmd gamemode creative
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd tp @s 106000.5 230 106000.5
+wait 80
+cmd fill 105975 219 105975 106025 219 106025 minecraft:grass_block
+cmd fill 105975 220 105975 106025 227 106025 minecraft:air
+cmd tp @s 106000.5 220 106000.5 -90 5
+wait 40
+cmd kill @e[type=!player,distance=..100]
+cmd kill @e[type=item,distance=..100]
+cmd data get entity @s "neoforge:attachments"
+# 1: The treant among the trees.
+cmd place feature minecraft:oak 106009 220 105996
+cmd place feature minecraft:oak 106012 220 106004
+cmd place feature minecraft:oak 106008 220 106005
+cmd place feature minecraft:oak 106014 220 105999
+cmd summon elementalarcana:thornwood_treant 106010.5 220 106000.5
+wait 4
+cmd data merge entity @e[type=elementalarcana:thornwood_treant,limit=1] {wood:"oak"}
+cmd gamemode survival
+cmd effect give @s minecraft:resistance 900 3 true
+wait 20
+shot treant_among_trees
+cmd data get entity @e[type=elementalarcana:thornwood_treant,limit=1] awake
+camera back
+cmd tp @s 106005.5 220 106000.5 -65 5
+wait 3
+shot treant_wake_0
+wait 3
+shot treant_wake_1
+wait 3
+shot treant_wake_2
+wait 3
+shot treant_wake_3
+wait 3
+shot treant_wake_4
+wait 3
+shot treant_wake_5
+wait 3
+shot treant_wake_6
+wait 3
+shot treant_wake_7
+cmd data get entity @e[type=elementalarcana:thornwood_treant,limit=1] awake
+cmd data get entity @s active_effects
+wait 4
+shot treant_rooted
+cmd damage @e[type=elementalarcana:thornwood_treant,limit=1] 1 minecraft:player_attack by @s
+wait 30
+shot treant_grasp_0
+wait 10
+shot treant_grasp_1
+cmd data get entity @e[type=elementalarcana:thornwood_treant,limit=1] Pos
+cmd kill @e[type=elementalarcana:thornwood_treant]
+wait 30
+cmd execute as @e[type=item,distance=..30] run data get entity @s Item
+cmd kill @e[type=item,distance=..100]
+camera first
+# 2: The wraith at night.
+cmd time set midnight
+cmd effect clear @s
+cmd effect give @s minecraft:resistance 900 3 true
+cmd tp @s 105990.5 220 106000.5 -90 -15
+cmd summon elementalarcana:frost_wraith 105998.5 224 106000.5
+wait 30
+cmd data get entity @e[type=elementalarcana:frost_wraith,limit=1] "neoforge:attachments"
+shot wraith_0
+wait 15
+shot wraith_1
+cmd data get entity @s TicksFrozen
+wait 15
+camera back
+shot wraith_2
+cmd data get entity @s TicksFrozen
+wait 15
+shot wraith_3
+cmd data get entity @s TicksFrozen
+cmd data get entity @s active_effects
+wait 15
+shot wraith_4
+cmd data get entity @s TicksFrozen
+cmd data get entity @s active_effects
+wait 15
+shot wraith_5
+cmd data get entity @s TicksFrozen
+cmd data get entity @s active_effects
+wait 15
+shot wraith_6
+cmd data get entity @s TicksFrozen
+cmd data get entity @s active_effects
+wait 15
+shot wraith_7
+cmd data get entity @s TicksFrozen
+cmd data get entity @s active_effects
+wait 15
+shot wraith_8
+cmd data get entity @s active_effects
+cmd kill @e[type=elementalarcana:frost_wraith]
+camera first
+# 3: The salamander.
+cmd time set noon
+cmd effect clear @s
+cmd effect give @s minecraft:resistance 900 3 true
+cmd kill @e[type=item,distance=..100]
+cmd tp @s 106000.5 220 106000.5 -90 15
+cmd summon elementalarcana:ember_salamander 106007.5 220 106000.5
+wait 30
+shot salamander_basking
+cmd tp @s 106004.5 220 106000.5 -90 20
+wait 4
+shot salamander_spit_0
+wait 4
+shot salamander_spit_1
+wait 4
+shot salamander_spit_2
+wait 4
+shot salamander_spit_3
+camera back
+wait 20
+shot salamander_close_0
+wait 20
+shot salamander_close_1
+cmd execute as @e[type=elementalarcana:ember_salamander] run data get entity @s Pos
+wait 20
+shot salamander_close_2
+wait 20
+shot salamander_bite
+cmd data get entity @s Fire
+cmd data get entity @s Health
+cmd execute as @e[type=elementalarcana:ember_salamander] run data get entity @s Pos
+camera first
+cmd kill @e[type=elementalarcana:ember_salamander]
+cmd effect give @s minecraft:fire_resistance 900 0 true
+cmd fill 105995 220 106005 105999 220 106009 minecraft:stone
+cmd fill 105996 220 106006 105998 220 106008 minecraft:lava
+cmd summon elementalarcana:ember_salamander 105997.5 221 106007.5
+cmd tp @s 105997.5 223 106002.5 0 31
+wait 20
+cmd damage @e[type=elementalarcana:ember_salamander,limit=1] 10 minecraft:generic
+cmd data get entity @e[type=elementalarcana:ember_salamander,limit=1] Health
+shot salamander_lava
+wait 100
+cmd data get entity @e[type=elementalarcana:ember_salamander,limit=1] Health
+shot salamander_lava_healed
+wait 10
+cmd kill @e[type=elementalarcana:ember_salamander]
+cmd fill 105995 220 106005 105999 220 106009 minecraft:air
+cmd gamemode creative
+cmd effect clear @s
+cmd time set noon
+cmd gamerule doDaylightCycle true
+cmd gamerule doMobSpawning true
+quit

@@ -21,6 +21,7 @@ import com.chappadodle.elementalarcana.content.creature.WispSpawner;
 import com.chappadodle.elementalarcana.content.people.Bounties;
 import com.chappadodle.elementalarcana.content.rift.Rifts;
 import com.chappadodle.elementalarcana.content.sanctum.SanctumSealBlockEntity;
+import com.chappadodle.elementalarcana.content.wild.WildSpawner;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -150,6 +151,7 @@ public final class ArcanaCommand {
                 .then(riftOpen())
                 .then(bountyGive())
                 .then(golemSpawn())
+                .then(wildSpawn())
                 .then(Commands.literal("sanctum").then(Commands.literal("reset").executes(ctx -> resetSanctums(ctx.getSource()))))
                 .then(Commands.literal("tide")
                         .then(Commands.literal("start").executes(ctx -> {
@@ -272,6 +274,32 @@ public final class ArcanaCommand {
             }));
         }
         return golem;
+    }
+
+    /**
+     * /arcana wild <treant|wraith|salamander> [natural]: brings one of the Creatures of the Wild in
+     * 20 to 40 blocks from where it ran, the way the spawner does; with {@code natural}, only in its
+     * own land and away from others of its kind, as the spawner would.
+     */
+    private static LiteralArgumentBuilder<CommandSourceStack> wildSpawn() {
+        LiteralArgumentBuilder<CommandSourceStack> wild = Commands.literal("wild");
+        for (WildSpawner.Kind kind : WildSpawner.Kind.values()) {
+            String name = kind.name().toLowerCase(Locale.ROOT);
+            wild.then(Commands.literal(name).executes(ctx -> spawnWild(ctx.getSource(), kind, true))
+                    .then(Commands.literal("natural").executes(ctx -> spawnWild(ctx.getSource(), kind, false))));
+        }
+        return wild;
+    }
+
+    private static int spawnWild(CommandSourceStack source, WildSpawner.Kind kind, boolean forced) {
+        Mob mob = WildSpawner.trySpawn(source.getLevel(), kind, source.getPosition(), source.getLevel().getRandom(), forced);
+        if (mob == null) {
+            source.sendFailure(Component.translatable("commands.elementalarcana.wild_none"));
+            return 0;
+        }
+        source.sendSuccess(() -> Component.translatable("commands.elementalarcana.wild_spawned", mob.getDisplayName(),
+                mob.getBlockX(), mob.getBlockY(), mob.getBlockZ()), false);
+        return 1;
     }
 
     private static LiteralArgumentBuilder<CommandSourceStack> wispSpawn() {

@@ -1,10 +1,30 @@
 {
   "values": [
-    "minecraft:zombie", "minecraft:husk", "minecraft:zombie_villager", "minecraft:drowned",
-    "minecraft:skeleton", "minecraft:stray", "minecraft:bogged", "minecraft:wither_skeleton",
-    "minecraft:spider", "minecraft:cave_spider", "minecraft:creeper", "minecraft:witch",
-    "minecraft:pillager", "minecraft:vindicator", "minecraft:piglin", "minecraft:zombified_piglin",
-    "minecraft:slime", "minecraft:enderman", "minecraft:blaze", "minecraft:magma_cube",
-    "minecraft:breeze", "minecraft:guardian", "minecraft:phantom"
+    "minecraft:zombie",
+    "minecraft:husk",
+    "minecraft:zombie_villager",
+    "minecraft:drowned",
+    "minecraft:skeleton",
+    "minecraft:stray",
+    "minecraft:bogged",
+    "minecraft:wither_skeleton",
+    "minecraft:spider",
+    "minecraft:cave_spider",
+    "minecraft:creeper",
+    "minecraft:witch",
+    "minecraft:pillager",
+    "minecraft:vindicator",
+    "minecraft:piglin",
+    "minecraft:zombified_piglin",
+    "minecraft:slime",
+    "minecraft:enderman",
+    "minecraft:blaze",
+    "minecraft:magma_cube",
+    "minecraft:breeze",
+    "minecraft:guardian",
+    "minecraft:phantom",
+    "elementalarcana:thornwood_treant",
+    "elementalarcana:frost_wraith",
+    "elementalarcana:ember_salamander"
   ]
 }

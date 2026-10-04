@@ -1,0 +1,43 @@
+{
+  "parent": "elementalarcana:arcana/awakening",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:heartwood"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.into_the_wild.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.into_the_wild.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "thornwood_treant": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": {
+          "type": "elementalarcana:thornwood_treant"
+        }
+      }
+    },
+    "frost_wraith": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": {
+          "type": "elementalarcana:frost_wraith"
+        }
+      }
+    },
+    "ember_salamander": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": {
+          "type": "elementalarcana:ember_salamander"
+        }
+      }
+    }
+  }
+}

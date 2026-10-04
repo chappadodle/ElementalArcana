@@ -117,6 +117,9 @@ ADVANCEMENTS = [
      "Saddle and ride a drake you raised", magic("drake_ride"), None),
     ("golem_breaker", "awakening", item("minecraft:mossy_cobblestone"), "task", "Golem Breaker",
      "Defeat an Elemental Golem", killed("#" + NS + "golems"), None),
+    ("into_the_wild", "awakening", item("heartwood"), "challenge", "Into the Wild",
+     "Defeat a Thornwood Treant, a Frost Wraith and an Ember Salamander",
+     {name: killed(NS + name)["killed"] for name in ("thornwood_treant", "frost_wraith", "ember_salamander")}, None),
     ("lorekeeper", "awakening", item("minecraft:written_book"), "task", "Lorekeeper",
      "Find a page of the old story in a ruin", {
          "page": {"trigger": "minecraft:inventory_changed", "conditions": {"items": [{
