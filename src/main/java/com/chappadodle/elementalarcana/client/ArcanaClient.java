@@ -3,6 +3,7 @@ package com.chappadodle.elementalarcana.client;
 import com.chappadodle.elementalarcana.api.DrakeRules;
 import com.chappadodle.elementalarcana.content.drake.ModDrakes;
 import com.chappadodle.elementalarcana.content.wild.ModWild;
+import com.chappadodle.elementalarcana.content.infusion.ModInfusion;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Bubble;
 import com.chappadodle.elementalarcana.api.ProjectileSpell;
@@ -374,6 +375,7 @@ public final class ArcanaClient {
         event.registerEntityRenderer(ModWild.TREANT.get(), TreantRenderer::new);
         event.registerEntityRenderer(ModWild.FROST_WRAITH.get(), FrostWraithRenderer::new);
         event.registerEntityRenderer(ModWild.SALAMANDER.get(), SalamanderRenderer::new);
+        event.registerBlockEntityRenderer(ModInfusion.ALTAR_ENTITY.get(), InfusionAltarRenderer::new);
     }
 
     @SubscribeEvent

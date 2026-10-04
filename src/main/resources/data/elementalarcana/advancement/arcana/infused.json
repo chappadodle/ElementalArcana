@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/awakening",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:infusion_altar"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.infused.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.infused.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "infusion": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "infusion"
+      }
+    }
+  }
+}

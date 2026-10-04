@@ -3,6 +3,7 @@ package com.chappadodle.elementalarcana.content;
 import com.chappadodle.elementalarcana.api.DrakeRules;
 import com.chappadodle.elementalarcana.content.drake.ModDrakes;
 import com.chappadodle.elementalarcana.content.wild.ModWild;
+import com.chappadodle.elementalarcana.content.infusion.ModInfusion;
 import com.chappadodle.elementalarcana.api.Relic;
 import com.chappadodle.elementalarcana.content.relic.ModRelics;
 import com.chappadodle.elementalarcana.content.crypt.ModCrypts;
@@ -98,6 +99,7 @@ public final class ModTabs {
                 }
                 output.accept(ModDrakes.SADDLE.get());
                 ModWild.items().forEach(item -> output.accept(item.get()));
+                output.accept(ModInfusion.ALTAR_ITEM.get());
             })
             .build());
 

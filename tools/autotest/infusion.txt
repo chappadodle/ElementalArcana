@@ -1,0 +1,130 @@
+# Arcane Infusion (see the spec), in survival on a stone platform at y 220 in fresh land:
+# 1: an Infusion Altar; a diamond sword set on it (use), eight Fire Essence poured in one by one
+#    (use; shots as the basin fills and as it infuses), then taken back with an empty hand (the
+#    sword's components logged);
+# 2: two still husks, one struck with the infused sword, one with a plain sword (by command, as the
+#    player): fire and health logged;
+# 3: an ice-infused sword striking a soaked husk: it freezes (effects logged, a shot);
+# 4: four fire-infused iron pieces worn, standing in fire for three seconds (health and fire logged).
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd difficulty normal
+cmd gamemode creative
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd tp @s 110000.5 230 110000.5
+wait 80
+cmd fill 109985 219 109985 110015 219 110015 minecraft:stone
+cmd fill 109985 220 109985 110015 226 110015 minecraft:air
+cmd tp @s 110000.5 220 110000.5 -90 35
+wait 40
+cmd kill @e[type=!player,distance=..100]
+cmd kill @e[type=item,distance=..100]
+cmd clear @s
+cmd gamemode survival
+cmd effect give @s minecraft:resistance 900 3 true
+# 1: The altar.
+cmd setblock 110002 220 110000 elementalarcana:infusion_altar
+cmd give @s minecraft:diamond_sword
+wait 10
+cmd give @s elementalarcana:fire_essence 8
+wait 10
+slot 0
+wait 4
+use
+wait 10
+shot altar_sword
+slot 1
+wait 4
+use
+wait 6
+use
+wait 6
+use
+wait 6
+use
+wait 6
+shot altar_half
+use
+wait 6
+use
+wait 6
+use
+wait 6
+shot altar_seven
+use
+wait 3
+shot altar_infused_0
+wait 6
+shot altar_infused_1
+slot 8
+wait 4
+use
+wait 10
+cmd data get entity @s Inventory
+shot altar_taken
+# 2: Infused and plain swords on two husks.
+cmd summon minecraft:husk 110003.5 220 109998.5 {NoAI:1b,Tags:["eat_a"]}
+cmd summon minecraft:husk 110003.5 220 110002.5 {NoAI:1b,Tags:["eat_b"]}
+cmd clear @s
+cmd give @s minecraft:diamond_sword[elementalarcana:infusion="fire"]
+wait 10
+slot 0
+wait 4
+cmd damage @e[tag=eat_a,limit=1] 6 minecraft:player_attack by @s
+cmd clear @s
+cmd give @s minecraft:diamond_sword
+wait 10
+cmd damage @e[tag=eat_b,limit=1] 6 minecraft:player_attack by @s
+wait 4
+cmd data get entity @e[tag=eat_a,limit=1] Fire
+cmd data get entity @e[tag=eat_a,limit=1] Health
+cmd data get entity @e[tag=eat_b,limit=1] Fire
+cmd data get entity @e[tag=eat_b,limit=1] Health
+look -60 10
+wait 4
+shot infused_strike
+cmd kill @e[tag=eat_a]
+cmd kill @e[tag=eat_b]
+# 3: Ice on a soaked husk.
+cmd summon minecraft:husk 110003.5 220 110000.5 {NoAI:1b,Tags:["eat_c"]}
+cmd clear @s
+cmd give @s minecraft:diamond_sword[elementalarcana:infusion="ice"]
+wait 10
+cmd effect give @e[tag=eat_c] elementalarcana:wet 10
+wait 4
+cmd damage @e[tag=eat_c,limit=1] 4 minecraft:player_attack by @s
+wait 4
+cmd data get entity @e[tag=eat_c,limit=1] active_effects
+look -90 15
+wait 4
+shot infused_freeze
+cmd kill @e[tag=eat_c]
+# 4: Fire-infused armour in fire.
+cmd clear @s
+cmd item replace entity @s armor.head with minecraft:iron_helmet[elementalarcana:infusion="fire"]
+cmd item replace entity @s armor.chest with minecraft:iron_chestplate[elementalarcana:infusion="fire"]
+cmd item replace entity @s armor.legs with minecraft:iron_leggings[elementalarcana:infusion="fire"]
+cmd item replace entity @s armor.feet with minecraft:iron_boots[elementalarcana:infusion="fire"]
+cmd effect clear @s
+cmd setblock 110000 219 110006 minecraft:netherrack
+cmd setblock 110000 220 110006 minecraft:fire
+cmd tp @s 110000.5 220 110006.5 -90 30
+wait 4
+cmd data get entity @s Health
+camera back
+wait 30
+shot armour_in_fire
+wait 30
+cmd data get entity @s Health
+cmd data get entity @s Fire
+wait 10
+camera first
+cmd setblock 110000 220 110006 minecraft:air
+cmd clear @s
+cmd gamemode creative
+cmd effect clear @s
+quit

@@ -83,7 +83,7 @@ public final class ElementalMatchups {
      * drowning, falling, and falling blocks and suffocation (earth).
      */
     @Nullable
-    private static Element natureOf(DamageSource source) {
+    public static Element natureOf(DamageSource source) {
         if (source.is(DamageTypes.LIGHTNING_BOLT)) {
             return Element.LIGHTNING;
         }
@@ -106,7 +106,8 @@ public final class ElementalMatchups {
         return null;
     }
 
-    private static void feedback(ServerLevel level, LivingEntity target, Element spell, boolean strong) {
+    /** A strong hit's crack and burst, or a resisted one's thud (at most every half second per target). */
+    public static void feedback(ServerLevel level, LivingEntity target, Element spell, boolean strong) {
         CompoundTag data = target.getPersistentData();
         long now = level.getGameTime();
         if (now < data.getLong(TAG_FEEDBACK_UNTIL)) {

@@ -1,0 +1,26 @@
+{
+  "values": [
+    "#minecraft:enchantable/weapon",
+    "#minecraft:enchantable/bow",
+    "#minecraft:enchantable/crossbow",
+    "#minecraft:enchantable/trident",
+    "#minecraft:enchantable/mace",
+    "#minecraft:enchantable/armor",
+    "elementalarcana:apprentice_hood",
+    "elementalarcana:apprentice_robe",
+    "elementalarcana:apprentice_trousers",
+    "elementalarcana:apprentice_boots",
+    "elementalarcana:adept_hood",
+    "elementalarcana:adept_robe",
+    "elementalarcana:adept_trousers",
+    "elementalarcana:adept_boots",
+    "elementalarcana:master_hood",
+    "elementalarcana:master_robe",
+    "elementalarcana:master_trousers",
+    "elementalarcana:master_boots",
+    "elementalarcana:archmage_hood",
+    "elementalarcana:archmage_robe",
+    "elementalarcana:archmage_trousers",
+    "elementalarcana:archmage_boots"
+  ]
+}

@@ -115,6 +115,8 @@ ADVANCEMENTS = [
      "Keep a drake's egg warm in its element's way until it hatches", magic("drake_hatched"), None),
     ("dragon_rider", "hatchling", item("drake_saddle"), "challenge", "Dragon Rider",
      "Saddle and ride a drake you raised", magic("drake_ride"), None),
+    ("infused", "awakening", item("infusion_altar"), "task", "Infused",
+     "Infuse a weapon or armour piece with an element at an Infusion Altar", magic("infusion"), None),
     ("golem_breaker", "awakening", item("minecraft:mossy_cobblestone"), "task", "Golem Breaker",
      "Defeat an Elemental Golem", killed("#" + NS + "golems"), None),
     ("into_the_wild", "awakening", item("heartwood"), "challenge", "Into the Wild",

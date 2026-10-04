@@ -13,6 +13,7 @@ import com.chappadodle.elementalarcana.content.sanctum.SovereignHeartItem;
 import com.chappadodle.elementalarcana.content.tower.GuardianCoreItem;
 import com.chappadodle.elementalarcana.content.tower.MageTowerStructure;
 import com.chappadodle.elementalarcana.content.tower.ModTowers;
+import com.chappadodle.elementalarcana.content.infusion.ModInfusion;
 import com.chappadodle.elementalarcana.content.wild.ModWild;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -67,6 +68,7 @@ public class ArcanaJeiPlugin implements IModPlugin {
         registration.addIngredientInfo(ModWild.HEARTWOOD.get(), info("heartwood"));
         registration.addIngredientInfo(ModWild.WRAITH_SILK.get(), info("wraith_silk"));
         registration.addIngredientInfo(ModWild.SALAMANDER_SCALE.get(), info("salamander_scale"));
+        registration.addIngredientInfo(ModInfusion.ALTAR_ITEM.get(), info("infusion_altar"));
     }
 
     @Override

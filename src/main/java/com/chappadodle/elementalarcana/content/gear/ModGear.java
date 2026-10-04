@@ -39,7 +39,8 @@ public final class ModGear {
     public static final DeferredRegister<ArmorMaterial> ARMOR_MATERIALS = DeferredRegister.create(Registries.ARMOR_MATERIAL, ElementalArcana.MODID);
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ElementalArcana.MODID);
 
-    private static final Codec<Element> ELEMENT_CODEC = Codec.STRING.comapFlatMap(
+    /** An element by its lower-case name, as saved (the focus element, and infusions). */
+    public static final Codec<Element> ELEMENT_CODEC = Codec.STRING.comapFlatMap(
             name -> {
                 for (Element element : Element.values()) {
                     if (element.name().equalsIgnoreCase(name)) {
@@ -49,7 +50,7 @@ public final class ModGear {
                 return DataResult.error(() -> "Unknown element: " + name);
             },
             element -> element.name().toLowerCase(Locale.ROOT));
-    private static final StreamCodec<FriendlyByteBuf, Element> ELEMENT_STREAM_CODEC = NeoForgeStreamCodecs.enumCodec(Element.class);
+    public static final StreamCodec<FriendlyByteBuf, Element> ELEMENT_STREAM_CODEC = NeoForgeStreamCodecs.enumCodec(Element.class);
 
     /** The element a focus is attuned to. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Element>> ELEMENT =
