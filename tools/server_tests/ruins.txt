@@ -1,0 +1,16 @@
+# The ruins' chest loot: three chests' worth rolled from elementalarcana:chests/ruin onto a stone
+# floor and listed (old things, sometimes an apprentice's gear, often a written lore page with its
+# title, author and pages).
+gamerule doMobSpawning false
+forceload add -16 -16 16 16
+fill -12 99 -12 12 99 12 minecraft:stone
+fill -12 100 -12 12 106 12 minecraft:air
+kill @e[type=!player]
+execute positioned 0 101 0 run loot spawn ~ ~ ~ loot elementalarcana:chests/ruin
+execute positioned 0 101 0 run loot spawn ~ ~ ~ loot elementalarcana:chests/ruin
+execute positioned 0 101 0 run loot spawn ~ ~ ~ loot elementalarcana:chests/ruin
+sleep 1
+execute as @e[type=item] run data get entity @s Item
+kill @e[type=item]
+locate structure elementalarcana:ruin
+forceload remove all

@@ -1,0 +1,33 @@
+# Ruins: four ruins found far out in fresh land, each seen from above (goto: 5 blocks south and 18
+# up, looking down at the middle, Slow Falling keeping the view steady); the layouts
+# come out at random.
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamemode creative
+cmd effect clear @s
+cmd effect give @s minecraft:slow_falling 99999 0 true
+cmd tp @s -31000 160 -27000
+wait 80
+goto elementalarcana:ruin 5 18 0
+wait 60
+shot ruin_a
+cmd tp @s -27000 160 -31000
+wait 80
+goto elementalarcana:ruin 5 18 0
+wait 60
+shot ruin_b
+cmd tp @s -33000 160 -33000
+wait 80
+goto elementalarcana:ruin 5 18 0
+wait 60
+shot ruin_c
+cmd tp @s -24000 160 -24000
+wait 80
+goto elementalarcana:ruin 5 18 0
+wait 60
+shot ruin_d
+cmd effect clear @s
+quit

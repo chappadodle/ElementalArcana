@@ -107,6 +107,10 @@ ADVANCEMENTS = [
      "Bind a wisp as your familiar", magic("familiar"), None),
     ("golem_breaker", "awakening", item("minecraft:mossy_cobblestone"), "task", "Golem Breaker",
      "Defeat an Elemental Golem", killed("#" + NS + "golems"), None),
+    ("lorekeeper", "awakening", item("minecraft:written_book"), "task", "Lorekeeper",
+     "Find a page of the old story in a ruin", {
+         "page": {"trigger": "minecraft:inventory_changed", "conditions": {"items": [{
+             "items": "minecraft:written_book", "predicates": {"minecraft:custom_data": "{elementalarcana_lore:1b}"}}]}}}, None),
     ("attuned_foe", "awakening", item("crystal_essence"), "task", "Attuned Foe",
      "Defeat a creature Attuned to an element", magic("defeated"), None),
     ("archmage_slayer", "attuned_foe", item("radiance_essence"), "challenge", "Archmage Slayer",

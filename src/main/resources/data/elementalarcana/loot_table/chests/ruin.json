@@ -1,0 +1,493 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 3,
+        "max": 6
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:bone",
+          "weight": 10,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 4
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:iron_ingot",
+          "weight": 8,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 3
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:gold_ingot",
+          "weight": 5,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:emerald",
+          "weight": 8,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 4
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:paper",
+          "weight": 6,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 4
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:candle",
+          "weight": 4,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:amethyst_shard",
+          "weight": 5,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 3
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "elementalarcana:fire_essence",
+          "weight": 3,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "elementalarcana:water_essence",
+          "weight": 3,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "elementalarcana:wind_essence",
+          "weight": 3,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "elementalarcana:earth_essence",
+          "weight": 3,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:empty",
+          "weight": 10
+        },
+        {
+          "type": "minecraft:item",
+          "name": "elementalarcana:apprentice_wand",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "elementalarcana:element": "fire"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "elementalarcana:apprentice_wand",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "elementalarcana:element": "water"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "elementalarcana:apprentice_wand",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "elementalarcana:element": "wind"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "elementalarcana:apprentice_wand",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "elementalarcana:element": "earth"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "elementalarcana:apprentice_hood",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "elementalarcana:apprentice_robe",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "elementalarcana:apprentice_trousers",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "elementalarcana:apprentice_boots",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:empty",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_book_cover",
+              "title": "The Splitting",
+              "author": "Annals of the First Circle"
+            },
+            {
+              "function": "minecraft:set_written_book_pages",
+              "mode": "replace_all",
+              "pages": [
+                {
+                  "translate": "lore.elementalarcana.splitting.1"
+                },
+                {
+                  "translate": "lore.elementalarcana.splitting.2"
+                }
+              ]
+            },
+            {
+              "function": "minecraft:set_custom_data",
+              "tag": "{elementalarcana_lore:1b,elementalarcana_page:\"splitting\"}"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_book_cover",
+              "title": "Of the Hollow",
+              "author": "A scholar of the Circle"
+            },
+            {
+              "function": "minecraft:set_written_book_pages",
+              "mode": "replace_all",
+              "pages": [
+                {
+                  "translate": "lore.elementalarcana.hollow.1"
+                },
+                {
+                  "translate": "lore.elementalarcana.hollow.2"
+                }
+              ]
+            },
+            {
+              "function": "minecraft:set_custom_data",
+              "tag": "{elementalarcana_lore:1b,elementalarcana_page:\"hollow\"}"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_book_cover",
+              "title": "The Four Seals",
+              "author": "Oath-keeper, unsigned"
+            },
+            {
+              "function": "minecraft:set_written_book_pages",
+              "mode": "replace_all",
+              "pages": [
+                {
+                  "translate": "lore.elementalarcana.seals.1"
+                },
+                {
+                  "translate": "lore.elementalarcana.seals.2"
+                }
+              ]
+            },
+            {
+              "function": "minecraft:set_custom_data",
+              "tag": "{elementalarcana_lore:1b,elementalarcana_page:\"seals\"}"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_book_cover",
+              "title": "A Lament",
+              "author": "Mirel of the low villages"
+            },
+            {
+              "function": "minecraft:set_written_book_pages",
+              "mode": "replace_all",
+              "pages": [
+                {
+                  "translate": "lore.elementalarcana.lament.1"
+                },
+                {
+                  "translate": "lore.elementalarcana.lament.2"
+                }
+              ]
+            },
+            {
+              "function": "minecraft:set_custom_data",
+              "tag": "{elementalarcana_lore:1b,elementalarcana_page:\"lament\"}"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_book_cover",
+              "title": "On Wisps",
+              "author": "Field notes, Third Circle"
+            },
+            {
+              "function": "minecraft:set_written_book_pages",
+              "mode": "replace_all",
+              "pages": [
+                {
+                  "translate": "lore.elementalarcana.wisps.1"
+                },
+                {
+                  "translate": "lore.elementalarcana.wisps.2"
+                }
+              ]
+            },
+            {
+              "function": "minecraft:set_custom_data",
+              "tag": "{elementalarcana_lore:1b,elementalarcana_page:\"wisps\"}"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_book_cover",
+              "title": "The Torn Sky",
+              "author": "Watch-keeper's log"
+            },
+            {
+              "function": "minecraft:set_written_book_pages",
+              "mode": "replace_all",
+              "pages": [
+                {
+                  "translate": "lore.elementalarcana.rifts.1"
+                },
+                {
+                  "translate": "lore.elementalarcana.rifts.2"
+                }
+              ]
+            },
+            {
+              "function": "minecraft:set_custom_data",
+              "tag": "{elementalarcana_lore:1b,elementalarcana_page:\"rifts\"}"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_book_cover",
+              "title": "The Golem-Wrights",
+              "author": "Guild of the Standing Stone"
+            },
+            {
+              "function": "minecraft:set_written_book_pages",
+              "mode": "replace_all",
+              "pages": [
+                {
+                  "translate": "lore.elementalarcana.golems.1"
+                },
+                {
+                  "translate": "lore.elementalarcana.golems.2"
+                }
+              ]
+            },
+            {
+              "function": "minecraft:set_custom_data",
+              "tag": "{elementalarcana_lore:1b,elementalarcana_page:\"golems\"}"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_book_cover",
+              "title": "The Last Entry",
+              "author": "Unsigned"
+            },
+            {
+              "function": "minecraft:set_written_book_pages",
+              "mode": "replace_all",
+              "pages": [
+                {
+                  "translate": "lore.elementalarcana.last.1"
+                },
+                {
+                  "translate": "lore.elementalarcana.last.2"
+                }
+              ]
+            },
+            {
+              "function": "minecraft:set_custom_data",
+              "tag": "{elementalarcana_lore:1b,elementalarcana_page:\"last\"}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

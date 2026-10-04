@@ -1,0 +1,32 @@
+{
+  "parent": "elementalarcana:arcana/awakening",
+  "display": {
+    "icon": {
+      "id": "minecraft:written_book"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.lorekeeper.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.lorekeeper.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "page": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:written_book",
+            "predicates": {
+              "minecraft:custom_data": "{elementalarcana_lore:1b}"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

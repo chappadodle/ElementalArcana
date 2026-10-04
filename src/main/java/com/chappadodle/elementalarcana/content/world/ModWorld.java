@@ -18,7 +18,8 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 /**
  * The world's magic places (docs/superpowers/specs/2026-10-02-shrines-design.md): the shrine
- * structure, its generation piece, and the Shrine Core block at its heart.
+ * structure, its generation piece, and the Shrine Core block at its heart; and the old ruins
+ * (docs/superpowers/specs/2026-10-04-ruins-design.md).
  */
 public final class ModWorld {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(ElementalArcana.MODID);
@@ -40,6 +41,11 @@ public final class ModWorld {
             STRUCTURE_TYPES.register("shrine", () -> () -> ShrineStructure.CODEC);
     public static final DeferredHolder<StructurePieceType, StructurePieceType> SHRINE_PIECE =
             STRUCTURE_PIECES.register("shrine", () -> (StructurePieceType.ContextlessType) ShrinePiece::new);
+
+    public static final DeferredHolder<StructureType<?>, StructureType<RuinStructure>> RUIN =
+            STRUCTURE_TYPES.register("ruin", () -> () -> RuinStructure.CODEC);
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> RUIN_PIECE =
+            STRUCTURE_PIECES.register("ruin", () -> (StructurePieceType.ContextlessType) RuinPiece::new);
 
     private ModWorld() {
     }
