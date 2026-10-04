@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " T ",
+    "MEM"
+  ],
+  "key": {
+    "T": {
+      "item": "minecraft:phantom_membrane"
+    },
+    "M": {
+      "item": "elementalarcana:wraith_silk"
+    },
+    "E": {
+      "item": "elementalarcana:ice_essence"
+    }
+  },
+  "result": {
+    "id": "elementalarcana:wraithsilk_veil",
+    "count": 1
+  }
+}

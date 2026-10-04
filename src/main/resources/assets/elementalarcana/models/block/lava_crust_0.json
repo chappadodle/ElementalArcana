@@ -1,0 +1,91 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "elementalarcana:block/lava_crust",
+    "crust": "elementalarcana:block/lava_crust",
+    "cracks": "elementalarcana:block/lava_crust_cracks_0"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#crust",
+          "cullface": "north"
+        },
+        "east": {
+          "texture": "#crust",
+          "cullface": "east"
+        },
+        "south": {
+          "texture": "#crust",
+          "cullface": "south"
+        },
+        "west": {
+          "texture": "#crust",
+          "cullface": "west"
+        },
+        "up": {
+          "texture": "#crust",
+          "cullface": "up"
+        },
+        "down": {
+          "texture": "#crust",
+          "cullface": "down"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      },
+      "faces": {
+        "north": {
+          "texture": "#cracks",
+          "cullface": "north"
+        },
+        "east": {
+          "texture": "#cracks",
+          "cullface": "east"
+        },
+        "south": {
+          "texture": "#cracks",
+          "cullface": "south"
+        },
+        "west": {
+          "texture": "#cracks",
+          "cullface": "west"
+        },
+        "up": {
+          "texture": "#cracks",
+          "cullface": "up"
+        },
+        "down": {
+          "texture": "#cracks",
+          "cullface": "down"
+        }
+      }
+    }
+  ]
+}

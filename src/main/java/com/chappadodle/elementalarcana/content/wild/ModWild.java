@@ -7,9 +7,14 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -21,6 +26,7 @@ import java.util.List;
  * Thornwood Treant, the Frost Wraith and the Ember Salamander, what they leave behind, and Rooted.
  */
 public final class ModWild {
+    private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(ElementalArcana.MODID);
     private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ElementalArcana.MODID);
     private static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(Registries.ENTITY_TYPE, ElementalArcana.MODID);
     private static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(Registries.MOB_EFFECT, ElementalArcana.MODID);
@@ -48,6 +54,20 @@ public final class ModWild {
     public static final DeferredItem<Item> SALAMANDER_SCALE = ITEMS.register("salamander_scale",
             () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
 
+    /** Trophies of the Wild (docs/superpowers/specs/2026-10-04-wild-trophies-design.md): each creature's trick, carried. */
+    public static final DeferredItem<WildCharmItem> HEARTWOOD_TALISMAN = ITEMS.register("heartwood_talisman",
+            () -> new WildCharmItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    public static final DeferredItem<WildCharmItem> WRAITHSILK_VEIL = ITEMS.register("wraithsilk_veil",
+            () -> new WildCharmItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    public static final DeferredItem<WildCharmItem> SALAMANDER_CHARM = ITEMS.register("salamander_charm",
+            () -> new WildCharmItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+
+    /** Lava cooled under a Salamander Charm's bearer; it melts back on its own. */
+    public static final DeferredBlock<LavaCrustBlock> LAVA_CRUST = BLOCKS.register("lava_crust", () -> new LavaCrustBlock(
+            BlockBehaviour.Properties.of().mapColor(MapColor.NETHER).strength(0.5f).sound(SoundType.BASALT)
+                    .lightLevel(state -> 3 + 3 * state.getValue(LavaCrustBlock.AGE)).noLootTable()
+                    .isValidSpawn((state, level, pos, type) -> false).pushReaction(PushReaction.BLOCK)));
+
     /** Held fast by roots: no walking, no jumping. */
     public static final DeferredHolder<MobEffect, RootedEffect> ROOTED = EFFECTS.register("rooted", RootedEffect::new);
 
@@ -55,6 +75,7 @@ public final class ModWild {
     }
 
     public static void register(IEventBus modEventBus) {
+        BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);
         ENTITY_TYPES.register(modEventBus);
         EFFECTS.register(modEventBus);
@@ -67,8 +88,9 @@ public final class ModWild {
         event.put(SALAMANDER.get(), SalamanderEntity.createAttributes().build());
     }
 
-    /** For the creative tab: the eggs, then the materials. */
+    /** For the creative tab: the eggs, the materials, then the charms they make. */
     public static List<DeferredItem<? extends Item>> items() {
-        return List.of(TREANT_EGG, FROST_WRAITH_EGG, SALAMANDER_EGG, HEARTWOOD, WRAITH_SILK, SALAMANDER_SCALE);
+        return List.of(TREANT_EGG, FROST_WRAITH_EGG, SALAMANDER_EGG, HEARTWOOD, WRAITH_SILK, SALAMANDER_SCALE,
+                HEARTWOOD_TALISMAN, WRAITHSILK_VEIL, SALAMANDER_CHARM);
     }
 }

@@ -8,6 +8,9 @@
 - the icons of Heartwood, Wraith Silk, the Salamander Scale and the Rooted effect, and the item models;
 - the loot tables, the biome tags of their lands, and the entity tags (innate elements, can_attune,
   wild_creatures). (Their advancement, Into the Wild, is in tools/gen_advancements.py.)
+- Trophies of the Wild (docs/superpowers/specs/2026-10-04-wild-trophies-design.md): the three charms'
+  icons and recipes, and the Cooling Crust's textures (its crust and four stages of glowing cracks),
+  models and blockstate.
 
 Run from the project root:  python3 tools/gen_wild.py
 """
@@ -465,6 +468,146 @@ ROOTED = [
 ]
 
 
+TALISMAN = [
+    "................",
+    ".......ss.......",
+    "......s..s......",
+    "......s..s......",
+    ".......ss.......",
+    ".....bbbbbb.....",
+    "....bwwwwwwb....",
+    "...bwwwLLwwwb...",
+    "...bwwLggLwwb...",
+    "...bwLggggLwb...",
+    "...bwwLggLwwb...",
+    "...bwwwgLwwwb...",
+    "....bwwgwwwb....",
+    ".....bbbbbb.....",
+    "................",
+    "................",
+]
+VEIL = [
+    "................",
+    "......cCc.......",
+    ".....sLcLs......",
+    "....sLLLLLs.....",
+    "....sLLfLLLs....",
+    "...sLLLLLLLs....",
+    "...sLfLLLLLLs...",
+    "...sLLLLLfLLs...",
+    "..sLLLLLLLLLs...",
+    "..sLLLfLLLLLLs..",
+    "..sLLLLLLLLLLs..",
+    "..sLsLLsLLsLs...",
+    "...s.Ls.Ls.s....",
+    "......s..s......",
+    "................",
+    "................",
+]
+SAL_CHARM = [
+    "................",
+    "......ggg.......",
+    ".....g...g......",
+    ".....g...g......",
+    "......ggg.......",
+    ".......c........",
+    "......dsd.......",
+    ".....dseesd.....",
+    "....dseEEesd....",
+    "....dseEhEesd...",
+    "....dseEEEesd...",
+    ".....dseEesd....",
+    "......dseesd....",
+    ".......dssd.....",
+    "........dd......",
+    "................",
+]
+
+
+def crust():
+    """The Cooling Crust: dark cooled rock, and its cracks for each of its four stages, wider and
+    brighter as it ages (the cracks are drawn glowing, on their own layer)."""
+    rng = np.random.default_rng(5400)
+    base = np.zeros((16, 16, 4))
+    for y in range(16):
+        for x in range(16):
+            roll = rng.random()
+            color = (58, 42, 38) if roll < 0.45 else (42, 31, 29) if roll < 0.8 else (78, 56, 46)
+            base[y, x, :3] = np.array(color, dtype=float) + (rng.random() - 0.5) * 8
+            base[y, x, 3] = 255
+    # Crack paths: each runs mostly one way across the tile, jittering; each stage shows more of them,
+    # brighter (they wrap at the edges, so neighbouring crusts join up).
+    paths = []
+    for _ in range(8):
+        x, y = (int(v) for v in rng.integers(0, 16, size=2))
+        heading = [(1, 0), (0, 1), (1, 1), (1, -1)][int(rng.integers(0, 4))]
+        path = []
+        for _ in range(int(rng.integers(6, 12))):
+            path.append((x % 16, y % 16))
+            if rng.random() < 0.35:
+                x, y = x + heading[1], y + heading[0]
+            else:
+                x, y = x + heading[0], y + heading[1]
+        paths.append(path)
+    stages = []
+    for age in range(4):
+        img = np.zeros((16, 16, 4), dtype=np.uint8)
+        hot = (255, 110 + 35 * age, 25 + 20 * age)
+        for path in paths[:2 + 2 * age]:
+            for x, y in path:
+                img[y, x] = (*hot, 255)
+        if age == 3:
+            for _ in range(4):
+                x, y = paths[int(rng.integers(0, len(paths)))][int(rng.integers(0, 5))]
+                img[y, x] = (255, 236, 140, 255)
+        stages.append(Image.fromarray(img, "RGBA"))
+    return Image.fromarray(base.astype(np.uint8), "RGBA"), stages
+
+
+def crust_model(age):
+    faces = {side: {"texture": "#crust", "cullface": side} for side in ("north", "east", "south", "west", "up", "down")}
+    glow = {side: {"texture": "#cracks", "cullface": side} for side in ("north", "east", "south", "west", "up", "down")}
+    return {"parent": "minecraft:block/block", "render_type": "minecraft:cutout",
+            "textures": {"particle": f"{NS}block/lava_crust", "crust": f"{NS}block/lava_crust",
+                         "cracks": f"{NS}block/lava_crust_cracks_{age}"},
+            "elements": [{"from": [0, 0, 0], "to": [16, 16, 16], "faces": faces},
+                         {"from": [0, 0, 0], "to": [16, 16, 16], "neoforge_data": {"block_light": 15, "sky_light": 15},
+                          "faces": glow}]}
+
+
+def charm_recipe(result, top, material, essence):
+    return {"type": "minecraft:crafting_shaped", "category": "equipment", "pattern": [" T ", "MEM"],
+            "key": {"T": {"item": top}, "M": {"item": f"{NS}{material}"}, "E": {"item": f"{NS}{essence}_essence"}},
+            "result": {"id": f"{NS}{result}", "count": 1}}
+
+
+def trophies():
+    items = ASSETS / "textures/item"
+    icon(TALISMAN, {"s": (226, 222, 206), "b": (92, 66, 38), "w": (176, 138, 82), "g": (96, 170, 60),
+                    "L": (146, 212, 96)}).save(items / "heartwood_talisman.png")
+    icon(VEIL, {"c": (110, 196, 250), "C": (232, 250, 255), "s": (120, 160, 196), "L": (214, 234, 248),
+                "f": (255, 255, 255)}).save(items / "wraithsilk_veil.png")
+    icon(SAL_CHARM, {"g": (214, 168, 58), "c": (150, 108, 34), "d": SCALE_DARK, "s": SCALE, "e": EMBER, "E": (255, 182, 64),
+                     "h": EMBER_HOT}).save(items / "salamander_charm.png")
+    models = ASSETS / "models/item"
+    for name in ("heartwood_talisman", "wraithsilk_veil", "salamander_charm"):
+        write_json(models / f"{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{NS}item/{name}"}})
+    base, stages = crust()
+    blocks = ASSETS / "textures/block"
+    base.save(blocks / "lava_crust.png")
+    for age, img in enumerate(stages):
+        img.save(blocks / f"lava_crust_cracks_{age}.png")
+        write_json(ASSETS / f"models/block/lava_crust_{age}.json", crust_model(age))
+    # Each crust block turned a random way, so the cracks don't repeat block to block.
+    write_json(ASSETS / "blockstates/lava_crust.json",
+               {"variants": {f"age={age}": [{"model": f"{NS}block/lava_crust_{age}", "y": turn} for turn in (0, 90, 180, 270)]
+                             for age in range(4)}})
+    recipes = DATA / "recipe"
+    write_json(recipes / "heartwood_talisman.json", charm_recipe("heartwood_talisman", "minecraft:string", "heartwood", "earth"))
+    write_json(recipes / "wraithsilk_veil.json", charm_recipe("wraithsilk_veil", "minecraft:phantom_membrane", "wraith_silk", "ice"))
+    write_json(recipes / "salamander_charm.json", charm_recipe("salamander_charm", "minecraft:gold_nugget", "salamander_scale", "fire"))
+
+
 # --- Data ---------------------------------------------------------------------------------------
 
 def item(name, weight=1, low=None, high=None, looting=False):
@@ -544,6 +687,7 @@ def main():
     write_json(DATA / "tags/entity_type/wild_creatures.json",
                {"values": [f"{NS}thornwood_treant", f"{NS}frost_wraith", f"{NS}ember_salamander"]})
 
+    trophies()
     print("wild art and data written")
 
 

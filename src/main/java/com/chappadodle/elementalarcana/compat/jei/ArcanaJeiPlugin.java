@@ -13,6 +13,7 @@ import com.chappadodle.elementalarcana.content.sanctum.SovereignHeartItem;
 import com.chappadodle.elementalarcana.content.tower.GuardianCoreItem;
 import com.chappadodle.elementalarcana.content.tower.MageTowerStructure;
 import com.chappadodle.elementalarcana.content.tower.ModTowers;
+import com.chappadodle.elementalarcana.content.wild.ModWild;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.IRecipeRegistration;
@@ -63,6 +64,9 @@ public class ArcanaJeiPlugin implements IModPlugin {
         registration.addIngredientInfo(ModPeople.SCROLL_OF_UNBINDING.get(), info("scroll_of_unbinding"));
         registration.addIngredientInfo(ModPeople.TOME_OF_INSIGHT.get(), info("tome_of_insight"));
         registration.addIngredientInfo(ModItems.JOURNAL.get(), info("arcanist_journal"));
+        registration.addIngredientInfo(ModWild.HEARTWOOD.get(), info("heartwood"));
+        registration.addIngredientInfo(ModWild.WRAITH_SILK.get(), info("wraith_silk"));
+        registration.addIngredientInfo(ModWild.SALAMANDER_SCALE.get(), info("salamander_scale"));
     }
 
     @Override

@@ -1,0 +1,89 @@
+# Trophies of the Wild (see the spec), in survival on a stone platform at y 220 in fresh land:
+# 1: the Salamander Charm: the player walks east across a lava pool 9 blocks wide (shots every 10
+#    ticks, third person: the crust forming under them, older behind), their height and health
+#    logged on the far side (on the crust, unburnt);
+# 2: the Wraithsilk Veil: a zombie hits the player (positions logged before and after, a shot);
+# 3: the Heartwood Talisman: at noon on grass with natural regeneration off, the player at half
+#    health heals (health logged over 12 seconds, a shot); then Rooted is refused (effects logged).
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd difficulty normal
+cmd gamemode creative
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd tp @s 108000.5 230 108000.5
+wait 80
+cmd fill 107985 219 107985 108015 219 108015 minecraft:stone
+cmd fill 107985 220 107985 108015 226 108015 minecraft:air
+cmd tp @s 107996.5 220 108000.5 -90 25
+wait 40
+cmd kill @e[type=!player,distance=..100]
+cmd kill @e[type=item,distance=..100]
+cmd clear @s
+# 1: Across the lava.
+cmd fill 107996 218 107996 108008 218 108004 minecraft:stone
+cmd fill 107998 219 107998 108006 219 108002 minecraft:lava
+cmd give @s elementalarcana:salamander_charm
+cmd gamemode survival
+cmd effect give @s minecraft:resistance 900 3 true
+wait 20
+camera back
+shot crust_0
+key forward down
+wait 10
+shot crust_1
+wait 10
+shot crust_2
+wait 10
+shot crust_3
+wait 10
+shot crust_4
+wait 10
+key forward up
+shot crust_5
+cmd data get entity @s Pos
+cmd data get entity @s Health
+wait 40
+shot crust_6
+wait 60
+shot crust_7
+camera first
+# 2: The veil.
+cmd clear @s
+cmd give @s elementalarcana:wraithsilk_veil
+cmd tp @s 108000.5 220 108010.5 0 10
+cmd summon minecraft:zombie 108000.5 220 108012.5
+cmd data get entity @s Pos
+wait 40
+cmd data get entity @s Pos
+shot veil_0
+wait 10
+cmd data get entity @s Pos
+shot veil_1
+cmd kill @e[type=minecraft:zombie]
+# 3: The talisman.
+cmd clear @s
+cmd give @s elementalarcana:heartwood_talisman
+cmd gamerule naturalRegeneration false
+cmd fill 107988 219 107988 107994 219 107994 minecraft:grass_block
+cmd tp @s 107991.5 220 107991.5 45 20
+cmd effect clear @s
+wait 10
+cmd damage @s 10 minecraft:generic
+cmd data get entity @s Health
+wait 120
+cmd data get entity @s Health
+wait 120
+cmd data get entity @s Health
+shot talisman_rest
+cmd effect give @s elementalarcana:rooted 5
+cmd data get entity @s active_effects
+wait 10
+cmd gamerule naturalRegeneration true
+cmd gamemode creative
+cmd effect clear @s
+cmd clear @s
+quit

@@ -1,0 +1,49 @@
+{
+  "parent": "elementalarcana:arcana/into_the_wild",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:salamander_charm"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.wild_at_heart.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.wild_at_heart.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "heartwood_talisman": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "elementalarcana:heartwood_talisman"
+          }
+        ]
+      }
+    },
+    "wraithsilk_veil": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "elementalarcana:wraithsilk_veil"
+          }
+        ]
+      }
+    },
+    "salamander_charm": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "elementalarcana:salamander_charm"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " T ",
+    "MEM"
+  ],
+  "key": {
+    "T": {
+      "item": "minecraft:gold_nugget"
+    },
+    "M": {
+      "item": "elementalarcana:salamander_scale"
+    },
+    "E": {
+      "item": "elementalarcana:fire_essence"
+    }
+  },
+  "result": {
+    "id": "elementalarcana:salamander_charm",
+    "count": 1
+  }
+}

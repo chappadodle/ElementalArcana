@@ -1,0 +1,20 @@
+# Trophies of the Wild: two Cooling Crusts set apart on a lava pool (side by side, /setblock's
+# update would melt the first, as it does frosted ice), still crust at first, lava again within 15
+# seconds (they melt on their own, faster with few crust neighbours). The charms' recipes load
+# with the server (any error would show in the log).
+gamerule doMobSpawning false
+forceload add -8 -8 8 8
+fill -4 99 -4 4 99 4 minecraft:stone
+fill -4 100 -4 4 100 4 minecraft:stone
+fill -3 100 -3 3 100 3 minecraft:lava
+fill -4 101 -4 4 104 4 minecraft:air
+setblock 0 100 0 elementalarcana:lava_crust
+setblock 2 100 0 elementalarcana:lava_crust
+sleep 1
+execute if block 0 100 0 elementalarcana:lava_crust
+execute if block 2 100 0 elementalarcana:lava_crust[age=0]
+sleep 15
+execute if block 0 100 0 minecraft:lava
+execute if block 2 100 0 minecraft:lava
+fill -4 99 -4 4 104 4 minecraft:air
+forceload remove all

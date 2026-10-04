@@ -120,6 +120,9 @@ ADVANCEMENTS = [
     ("into_the_wild", "awakening", item("heartwood"), "challenge", "Into the Wild",
      "Defeat a Thornwood Treant, a Frost Wraith and an Ember Salamander",
      {name: killed(NS + name)["killed"] for name in ("thornwood_treant", "frost_wraith", "ember_salamander")}, None),
+    ("wild_at_heart", "into_the_wild", item("salamander_charm"), "goal", "Wild at Heart",
+     "Make a Heartwood Talisman, a Wraithsilk Veil and a Salamander Charm",
+     has(("heartwood_talisman", None), ("wraithsilk_veil", None), ("salamander_charm", None)), None),
     ("lorekeeper", "awakening", item("minecraft:written_book"), "task", "Lorekeeper",
      "Find a page of the old story in a ruin", {
          "page": {"trigger": "minecraft:inventory_changed", "conditions": {"items": [{
