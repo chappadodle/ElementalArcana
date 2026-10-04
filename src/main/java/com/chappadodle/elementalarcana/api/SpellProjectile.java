@@ -11,6 +11,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.level.ClipContext;
@@ -378,10 +379,14 @@ public class SpellProjectile extends ThrowableProjectile {
     }
 
     // Vanilla lets a projectile hit its own shooter once it has flown clear of them (arrows shot
-    // straight up, returning boomerangs...). A spell never hits its own caster.
+    // straight up, returning boomerangs...). A spell never hits its own caster, nor their pets.
     @Override
     protected boolean canHitEntity(Entity target) {
-        return super.canHitEntity(target) && target != getOwner() && !piercedIds.contains(target.getId());
+        Entity owner = getOwner();
+        if (owner != null && target instanceof OwnableEntity pet && owner.getUUID().equals(pet.getOwnerUUID())) {
+            return false;
+        }
+        return super.canHitEntity(target) && target != owner && !piercedIds.contains(target.getId());
     }
 
     @Override

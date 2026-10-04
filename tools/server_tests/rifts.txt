@@ -3,6 +3,8 @@
 # Warden), then it collapses ("Test failed": no rift left) and throws out its cache, listed item by
 # item (a stack of Fire Essence and two to five finds) before it's cleared away. Then a Water Rift
 # cheated of its kills (the world turned peaceful) fades: no rift and no cache ("Test failed" twice).
+# Last, an Earth Rift's chunk is unloaded mid-wave and loaded again: rifts aren't saved, and its
+# creatures don't come back either ("Test failed").
 gamerule doMobSpawning false
 gamerule doMobLoot false
 forceload add -16 -16 16 16
@@ -27,6 +29,13 @@ sleep 4
 execute if entity @e[type=elementalarcana:rift]
 execute if entity @e[type=item]
 difficulty easy
+execute positioned 0 100 0 run arcana rift earth
+sleep 4
+forceload remove all
+sleep 6
+forceload add -16 -16 16 16
+sleep 3
+execute if entity @e[tag=elementalarcana_rift]
 gamerule doMobLoot true
 gamerule doMobSpawning true
 forceload remove all

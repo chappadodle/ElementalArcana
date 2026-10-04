@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:amethyst_shard"
+    },
+    {
+      "item": "elementalarcana:wisp_mote"
+    },
+    {
+      "tag": "elementalarcana:essences"
+    },
+    {
+      "tag": "elementalarcana:essences"
+    }
+  ],
+  "result": {
+    "id": "elementalarcana:binding_charm",
+    "count": 1
+  }
+}

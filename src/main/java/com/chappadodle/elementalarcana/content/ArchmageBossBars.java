@@ -11,6 +11,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.OwnableEntity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
@@ -64,7 +65,7 @@ public final class ArchmageBossBars {
             return;
         }
         CreatureMagic magic = Attunement.get(mob);
-        if (magic == null || magic.rank() != AttunementRank.ARCHMAGE) {
+        if (magic == null || magic.rank() != AttunementRank.ARCHMAGE || mob instanceof OwnableEntity pet && pet.getOwnerUUID() != null) {
             return;
         }
         ServerBossEvent bar = BARS.computeIfAbsent(mob.getUUID(), id -> create(mob, magic));

@@ -16,6 +16,28 @@ SPARKLE = {"W": 0xFFFFFFFF, "c": 0xFFCFF4FF, "b": 0xC0A8E6FF, "f": 0x7090D8FF}
 SHARD = {"w": 0xFFFFFFFF, "l": 0xFFC8F0FF, "b": 0xFF7CC4F0, "d": 0xFF3C80C0}
 
 SPRITES = {
+    # A Binding Charm: a violet gem in a gold rim, hanging from a cord.
+    "item/binding_charm": ({
+        "k": 0x3A2A1A, "c": 0x8A6A3A, "g": 0xE8B840, "y": 0xFFE08A, "d": 0xA87A20,
+        "v": 0x9A4CD8, "l": 0xC890FF, "w": 0xFFFFFF, "p": 0x5A2A8A,
+    }, [
+        "................",
+        "......kkkk......",
+        ".....kcccck.....",
+        "....kc....ck....",
+        "....kc....ck....",
+        ".....kc..ck.....",
+        "......kggk......",
+        ".....kgyygk.....",
+        "....kgdppdgk....",
+        "...kgpvlwvpgk...",
+        "...kgvlvvvvgk...",
+        "...kgvvvvvpgk...",
+        "...kgpvvvppgk...",
+        "....kgppppgk....",
+        ".....kgddgk.....",
+        "......kkkk......",
+    ]),
     # An Arcanist's bounty: a sheet between two rolls, a red wax seal on a violet ribbon.
     "item/bounty_contract": ({
         "k": 0x4A2E14, "d": 0xB89A62, "l": 0xF3E6C0, "p": 0xE6D4A2, "r": 0xA8222A, "s": 0xE45656, "v": 0x7B3FA8,

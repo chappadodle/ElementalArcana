@@ -28,6 +28,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import org.jetbrains.annotations.Nullable;
@@ -139,6 +140,17 @@ public final class Rifts {
             }
         }
         return rift;
+    }
+
+    /**
+     * Rifts aren't saved, but their creatures are (they mustn't despawn mid-fight): one loaded back
+     * from disk has lost its rift (it was unloaded, or the server stopped), so it goes.
+     */
+    @SubscribeEvent
+    public static void onJoin(EntityJoinLevelEvent event) {
+        if (!event.getLevel().isClientSide() && event.loadedFromDisk() && event.getEntity().getTags().contains(RiftEntity.CREATURE_TAG)) {
+            event.setCanceled(true);
+        }
     }
 
     @SubscribeEvent

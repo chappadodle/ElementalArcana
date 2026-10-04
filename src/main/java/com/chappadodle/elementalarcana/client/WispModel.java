@@ -1,7 +1,6 @@
 package com.chappadodle.elementalarcana.client;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
-import com.chappadodle.elementalarcana.content.creature.WispEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;
@@ -14,13 +13,14 @@ import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 
 /**
  * A wisp, Minecraft style: a 4-pixel core spinning inside a 7-pixel shell that turns the other way,
  * with four 2-pixel motes circling it, the whole thing bobbing gently. Translucent (the shell is
  * see-through in the texture, tools/gen_creatures.py).
  */
-public class WispModel extends EntityModel<WispEntity> {
+public class WispModel<T extends Entity> extends EntityModel<T> {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(ElementalArcana.id("wisp"), "main");
     private static final int MOTES = 4;
     private static final float MIDDLE_Y = 19f;
@@ -52,7 +52,7 @@ public class WispModel extends EntityModel<WispEntity> {
     }
 
     @Override
-    public void setupAnim(WispEntity wisp, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void setupAnim(T wisp, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         root.y = MIDDLE_Y + Mth.sin(ageInTicks * 0.1f) * 1.2f;
         core.yRot = -ageInTicks * 0.09f;
         core.xRot = ageInTicks * 0.05f;

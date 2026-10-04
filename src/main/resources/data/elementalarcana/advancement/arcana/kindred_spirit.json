@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/wisp_hunter",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:binding_charm"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.kindred_spirit.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.kindred_spirit.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "familiar": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "familiar"
+      }
+    }
+  }
+}

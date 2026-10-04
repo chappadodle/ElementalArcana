@@ -1,0 +1,97 @@
+# Wisp Familiars: a fire mage (level 25, so a Magus familiar) binds a worn-down fire wisp with a
+# Binding Charm (the familiar's owner, name and rank go to the log), walks away and is followed,
+# strikes a zombie (by command, as the player) and is joined by the familiar's spells (the zombie's
+# health just after and five seconds on), tells it to stay (sneak, right-click: its position before
+# and after the mage walks off), and a Fireball thrown straight at it passes through and bursts
+# behind it, leaving its health as it was. Then a wisp at full health refuses the charm (a word on
+# the action bar).
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamerule doMobLoot false
+cmd gamemode survival
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd effect give @s minecraft:resistance 900 4 true
+cmd tp @s 0.5 100 0.5 -90 10
+wait 40
+cmd kill @e[type=!player]
+cmd kill @e[type=item]
+cmd clear @s
+cmd fill -10 99 -14 40 99 14 minecraft:grass_block
+cmd fill -10 100 -14 40 110 14 minecraft:air
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken fire
+cmd arcana level set 25
+cmd arcana spell elementalarcana:fireball 1
+cmd arcana mana fill
+cmd arcana cooldowns reset
+cmd title @s clear
+wait 20
+cmd give @s elementalarcana:binding_charm 2
+cmd summon elementalarcana:fire_wisp 3.5 100.4 0.5 {NoAI:1b,Health:1f}
+wait 10
+slot 0
+look -90 20
+wait 5
+use
+wait 10
+shot familiar_bound
+cmd execute as @e[type=elementalarcana:fire_familiar] run data get entity @s CustomName
+cmd execute as @e[type=elementalarcana:fire_familiar] run data get entity @s neoforge:attachments
+cmd execute if entity @e[type=elementalarcana:fire_wisp]
+cmd tp @s 12.5 100 0.5 90 10
+wait 60
+cmd execute as @e[type=elementalarcana:fire_familiar] run data get entity @s Pos
+camera back
+wait 3
+shot familiar_following
+camera first
+cmd summon zombie 6.5 100 5.5 {Tags:["eat"],PersistenceRequired:1b,Health:60f,attributes:[{id:"minecraft:generic.max_health",base:60d}]}
+cmd effect give @e[tag=eat] minecraft:slowness 60 255 true
+cmd tp @s 12.5 100 0.5 50 6
+wait 10
+cmd damage @e[tag=eat,limit=1] 1 minecraft:player_attack by @s
+cmd execute as @e[tag=eat] run data get entity @s Health
+camera back
+wait 40
+shot familiar_fighting
+camera first
+wait 60
+cmd execute as @e[tag=eat] run data get entity @s Health
+cmd kill @e[tag=eat]
+cmd tp @s 12.5 100 0.5 90 15
+wait 20
+key sneak down
+slot 8
+wait 5
+use
+wait 5
+key sneak up
+cmd execute as @e[type=elementalarcana:fire_familiar] run data get entity @s Pos
+cmd tp @s 30.5 100 0.5 90 10
+wait 60
+cmd execute as @e[type=elementalarcana:fire_familiar] run data get entity @s Pos
+cmd execute as @e[type=elementalarcana:fire_familiar] run data get entity @s Health
+cmd execute as @e[type=elementalarcana:fire_familiar] at @s run tp @p ~3 ~ ~ 90 20
+wait 10
+select elementalarcana:fireball
+cmd arcana cooldowns reset
+press
+release
+wait 40
+cmd execute as @e[type=elementalarcana:fire_familiar] run data get entity @s Health
+cmd summon elementalarcana:water_wisp 4.5 100.4 4.5 {NoAI:1b}
+cmd tp @s 0.5 100 4.5 -90 10
+wait 10
+slot 0
+use
+wait 10
+shot familiar_refused
+cmd kill @e[type=elementalarcana:water_wisp]
+cmd gamerule doMobLoot true
+wait 10
+quit

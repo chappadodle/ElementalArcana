@@ -2,6 +2,7 @@ package com.chappadodle.elementalarcana.api;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
@@ -16,8 +17,9 @@ import java.util.function.Predicate;
 
 /**
  * Who a spell's area effects (splash, burning ground, whirlpools, bursts) may hurt, given who cast
- * it. A player's magic spares other players (they can still be hit directly by a projectile), and
- * a monster's magic spares other monsters. The caster is never affected. Also: which creature a
+ * it. A player's magic spares other players (they can still be hit directly by a projectile) and
+ * their own pets, a familiar's is its master's, and a monster's magic spares other monsters. The
+ * caster is never affected. Also: which creature a
  * caster is aiming at.
  */
 public final class SpellTargets {
@@ -29,8 +31,16 @@ public final class SpellTargets {
         if (target == owner || !target.isAlive()) {
             return false;
         }
+        // A familiar's magic is its master's.
+        if (owner instanceof OwnableEntity pet && pet.getOwner() instanceof Player master) {
+            return target != master && canAffect(master, target);
+        }
         if (owner instanceof Enemy) {
             return !(target instanceof Enemy);
+        }
+        // A mage's magic spares their own pets (wolves, cats, horses, familiars).
+        if (owner instanceof Player player && target instanceof OwnableEntity pet && player.getUUID().equals(pet.getOwnerUUID())) {
+            return false;
         }
         return !(target instanceof Player);
     }

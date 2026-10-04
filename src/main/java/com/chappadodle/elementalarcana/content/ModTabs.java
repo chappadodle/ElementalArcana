@@ -59,6 +59,7 @@ public final class ModTabs {
                 output.accept(ModHollow.PRIME_KEY.get());
                 output.accept(ModHollow.PRIME_HEART.get());
                 output.accept(ModBrews.WISP_MOTE.get());
+                output.accept(ModCreatures.BINDING_CHARM.get());
                 ModBrews.potions().forEach(potion -> output.accept(PotionContents.createItemStack(Items.POTION, potion)));
                 output.accept(ModTowers.ACOLYTE_EGG.get());
                 output.accept(ModTowers.MAGISTER_EGG.get());

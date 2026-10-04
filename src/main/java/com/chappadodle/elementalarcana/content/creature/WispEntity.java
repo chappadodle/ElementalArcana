@@ -50,7 +50,7 @@ import org.jetbrains.annotations.Nullable;
  * from a distance, circling its target. It leaves the dormant and its kin alone, fights other mages
  * on sight, and fights back against anyone who hurts it. A shrine's guardians stay near the shrine.
  */
-public class WispEntity extends Monster implements FlyingAnimal {
+public class WispEntity extends Monster implements FlyingAnimal, ElementalOrb {
     /** How far a shrine's guardian strays from it. */
     public static final int GUARD_RADIUS = 8;
 
@@ -74,6 +74,12 @@ public class WispEntity extends Monster implements FlyingAnimal {
                 .add(Attributes.FOLLOW_RANGE, 24);
     }
 
+    /** Whether it guards a shrine (a guardian can't be bound as a familiar). */
+    public boolean isGuardian() {
+        return home != null;
+    }
+
+    @Override
     public Element element() {
         return element;
     }

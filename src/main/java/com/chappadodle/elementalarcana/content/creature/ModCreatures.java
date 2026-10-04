@@ -17,12 +17,20 @@ import java.util.EnumMap;
 import java.util.Locale;
 import java.util.Map;
 
-/** The mod's creatures (docs/superpowers/specs/2026-10-02-wisps-design.md): a wisp of every element and their spawn eggs. */
+/**
+ * The mod's creatures (docs/superpowers/specs/2026-10-02-wisps-design.md): a wisp of every element and
+ * their spawn eggs; a familiar of every element (a bound wisp, see the Familiars spec) and the
+ * Binding Charm that makes one.
+ */
 public final class ModCreatures {
     private static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(Registries.ENTITY_TYPE, ElementalArcana.MODID);
     private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ElementalArcana.MODID);
     private static final Map<Element, DeferredHolder<EntityType<?>, EntityType<WispEntity>>> WISPS = new EnumMap<>(Element.class);
     private static final Map<Element, DeferredItem<DeferredSpawnEggItem>> WISP_EGGS = new EnumMap<>(Element.class);
+    private static final Map<Element, DeferredHolder<EntityType<?>, EntityType<FamiliarEntity>>> FAMILIARS = new EnumMap<>(Element.class);
+    /** Binds a worn-down wild wisp as its user's familiar. */
+    public static final DeferredItem<BindingCharmItem> BINDING_CHARM = ITEMS.register("binding_charm",
+            () -> new BindingCharmItem(new Item.Properties().stacksTo(16)));
 
     static {
         for (Element element : Element.values()) {
@@ -39,6 +47,18 @@ public final class ModCreatures {
                 return builder.build(ElementalArcana.MODID + ":" + name);
             });
             WISPS.put(element, type);
+            String familiar = element.name().toLowerCase(Locale.ROOT) + "_familiar";
+            FAMILIARS.put(element, ENTITY_TYPES.register(familiar, () -> {
+                EntityType.Builder<FamiliarEntity> builder = EntityType.Builder
+                        .<FamiliarEntity>of((entityType, level) -> new FamiliarEntity(entityType, level, element), MobCategory.CREATURE)
+                        .sized(0.6f, 0.6f)
+                        .eyeHeight(0.3f)
+                        .clientTrackingRange(10);
+                if (element == Element.FIRE) {
+                    builder.fireImmune();
+                }
+                return builder.build(ElementalArcana.MODID + ":" + familiar);
+            }));
             WISP_EGGS.put(element, ITEMS.register(name + "_spawn_egg",
                     () -> new DeferredSpawnEggItem(type, eggColor(element), eggSpots(element), new Item.Properties())));
         }
@@ -57,12 +77,17 @@ public final class ModCreatures {
         return WISPS.get(element).get();
     }
 
+    public static EntityType<FamiliarEntity> familiar(Element element) {
+        return FAMILIARS.get(element).get();
+    }
+
     public static Item wispEgg(Element element) {
         return WISP_EGGS.get(element).get();
     }
 
     private static void registerAttributes(EntityAttributeCreationEvent event) {
         WISPS.values().forEach(type -> event.put(type.get(), WispEntity.createAttributes().build()));
+        FAMILIARS.values().forEach(type -> event.put(type.get(), FamiliarEntity.createAttributes().build()));
     }
 
     /** The egg's shell: the wisp's shell colour. */

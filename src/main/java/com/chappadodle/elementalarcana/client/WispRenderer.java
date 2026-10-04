@@ -2,7 +2,7 @@ package com.chappadodle.elementalarcana.client;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Element;
-import com.chappadodle.elementalarcana.content.creature.WispEntity;
+import com.chappadodle.elementalarcana.content.creature.ElementalOrb;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -10,16 +10,17 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Mob;
 
 import java.util.EnumMap;
 import java.util.Locale;
 import java.util.Map;
 
 /**
- * Draws a wisp at full brightness with its element's texture and a soft, pulsing halo of its
+ * Draws a wisp (or a familiar, a bound wisp) at full brightness with its element's texture and a soft, pulsing halo of its
  * element's light (GlowHalo), and without tipping over when it dies.
  */
-public class WispRenderer extends MobRenderer<WispEntity, WispModel> {
+public class WispRenderer<T extends Mob & ElementalOrb> extends MobRenderer<T, WispModel<T>> {
     private static final Map<Element, ResourceLocation> TEXTURES = new EnumMap<>(Element.class);
     private static final float HALO_SIZE = 1.4f;
     private static final float HALO_STRENGTH = 0.55f;
@@ -31,11 +32,11 @@ public class WispRenderer extends MobRenderer<WispEntity, WispModel> {
     }
 
     public WispRenderer(EntityRendererProvider.Context context) {
-        super(context, new WispModel(context.bakeLayer(WispModel.LAYER)), 0.2f);
+        super(context, new WispModel<>(context.bakeLayer(WispModel.LAYER)), 0.2f);
     }
 
     @Override
-    public void render(WispEntity wisp, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource buffers, int packedLight) {
+    public void render(T wisp, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource buffers, int packedLight) {
         super.render(wisp, entityYaw, partialTick, poseStack, buffers, packedLight);
         float time = wisp.tickCount + partialTick;
         // The model's middle, bobbing with it (WispModel: 5 pixels up, 1.2 pixels of bob).
@@ -64,17 +65,17 @@ public class WispRenderer extends MobRenderer<WispEntity, WispModel> {
     }
 
     @Override
-    public ResourceLocation getTextureLocation(WispEntity wisp) {
+    public ResourceLocation getTextureLocation(T wisp) {
         return TEXTURES.get(wisp.element());
     }
 
     @Override
-    protected int getBlockLightLevel(WispEntity wisp, BlockPos pos) {
+    protected int getBlockLightLevel(T wisp, BlockPos pos) {
         return 15;
     }
 
     @Override
-    protected float getFlipDegrees(WispEntity wisp) {
+    protected float getFlipDegrees(T wisp) {
         return 0;
     }
 }

@@ -331,6 +331,7 @@ public final class ArcanaClient {
         event.registerEntityRenderer(ModContent.CRYSTAL_SPIRE.get(), CrystalSpireRenderer::new);
         for (Element element : Element.values()) {
             event.registerEntityRenderer(ModCreatures.wisp(element), WispRenderer::new);
+            event.registerEntityRenderer(ModCreatures.familiar(element), WispRenderer::new);
         }
         event.registerEntityRenderer(ModTowers.ACOLYTE.get(), TowerMageRenderer::new);
         event.registerEntityRenderer(ModTowers.MAGISTER.get(), TowerMageRenderer::new);
