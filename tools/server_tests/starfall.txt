@@ -1,0 +1,27 @@
+# Starfall at midnight on a grass floor: a star made to fall on a point (its streak takes three
+# seconds), then the crater (the star block, a scorched ring), the Radiance wisps round it; the star
+# mined by command (its fragments and Essence dropped); a Starlit Lantern stopping a zombie's
+# natural spawn beside it is checked by the spawner later in play (here: it's placed and loads).
+gamerule doMobSpawning false
+gamerule doTileDrops true
+gamerule doDaylightCycle false
+time set midnight
+forceload add -8 -8 8 8
+fill -8 99 -8 8 99 8 minecraft:grass_block
+fill -8 100 -8 8 106 8 minecraft:air
+kill @e[type=!player]
+arcana starfall 0 100 0
+sleep 4
+execute if block 0 100 0 elementalarcana:fallen_star
+execute if block 0 99 0 minecraft:magma_block
+execute if entity @e[type=elementalarcana:radiance_wisp]
+setblock 0 100 0 minecraft:air destroy
+sleep 1
+execute as @e[type=item] run data get entity @s Item
+kill @e[type=!player]
+setblock 4 100 4 elementalarcana:starlit_lantern
+execute if block 4 100 4 elementalarcana:starlit_lantern
+fill -8 99 -8 8 106 8 minecraft:air
+forceload remove all
+gamerule doDaylightCycle true
+time set day

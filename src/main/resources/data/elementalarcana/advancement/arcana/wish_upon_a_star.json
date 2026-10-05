@@ -1,0 +1,29 @@
+{
+  "parent": "elementalarcana:arcana/awakening",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:star_fragment"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.wish_upon_a_star.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.wish_upon_a_star.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "star_fragment": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "elementalarcana:star_fragment"
+          }
+        ]
+      }
+    }
+  }
+}

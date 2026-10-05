@@ -23,6 +23,7 @@ import com.chappadodle.elementalarcana.content.rift.Rifts;
 import com.chappadodle.elementalarcana.content.sanctum.SanctumSealBlockEntity;
 import com.chappadodle.elementalarcana.content.wild.WildSpawner;
 import com.chappadodle.elementalarcana.content.cantrip.ModCantrips;
+import com.chappadodle.elementalarcana.content.star.Starfalls;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -154,6 +155,7 @@ public final class ArcanaCommand {
                 .then(golemSpawn())
                 .then(wildSpawn())
                 .then(cantripLearn())
+                .then(starfallCommand())
                 .then(Commands.literal("sanctum").then(Commands.literal("reset").executes(ctx -> resetSanctums(ctx.getSource()))))
                 .then(Commands.literal("tide")
                         .then(Commands.literal("start").executes(ctx -> {
@@ -302,6 +304,19 @@ public final class ArcanaCommand {
         source.sendSuccess(() -> Component.translatable("commands.elementalarcana.wild_spawned", mob.getDisplayName(),
                 mob.getBlockX(), mob.getBlockY(), mob.getBlockZ()), false);
         return 1;
+    }
+
+    /** /arcana starfall [pos]: a star falls 100 to 180 blocks off, or on {@code pos} (for tests). */
+    private static LiteralArgumentBuilder<CommandSourceStack> starfallCommand() {
+        return Commands.literal("starfall")
+                .executes(ctx -> Starfalls.fallNear(ctx.getSource().getLevel(), ctx.getSource().getPosition(),
+                        ctx.getSource().getLevel().getRandom()) ? 1 : 0)
+                .then(Commands.argument("pos", net.minecraft.commands.arguments.coordinates.BlockPosArgument.blockPos()).executes(ctx -> {
+                    BlockPos pos = net.minecraft.commands.arguments.coordinates.BlockPosArgument.getLoadedBlockPos(ctx, "pos");
+                    Starfalls.fallAt(ctx.getSource().getLevel(), pos, ctx.getSource().getLevel().getRandom());
+                    ctx.getSource().sendSuccess(() -> Component.literal("A star falls on " + pos.toShortString()), false);
+                    return 1;
+                }));
     }
 
     /** /arcana cantrip <cantrip>|all|forget: learns cantrips without their scrolls, or forgets them all (for tests). */

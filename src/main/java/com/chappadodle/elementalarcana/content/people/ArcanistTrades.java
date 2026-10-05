@@ -12,6 +12,7 @@ import com.chappadodle.elementalarcana.content.brew.ModBrews;
 import com.chappadodle.elementalarcana.content.gear.ModGear;
 import com.chappadodle.elementalarcana.content.cantrip.ModCantrips;
 import com.chappadodle.elementalarcana.api.Spell;
+import com.chappadodle.elementalarcana.content.star.ModStars;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
@@ -76,6 +77,7 @@ public final class ArcanistTrades {
         trades.get(3).add(sell(random -> ModTabs.focusOf(ModGear.ADEPT_STAFF.get(), anyElement(random)), 18, null, 3, 10));
         trades.get(3).add(sell(random -> PotionContents.createItemStack(Items.POTION, ModBrews.CLARITY_ELIXIR), 6, null, 6, 10));
         trades.get(3).add(sell(ArcanistTrades::anyCantripScroll, 8, new ItemCost(Items.PAPER, 1), 3, 10));
+        trades.get(3).add(buy(random -> new ItemCost(ModStars.STAR_FRAGMENT.get(), 1), 6, 8, 15));
         // Expert
         trades.get(4).add(sell(random -> new ItemStack(oneOf(random, ModGear.ADEPT_HOOD.get(), ModGear.ADEPT_ROBE.get(),
                 ModGear.ADEPT_TROUSERS.get(), ModGear.ADEPT_BOOTS.get())), 16, null, 3, 15));

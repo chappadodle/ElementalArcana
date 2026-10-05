@@ -16,6 +16,7 @@ import com.chappadodle.elementalarcana.content.tower.ModTowers;
 import com.chappadodle.elementalarcana.content.infusion.ModInfusion;
 import com.chappadodle.elementalarcana.content.wild.ModWild;
 import com.chappadodle.elementalarcana.content.cantrip.ModCantrips;
+import com.chappadodle.elementalarcana.content.star.ModStars;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.IRecipeRegistration;
@@ -72,6 +73,8 @@ public class ArcanaJeiPlugin implements IModPlugin {
         registration.addIngredientInfo(ModWild.HARPY_PLUME.get(), info("harpy_plume"));
         registration.addIngredientInfo(ModWild.PRISM_CORE.get(), info("prism_core"));
         registration.addIngredientInfo(ModWild.BOG_PEARL.get(), info("bog_pearl"));
+        registration.addIngredientInfo(ModStars.STAR_FRAGMENT.get(), info("star_fragment"));
+        registration.addIngredientInfo(ModStars.STARLIT_LANTERN_ITEM.get(), info("starlit_lantern"));
         registration.addIngredientInfo(ModInfusion.ALTAR_ITEM.get(), info("infusion_altar"));
         registration.addItemStackInfo(ModCantrips.cantrips().stream().map(ModCantrips::scroll).toList(), info("cantrip_scroll"));
     }

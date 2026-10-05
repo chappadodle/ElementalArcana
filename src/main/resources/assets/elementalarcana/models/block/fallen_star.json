@@ -1,0 +1,155 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "elementalarcana:block/fallen_star",
+    "star": "elementalarcana:block/fallen_star"
+  },
+  "elements": [
+    {
+      "from": [
+        5,
+        0,
+        5
+      ],
+      "to": [
+        11,
+        10,
+        11
+      ],
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      },
+      "faces": {
+        "north": {
+          "texture": "#star"
+        },
+        "east": {
+          "texture": "#star"
+        },
+        "south": {
+          "texture": "#star"
+        },
+        "west": {
+          "texture": "#star"
+        },
+        "up": {
+          "texture": "#star"
+        },
+        "down": {
+          "texture": "#star"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        0,
+        6
+      ],
+      "to": [
+        6,
+        6,
+        9
+      ],
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      },
+      "faces": {
+        "north": {
+          "texture": "#star"
+        },
+        "east": {
+          "texture": "#star"
+        },
+        "south": {
+          "texture": "#star"
+        },
+        "west": {
+          "texture": "#star"
+        },
+        "up": {
+          "texture": "#star"
+        },
+        "down": {
+          "texture": "#star"
+        }
+      }
+    },
+    {
+      "from": [
+        10,
+        0,
+        4
+      ],
+      "to": [
+        13,
+        7,
+        7
+      ],
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      },
+      "faces": {
+        "north": {
+          "texture": "#star"
+        },
+        "east": {
+          "texture": "#star"
+        },
+        "south": {
+          "texture": "#star"
+        },
+        "west": {
+          "texture": "#star"
+        },
+        "up": {
+          "texture": "#star"
+        },
+        "down": {
+          "texture": "#star"
+        }
+      }
+    },
+    {
+      "from": [
+        7,
+        0,
+        10
+      ],
+      "to": [
+        10,
+        5,
+        13
+      ],
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      },
+      "faces": {
+        "north": {
+          "texture": "#star"
+        },
+        "east": {
+          "texture": "#star"
+        },
+        "south": {
+          "texture": "#star"
+        },
+        "west": {
+          "texture": "#star"
+        },
+        "up": {
+          "texture": "#star"
+        },
+        "down": {
+          "texture": "#star"
+        }
+      }
+    }
+  ]
+}

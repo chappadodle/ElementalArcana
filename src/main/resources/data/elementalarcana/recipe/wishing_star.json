@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "elementalarcana:star_fragment"
+    },
+    {
+      "item": "elementalarcana:star_fragment"
+    },
+    {
+      "item": "elementalarcana:radiance_essence"
+    }
+  ],
+  "result": {
+    "id": "elementalarcana:wishing_star",
+    "count": 1
+  }
+}

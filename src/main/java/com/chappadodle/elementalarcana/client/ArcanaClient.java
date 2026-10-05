@@ -298,6 +298,7 @@ public final class ArcanaClient {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
             WaterBeams.render(event);
             ProspectOutlines.render(event);
+            StarfallClient.render(event);
         }
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
             RenderSystem.defaultBlendFunc();

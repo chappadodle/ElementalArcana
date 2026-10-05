@@ -1,0 +1,63 @@
+# Starfall (see the spec), at midnight on a grass platform at y 220 in fresh land: a star made to
+# fall 40 blocks off (shots of the streak across the sky, the impact, the pillar of light from
+# where the player stands); then up close (the crater, the star, its wisps); the star mined with a
+# diamond pickaxe (fragments in the inventory logged); a Wishing Star used (mana logged).
+hud on
+cmd time set midnight
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd difficulty normal
+cmd gamemode creative
+cmd effect clear @s
+cmd tp @s 120000.5 230 120000.5
+wait 80
+cmd fill 119970 219 119970 120030 219 120030 minecraft:grass_block
+cmd fill 119970 220 119970 120030 227 120030 minecraft:air
+cmd tp @s 119972.5 220 120000.5 -90 -40
+wait 20
+cmd kill @e[type=!player,distance=..100]
+cmd arcana starfall 120025 220 120000
+wait 15
+shot star_streak_0
+cmd tp @s 119972.5 220 120000.5 -45 -40
+wait 15
+shot star_streak_1
+cmd tp @s 119972.5 220 120000.5 -135 -40
+wait 15
+shot star_streak_2
+wait 20
+shot star_impact
+cmd tp @s 119990.5 220 120000.5 -90 -30
+wait 20
+shot star_pillar
+cmd tp @s 120021.5 220 120000.5 -90 25
+wait 20
+shot star_crater
+cmd gamemode survival
+cmd effect give @s minecraft:resistance 900 4 true
+cmd give @s minecraft:diamond_pickaxe
+wait 10
+slot 0
+cmd tp @s 120023.5 220 120000.5 -90 45
+wait 10
+cmd setblock 120025 220 120000 minecraft:air destroy
+wait 20
+cmd tp @s 120025.5 220 120000.5
+wait 20
+cmd data get entity @s Inventory
+shot star_mined
+cmd clear @s
+cmd give @s elementalarcana:wishing_star
+cmd arcana mana set 5
+wait 10
+slot 0
+use
+wait 10
+cmd data get entity @s "neoforge:attachments"."elementalarcana:magic".mana
+cmd kill @e[type=elementalarcana:radiance_wisp]
+cmd clear @s
+cmd gamemode creative
+cmd time set noon
+wait 10
+quit

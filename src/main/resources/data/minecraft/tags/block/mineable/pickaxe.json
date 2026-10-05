@@ -1,6 +1,9 @@
 {
   "replace": false,
   "values": [
-    "elementalarcana:infusion_altar"
+    "elementalarcana:infusion_altar",
+    "elementalarcana:fallen_star",
+    "elementalarcana:starstone",
+    "elementalarcana:starlit_lantern"
   ]
 }
