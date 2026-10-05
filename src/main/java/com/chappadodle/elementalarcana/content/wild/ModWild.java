@@ -41,6 +41,17 @@ public final class ModWild {
             () -> EntityType.Builder.of(SalamanderEntity::new, MobCategory.MONSTER).sized(1.0f, 0.6f).eyeHeight(0.45f)
                     .fireImmune().clientTrackingRange(8).build(ElementalArcana.MODID + ":ember_salamander"));
 
+    // Creatures of the Wild II (docs/superpowers/specs/2026-10-05-wild-creatures-2-design.md).
+    public static final DeferredHolder<EntityType<?>, EntityType<HarpyEntity>> HARPY = ENTITY_TYPES.register("gale_harpy",
+            () -> EntityType.Builder.of(HarpyEntity::new, MobCategory.MONSTER).sized(0.8f, 1.6f).eyeHeight(1.35f)
+                    .clientTrackingRange(10).build(ElementalArcana.MODID + ":gale_harpy"));
+    public static final DeferredHolder<EntityType<?>, EntityType<CrystalCrawlerEntity>> CRAWLER = ENTITY_TYPES.register("crystal_crawler",
+            () -> EntityType.Builder.of(CrystalCrawlerEntity::new, MobCategory.MONSTER).sized(1.4f, 0.9f).eyeHeight(0.6f)
+                    .clientTrackingRange(8).build(ElementalArcana.MODID + ":crystal_crawler"));
+    public static final DeferredHolder<EntityType<?>, EntityType<BogLurkerEntity>> LURKER = ENTITY_TYPES.register("bog_lurker",
+            () -> EntityType.Builder.of(BogLurkerEntity::new, MobCategory.MONSTER).sized(1.4f, 0.7f).eyeHeight(0.6f)
+                    .clientTrackingRange(8).build(ElementalArcana.MODID + ":bog_lurker"));
+
     public static final DeferredItem<DeferredSpawnEggItem> TREANT_EGG = ITEMS.register("thornwood_treant_spawn_egg",
             () -> new DeferredSpawnEggItem(TREANT, 0x5A3F24, 0x4E8A2E, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> FROST_WRAITH_EGG = ITEMS.register("frost_wraith_spawn_egg",
@@ -48,11 +59,21 @@ public final class ModWild {
     public static final DeferredItem<DeferredSpawnEggItem> SALAMANDER_EGG = ITEMS.register("ember_salamander_spawn_egg",
             () -> new DeferredSpawnEggItem(SALAMANDER, 0x7A2E12, 0xFFA030, new Item.Properties()));
 
+    public static final DeferredItem<DeferredSpawnEggItem> HARPY_EGG = ITEMS.register("gale_harpy_spawn_egg",
+            () -> new DeferredSpawnEggItem(HARPY, 0x6F7F98, 0xE8D27A, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> CRAWLER_EGG = ITEMS.register("crystal_crawler_spawn_egg",
+            () -> new DeferredSpawnEggItem(CRAWLER, 0x3A3046, 0xC48CFF, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> LURKER_EGG = ITEMS.register("bog_lurker_spawn_egg",
+            () -> new DeferredSpawnEggItem(LURKER, 0x4A5A30, 0xC8B060, new Item.Properties()));
+
     /** What the three leave behind now and then: materials for the wild's own gear. */
     public static final DeferredItem<Item> HEARTWOOD = ITEMS.register("heartwood", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
     public static final DeferredItem<Item> WRAITH_SILK = ITEMS.register("wraith_silk", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
     public static final DeferredItem<Item> SALAMANDER_SCALE = ITEMS.register("salamander_scale",
             () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
+    public static final DeferredItem<Item> HARPY_PLUME = ITEMS.register("harpy_plume", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
+    public static final DeferredItem<Item> PRISM_CORE = ITEMS.register("prism_core", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
+    public static final DeferredItem<Item> BOG_PEARL = ITEMS.register("bog_pearl", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
 
     /** Trophies of the Wild (docs/superpowers/specs/2026-10-04-wild-trophies-design.md): each creature's trick, carried. */
     public static final DeferredItem<WildCharmItem> HEARTWOOD_TALISMAN = ITEMS.register("heartwood_talisman",
@@ -86,11 +107,14 @@ public final class ModWild {
         event.put(TREANT.get(), TreantEntity.createAttributes().build());
         event.put(FROST_WRAITH.get(), FrostWraithEntity.createAttributes().build());
         event.put(SALAMANDER.get(), SalamanderEntity.createAttributes().build());
+        event.put(HARPY.get(), HarpyEntity.createAttributes().build());
+        event.put(CRAWLER.get(), CrystalCrawlerEntity.createAttributes().build());
+        event.put(LURKER.get(), BogLurkerEntity.createAttributes().build());
     }
 
     /** For the creative tab: the eggs, the materials, then the charms they make. */
     public static List<DeferredItem<? extends Item>> items() {
-        return List.of(TREANT_EGG, FROST_WRAITH_EGG, SALAMANDER_EGG, HEARTWOOD, WRAITH_SILK, SALAMANDER_SCALE,
-                HEARTWOOD_TALISMAN, WRAITHSILK_VEIL, SALAMANDER_CHARM);
+        return List.of(TREANT_EGG, FROST_WRAITH_EGG, SALAMANDER_EGG, HARPY_EGG, CRAWLER_EGG, LURKER_EGG, HEARTWOOD, WRAITH_SILK,
+                SALAMANDER_SCALE, HARPY_PLUME, PRISM_CORE, BOG_PEARL, HEARTWOOD_TALISMAN, WRAITHSILK_VEIL, SALAMANDER_CHARM);
     }
 }

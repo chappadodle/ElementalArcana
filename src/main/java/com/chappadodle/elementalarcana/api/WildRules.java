@@ -13,6 +13,9 @@ public final class WildRules {
     public static final float TREANT_CHANCE = 0.06f;
     public static final float WRAITH_CHANCE = 0.12f;
     public static final float SALAMANDER_CHANCE = 0.08f;
+    public static final float HARPY_CHANCE = 0.08f;
+    public static final float CRAWLER_CHANCE = 0.10f;
+    public static final float LURKER_CHANCE = 0.10f;
 
     // The treant.
     public static final double TREANT_WAKE = 6;
@@ -39,7 +42,49 @@ public final class WildRules {
     public static final int SPIT_COOLDOWN_TICKS = 80;
     public static final int BITE_FIRE_TICKS = 60;
 
+    // The harpy (docs/superpowers/specs/2026-10-05-wild-creatures-2-design.md).
+    public static final int SNATCH_COOLDOWN_TICKS = 160;
+    public static final double SNATCH_LIFT = 6;
+    public static final int SNATCH_MAX_TICKS = 60;
+    public static final float SNATCH_BREAK_DAMAGE = 6f;
+    public static final int GUST_COOLDOWN_TICKS = 100;
+    public static final double GUST_RANGE = 10;
+
+    // The crawler.
+    public static final int CRAWLER_MAX_Y = 40;
+    public static final int VOLLEY_COOLDOWN_TICKS = 70;
+    public static final double VOLLEY_RANGE = 16;
+    public static final float VOLLEY_SPREAD_DEGREES = 8f;
+    /** Each of its shards, against a mob's full prism bolt. */
+    public static final float VOLLEY_POWER = 0.7f;
+    public static final double BURST_RADIUS = 3;
+    public static final float BURST_DAMAGE = 4f;
+
+    // The lurker.
+    public static final double LUNGE_RANGE = 5;
+    public static final int LUNGE_COOLDOWN_TICKS = 100;
+    public static final float LUNGE_BITE = 6f;
+    public static final int HOLD_TICKS = 60;
+    public static final float HOLD_BREAK_DAMAGE = 8f;
+    public static final double SPIT_MUD_RANGE = 12;
+    public static final int MUD_COOLDOWN_TICKS = 90;
+
     private WildRules() {
+    }
+
+    /** Whether a harpy lets go: it's carried them long enough, or it's been hurt enough meanwhile. */
+    public static boolean snatchBroken(int carriedTicks, float damageWhileCarrying) {
+        return carriedTicks >= SNATCH_MAX_TICKS || damageWhileCarrying >= SNATCH_BREAK_DAMAGE;
+    }
+
+    /** Whether a lurker lets go: it's held on long enough, or one hit was hard enough. */
+    public static boolean holdBroken(int heldTicks, float hit) {
+        return heldTicks >= HOLD_TICKS || hit >= HOLD_BREAK_DAMAGE;
+    }
+
+    /** The crawler's three shards, as turns (degrees) from straight at its target. */
+    public static float[] volleyOffsets() {
+        return new float[]{-VOLLEY_SPREAD_DEGREES, 0, VOLLEY_SPREAD_DEGREES};
     }
 
     /** How hard a hit lands on a treant: fire burns it worse. */

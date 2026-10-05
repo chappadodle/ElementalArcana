@@ -1,0 +1,43 @@
+{
+  "parent": "elementalarcana:arcana/into_the_wild",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:harpy_plume"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.wild_things.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.wild_things.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "gale_harpy": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": {
+          "type": "elementalarcana:gale_harpy"
+        }
+      }
+    },
+    "crystal_crawler": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": {
+          "type": "elementalarcana:crystal_crawler"
+        }
+      }
+    },
+    "bog_lurker": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": {
+          "type": "elementalarcana:bog_lurker"
+        }
+      }
+    }
+  }
+}

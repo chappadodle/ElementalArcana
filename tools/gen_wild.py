@@ -8,6 +8,9 @@
 - the icons of Heartwood, Wraith Silk, the Salamander Scale and the Rooted effect, and the item models;
 - the loot tables, the biome tags of their lands, and the entity tags (innate elements, can_attune,
   wild_creatures). (Their advancement, Into the Wild, is in tools/gen_advancements.py.)
+- Creatures of the Wild II (docs/superpowers/specs/2026-10-05-wild-creatures-2-design.md): the Gale
+  Harpy's feathers (64x64), the Crystal Crawler's plates and crystals (64x32, and their glow), the
+  Bog Lurker's hide (128x64), their materials' icons, loot, lands and tags;
 - Trophies of the Wild (docs/superpowers/specs/2026-10-04-wild-trophies-design.md): the three charms'
   icons and recipes, and the Cooling Crust's textures (its crust and four stages of glowing cracks),
   models and blockstate.
@@ -41,6 +44,9 @@ TREANT_LANDS = ["minecraft:forest", "minecraft:flower_forest", "minecraft:birch_
                 "minecraft:dark_forest", "minecraft:taiga", "minecraft:old_growth_pine_taiga", "minecraft:old_growth_spruce_taiga"]
 WRAITH_LANDS = ["minecraft:snowy_plains", "minecraft:ice_spikes", "minecraft:snowy_taiga", "minecraft:snowy_slopes",
                 "minecraft:grove", "minecraft:frozen_river", "minecraft:frozen_peaks", "minecraft:jagged_peaks"]
+HARPY_LANDS = ["minecraft:windswept_hills", "minecraft:windswept_gravelly_hills", "minecraft:windswept_forest", "minecraft:stony_peaks",
+               "minecraft:jagged_peaks", "minecraft:meadow"]
+LURKER_LANDS = ["minecraft:swamp", "minecraft:mangrove_swamp"]
 SALAMANDER_LANDS = ["minecraft:badlands", "minecraft:eroded_badlands", "minecraft:wooded_badlands", "minecraft:desert",
                     "minecraft:nether_wastes", "minecraft:basalt_deltas"]
 
@@ -381,6 +387,181 @@ def salamander():
     return c.image(), Image.fromarray(glow_img, "RGBA")
 
 
+# --- Creatures of the Wild II ----------------------------------------------------------------------
+
+FEATHER = (112, 126, 152)
+FEATHER_DARK = (78, 88, 112)
+FEATHER_LIGHT = (156, 170, 194)
+
+
+def feathers(c, rect, tips=False, rows_per=3):
+    """Feathers in rows: each column a vane, a light edge, darker toward its tip; {tips}: the lowest
+    row torn into points."""
+    x0, y0, x1, y1 = rect
+    for y in range(y0, y1):
+        for x in range(x0, x1):
+            row = (y - y0) % rows_per
+            color = FEATHER_LIGHT if row == 0 else FEATHER if (x + (y - y0) // rows_per) % 3 else FEATHER_DARK
+            if tips and y == y1 - 1 and (x - x0) % 2:
+                c.put(x, y, (0, 0, 0), 0)
+                continue
+            if tips and y >= y1 - 2:
+                color = FEATHER_DARK
+            c.put(x, y, np.array(color, dtype=float) + (c.rng.random() - 0.5) * 8)
+
+
+def harpy():
+    c = Canvas(64, 64, 5500)
+    skin, eye, brow = (210, 186, 156), (248, 214, 70), (60, 52, 62)
+    head = box_faces(0, 0, 6, 6, 6)
+    for name, rect in head.items():
+        feathers(c, rect)
+    x0, y0, x1, y1 = head["front"]
+    c.fill((x0, y0 + 2, x1, y1), skin, 8)
+    for ex in (x0 + 1, x1 - 2):
+        c.put(ex, y0 + 3, eye)
+        c.put(ex, y0 + 2, brow)
+    c.put(x0 + 2, y0 + 5, (150, 96, 80))
+    c.put(x0 + 3, y0 + 5, (150, 96, 80))
+    for name, rect in box_faces(24, 0, 2, 5, 6).items():
+        feathers(c, rect, rows_per=2)
+    for name, rect in box_faces(0, 12, 6, 9, 4).items():
+        feathers(c, rect)
+    x0, y0, x1, y1 = box_faces(0, 12, 6, 9, 4)["front"]
+    c.fill((x0 + 1, y0 + 1, x1 - 1, y1 - 2), (196, 204, 216), 10)
+    for name, rect in box_faces(40, 0, 2, 9, 2).items():
+        feathers(c, rect)
+    for name, rect in box_faces(0, 26, 1, 12, 6).items():
+        feathers(c, rect, tips=name in ("right", "left"))
+    leg, scale_dark, talon = (206, 176, 96), (164, 136, 70), (52, 44, 40)
+    for name, rect in box_faces(20, 12, 2, 7, 2).items():
+        x0, y0, x1, y1 = rect
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                c.put(x, y, scale_dark if (y - y0) % 2 else leg)
+    for name, rect in box_faces(28, 12, 3, 1, 4).items():
+        c.fill(rect, talon, 6)
+    for name, rect in box_faces(20, 26, 5, 1, 5).items():
+        feathers(c, rect, rows_per=2)
+    return c.image()
+
+
+CRAWL_PLATE = (54, 48, 64)
+CRAWL_DARK = (36, 32, 44)
+CRAWL_LIGHT = (76, 68, 90)
+CRYSTAL = (196, 140, 255)
+CRYSTAL_LIGHT = (238, 212, 255)
+CRYSTAL_DARK = (132, 84, 206)
+CRAWL_EYE = (226, 170, 255)
+
+
+def plates(c, rect):
+    x0, y0, x1, y1 = rect
+    for y in range(y0, y1):
+        for x in range(x0, x1):
+            color = CRAWL_DARK if (y - y0) % 3 == 2 else CRAWL_LIGHT if (x + y) % 7 == 0 else CRAWL_PLATE
+            c.put(x, y, np.array(color, dtype=float) + (c.rng.random() - 0.5) * 8)
+
+
+def crawler():
+    c = Canvas(64, 32, 5600)
+    glow = []
+    for rect in box_faces(0, 0, 8, 5, 10).values():
+        plates(c, rect)
+    head = box_faces(36, 0, 6, 4, 5)
+    for rect in head.values():
+        plates(c, rect)
+    x0, y0, x1, y1 = head["front"]
+    for ex, ey in ((x0 + 1, y0 + 1), (x1 - 2, y0 + 1), (x0 + 2, y0 + 2), (x1 - 3, y0 + 2)):
+        c.put(ex, ey, CRAWL_EYE)
+        glow.append((ex, ey))
+    for name, rect in box_faces(36, 10, 12, 2, 2).items():
+        x0, y0, x1, y1 = rect
+        plates(c, rect)
+        if name in ("front", "back", "top", "bottom"):
+            for y in range(y0, y1):
+                c.put(x0 + (x1 - x0) // 2, y, CRAWL_LIGHT)
+    for name, rect in box_faces(0, 16, 2, 8, 2).items():
+        x0, y0, x1, y1 = rect
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                color = CRYSTAL_LIGHT if x == x0 else CRYSTAL_DARK if x == x1 - 1 else CRYSTAL
+                if y == y0 and name not in ("top", "bottom"):
+                    color = CRYSTAL_LIGHT
+                c.put(x, y, color)
+                glow.append((x, y))
+    for rect in box_faces(8, 16, 1, 1, 3).values():
+        c.fill(rect, (28, 24, 32), 4)
+    glow_img = np.zeros((32, 64, 4), dtype=np.uint8)
+    for x, y in glow:
+        glow_img[y, x, :3] = c.img[y, x, :3]
+        glow_img[y, x, 3] = 255
+    return c.image(), Image.fromarray(glow_img, "RGBA")
+
+
+BOG = (74, 90, 48)
+BOG_DARK = (50, 62, 32)
+BOG_LIGHT = (106, 120, 66)
+BOG_BELLY = (176, 160, 104)
+
+
+def hide_mottled(c, rect, belly_rows=0, ridges=False):
+    x0, y0, x1, y1 = rect
+    for y in range(y0, y1):
+        for x in range(x0, x1):
+            roll = c.rng.random()
+            color = BOG_DARK if roll < 0.28 else BOG_LIGHT if roll > 0.86 else BOG
+            if y >= y1 - belly_rows:
+                color = BOG_BELLY
+            if ridges and (x - x0) % 3 == 1 and (y - y0) % 4 < 2:
+                color = BOG_DARK
+            c.put(x, y, np.array(color, dtype=float) + (c.rng.random() - 0.5) * 8)
+
+
+def lurker():
+    c = Canvas(128, 64, 5700)
+    for name, rect in box_faces(0, 0, 12, 5, 16).items():
+        if name == "bottom":
+            c.fill(rect, BOG_BELLY, 10)
+        else:
+            hide_mottled(c, rect, belly_rows=1 if name != "top" else 0, ridges=name == "top")
+    for name, rect in box_faces(56, 0, 10, 4, 8).items():
+        if name == "bottom":
+            c.fill(rect, (196, 112, 104), 10)
+        else:
+            hide_mottled(c, rect)
+    x0, y0, x1, y1 = box_faces(56, 0, 10, 4, 8)["front"]
+    for x in range(x0, x1):
+        c.put(x, y1 - 1, BOG_DARK)
+    for name, rect in box_faces(56, 12, 10, 2, 8).items():
+        if name == "top":
+            c.fill(rect, (196, 112, 104), 10)
+            x0, y0, x1, y1 = rect
+            for x in range(x0, x1, 2):
+                c.put(x, y0, (236, 232, 214))
+        elif name == "bottom":
+            c.fill(rect, BOG_BELLY, 10)
+        else:
+            hide_mottled(c, rect)
+    for name, rect in box_faces(92, 0, 2, 2, 2).items():
+        x0, y0, x1, y1 = rect
+        c.fill(rect, (214, 196, 70), 6)
+        if name == "front":
+            c.put(x0, y0, (24, 20, 16))
+            c.put(x0, y0 + 1, (24, 20, 16))
+    for name, rect in box_faces(92, 4, 3, 4, 3).items():
+        hide_mottled(c, rect)
+        if name not in ("top", "bottom"):
+            x0, y0, x1, y1 = rect
+            for x in range(x0, x1):
+                c.put(x, y1 - 1, (40, 46, 26))
+    for name, rect in box_faces(0, 21, 6, 4, 10).items():
+        hide_mottled(c, rect, belly_rows=1 if name in ("left", "right") else 0, ridges=name == "top")
+    for name, rect in box_faces(32, 21, 4, 3, 8).items():
+        hide_mottled(c, rect, ridges=name == "top")
+    return c.image()
+
+
 # --- Icons --------------------------------------------------------------------------------------
 
 def icon(rows, colors):
@@ -608,6 +789,62 @@ def trophies():
     write_json(recipes / "salamander_charm.json", charm_recipe("salamander_charm", "minecraft:gold_nugget", "salamander_scale", "fire"))
 
 
+PLUME = [
+    "................",
+    "............LL..",
+    "...........LFFL.",
+    "..........LFFFL.",
+    ".........LFFFL..",
+    "........LFFFL...",
+    ".......LFFFL....",
+    "......LFFdL.....",
+    ".....LFFdL......",
+    "....LFdFL.......",
+    "....LdFL........",
+    "...gdLL.........",
+    "..gg............",
+    ".gg.............",
+    "g...............",
+    "................",
+]
+PRISM = [
+    "................",
+    ".......L........",
+    "......LLV.......",
+    ".....LLVVV......",
+    "....LLVVVVd.....",
+    "...LLVVVVVdd....",
+    "..LLLVVVVVddd...",
+    "..VVVVVHVVVVd...",
+    "..dVVVVVVVVdd...",
+    "...ddVVVVVdd....",
+    "....ddVVVdd.....",
+    ".....ddVdd......",
+    "......ddd.......",
+    ".......d........",
+    "................",
+    "................",
+]
+PEARL = [
+    "................",
+    "................",
+    "................",
+    ".....dddddd.....",
+    "....dpppppPd....",
+    "...dppHHpppPd...",
+    "...dpHHppppPd...",
+    "...dpppppppPd...",
+    "...dppppppPPd...",
+    "...dpppppPPPd...",
+    "....dpPPPPPd....",
+    ".....dddddd.....",
+    "................",
+    "................",
+    "................",
+    "................",
+]
+
+
 # --- Data ---------------------------------------------------------------------------------------
 
 def item(name, weight=1, low=None, high=None, looting=False):
@@ -646,6 +883,32 @@ def add_to_tag(path, names):
     write_json(path, tag)
 
 
+def wild_two():
+    entity = ASSETS / "textures/entity/wild"
+    harpy().save(entity / "gale_harpy.png")
+    skin, glow = crawler()
+    skin.save(entity / "crystal_crawler.png")
+    glow.save(entity / "crystal_crawler_glow.png")
+    lurker().save(entity / "bog_lurker.png")
+    items = ASSETS / "textures/item"
+    icon(PLUME, {"L": FEATHER_LIGHT, "F": FEATHER, "d": FEATHER_DARK, "g": (214, 176, 70)}).save(items / "harpy_plume.png")
+    icon(PRISM, {"L": CRYSTAL_LIGHT, "V": CRYSTAL, "d": CRYSTAL_DARK, "H": (255, 255, 255)}).save(items / "prism_core.png")
+    icon(PEARL, {"d": (66, 84, 54), "p": (176, 196, 150), "P": (130, 150, 108), "H": (236, 246, 226)}).save(items / "bog_pearl.png")
+    models = ASSETS / "models/item"
+    for name in ("harpy_plume", "prism_core", "bog_pearl"):
+        write_json(models / f"{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{NS}item/{name}"}})
+    for name in ("gale_harpy", "crystal_crawler", "bog_lurker"):
+        write_json(models / f"{name}_spawn_egg.json", {"parent": "minecraft:item/template_spawn_egg"})
+    tables = DATA / "loot_table/entities"
+    write_json(tables / "gale_harpy.json", loot("wind", "minecraft:feather", 1, 3, "harpy_plume", 0.15))
+    write_json(tables / "crystal_crawler.json", loot("crystal", "minecraft:amethyst_shard", 1, 3, "prism_core", 0.12))
+    lurker_loot = loot("water", "minecraft:slime_ball", 0, 2, "bog_pearl", 0.15)
+    lurker_loot["pools"].insert(2, {"rolls": 1, "entries": [item("minecraft:clay_ball", 1, 1, 3)]})
+    write_json(tables / "bog_lurker.json", lurker_loot)
+    # The lurker breathes under water (the tag vanilla reads).
+    add_to_tag(DATA.parent / "minecraft/tags/entity_type/can_breathe_under_water.json", [f"{NS}bog_lurker"])
+
+
 def main():
     entity = ASSETS / "textures/entity/wild"
     entity.mkdir(parents=True, exist_ok=True)
@@ -679,13 +942,21 @@ def main():
     write_json(biomes / "treant.json", {"values": TREANT_LANDS})
     write_json(biomes / "frost_wraith.json", {"values": WRAITH_LANDS})
     write_json(biomes / "salamander.json", {"values": SALAMANDER_LANDS})
+    write_json(biomes / "gale_harpy.json", {"values": HARPY_LANDS})
+    write_json(biomes / "bog_lurker.json", {"values": LURKER_LANDS})
     innate = DATA / "tags/entity_type/innate"
     add_to_tag(innate / "earth.json", [f"{NS}thornwood_treant"])
     add_to_tag(innate / "ice.json", [f"{NS}frost_wraith"])
     add_to_tag(innate / "fire.json", [f"{NS}ember_salamander"])
-    add_to_tag(DATA / "tags/entity_type/can_attune.json", [f"{NS}thornwood_treant", f"{NS}frost_wraith", f"{NS}ember_salamander"])
+    add_to_tag(innate / "wind.json", [f"{NS}gale_harpy"])
+    add_to_tag(innate / "crystal.json", [f"{NS}crystal_crawler"])
+    add_to_tag(innate / "water.json", [f"{NS}bog_lurker"])
+    add_to_tag(DATA / "tags/entity_type/can_attune.json", [f"{NS}thornwood_treant", f"{NS}frost_wraith", f"{NS}ember_salamander",
+                                                           f"{NS}gale_harpy", f"{NS}crystal_crawler", f"{NS}bog_lurker"])
     write_json(DATA / "tags/entity_type/wild_creatures.json",
-               {"values": [f"{NS}thornwood_treant", f"{NS}frost_wraith", f"{NS}ember_salamander"]})
+               {"values": [f"{NS}{name}" for name in ("thornwood_treant", "frost_wraith", "ember_salamander", "gale_harpy",
+                                                       "crystal_crawler", "bog_lurker")]})
+    wild_two()
 
     trophies()
     print("wild art and data written")

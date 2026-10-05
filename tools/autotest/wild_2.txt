@@ -1,0 +1,114 @@
+# Creatures of the Wild II (see the spec), in survival with Resistance IV on a grass platform at
+# y 220 in fresh land:
+# 1: a Gale Harpy hunting the player: circling, gusting, diving to snatch and lift them (their
+#    height logged every half second, shots), letting go;
+# 2: a Crystal Crawler in a dark stone room: its volley of crystal shards (shots), then struck
+#    down beside the player: its burst (the player's health before and after);
+# 3: a Bog Lurker lying in a pool; the player steps to its edge: it lunges, bites and holds on
+#    (the player's position and health logged, shots).
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd difficulty normal
+cmd gamemode creative
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd tp @s 114000.5 230 114000.5
+wait 80
+cmd fill 113975 219 113975 114025 219 114025 minecraft:grass_block
+cmd fill 113975 220 113975 114025 231 114025 minecraft:air
+cmd tp @s 114000.5 220 114000.5 -90 -20
+wait 40
+cmd kill @e[type=!player,distance=..100]
+cmd kill @e[type=item,distance=..100]
+cmd clear @s
+cmd gamemode survival
+cmd effect give @s minecraft:resistance 900 3 true
+# 1: The harpy.
+cmd summon elementalarcana:gale_harpy 114008.5 228 114000.5
+wait 20
+shot harpy_0
+cmd data get entity @s Pos[1]
+wait 10
+cmd data get entity @s Pos[1]
+wait 10
+shot harpy_1
+cmd data get entity @s Pos[1]
+wait 10
+cmd data get entity @s Pos[1]
+camera back
+wait 10
+shot harpy_2
+cmd data get entity @s Pos[1]
+wait 10
+cmd data get entity @s Pos[1]
+wait 10
+shot harpy_3
+cmd data get entity @s Pos[1]
+wait 10
+cmd data get entity @s Pos[1]
+wait 10
+shot harpy_4
+cmd data get entity @s Pos[1]
+wait 10
+cmd data get entity @s Pos[1]
+wait 10
+shot harpy_5
+cmd data get entity @s Pos[1]
+cmd data get entity @s Health
+camera first
+cmd kill @e[type=elementalarcana:gale_harpy]
+cmd effect give @s minecraft:instant_health 1 10 true
+# 2: The crawler in the dark.
+cmd fill 113985 220 113985 113999 225 113999 minecraft:stone hollow
+cmd tp @s 113987.5 221 113992.5 -90 10
+cmd summon elementalarcana:crystal_crawler 113996.5 221 113992.5
+wait 30
+shot crawler_0
+wait 10
+shot crawler_1
+wait 10
+shot crawler_2
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd tp @e[type=elementalarcana:crystal_crawler] 113989.5 221 113992.5
+wait 5
+cmd data get entity @s Health
+cmd damage @e[type=elementalarcana:crystal_crawler,limit=1] 200 minecraft:player_attack by @s
+wait 4
+shot crawler_burst
+cmd data get entity @s Health
+cmd fill 113985 220 113985 113999 225 113999 minecraft:air
+cmd kill @e[type=item,distance=..100]
+# 3: The lurker.
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd fill 114006 216 113994 114016 219 114006 minecraft:stone
+cmd fill 114007 217 113995 114015 219 114005 minecraft:water
+cmd summon elementalarcana:bog_lurker 114008.5 218 114000.5
+cmd tp @s 114001.5 220 114000.5 -90 15
+wait 40
+shot lurker_wait
+cmd tp @s 114005.5 220 114000.5 -90 25
+wait 8
+shot lurker_0
+cmd data get entity @s Pos
+wait 8
+shot lurker_1
+cmd data get entity @s Pos
+wait 8
+camera back
+shot lurker_2
+cmd data get entity @s Pos
+wait 15
+cmd data get entity @s Pos
+cmd data get entity @s Health
+wait 30
+cmd data get entity @s Pos
+camera first
+cmd kill @e[type=elementalarcana:bog_lurker]
+cmd fill 114006 216 113994 114016 219 114006 minecraft:air
+wait 10
+cmd gamemode creative
+cmd effect clear @s
+quit

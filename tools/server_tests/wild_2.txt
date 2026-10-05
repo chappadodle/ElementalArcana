@@ -1,0 +1,45 @@
+# Creatures of the Wild II, at noon: a Gale Harpy, a Crystal Crawler and a Bog Lurker (in a pool)
+# summoned on a grass floor (their health); killed by command (their drops: feathers; amethyst
+# shards; slimeballs and clay). Then the spawner bringing each in: the harpy and the crawler on a
+# high grass platform, the lurker on a high pool ("Test passed" each).
+gamerule doMobSpawning false
+gamerule doMobLoot true
+gamerule doDaylightCycle false
+time set noon
+weather clear
+forceload add -48 -48 48 48
+fill -12 99 -12 12 99 12 minecraft:grass_block
+fill -12 100 -12 12 106 12 minecraft:air
+fill -10 98 -10 -6 98 -6 minecraft:stone
+fill -10 99 -10 -6 99 -6 minecraft:water
+kill @e[type=!player]
+summon elementalarcana:gale_harpy 0 103 0
+summon elementalarcana:crystal_crawler 4 100 0
+summon elementalarcana:bog_lurker -8 99 -8
+sleep 2
+execute as @e[type=elementalarcana:gale_harpy] run data get entity @s Health
+execute as @e[type=elementalarcana:crystal_crawler] run data get entity @s Health
+execute as @e[type=elementalarcana:bog_lurker] run data get entity @s Health
+kill @e[type=!player,type=!item]
+sleep 2
+execute as @e[type=item] run data get entity @s Item
+kill @e[type=item]
+kill @e[type=minecraft:experience_orb]
+fill -42 250 -42 42 250 42 minecraft:grass_block
+execute positioned 0 251 0 run arcana wild harpy
+execute positioned 0 251 0 run arcana wild crawler
+sleep 1
+execute if entity @e[type=elementalarcana:gale_harpy]
+execute if entity @e[type=elementalarcana:crystal_crawler]
+kill @e[type=!player]
+fill -42 249 -42 42 249 42 minecraft:stone
+fill -42 250 -42 42 251 42 minecraft:water
+execute positioned 0 252 0 run arcana wild lurker
+sleep 1
+execute if entity @e[type=elementalarcana:bog_lurker]
+kill @e[type=!player]
+fill -42 249 -42 42 252 42 minecraft:air
+fill -12 98 -12 12 106 12 minecraft:air
+forceload remove all
+gamerule doDaylightCycle true
+time set day

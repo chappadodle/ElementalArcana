@@ -69,6 +69,9 @@ public class ArcanaJeiPlugin implements IModPlugin {
         registration.addIngredientInfo(ModWild.HEARTWOOD.get(), info("heartwood"));
         registration.addIngredientInfo(ModWild.WRAITH_SILK.get(), info("wraith_silk"));
         registration.addIngredientInfo(ModWild.SALAMANDER_SCALE.get(), info("salamander_scale"));
+        registration.addIngredientInfo(ModWild.HARPY_PLUME.get(), info("harpy_plume"));
+        registration.addIngredientInfo(ModWild.PRISM_CORE.get(), info("prism_core"));
+        registration.addIngredientInfo(ModWild.BOG_PEARL.get(), info("bog_pearl"));
         registration.addIngredientInfo(ModInfusion.ALTAR_ITEM.get(), info("infusion_altar"));
         registration.addItemStackInfo(ModCantrips.cantrips().stream().map(ModCantrips::scroll).toList(), info("cantrip_scroll"));
     }

@@ -9,6 +9,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -16,6 +17,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -27,21 +29,24 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Where the Creatures of the Wild come from (see their spec): every 20 seconds each player rolls for
- * each of the three, and one that comes up is born 20 to 40 blocks off in its own land, never two
- * of a kind within 48 blocks. Treants stand up among the trees, wraiths drift over the snow at
- * night, and salamanders bask in the badlands and deserts and on the Nether's floor.
+ * Where the Creatures of the Wild come from (see their specs): every 20 seconds each player rolls for
+ * each kind, and one that comes up is born 20 to 40 blocks off in its own place, never two of a kind
+ * within 48 blocks. Treants stand up among the trees, wraiths drift over the snow at night,
+ * salamanders bask in the badlands, deserts and on the Nether's floor, harpies circle high over the
+ * peaks by day, crawlers creep on cave floors far underground, and lurkers lie in swamp water.
  */
 @EventBusSubscriber(modid = ElementalArcana.MODID)
 public final class WildSpawner {
     public static final TagKey<Biome> TREANT_LANDS = TagKey.create(Registries.BIOME, ElementalArcana.id("wild/treant"));
     public static final TagKey<Biome> WRAITH_LANDS = TagKey.create(Registries.BIOME, ElementalArcana.id("wild/frost_wraith"));
     public static final TagKey<Biome> SALAMANDER_LANDS = TagKey.create(Registries.BIOME, ElementalArcana.id("wild/salamander"));
+    public static final TagKey<Biome> HARPY_LANDS = TagKey.create(Registries.BIOME, ElementalArcana.id("wild/gale_harpy"));
+    public static final TagKey<Biome> LURKER_LANDS = TagKey.create(Registries.BIOME, ElementalArcana.id("wild/bog_lurker"));
     private static final int TRIES = 6;
 
-    /** The three, for the spawner and the test command. */
+    /** Every kind, for the spawner and the test command. */
     public enum Kind {
-        TREANT, WRAITH, SALAMANDER
+        TREANT, WRAITH, SALAMANDER, HARPY, CRAWLER, LURKER
     }
 
     private WildSpawner() {
@@ -65,6 +70,15 @@ public final class WildSpawner {
             if (!level.isDay() && random.nextFloat() < WildRules.WRAITH_CHANCE) {
                 trySpawn(level, Kind.WRAITH, player.position(), random, false);
             }
+            if (level.isDay() && random.nextFloat() < WildRules.HARPY_CHANCE) {
+                trySpawn(level, Kind.HARPY, player.position(), random, false);
+            }
+            if (player.getY() < WildRules.CRAWLER_MAX_Y + 16 && random.nextFloat() < WildRules.CRAWLER_CHANCE) {
+                trySpawn(level, Kind.CRAWLER, player.position(), random, false);
+            }
+            if (random.nextFloat() < WildRules.LURKER_CHANCE) {
+                trySpawn(level, Kind.LURKER, player.position(), random, false);
+            }
         }
         if ((level.dimension() == Level.OVERWORLD || level.dimension() == Level.NETHER) && random.nextFloat() < WildRules.SALAMANDER_CHANCE) {
             trySpawn(level, Kind.SALAMANDER, player.position(), random, false);
@@ -86,18 +100,19 @@ public final class WildSpawner {
             if (!level.hasChunkAt(new BlockPos(x, 0, z))) {
                 continue;
             }
-            BlockPos pos = ground(level, x, Mth.floor(around.y), z);
-            if (pos == null || !forced && !level.getBiome(pos).is(lands(kind))) {
+            BlockPos pos = place(level, kind, x, Mth.floor(around.y), z);
+            if (pos == null || !forced && !inItsLand(level, kind, pos)) {
                 continue;
             }
             if (!forced && !level.getEntitiesOfClass(Mob.class, new AABB(pos).inflate(WildRules.SPACING),
                     mob -> mob.getType() == type(kind)).isEmpty()) {
                 continue;
             }
-            if (!fits(level, kind, pos)) {
-                continue;
-            }
-            BlockPos at = kind == Kind.WRAITH ? pos.above(3 + random.nextInt(3)) : pos;
+            BlockPos at = switch (kind) {
+                case WRAITH -> pos.above(3 + random.nextInt(3));
+                case HARPY -> pos.above(10 + random.nextInt(7));
+                default -> pos;
+            };
             Mob mob = type(kind).spawn(level, at, forced ? MobSpawnType.COMMAND : MobSpawnType.NATURAL);
             if (mob != null) {
                 return mob;
@@ -111,38 +126,53 @@ public final class WildSpawner {
             case TREANT -> ModWild.TREANT.get();
             case WRAITH -> ModWild.FROST_WRAITH.get();
             case SALAMANDER -> ModWild.SALAMANDER.get();
+            case HARPY -> ModWild.HARPY.get();
+            case CRAWLER -> ModWild.CRAWLER.get();
+            case LURKER -> ModWild.LURKER.get();
         };
     }
 
-    private static TagKey<Biome> lands(Kind kind) {
+    private static boolean inItsLand(ServerLevel level, Kind kind, BlockPos pos) {
         return switch (kind) {
-            case TREANT -> TREANT_LANDS;
-            case WRAITH -> WRAITH_LANDS;
-            case SALAMANDER -> SALAMANDER_LANDS;
+            case TREANT -> level.getBiome(pos).is(TREANT_LANDS);
+            case WRAITH -> level.getBiome(pos).is(WRAITH_LANDS);
+            case SALAMANDER -> level.getBiome(pos).is(SALAMANDER_LANDS);
+            case HARPY -> level.getBiome(pos).is(HARPY_LANDS);
+            case LURKER -> level.getBiome(pos).is(LURKER_LANDS);
+            // Deep in the dark: under the crawler's height and out of the light.
+            case CRAWLER -> pos.getY() < WildRules.CRAWLER_MAX_Y && level.getBrightness(LightLayer.SKY, pos) == 0
+                    && level.getBrightness(LightLayer.BLOCK, pos) <= 7;
         };
     }
 
-    /**
-     * The open ground at (x, z): the top of the land outside the Nether; in the Nether (under its
-     * roof) the first floor with room above it, searching down from a little over {@code nearY}.
-     */
+    /** Where at (x, z) {@code kind} could be born, near {@code nearY}, or null if nowhere. */
     @Nullable
-    private static BlockPos ground(ServerLevel level, int x, int nearY, int z) {
-        if (level.dimensionType().hasCeiling()) {
-            for (int y = Math.min(nearY + 16, level.getMaxBuildHeight() - 3); y > Math.max(nearY - 24, level.getMinBuildHeight()); y--) {
+    private static BlockPos place(ServerLevel level, Kind kind, int x, int nearY, int z) {
+        if (kind == Kind.CRAWLER || level.dimensionType().hasCeiling()) {
+            // Under a roof (caves, the Nether): the first floor with room above it, down from a little over nearY.
+            for (int y = Math.min(nearY + 8, level.getMaxBuildHeight() - 3); y > Math.max(nearY - 24, level.getMinBuildHeight()); y--) {
                 BlockPos pos = new BlockPos(x, y, z);
-                if (level.getBlockState(pos).isAir() && level.getBlockState(pos.above()).isAir()
-                        && level.getBlockState(pos.below()).isFaceSturdy(level, pos.below(), Direction.UP)) {
+                if (fits(level, kind, pos)) {
                     return pos;
                 }
             }
             return null;
         }
-        return new BlockPos(x, level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z), z);
+        BlockPos top = new BlockPos(x, level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z), z);
+        if (kind == Kind.LURKER) {
+            // In the water, just under its surface.
+            BlockPos water = top.below();
+            return fits(level, kind, water) ? water : null;
+        }
+        return fits(level, kind, top) ? top : null;
     }
 
-    /** Dry, sturdy ground (a forest floor for a treant) with room for the creature above it. */
+    /** Sturdy dry ground (a forest floor for a treant) with room above it, or for a lurker, deep enough water. */
     private static boolean fits(ServerLevel level, Kind kind, BlockPos pos) {
+        if (kind == Kind.LURKER) {
+            return level.getFluidState(pos).is(FluidTags.WATER) && level.getFluidState(pos.below()).is(FluidTags.WATER)
+                    && level.getBlockState(pos.above()).getCollisionShape(level, pos.above()).isEmpty();
+        }
         BlockState ground = level.getBlockState(pos.below());
         if (!ground.isFaceSturdy(level, pos.below(), Direction.UP) || !ground.getFluidState().isEmpty()) {
             return false;
@@ -150,11 +180,11 @@ public final class WildSpawner {
         if (kind == Kind.TREANT && !ground.is(BlockTags.DIRT)) {
             return false;
         }
-        int radius = kind == Kind.TREANT ? 1 : 0;
+        int radius = kind == Kind.TREANT || kind == Kind.CRAWLER ? 1 : 0;
         int height = switch (kind) {
             case TREANT -> 3;
-            case WRAITH -> 5;
-            case SALAMANDER -> 1;
+            case WRAITH, HARPY -> 5;
+            case SALAMANDER, CRAWLER, LURKER -> 1;
         };
         for (BlockPos p : BlockPos.betweenClosed(pos.offset(-radius, 0, -radius), pos.offset(radius, height - 1, radius))) {
             BlockState state = level.getBlockState(p);
