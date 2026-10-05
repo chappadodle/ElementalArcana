@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.content.rift;
 
+import com.chappadodle.elementalarcana.core.ArcanaServerConfig;
+import com.chappadodle.elementalarcana.api.ConfigRates;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.AttunementRank;
 import com.chappadodle.elementalarcana.api.Element;
@@ -70,7 +72,7 @@ public final class Rifts {
         if (last != null && now - last < RiftRules.PLAYER_COOLDOWN_TICKS) {
             return;
         }
-        if (player.getRandom().nextDouble() >= RiftRules.chance(!level.isDay(), level.isThundering())) {
+        if (player.getRandom().nextDouble() >= ConfigRates.scaled(RiftRules.chance(!level.isDay(), level.isThundering()), ArcanaServerConfig.RIFTS.get())) {
             return;
         }
         BlockPos at = findSpot(level, player.position(), player.getRandom());

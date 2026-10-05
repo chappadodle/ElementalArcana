@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.content.creature;
 
+import com.chappadodle.elementalarcana.core.ArcanaServerConfig;
+import com.chappadodle.elementalarcana.api.ConfigRates;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.GolemRules;
@@ -41,7 +43,7 @@ public final class GolemSpawner {
         }
         ServerLevel level = player.serverLevel();
         if (level.dimension() != Level.OVERWORLD || !WispSpawner.canSpawn(level)
-                || player.getRandom().nextDouble() >= GolemRules.chance(!level.isDay())) {
+                || player.getRandom().nextDouble() >= ConfigRates.scaled(GolemRules.chance(!level.isDay()), ArcanaServerConfig.GOLEMS.get())) {
             return;
         }
         trySpawn(level, player.position(), player.getRandom(), null);

@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.content.star;
 
+import com.chappadodle.elementalarcana.core.ArcanaServerConfig;
+import com.chappadodle.elementalarcana.api.ConfigRates;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.StarfallRules;
@@ -76,7 +78,7 @@ public final class Starfalls {
         RandomSource random = level.getRandom();
         if (StarfallRules.crosses(dayTime - 1, dayTime, StarfallRules.DUSK)) {
             for (ServerPlayer player : level.players()) {
-                if (MagicAttachments.get(player).isAwakened() && random.nextFloat() < StarfallRules.NIGHT_CHANCE) {
+                if (MagicAttachments.get(player).isAwakened() && random.nextFloat() < ConfigRates.scaled(StarfallRules.NIGHT_CHANCE, ArcanaServerConfig.STARFALL.get())) {
                     PENDING.add(new Pending(player.getUUID(), now + StarfallRules.fallTime(random.nextDouble()) - StarfallRules.DUSK));
                 }
             }

@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.content;
 
+import com.chappadodle.elementalarcana.core.ArcanaServerConfig;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.network.ManaTidePayload;
 import net.minecraft.ChatFormatting;
@@ -74,7 +75,7 @@ public class ManaTides extends SavedData {
             tides.setDirty();
         }
         long dayTime = overworld.getDayTime() % DAY;
-        if (tides.endsAt <= now && now >= tides.nextTideAt && dayTime >= NIGHTFALL && dayTime < NIGHTFALL + 1000) {
+        if (tides.endsAt <= now && now >= tides.nextTideAt && dayTime >= NIGHTFALL && dayTime < NIGHTFALL + 1000 && ArcanaServerConfig.MANA_TIDES.get()) {
             tides.endsAt = now + (DAWN - dayTime);
             tides.setDirty();
         }

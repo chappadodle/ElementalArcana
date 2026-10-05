@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.content.wild;
 
+import com.chappadodle.elementalarcana.core.ArcanaServerConfig;
+import com.chappadodle.elementalarcana.api.ConfigRates;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.WildRules;
 import com.chappadodle.elementalarcana.content.creature.WispSpawner;
@@ -42,6 +44,11 @@ public final class WildSpawner {
     public static final TagKey<Biome> SALAMANDER_LANDS = TagKey.create(Registries.BIOME, ElementalArcana.id("wild/salamander"));
     public static final TagKey<Biome> HARPY_LANDS = TagKey.create(Registries.BIOME, ElementalArcana.id("wild/gale_harpy"));
     public static final TagKey<Biome> LURKER_LANDS = TagKey.create(Registries.BIOME, ElementalArcana.id("wild/bog_lurker"));
+    /** A wild creature's chance at the server's rate for them. */
+    private static double wild(float chance) {
+        return ConfigRates.scaled(chance, ArcanaServerConfig.WILD_CREATURES.get());
+    }
+
     private static final int TRIES = 6;
 
     /** Every kind, for the spawner and the test command. */
@@ -64,23 +71,23 @@ public final class WildSpawner {
         }
         RandomSource random = player.getRandom();
         if (level.dimension() == Level.OVERWORLD) {
-            if (random.nextFloat() < WildRules.TREANT_CHANCE) {
+            if (random.nextFloat() < wild(WildRules.TREANT_CHANCE)) {
                 trySpawn(level, Kind.TREANT, player.position(), random, false);
             }
-            if (!level.isDay() && random.nextFloat() < WildRules.WRAITH_CHANCE) {
+            if (!level.isDay() && random.nextFloat() < wild(WildRules.WRAITH_CHANCE)) {
                 trySpawn(level, Kind.WRAITH, player.position(), random, false);
             }
-            if (level.isDay() && random.nextFloat() < WildRules.HARPY_CHANCE) {
+            if (level.isDay() && random.nextFloat() < wild(WildRules.HARPY_CHANCE)) {
                 trySpawn(level, Kind.HARPY, player.position(), random, false);
             }
-            if (player.getY() < WildRules.CRAWLER_MAX_Y + 16 && random.nextFloat() < WildRules.CRAWLER_CHANCE) {
+            if (player.getY() < WildRules.CRAWLER_MAX_Y + 16 && random.nextFloat() < wild(WildRules.CRAWLER_CHANCE)) {
                 trySpawn(level, Kind.CRAWLER, player.position(), random, false);
             }
-            if (random.nextFloat() < WildRules.LURKER_CHANCE) {
+            if (random.nextFloat() < wild(WildRules.LURKER_CHANCE)) {
                 trySpawn(level, Kind.LURKER, player.position(), random, false);
             }
         }
-        if ((level.dimension() == Level.OVERWORLD || level.dimension() == Level.NETHER) && random.nextFloat() < WildRules.SALAMANDER_CHANCE) {
+        if ((level.dimension() == Level.OVERWORLD || level.dimension() == Level.NETHER) && random.nextFloat() < wild(WildRules.SALAMANDER_CHANCE)) {
             trySpawn(level, Kind.SALAMANDER, player.position(), random, false);
         }
     }

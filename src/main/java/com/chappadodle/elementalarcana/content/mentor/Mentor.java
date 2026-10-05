@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.content.mentor;
 
+import com.chappadodle.elementalarcana.core.ArcanaServerConfig;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.MentorChapters;
@@ -118,10 +119,10 @@ public final class Mentor {
         player.setData(ModMentor.TALE, new ModMentor.Tale(index, tale.stoneGiven()));
     }
 
-    /** Gives the player their Sending Stone, once ever. */
+    /** Gives the player their Sending Stone, once ever (unless the server's settings say not to). */
     public static void giveStone(ServerPlayer player) {
         ModMentor.Tale tale = player.getData(ModMentor.TALE);
-        if (tale.stoneGiven()) {
+        if (tale.stoneGiven() || !ArcanaServerConfig.SENDING_STONE.get()) {
             return;
         }
         player.setData(ModMentor.TALE, new ModMentor.Tale(tale.chapter(), true));

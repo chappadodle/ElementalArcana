@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.content.creature;
 
+import com.chappadodle.elementalarcana.core.ArcanaServerConfig;
+import com.chappadodle.elementalarcana.api.ConfigRates;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.ManaWeatherRules;
@@ -70,7 +72,8 @@ public final class WispSpawner {
             return;
         }
         ServerLevel level = player.serverLevel();
-        double chance = (level.isThundering() ? STORM_CHANCE : CHANCE) * (ManaTides.active() ? ManaWeatherRules.TIDE_CHANCES : 1);
+        double chance = ConfigRates.scaled((level.isThundering() ? STORM_CHANCE : CHANCE) * (ManaTides.active() ? ManaWeatherRules.TIDE_CHANCES : 1),
+                ArcanaServerConfig.WISPS.get());
         if (canSpawn(level) && player.getRandom().nextDouble() < chance) {
             trySpawnWild(level, player, null);
         }

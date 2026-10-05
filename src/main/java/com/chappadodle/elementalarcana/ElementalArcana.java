@@ -1,5 +1,8 @@
 package com.chappadodle.elementalarcana;
 
+import com.chappadodle.elementalarcana.core.ArcanaServerConfig;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.ModContainer;
 import com.chappadodle.elementalarcana.content.drake.ModDrakes;
 import com.chappadodle.elementalarcana.content.wild.ModWild;
 import com.chappadodle.elementalarcana.content.infusion.ModInfusion;
@@ -40,7 +43,9 @@ public class ElementalArcana {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 
-    public ElementalArcana(IEventBus modEventBus) {
+    public ElementalArcana(IEventBus modEventBus, ModContainer modContainer) {
+        // The server's settings (see core/ArcanaServerConfig).
+        modContainer.registerConfig(ModConfig.Type.SERVER, ArcanaServerConfig.SPEC);
         modEventBus.addListener(NewRegistryEvent.class, event -> {
             event.register(SpellRegistries.SCHOOLS);
             event.register(SpellRegistries.SPELLS);

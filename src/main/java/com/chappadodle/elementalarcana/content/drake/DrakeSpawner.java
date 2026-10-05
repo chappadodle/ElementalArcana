@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.content.drake;
 
+import com.chappadodle.elementalarcana.core.ArcanaServerConfig;
+import com.chappadodle.elementalarcana.api.ConfigRates;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.DrakeRules;
 import com.chappadodle.elementalarcana.api.Element;
@@ -62,7 +64,7 @@ public final class DrakeSpawner {
         ServerLevel level = player.serverLevel();
         if (level.dimension() != Level.OVERWORLD || !WispSpawner.canSpawn(level) || !level.isDay() || player.isSpectator()
                 || Math.hypot(player.getX(), player.getZ()) < DrakeRules.MIN_DISTANCE
-                || level.getRandom().nextFloat() >= DrakeRules.WILD_CHANCE) {
+                || level.getRandom().nextFloat() >= ConfigRates.scaled(DrakeRules.WILD_CHANCE, ArcanaServerConfig.DRAKES.get())) {
             return;
         }
         Element element = landsOf(level.getBiome(player.blockPosition()), false);

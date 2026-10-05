@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.content;
 
+import com.chappadodle.elementalarcana.core.ArcanaServerConfig;
+import com.chappadodle.elementalarcana.api.ConfigRates;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.AwakeningRules;
 import com.chappadodle.elementalarcana.api.Element;
@@ -60,7 +62,8 @@ public final class AwakeningEvents {
             return;
         }
         data.setLastRolledDay(day);
-        if (player.getRandom().nextDouble() < AwakeningRules.dailyChance(day) * (ManaTides.active() ? ManaWeatherRules.TIDE_CHANCES : 1)) {
+        if (player.getRandom().nextDouble() < ConfigRates.scaled(AwakeningRules.dailyChance(day) * (ManaTides.active() ? ManaWeatherRules.TIDE_CHANCES : 1),
+                ArcanaServerConfig.NATURAL_AWAKENING.get())) {
             Element element = AwakeningRules.pick(AwakeningRules.anyWeights(), player.getRandom().nextDouble());
             if (element != null) {
                 Awakenings.wake(player, element, Component.translatable("message.elementalarcana.awakening.timer"));

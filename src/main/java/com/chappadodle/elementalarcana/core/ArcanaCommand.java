@@ -161,6 +161,7 @@ public final class ArcanaCommand {
                 .then(Commands.literal("sanctum").then(Commands.literal("reset").executes(ctx -> resetSanctums(ctx.getSource()))))
                 .then(Commands.literal("mentor").then(Commands.argument("chapter", IntegerArgumentType.integer(0, MentorChapters.CHAPTERS.size()))
                         .executes(ctx -> setMentorChapter(ctx.getSource(), IntegerArgumentType.getInteger(ctx, "chapter")))))
+                .then(Commands.literal("config").executes(ctx -> showConfig(ctx.getSource())))
                 .then(Commands.literal("tide")
                         .then(Commands.literal("start").executes(ctx -> {
                             ManaTides.force(ctx.getSource().getServer());
@@ -254,6 +255,17 @@ public final class ArcanaCommand {
             bounty.then(kind);
         }
         return bounty;
+    }
+
+    /** /arcana config: the server's settings for the mod in force (config/elementalarcana-server.toml, or the world's override). */
+    private static int showConfig(CommandSourceStack source) {
+        source.sendSuccess(() -> Component.literal(String.format(Locale.ROOT,
+                "Elemental Arcana settings: rifts x%.2f, starfall x%.2f, mana tides %s, wisps x%.2f, wild creatures x%.2f, drakes x%.2f, "
+                        + "golems x%.2f, natural awakening x%.2f, sending stone %s",
+                ArcanaServerConfig.RIFTS.get(), ArcanaServerConfig.STARFALL.get(), ArcanaServerConfig.MANA_TIDES.get() ? "on" : "off",
+                ArcanaServerConfig.WISPS.get(), ArcanaServerConfig.WILD_CREATURES.get(), ArcanaServerConfig.DRAKES.get(),
+                ArcanaServerConfig.GOLEMS.get(), ArcanaServerConfig.NATURAL_AWAKENING.get(), ArcanaServerConfig.SENDING_STONE.get() ? "on" : "off")), false);
+        return 1;
     }
 
     /** Sets the player's chapter of Caelith's tale (past the last: the tale is told). */

@@ -1,0 +1,4 @@
+# The server's settings for the mod (see the server config spec): written on the server's first
+# start with them (config/elementalarcana-server.toml, every rate at 1, both switches on), and
+# /arcana config shows them.
+arcana config
