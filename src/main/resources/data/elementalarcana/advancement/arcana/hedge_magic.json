@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/awakening",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:cantrip_scroll"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.hedge_magic.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.hedge_magic.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "cantrip": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "cantrip"
+      }
+    }
+  }
+}

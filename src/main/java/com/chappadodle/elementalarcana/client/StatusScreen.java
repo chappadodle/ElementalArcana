@@ -9,6 +9,7 @@ import com.chappadodle.elementalarcana.content.ModContent;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.core.MagicData;
 import com.chappadodle.elementalarcana.network.EssencePayload;
+import com.chappadodle.elementalarcana.content.cantrip.ModCantrips;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -216,7 +217,8 @@ public class StatusScreen extends Screen {
     }
 
     private void drawSchoolRow(GuiGraphics graphics, MagicData data, SpellSchool school, int y) {
-        boolean owned = data.hasAffinity(school);
+        // The Arcane school is any awakened mage's: its cantrips are learned from scrolls.
+        boolean owned = data.hasAffinity(school) || ModCantrips.isArcane(school) && data.isAwakened();
         int color = FastColor.ARGB32.opaque(school.color());
         graphics.drawString(font, school.displayName(), left + 10, y + 3, owned ? color : ArcanaDraw.withAlpha(color, 0.45f), false);
         if (!owned) {
@@ -275,6 +277,12 @@ public class StatusScreen extends Screen {
         }
         lines.add(Component.translatable("tooltip.elementalarcana.mana_cost", spell.manaCost(data.spellLevel(spell))).withStyle(ChatFormatting.BLUE));
         lines.add(Component.translatable("tooltip.elementalarcana.cooldown", String.format("%.1f", spell.cooldownTicks(data.spellLevel(spell), data.cooldownFactor()) / 20f)).withStyle(ChatFormatting.BLUE));
+        if (ModCantrips.isCantrip(spell)) {
+            if (!data.canCast(spell)) {
+                lines.add(Component.translatable("tooltip.elementalarcana.learn_from_scroll").withStyle(ChatFormatting.GOLD));
+            }
+            return lines;
+        }
         if (!data.canCast(spell)) {
             lines.add(Component.translatable("tooltip.elementalarcana.unlock_in_tree").withStyle(ChatFormatting.GOLD));
         }
@@ -288,7 +296,8 @@ public class StatusScreen extends Screen {
             int rowY = listTop - scroll;
             for (Row row : rows) {
                 if (mouseY >= rowY && mouseY < rowY + row.height()) {
-                    if (row.spell() != null) {
+                    // Cantrips aren't in the tree: nothing to open.
+                    if (row.spell() != null && !ModCantrips.isCantrip(row.spell())) {
                         minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1f));
                         minecraft.setScreen(new SkillTreeScreen(this, row.spell()));
                         return true;

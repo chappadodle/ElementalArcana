@@ -3,6 +3,7 @@ package com.chappadodle.elementalarcana;
 import com.chappadodle.elementalarcana.content.drake.ModDrakes;
 import com.chappadodle.elementalarcana.content.wild.ModWild;
 import com.chappadodle.elementalarcana.content.infusion.ModInfusion;
+import com.chappadodle.elementalarcana.content.cantrip.ModCantrips;
 import com.chappadodle.elementalarcana.content.relic.ModRelics;
 import com.chappadodle.elementalarcana.content.crypt.ModCrypts;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
@@ -60,6 +61,7 @@ public class ElementalArcana {
         ModDrakes.register(modEventBus);
         ModWild.register(modEventBus);
         ModInfusion.register(modEventBus);
+        ModCantrips.register(modEventBus);
         ModBrews.register(modEventBus);
         ModTabs.TABS.register(modEventBus);
     }

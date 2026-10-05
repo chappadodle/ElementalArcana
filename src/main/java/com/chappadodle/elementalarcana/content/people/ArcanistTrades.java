@@ -10,6 +10,8 @@ import com.chappadodle.elementalarcana.content.ModItems;
 import com.chappadodle.elementalarcana.content.ModTabs;
 import com.chappadodle.elementalarcana.content.brew.ModBrews;
 import com.chappadodle.elementalarcana.content.gear.ModGear;
+import com.chappadodle.elementalarcana.content.cantrip.ModCantrips;
+import com.chappadodle.elementalarcana.api.Spell;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
@@ -66,12 +68,14 @@ public final class ArcanistTrades {
         trades.get(2).add(buy(random -> new ItemCost(Items.GLOWSTONE_DUST, 4), 1, 16, 5));
         trades.get(2).add(sell(random -> new ItemStack(ModItems.essence(anyElement(random))), 5, null, 8, 5));
         trades.get(2).add(sell(random -> PotionContents.createItemStack(Items.POTION, ModBrews.MANA_DRAUGHT), 2, null, 12, 5));
+        trades.get(2).add(sell(ArcanistTrades::anyCantripScroll, 10, new ItemCost(Items.PAPER, 1), 3, 5));
         trades.get(2).add(sell(random -> new ItemStack(oneOf(random, ModGear.APPRENTICE_HOOD.get(), ModGear.APPRENTICE_ROBE.get(),
                 ModGear.APPRENTICE_TROUSERS.get(), ModGear.APPRENTICE_BOOTS.get())), 6, null, 4, 5));
         // Journeyman
         trades.get(3).add(sell(random -> new ItemStack(ModItems.catalyst(anyFamily(random))), 20, new ItemCost(Items.DIAMOND, 1), 2, 15));
         trades.get(3).add(sell(random -> ModTabs.focusOf(ModGear.ADEPT_STAFF.get(), anyElement(random)), 18, null, 3, 10));
         trades.get(3).add(sell(random -> PotionContents.createItemStack(Items.POTION, ModBrews.CLARITY_ELIXIR), 6, null, 6, 10));
+        trades.get(3).add(sell(ArcanistTrades::anyCantripScroll, 8, new ItemCost(Items.PAPER, 1), 3, 10));
         // Expert
         trades.get(4).add(sell(random -> new ItemStack(oneOf(random, ModGear.ADEPT_HOOD.get(), ModGear.ADEPT_ROBE.get(),
                 ModGear.ADEPT_TROUSERS.get(), ModGear.ADEPT_BOOTS.get())), 16, null, 3, 15));
@@ -116,6 +120,12 @@ public final class ArcanistTrades {
     private static Element anyFamily(RandomSource random) {
         Element[] families = Arrays.stream(Element.values()).filter(element -> ModItems.catalyst(element) != null).toArray(Element[]::new);
         return families[random.nextInt(families.length)];
+    }
+
+    /** A scroll of any cantrip (see the Cantrips spec). */
+    private static ItemStack anyCantripScroll(RandomSource random) {
+        List<Spell> cantrips = ModCantrips.cantrips();
+        return ModCantrips.scroll(cantrips.get(random.nextInt(cantrips.size())));
     }
 
     private static Item oneOf(RandomSource random, Item... items) {

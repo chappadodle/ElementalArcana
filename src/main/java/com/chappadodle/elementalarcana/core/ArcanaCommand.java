@@ -22,6 +22,7 @@ import com.chappadodle.elementalarcana.content.people.Bounties;
 import com.chappadodle.elementalarcana.content.rift.Rifts;
 import com.chappadodle.elementalarcana.content.sanctum.SanctumSealBlockEntity;
 import com.chappadodle.elementalarcana.content.wild.WildSpawner;
+import com.chappadodle.elementalarcana.content.cantrip.ModCantrips;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -152,6 +153,7 @@ public final class ArcanaCommand {
                 .then(bountyGive())
                 .then(golemSpawn())
                 .then(wildSpawn())
+                .then(cantripLearn())
                 .then(Commands.literal("sanctum").then(Commands.literal("reset").executes(ctx -> resetSanctums(ctx.getSource()))))
                 .then(Commands.literal("tide")
                         .then(Commands.literal("start").executes(ctx -> {
@@ -300,6 +302,33 @@ public final class ArcanaCommand {
         source.sendSuccess(() -> Component.translatable("commands.elementalarcana.wild_spawned", mob.getDisplayName(),
                 mob.getBlockX(), mob.getBlockY(), mob.getBlockZ()), false);
         return 1;
+    }
+
+    /** /arcana cantrip <cantrip>|all|forget: learns cantrips without their scrolls, or forgets them all (for tests). */
+    private static LiteralArgumentBuilder<CommandSourceStack> cantripLearn() {
+        LiteralArgumentBuilder<CommandSourceStack> cantrip = Commands.literal("cantrip")
+                .then(Commands.literal("all").executes(ctx -> learnCantrips(ctx.getSource(), ModCantrips.cantrips())))
+                .then(Commands.literal("forget").executes(ctx -> modify(ctx.getSource(), MagicData::forgetCantrips,
+                        "commands.elementalarcana.cantrips_forgotten")));
+        for (Spell spell : ModCantrips.cantrips()) {
+            cantrip.then(Commands.literal(spell.id().getPath()).executes(ctx -> learnCantrips(ctx.getSource(), List.of(spell))));
+        }
+        return cantrip;
+    }
+
+    private static int learnCantrips(CommandSourceStack source, List<Spell> cantrips) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        MagicData data = MagicAttachments.get(player);
+        int learned = 0;
+        for (Spell spell : cantrips) {
+            if (data.learnCantrip(spell.id())) {
+                learned++;
+            }
+        }
+        MagicAttachments.sync(player);
+        int count = learned;
+        source.sendSuccess(() -> Component.literal("Learned " + count + " cantrip(s)"), false);
+        return count;
     }
 
     private static LiteralArgumentBuilder<CommandSourceStack> wispSpawn() {

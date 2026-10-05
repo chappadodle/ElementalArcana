@@ -15,6 +15,7 @@ import com.chappadodle.elementalarcana.content.tower.MageTowerStructure;
 import com.chappadodle.elementalarcana.content.tower.ModTowers;
 import com.chappadodle.elementalarcana.content.infusion.ModInfusion;
 import com.chappadodle.elementalarcana.content.wild.ModWild;
+import com.chappadodle.elementalarcana.content.cantrip.ModCantrips;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.IRecipeRegistration;
@@ -69,6 +70,7 @@ public class ArcanaJeiPlugin implements IModPlugin {
         registration.addIngredientInfo(ModWild.WRAITH_SILK.get(), info("wraith_silk"));
         registration.addIngredientInfo(ModWild.SALAMANDER_SCALE.get(), info("salamander_scale"));
         registration.addIngredientInfo(ModInfusion.ALTAR_ITEM.get(), info("infusion_altar"));
+        registration.addItemStackInfo(ModCantrips.cantrips().stream().map(ModCantrips::scroll).toList(), info("cantrip_scroll"));
     }
 
     @Override

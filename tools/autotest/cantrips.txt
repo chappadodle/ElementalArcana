@@ -1,0 +1,165 @@
+# Cantrips (see the spec), in survival at night in fresh land at y 220:
+# 1: a Mage Light scroll read (use) while asleep (nothing learned) and once awake (learned; the
+#    player's cantrips logged), the Status window
+#    showing the Arcane school (a shot); then the rest learned by command;
+# 2: Mage Light in a dark stone room (shots before and after);
+# 3: Prospect inside a block of stone with ores in it (a shot of the outlines through the stone);
+# 4: Mend on a worn diamond pickaxe (its damage logged: 1000, then 688);
+# 5: Water Breathing, Featherfall and Night Eye (effects logged);
+# 6: Recall to a bed 30 blocks off (positions logged), then a Recall broken by a step (position
+#    and its cooldown logged: given back).
+hud on
+cmd time set midnight
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd difficulty peaceful
+cmd gamemode creative
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd tp @s 112000.5 230 112000.5
+wait 80
+cmd fill 111980 219 111980 112020 219 112020 minecraft:stone
+cmd fill 111980 220 111980 112020 227 112020 minecraft:air
+cmd tp @s 112000.5 220 112000.5 -90 0
+wait 40
+cmd kill @e[type=!player,distance=..100]
+cmd kill @e[type=item,distance=..100]
+cmd clear @s
+cmd gamemode survival
+cmd effect give @s minecraft:resistance 900 3 true
+cmd arcana cantrip forget
+cmd arcana affinity reset
+cmd arcana mana fill
+cmd arcana cooldowns reset
+# 1: A scroll read while the player's magic sleeps (nothing learned), then once it's awake.
+cmd give @s elementalarcana:cantrip_scroll[elementalarcana:cantrip="elementalarcana:mage_light"]
+wait 10
+slot 0
+wait 4
+use
+wait 10
+cmd data get entity @s "neoforge:attachments"."elementalarcana:magic".cantrips
+cmd arcana awaken fire
+wait 40
+cmd arcana mana fill
+use
+wait 10
+cmd data get entity @s "neoforge:attachments"."elementalarcana:magic".cantrips
+screen status
+wait 10
+shot cantrip_status
+screen close
+cmd arcana cantrip all
+cmd data get entity @s "neoforge:attachments"."elementalarcana:magic".cantrips
+# 2: Mage Light in a dark room.
+cmd fill 111994 220 112008 112002 224 112016 minecraft:stone hollow
+cmd tp @s 111998.5 221 112012.5 -90 10
+wait 20
+shot light_before
+select elementalarcana:mage_light
+wait 4
+press
+wait 2
+release
+wait 10
+shot light_after
+cmd fill 111994 220 112008 112002 224 112016 minecraft:air
+# 3: Prospect in stone.
+cmd fill 111985 220 111985 111999 227 111999 minecraft:stone
+cmd fill 111991 222 111991 111993 223 111993 minecraft:air
+cmd setblock 111988 223 111990 minecraft:diamond_ore
+cmd setblock 111996 221 111994 minecraft:gold_ore
+cmd setblock 111990 225 111996 minecraft:iron_ore
+cmd setblock 111995 224 111988 minecraft:redstone_ore
+cmd setblock 111987 221 111995 minecraft:lapis_ore
+cmd setblock 111994 226 111992 minecraft:coal_ore
+cmd tp @s 111992.5 222 111992.5 -135 10
+cmd effect give @s minecraft:night_vision 30 0 true
+wait 20
+select elementalarcana:prospect
+wait 4
+press
+wait 2
+release
+wait 10
+shot prospect_0
+cmd tp @s 111992.5 222 111992.5 45 -10
+wait 10
+shot prospect_1
+cmd effect clear @s minecraft:night_vision
+cmd fill 111985 220 111985 111999 227 111999 minecraft:air
+cmd tp @s 112000.5 220 112000.5 -90 0
+# 4: Mend.
+cmd clear @s
+cmd give @s minecraft:diamond_pickaxe[damage=1000]
+wait 10
+slot 0
+cmd data get entity @s SelectedItem.components."minecraft:damage"
+select elementalarcana:mend
+wait 4
+press
+wait 2
+release
+wait 10
+cmd data get entity @s SelectedItem.components."minecraft:damage"
+# 5: The three effects.
+select elementalarcana:water_breathing
+wait 4
+press
+wait 2
+release
+wait 10
+select elementalarcana:featherfall
+wait 4
+press
+wait 2
+release
+wait 10
+select elementalarcana:night_eye
+wait 4
+press
+wait 2
+release
+wait 10
+cmd data get entity @s active_effects
+# 6: Recall.
+cmd effect clear @s
+cmd effect give @s minecraft:resistance 900 3 true
+cmd setblock 112010 220 112000 minecraft:red_bed[part=foot,facing=north]
+cmd setblock 112010 220 111999 minecraft:red_bed[part=head,facing=north]
+cmd spawnpoint @s 112010 220 111999
+cmd tp @s 111985.5 220 112015.5 -90 0
+wait 10
+cmd data get entity @s Pos
+select elementalarcana:recall
+wait 4
+press
+wait 2
+release
+wait 40
+camera back
+shot recall_channel
+wait 60
+camera first
+cmd data get entity @s Pos
+shot recall_home
+cmd arcana cooldowns reset
+cmd tp @s 111985.5 220 112015.5 -90 0
+wait 10
+press
+wait 2
+release
+wait 20
+cmd tp @s 111987.5 220 112015.5 -90 0
+wait 80
+cmd data get entity @s Pos
+cmd time query gametime
+cmd data get entity @s "neoforge:attachments"."elementalarcana:magic".cooldowns
+wait 10
+cmd clear @s
+cmd gamemode creative
+cmd effect clear @s
+cmd difficulty normal
+cmd time set noon
+quit

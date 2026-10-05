@@ -1,0 +1,39 @@
+{
+  "type": "elementalarcana:cantrip_scrolls",
+  "chance": 0.25,
+  "conditions": [
+    {
+      "condition": "minecraft:any_of",
+      "terms": [
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "elementalarcana:chests/ruin"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "elementalarcana:chests/arcanist_cottage"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "elementalarcana:chests/mage_tower_laboratory"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "elementalarcana:chests/drake_hoard_fire"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "elementalarcana:chests/drake_hoard_ice"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "elementalarcana:chests/drake_hoard_lightning"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "elementalarcana:chests/drake_hoard_wind"
+        }
+      ]
+    }
+  ]
+}

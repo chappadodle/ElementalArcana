@@ -87,6 +87,8 @@ public class SpellWheelScreen extends Screen {
         int centerY = height / 2;
         int count = spells.size();
         float step = Mth.TWO_PI / count;
+        // Wider for many spells (cantrips and all), so the slots never overlap.
+        int radius = Math.max(RADIUS, Math.round(count * 30 / Mth.TWO_PI));
 
         double dx = mouseX - centerX;
         double dy = mouseY - centerY;
@@ -105,8 +107,8 @@ public class SpellWheelScreen extends Screen {
         for (int i = 0; i < count; i++) {
             Spell spell = spells.get(i);
             float angle = -Mth.HALF_PI + i * step;
-            int slotX = centerX + Math.round(Mth.cos(angle) * RADIUS);
-            int slotY = centerY + Math.round(Mth.sin(angle) * RADIUS);
+            int slotX = centerX + Math.round(Mth.cos(angle) * radius);
+            int slotY = centerY + Math.round(Mth.sin(angle) * radius);
             int half = i == hovered ? 15 : 12;
             int schoolColor = FastColor.ARGB32.opaque(spell.school().color());
 
@@ -130,7 +132,7 @@ public class SpellWheelScreen extends Screen {
             graphics.drawCenteredString(font, cost, centerX, centerY + 2, 0xFF7FB2FF);
         }
         graphics.drawCenteredString(font, Component.translatable("screen.elementalarcana.wheel.hint",
-                ArcanaClient.SPELL_WHEEL.getTranslatedKeyMessage()), centerX, centerY + RADIUS + 26, 0xFFB0A8C8);
+                ArcanaClient.SPELL_WHEEL.getTranslatedKeyMessage()), centerX, centerY + radius + 26, 0xFFB0A8C8);
     }
 
     @Override

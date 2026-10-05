@@ -30,6 +30,11 @@ public final class ModSchools {
     public static final DeferredHolder<SpellSchool, SpellSchool> RADIANCE =
             SCHOOLS.register("radiance", () -> new SpellSchool(0xFFF1B8, () -> SoundEvents.BEACON_POWER_SELECT));
 
+    // Cantrips (docs/superpowers/specs/2026-10-04-cantrips-design.md): everyday magic of no element,
+    // learned from scrolls by any awakened mage.
+    public static final DeferredHolder<SpellSchool, SpellSchool> ARCANE =
+            SCHOOLS.register("arcane", () -> new SpellSchool(0xC9A8FF, () -> SoundEvents.ENCHANTMENT_TABLE_USE));
+
     private ModSchools() {
     }
 }

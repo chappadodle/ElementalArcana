@@ -1,0 +1,23 @@
+{
+  "type": "elementalarcana:cantrip_scrolls",
+  "chance": 0.5,
+  "conditions": [
+    {
+      "condition": "minecraft:any_of",
+      "terms": [
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "elementalarcana:chests/crypt_library"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "elementalarcana:chests/mage_tower_library"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "elementalarcana:chests/sanctum"
+        }
+      ]
+    }
+  ]
+}

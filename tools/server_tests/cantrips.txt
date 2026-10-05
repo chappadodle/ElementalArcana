@@ -1,0 +1,33 @@
+# Cantrips: a Mage Light set ("Test passed") and broken (nothing drops: "Test failed"); a crypt
+# library's loot rolled twelve times (the loot modifier adds a Cantrip Scroll to about half:
+# their count); a scroll's component. The loot modifiers load with the server (any error would
+# show in the log).
+gamerule doMobSpawning false
+gamerule doTileDrops true
+forceload add -4 -4 4 4
+fill -2 99 -2 2 99 2 minecraft:stone
+fill -2 100 -2 2 103 2 minecraft:air
+kill @e[type=item]
+setblock 0 101 0 elementalarcana:mage_light
+execute if block 0 101 0 elementalarcana:mage_light
+setblock 0 101 0 minecraft:air destroy
+sleep 1
+execute if entity @e[type=item,distance=..8]
+loot spawn 0 101 0 loot elementalarcana:chests/crypt_library
+loot spawn 0 101 0 loot elementalarcana:chests/crypt_library
+loot spawn 0 101 0 loot elementalarcana:chests/crypt_library
+loot spawn 0 101 0 loot elementalarcana:chests/crypt_library
+loot spawn 0 101 0 loot elementalarcana:chests/crypt_library
+loot spawn 0 101 0 loot elementalarcana:chests/crypt_library
+loot spawn 0 101 0 loot elementalarcana:chests/crypt_library
+loot spawn 0 101 0 loot elementalarcana:chests/crypt_library
+loot spawn 0 101 0 loot elementalarcana:chests/crypt_library
+loot spawn 0 101 0 loot elementalarcana:chests/crypt_library
+loot spawn 0 101 0 loot elementalarcana:chests/crypt_library
+loot spawn 0 101 0 loot elementalarcana:chests/crypt_library
+sleep 1
+execute if entity @e[type=item,nbt={Item:{id:"elementalarcana:cantrip_scroll"}}]
+execute as @e[type=item,nbt={Item:{id:"elementalarcana:cantrip_scroll"}},limit=2] run data get entity @s Item
+kill @e[type=item]
+fill -2 99 -2 2 103 2 minecraft:air
+forceload remove all

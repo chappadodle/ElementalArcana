@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -57,10 +58,12 @@ public final class MagicData {
             Codec.INT.optionalFieldOf("bonus_skill_points", 0).forGetter(data -> data.bonusTreePoints),
             StatPoints.CODEC.optionalFieldOf("stats", new StatPoints()).forGetter(data -> data.stats),
             Codec.STRING.listOf().optionalFieldOf("tree", List.of()).forGetter(data -> List.copyOf(data.treeNodes)),
-            AwakeningState.CODEC.optionalFieldOf("awakening", new AwakeningState()).forGetter(data -> data.awakening)
-    ).apply(instance, (mana, level, xp, affinities, selected, cooldowns, fallImmune, freeCast, spells, bonusTreePoints, stats, tree, awakening) ->
+            AwakeningState.CODEC.optionalFieldOf("awakening", new AwakeningState()).forGetter(data -> data.awakening),
+            ResourceLocation.CODEC.listOf().optionalFieldOf("cantrips", List.of()).forGetter(data -> List.copyOf(data.cantrips))
+    ).apply(instance, (mana, level, xp, affinities, selected, cooldowns, fallImmune, freeCast, spells, bonusTreePoints, stats, tree, awakening,
+                       cantrips) ->
             new MagicData(mana, level, xp, affinities, selected.orElse(null), cooldowns, fallImmune, freeCast, spells,
-                    bonusTreePoints, stats, tree, awakening, false, 0, Map.of())));
+                    bonusTreePoints, stats, tree, awakening, false, 0, Map.of()).withCantrips(cantrips)));
 
     // What the owning client needs: no fall flag, plus the live meditation state for the HUD.
     public static final StreamCodec<RegistryFriendlyByteBuf, MagicData> STREAM_CODEC = StreamCodec.of(
@@ -82,6 +85,7 @@ public final class MagicData {
                 buf.writeMap(data.gearStats, FriendlyByteBuf::writeUtf, FriendlyByteBuf::writeVarInt);
                 buf.writeBoolean(data.auraHidden);
                 buf.writeFloat(data.weather);
+                buf.writeCollection(data.cantrips, FriendlyByteBuf::writeResourceLocation);
             },
             buf -> new MagicData(
                     buf.readFloat(),
@@ -99,7 +103,8 @@ public final class MagicData {
                     AwakeningState.read(buf),
                     buf.readBoolean(),
                     buf.readVarInt(),
-                    buf.readMap(FriendlyByteBuf::readUtf, FriendlyByteBuf::readVarInt)).withAura(buf.readBoolean(), buf.readFloat()));
+                    buf.readMap(FriendlyByteBuf::readUtf, FriendlyByteBuf::readVarInt)).withAura(buf.readBoolean(), buf.readFloat())
+                    .withCantrips(buf.readList(FriendlyByteBuf::readResourceLocation)));
 
     private float mana;
     private int level;
@@ -138,6 +143,9 @@ public final class MagicData {
     // their aura, and how rich the air is where they stand (a multiplier on regeneration).
     private boolean auraHidden;
     private float weather = 1f;
+    // The cantrips learned from scrolls (docs/superpowers/specs/2026-10-04-cantrips-design.md): castable
+    // whatever the tree grants.
+    private final Set<ResourceLocation> cantrips = new LinkedHashSet<>();
     private int stillTicks;
     private double lastX;
     private double lastZ;
@@ -208,6 +216,11 @@ public final class MagicData {
             stats.clear();
         }
         this.mana = Math.min(mana, maxMana());
+    }
+
+    private MagicData withCantrips(List<ResourceLocation> learned) {
+        cantrips.addAll(learned);
+        return this;
     }
 
     private MagicData withAura(boolean auraHidden, float weather) {
@@ -490,7 +503,26 @@ public final class MagicData {
     // ---- spells ----
 
     public boolean canCast(Spell spell) {
-        return grants().spells().contains(spell.id().toString());
+        return grants().spells().contains(spell.id().toString()) || cantrips.contains(spell.id());
+    }
+
+    /** Whether this mage has learned the cantrip {@code spell} from its scroll. */
+    public boolean knowsCantrip(Spell spell) {
+        return cantrips.contains(spell.id());
+    }
+
+    /** Learns a cantrip for good. Returns false if it was already known. */
+    public boolean learnCantrip(ResourceLocation spell) {
+        return cantrips.add(spell);
+    }
+
+    public Set<ResourceLocation> cantrips() {
+        return Collections.unmodifiableSet(cantrips);
+    }
+
+    /** Dev/admin: forgets every cantrip. */
+    public void forgetCantrips() {
+        cantrips.clear();
     }
 
     /** Castable spells in registry order - the order the wheel and status window use. */
@@ -732,7 +764,9 @@ public final class MagicData {
     }
 
     public int spellLevel(Spell spell) {
-        return Math.min(grants().spellLevel(spell.id().toString()), spell.maxLevel());
+        int level = Math.min(grants().spellLevel(spell.id().toString()), spell.maxLevel());
+        // A cantrip isn't in the tree: once learned, it's simply known.
+        return cantrips.contains(spell.id()) ? Math.max(1, level) : level;
     }
 
     /** The branches chosen for {@code spell}, by level. */

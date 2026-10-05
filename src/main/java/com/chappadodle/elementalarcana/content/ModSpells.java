@@ -28,6 +28,15 @@ import com.chappadodle.elementalarcana.content.spell.StormeyeSpell;
 import com.chappadodle.elementalarcana.content.spell.WindBladeSpell;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import com.chappadodle.elementalarcana.api.CantripRules;
+import com.chappadodle.elementalarcana.content.cantrip.EffectCantripSpell;
+import com.chappadodle.elementalarcana.content.cantrip.MageLightSpell;
+import com.chappadodle.elementalarcana.content.cantrip.MendSpell;
+import com.chappadodle.elementalarcana.content.cantrip.ProspectSpell;
+import com.chappadodle.elementalarcana.content.cantrip.RecallSpell;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.effect.MobEffects;
 
 /** Registered exactly the way an addon would register its own spells. Order = order in the wheel. */
 public final class ModSpells {
@@ -65,6 +74,22 @@ public final class ModSpells {
     public static final DeferredHolder<Spell, PrismWardSpell> PRISM_WARD = SPELLS.register("prism_ward", PrismWardSpell::new);
     public static final DeferredHolder<Spell, ThunderclapSpell> THUNDERCLAP = SPELLS.register("thunderclap", ThunderclapSpell::new);
     public static final DeferredHolder<Spell, SanctuarySpell> SANCTUARY = SPELLS.register("sanctuary", SanctuarySpell::new);
+
+    // Cantrips (docs/superpowers/specs/2026-10-04-cantrips-design.md): the Arcane school, learned
+    // from scrolls; last, so they follow a mage's own elements in the wheel.
+    public static final DeferredHolder<Spell, MageLightSpell> MAGE_LIGHT = SPELLS.register("mage_light", MageLightSpell::new);
+    public static final DeferredHolder<Spell, ProspectSpell> PROSPECT = SPELLS.register("prospect", ProspectSpell::new);
+    public static final DeferredHolder<Spell, RecallSpell> RECALL = SPELLS.register("recall", RecallSpell::new);
+    public static final DeferredHolder<Spell, MendSpell> MEND = SPELLS.register("mend", MendSpell::new);
+    public static final DeferredHolder<Spell, EffectCantripSpell> WATER_BREATHING = SPELLS.register("water_breathing",
+            () -> new EffectCantripSpell(15, 1200, MobEffects.WATER_BREATHING, CantripRules.WATER_BREATHING_TICKS, ParticleTypes.BUBBLE_POP,
+                    SoundEvents.BUBBLE_COLUMN_UPWARDS_INSIDE));
+    public static final DeferredHolder<Spell, EffectCantripSpell> FEATHERFALL = SPELLS.register("featherfall",
+            () -> new EffectCantripSpell(10, 600, MobEffects.SLOW_FALLING, CantripRules.FEATHERFALL_TICKS, ParticleTypes.CLOUD,
+                    SoundEvents.PHANTOM_FLAP));
+    public static final DeferredHolder<Spell, EffectCantripSpell> NIGHT_EYE = SPELLS.register("night_eye",
+            () -> new EffectCantripSpell(10, 1200, MobEffects.NIGHT_VISION, CantripRules.NIGHT_EYE_TICKS, ParticleTypes.GLOW,
+                    SoundEvents.AMETHYST_BLOCK_CHIME));
 
     private ModSpells() {
     }
