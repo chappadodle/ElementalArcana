@@ -137,6 +137,41 @@
       ]
     },
     {
+      "id": "lightning_cloud_1",
+      "type": "small",
+      "x": 170,
+      "y": -373,
+      "stat": "potency",
+      "amount": 2,
+      "links": [
+        "lightning_start"
+      ],
+      "element": "lightning"
+    },
+    {
+      "id": "lightning_cloud_2",
+      "type": "small",
+      "x": 198,
+      "y": -345,
+      "stat": "affinity/wind",
+      "amount": 2,
+      "links": [
+        "lightning_cloud_1"
+      ],
+      "element": "lightning"
+    },
+    {
+      "id": "stormcall",
+      "type": "spell",
+      "x": 226,
+      "y": -317,
+      "spell": "elementalarcana:stormcall",
+      "element": "lightning",
+      "links": [
+        "lightning_cloud_2"
+      ]
+    },
+    {
       "id": "lightning_chain_lightning",
       "type": "path",
       "spell": "elementalarcana:chain_lightning",

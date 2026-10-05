@@ -157,6 +157,9 @@ public final class ModContent {
     /** Pyronado's wheels, for as long as they spin, in one particle (see PyronadoOptions). */
     public static final DeferredHolder<ParticleType<?>, ParticleType<PyronadoOptions>> PYRONADO =
             PARTICLES.register("pyronado", PyronadoOptions::newType);
+    /** Stormcall's cloud, for as long as it lasts, in one particle (see StormcloudOptions). */
+    public static final DeferredHolder<ParticleType<?>, ParticleType<StormcloudOptions>> STORMCLOUD =
+            PARTICLES.register("stormcloud", StormcloudOptions::newType);
 
     /** An icicle's whole shatter in one particle (see IceShatterOptions). */
     public static final DeferredHolder<ParticleType<?>, ParticleType<IceShatterOptions>> ICE_SHATTER =

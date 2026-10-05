@@ -207,6 +207,8 @@ lightning_xy = cluster("lightning", "wind", wind_ends["dash"], -45, "chain_light
     ("storm", -45, [("stat", "potency"), ("stat", "affinity/wind"), ("stat", "focus"),
                     ("notable", ("lightning_static_charge", {"potency": 6, "affinity/wind": 4}))]),
     ("spark", 45, [("stat", "focus"), ("stat", "affinity/wind"), ("spell", "thunderclap")]),
+    # Stormcall (docs/superpowers/specs/2026-10-05-stormcall-design.md).
+    ("cloud", 90, [("stat", "potency"), ("stat", "affinity/wind"), ("spell", "stormcall")]),
 ])
 # Chain Lightning levels on straight out from Lightning's start.
 path("lightning", "lightning", "lightning_chain_lightning", "chain_lightning", lightning_xy, -45, start_from="lightning_start")

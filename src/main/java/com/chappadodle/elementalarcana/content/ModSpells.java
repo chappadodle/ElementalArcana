@@ -18,6 +18,7 @@ import com.chappadodle.elementalarcana.content.spell.PrismBoltSpell;
 import com.chappadodle.elementalarcana.content.spell.PrismWardSpell;
 import com.chappadodle.elementalarcana.content.spell.PyronadoSpell;
 import com.chappadodle.elementalarcana.content.spell.SanctuarySpell;
+import com.chappadodle.elementalarcana.content.spell.StormcallSpell;
 import com.chappadodle.elementalarcana.content.spell.SmiteSpell;
 import com.chappadodle.elementalarcana.content.spell.StoneSkinSpell;
 import com.chappadodle.elementalarcana.content.spell.ThunderclapSpell;
@@ -74,6 +75,8 @@ public final class ModSpells {
     public static final DeferredHolder<Spell, PrismWardSpell> PRISM_WARD = SPELLS.register("prism_ward", PrismWardSpell::new);
     public static final DeferredHolder<Spell, ThunderclapSpell> THUNDERCLAP = SPELLS.register("thunderclap", ThunderclapSpell::new);
     public static final DeferredHolder<Spell, SanctuarySpell> SANCTUARY = SPELLS.register("sanctuary", SanctuarySpell::new);
+    // The derived elements' third spells.
+    public static final DeferredHolder<Spell, StormcallSpell> STORMCALL = SPELLS.register("stormcall", StormcallSpell::new);
 
     // Cantrips (docs/superpowers/specs/2026-10-04-cantrips-design.md): the Arcane school, learned
     // from scrolls; last, so they follow a mage's own elements in the wheel.

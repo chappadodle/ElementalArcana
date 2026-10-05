@@ -765,6 +765,8 @@
   "spell.elementalarcana.prism_ward.desc": "Crystal facets circle you for 6 seconds and turn every arrow, fireball and spell aimed at you back at whoever sent it.",
   "spell.elementalarcana.thunderclap": "Thunderclap",
   "spell.elementalarcana.thunderclap.desc": "A thunderclap around you: everything within 5 blocks is struck, thrown back and stunned. Wet foes take more and stay stunned longer.",
+  "spell.elementalarcana.stormcall": "Stormcall",
+  "spell.elementalarcana.stormcall.desc": "A storm cloud follows you for 10 seconds. It rains on the foes under it, and every moment a bolt leaps from it to one within 12 blocks: soaked foes first, and harder.",
   "spell.elementalarcana.sanctuary": "Sanctuary",
   "spell.elementalarcana.sanctuary.desc": "A circle of light at your feet for 8 seconds: it mends you and your allies inside, and sears the undead.",
   "spell.elementalarcana.mage_light": "Mage Light",
