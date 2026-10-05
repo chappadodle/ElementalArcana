@@ -769,6 +769,8 @@
   "spell.elementalarcana.stormcall.desc": "A storm cloud follows you for 10 seconds. It rains on the foes under it, and every moment a bolt leaps from it to one within 12 blocks: soaked foes first, and harder.",
   "spell.elementalarcana.geode_sentinel": "Geode Sentinel",
   "spell.elementalarcana.geode_sentinel.desc": "A crystal sentinel grows where you look. For 12 seconds every foe within 10 blocks turns on it, and whatever strikes it takes a shard back; then it bursts, leaving a shield crystal.",
+  "spell.elementalarcana.dawnbreak": "Dawnbreak",
+  "spell.elementalarcana.dawnbreak.desc": "A small sun rises over where you stand and shines for 12 seconds: the undead in its light burn, every other foe is scorched and shown up, and darkness lifts from you and your allies.",
   "spell.elementalarcana.sanctuary": "Sanctuary",
   "spell.elementalarcana.sanctuary.desc": "A circle of light at your feet for 8 seconds: it mends you and your allies inside, and sears the undead.",
   "spell.elementalarcana.mage_light": "Mage Light",

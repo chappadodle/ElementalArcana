@@ -137,6 +137,41 @@
       ]
     },
     {
+      "id": "radiance_sun_1",
+      "type": "small",
+      "x": 543,
+      "y": 226,
+      "stat": "vitality",
+      "amount": 2,
+      "links": [
+        "radiance_start"
+      ],
+      "element": "radiance"
+    },
+    {
+      "id": "radiance_sun_2",
+      "type": "small",
+      "x": 571,
+      "y": 198,
+      "stat": "affinity/fire",
+      "amount": 2,
+      "links": [
+        "radiance_sun_1"
+      ],
+      "element": "radiance"
+    },
+    {
+      "id": "dawnbreak",
+      "type": "spell",
+      "x": 599,
+      "y": 170,
+      "spell": "elementalarcana:dawnbreak",
+      "element": "radiance",
+      "links": [
+        "radiance_sun_2"
+      ]
+    },
+    {
       "id": "radiance_smite",
       "type": "path",
       "spell": "elementalarcana:smite",

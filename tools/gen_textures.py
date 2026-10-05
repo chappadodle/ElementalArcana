@@ -815,6 +815,36 @@ def geode_sentinel_icon(size=16):
     return img
 
 
+def dawnbreak_icon(size=16):
+    """Dawnbreak: a square sun half risen over the ground, its rays fanning up and out."""
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    grid = [
+        "................",
+        ".......r........",
+        "..r....r....r...",
+        "...r...r...r....",
+        "....r.....r.....",
+        "r.......r.......",
+        ".rr..WWWWWW..rr.",
+        ".....WYYYYW.....",
+        ".....WYyyYW.....",
+        "rrr..WYyyYW..rrr",
+        ".....WYYYYW.....",
+        "gggggggggggggggg",
+        "GGGGGGGGGGGGGGGG",
+        "................",
+        "................",
+        "................",
+    ]
+    colors = {"W": (255, 250, 220), "Y": (255, 222, 96), "y": (255, 180, 48), "r": (255, 236, 150),
+              "g": (196, 150, 64), "G": (120, 86, 40)}
+    for y, row in enumerate(grid):
+        for x, ch in enumerate(row):
+            if ch in colors:
+                img.putpixel((x, y), (*colors[ch], 255))
+    return img
+
+
 def sanctuary_icon(size=16):
     """Sanctuary: a ring of light on the ground with a beam falling into its middle."""
     img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
@@ -1547,6 +1577,7 @@ def main():
                        (ASSETS / "spell/thunderclap.png", thunderclap_icon), (ASSETS / "spell/sanctuary.png", sanctuary_icon),
                        (ASSETS / "spell/stormcall.png", stormcall_icon),
                        (ASSETS / "spell/geode_sentinel.png", geode_sentinel_icon),
+                       (ASSETS / "spell/dawnbreak.png", dawnbreak_icon),
                        (ASSETS / "spell/flame_burst.png", pyronado_icon), (ASSETS / "spell/ember_sprite.png", ember_sprite_icon)):
         make().save(path)
         print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))

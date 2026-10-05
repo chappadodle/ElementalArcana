@@ -1,0 +1,64 @@
+# Dawnbreak (see the spec) on a grass platform at midnight: a Radiance mage (level 40) among two
+# zombies (undead) and a spider (not), all of its level, without AI. The sun rising and shining
+# (shots, the second from behind and below); after six seconds the zombies are burning and hurt
+# more than the spider, which glows (health and effects logged); the sun gone after (a shot).
+hud on
+cmd time set midnight
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd difficulty normal
+cmd gamemode survival
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd effect give @s minecraft:resistance 600 4 true
+cmd tp @s 154000.5 100 154000.5 -90 -10
+wait 60
+cmd kill @e[type=!player,distance=..60]
+cmd fill 153990 99 153985 154020 99 154015 minecraft:grass_block
+cmd fill 153990 100 153985 154020 112 154015 minecraft:air
+cmd tp @s 154000.5 100 154000.5 -90 -10
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken radiance
+cmd arcana level set 40
+cmd arcana tree take radiance_sun_1
+cmd arcana tree take radiance_sun_2
+cmd arcana tree take dawnbreak
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd title @s clear
+wait 40
+cmd summon zombie 154005.5 100 153998.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b}
+cmd summon zombie 154006.5 100 154002.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b}
+cmd summon spider 154004.5 100 154000.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b}
+cmd arcana creaturelevel @e[tag=eat] set 40
+cmd arcana creaturelevel @e[tag=eat]
+wait 10
+select elementalarcana:dawnbreak
+press
+release
+wait 40
+shot dawnbreak_risen
+camera back
+look -90 -25
+wait 5
+shot dawnbreak_back
+camera first
+look -90 -10
+wait 80
+cmd execute as @e[tag=eat] run data get entity @s Health
+cmd execute as @e[tag=eat] run data get entity @s Fire
+cmd execute as @e[tag=eat] run data get entity @s active_effects
+wait 160
+shot dawnbreak_set
+cmd execute as @e[tag=eat] run data get entity @s Health
+cmd kill @e[tag=eat]
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken fire
+cmd time set noon
+cmd gamemode creative
+cmd effect clear @s
+wait 10
+quit

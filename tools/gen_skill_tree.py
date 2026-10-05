@@ -216,6 +216,8 @@ radiance_xy = cluster("radiance", "fire", fire_ends["burst"], 45, "smite", [
     ("dawn", -45, [("stat", "vitality"), ("stat", "affinity/fire"), ("stat", "reservoir"),
                    ("notable", ("radiance_inner_light", {"vitality": 6, "affinity/fire": 4}))]),
     ("halo", 45, [("stat", "ward"), ("stat", "affinity/fire"), ("spell", "sanctuary")]),
+    # Dawnbreak (docs/superpowers/specs/2026-10-05-dawnbreak-design.md).
+    ("sun", -90, [("stat", "vitality"), ("stat", "affinity/fire"), ("spell", "dawnbreak")]),
 ])
 crystal_xy = cluster("crystal", "earth", earth_ends["quake"], 135, "prism_bolt", [
     ("facet", 45, [("stat", "ward"), ("stat", "affinity/earth"), ("stat", "focus"),
