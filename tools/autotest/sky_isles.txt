@@ -1,0 +1,22 @@
+# Sky Isles (see the spec): the nearest isle found and seen (in spectator, hovering) from below,
+# from the side at its height, from above, and close over its pavilion (shots); by day.
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamemode spectator
+goto elementalarcana:sky_isle 30 -40 0
+wait 100
+shot sky_isle_below
+goto elementalarcana:sky_isle 40 16 14
+wait 40
+shot sky_isle_side
+goto elementalarcana:sky_isle 14 32 18
+wait 40
+shot sky_isle_above
+goto elementalarcana:sky_isle 7 23 18
+wait 40
+shot sky_isle_top
+cmd gamemode creative
+wait 10
+quit

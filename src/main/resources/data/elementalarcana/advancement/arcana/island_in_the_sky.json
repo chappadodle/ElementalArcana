@@ -1,0 +1,29 @@
+{
+  "parent": "elementalarcana:arcana/awakening",
+  "display": {
+    "icon": {
+      "id": "minecraft:feather"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.island_in_the_sky.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.island_in_the_sky.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "found": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": {
+          "location": {
+            "structures": "elementalarcana:sky_isle"
+          }
+        }
+      }
+    }
+  }
+}

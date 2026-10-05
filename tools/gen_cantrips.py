@@ -230,7 +230,7 @@ ICONS = {"mage_light": mage_light, "prospect": prospect, "recall": recall, "mend
          "water_breathing": water_breathing, "featherfall": featherfall, "night_eye": night_eye}
 LIBRARIES = ["crypt_library", "mage_tower_library", "sanctum"]
 OLD_CHESTS = ["ruin", "arcanist_cottage", "mage_tower_laboratory", "drake_hoard_fire", "drake_hoard_ice",
-              "drake_hoard_lightning", "drake_hoard_wind"]
+              "drake_hoard_lightning", "drake_hoard_wind", "sky_isle"]
 
 
 def modifier(tables, chance):

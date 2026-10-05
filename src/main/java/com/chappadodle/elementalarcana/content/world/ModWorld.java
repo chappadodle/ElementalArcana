@@ -47,6 +47,12 @@ public final class ModWorld {
     public static final DeferredHolder<StructurePieceType, StructurePieceType> RUIN_PIECE =
             STRUCTURE_PIECES.register("ruin", () -> (StructurePieceType.ContextlessType) RuinPiece::new);
 
+    // Sky Isles (docs/superpowers/specs/2026-10-05-sky-isles-design.md).
+    public static final DeferredHolder<StructureType<?>, StructureType<SkyIsleStructure>> SKY_ISLE =
+            STRUCTURE_TYPES.register("sky_isle", () -> () -> SkyIsleStructure.CODEC);
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> SKY_ISLE_PIECE =
+            STRUCTURE_PIECES.register("sky_isle", () -> (StructurePieceType.ContextlessType) SkyIslePiece::new);
+
     private ModWorld() {
     }
 

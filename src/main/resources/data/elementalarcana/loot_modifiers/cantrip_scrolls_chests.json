@@ -32,6 +32,10 @@
         {
           "condition": "neoforge:loot_table_id",
           "loot_table_id": "elementalarcana:chests/drake_hoard_wind"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "elementalarcana:chests/sky_isle"
         }
       ]
     }

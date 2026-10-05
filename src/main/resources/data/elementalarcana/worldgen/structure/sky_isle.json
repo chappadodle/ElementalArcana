@@ -1,0 +1,7 @@
+{
+  "type": "elementalarcana:sky_isle",
+  "biomes": "#elementalarcana:has_structure/sky_isles",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none"
+}

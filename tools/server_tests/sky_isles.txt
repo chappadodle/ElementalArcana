@@ -1,0 +1,13 @@
+# Sky Isles: the nearest one located (the structure is registered and placed over the land), one
+# placed by command (generated without error), and its chest's loot rolled.
+gamerule doMobSpawning false
+locate structure elementalarcana:sky_isle
+forceload add -8 -8 8 8
+place structure elementalarcana:sky_isle 0 64 0
+sleep 1
+execute positioned 0 100 0 run loot spawn ~ ~ ~ loot elementalarcana:chests/sky_isle
+sleep 1
+execute as @e[type=item] run data get entity @s Item
+kill @e[type=item]
+kill @e[type=elementalarcana:wind_wisp]
+forceload remove all

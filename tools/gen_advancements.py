@@ -119,6 +119,8 @@ ADVANCEMENTS = [
      "Learn a cantrip from a Cantrip Scroll", magic("cantrip"), None),
     ("infused", "awakening", item("infusion_altar"), "task", "Infused",
      "Infuse a weapon or armour piece with an element at an Infusion Altar", magic("infusion"), None),
+    ("island_in_the_sky", "awakening", item("minecraft:feather"), "goal", "Island in the Sky",
+     "Set foot on a sky isle", location(NS + "sky_isle"), None),
     ("wish_upon_a_star", "awakening", item("star_fragment"), "goal", "Wish Upon a Star",
      "Reach a fallen star before dawn and take its fragments", has(("star_fragment", None)), None),
     ("golem_breaker", "awakening", item("minecraft:mossy_cobblestone"), "task", "Golem Breaker",
