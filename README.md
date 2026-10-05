@@ -1,6 +1,6 @@
 # Elemental Arcana
 
-Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable framework. There are no wands and no scrolls: magic is a power your character has and grows through use, the way it works in RPGs and isekai.
+A magic mod that turns Minecraft into a fantasy adventure, for **NeoForge 1.21.1**. Magic is a power your character has, the way it works in RPGs and isekai: it wakes in you one day and grows as you use it, across eight elements, each with its spells, a skill tree, gear and relics. The world fills with places to find and things to fight (shrines and ley lines, ruins, crypts, mage towers, the Sovereigns' sanctums, sky isles, drake nests, rifts, falling stars, the creatures of the wild), and a voice in a sending stone leads you through it all, to the Hollow. The mod page's text is in [docs/mod-page.md](docs/mod-page.md).
 
 ## Playing
 
@@ -196,6 +196,7 @@ python3 tools/gen_sky_isles.py  # the Sky Isles' structure, spread and loot
 python3 tools/gen_pouch.py      # the Charm Pouch's icons, screen, recipe and the charms tag; needs numpy and Pillow
 python3 tools/gen_seeker.py     # the Seeker's Compass's 32 frames and model, its recipe, the seekable structure tags; needs numpy and Pillow
 python3 tools/gen_mentor.py     # the Sending Stone's icon and recipe, and Caelith's words for each chapter; needs numpy and Pillow
+python3 tools/gen_logo.py       # the mod's logo (the Mods screen's picture); needs numpy and Pillow
 bash tools/gen_sounds.sh        # needs sox
 python3 tools/gen_spell_sounds.py  # needs numpy, scipy and sox
 ```

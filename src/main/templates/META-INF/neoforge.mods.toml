@@ -15,7 +15,7 @@ loaderVersion="${loader_version_range}" #mandatory
 license="${mod_license}"
 
 # A URL to refer people to when problems occur with this mod
-#issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/" #optional
+issueTrackerURL="https://github.com/chappadodle/ElementalArcana/issues"
 
 # A list of mods - how many allowed here is determined by the individual mod loader
 [[mods]] #mandatory
@@ -46,8 +46,12 @@ authors="chappadodle"
 
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-A small, expandable magic framework with four elemental spells: wind, water, fire and ice.
+A magic mod that turns Minecraft into a fantasy adventure.
+
+Magic wakes in you one day: eight elements, spells that grow to level 10 down branching paths, a skill tree of notables and keystones, staffs, robes, relics and charms. The world fills with places to find and things to fight: shrines and ley lines, ruins, crypts and their Revenants, mage towers and their Magisters, the Sovereigns' sanctums, sky isles, drake nests, rifts, falling stars and the creatures of the wild. And a voice in a sending stone leads you through it all, to the Hollow.
 '''
+logoFile="elementalarcana_logo.png"
+displayURL="https://github.com/chappadodle/ElementalArcana"
 
 # LambDynamicLights (optional) calls this when it starts, for explosion flashes of light.
 [modproperties.${mod_id}."yumi:entrypoints"]

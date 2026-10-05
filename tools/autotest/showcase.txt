@@ -1,0 +1,119 @@
+# The mod page's gallery (docs/mod-page.md): places, spells and screens at their best, in fresh
+# land far from the other tests. Shots only; nothing is checked.
+hud off
+cmd time set 1000
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamemode spectator
+cmd effect clear @s
+cmd tp @s 172000.5 200 172000.5
+wait 100
+# Places.
+goto elementalarcana:fire_shrine 16 9 2
+wait 80
+shot gallery_shrine
+goto elementalarcana:sky_isle 26 2 3
+wait 100
+shot gallery_sky_isle
+goto elementalarcana:mage_tower 30 12 10
+wait 100
+shot gallery_tower
+# Spells, on a platform of grass.
+cmd tp @s 178000.5 110 178000.5 -90 0
+wait 80
+cmd fill 177988 99 177985 178020 99 178015 minecraft:grass_block
+cmd fill 177988 100 177985 178020 115 178015 minecraft:air
+cmd gamemode survival
+cmd effect give @s minecraft:resistance 600 4 true
+cmd effect give @s minecraft:saturation 600 0 true
+cmd tp @s 178000.5 100 178000.5 -90 15
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken lightning
+cmd arcana awaken crystal
+cmd arcana awaken radiance
+cmd arcana level set 40
+cmd arcana tree take lightning_cloud_1
+cmd arcana tree take lightning_cloud_2
+cmd arcana tree take stormcall
+cmd arcana tree take crystal_sentinel_1
+cmd arcana tree take crystal_sentinel_2
+cmd arcana tree take geode_sentinel
+cmd arcana tree take radiance_sun_1
+cmd arcana tree take radiance_sun_2
+cmd arcana tree take dawnbreak
+cmd title @s clear
+wait 40
+cmd summon husk 178009.5 100 177997.5 {Tags:["eat"],PersistenceRequired:1b}
+cmd summon husk 178010.5 100 178001.5 {Tags:["eat"],PersistenceRequired:1b}
+cmd summon husk 178009.5 100 178004.5 {Tags:["eat"],PersistenceRequired:1b}
+cmd arcana creaturelevel @e[tag=eat] set 40
+cmd arcana cooldowns reset
+cmd arcana mana fill
+wait 10
+select elementalarcana:geode_sentinel
+press
+release
+wait 50
+# Off to the side, facing it (it grew some six blocks east, where the mage looked).
+cmd tp @s 178000.5 100 177992.5 -37 12
+wait 5
+shot gallery_sentinel
+cmd tp @s 178000.5 100 178000.5 -90 15
+wait 5
+camera back
+select elementalarcana:stormcall
+press
+release
+wait 30
+look -90 -15
+wait 5
+shot gallery_stormcall
+camera first
+cmd kill @e[tag=eat]
+cmd time set 18000
+cmd summon zombie 178006.5 100 177998.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b}
+cmd summon zombie 178007.5 100 178002.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b}
+cmd arcana cooldowns reset
+cmd arcana mana fill
+wait 10
+look -90 10
+wait 3
+select elementalarcana:dawnbreak
+press
+release
+wait 45
+camera back
+look -90 -25
+wait 5
+shot gallery_dawnbreak
+camera first
+cmd kill @e[tag=eat]
+cmd time set 1000
+# Screens.
+hud on
+screen tree
+wait 20
+shot gallery_tree
+screen close
+cmd arcana mentor 2
+cmd clear @s
+cmd give @s elementalarcana:sending_stone
+wait 5
+slot 0
+wait 5
+use
+wait 15
+shot gallery_mentor
+screen close
+cmd arcana mentor 0
+cmd clear @s
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken fire
+cmd gamemode creative
+cmd effect clear @s
+cmd fill 177988 99 177985 178020 115 178015 minecraft:air
+wait 10
+quit
