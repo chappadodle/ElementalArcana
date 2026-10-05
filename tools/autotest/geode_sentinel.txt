@@ -1,0 +1,64 @@
+# Geode Sentinel (see the spec) on a grass platform at noon: a Crystal mage (level 40), three husks
+# of its level closing on them from 12 blocks east. The Sentinel grown a few blocks in front (shots);
+# the husks turn on it, not the mage: the mage's health (stays full), the Sentinel's (falls) and the
+# husks' (falling to its thorns) logged twice; it shatters (a shot), leaving its shield shard.
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd difficulty normal
+cmd gamemode survival
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd tp @s 148000.5 100 148000.5 -90 25
+wait 60
+cmd kill @e[type=!player,distance=..60]
+cmd fill 147990 99 147985 148020 99 148015 minecraft:grass_block
+cmd fill 147990 100 147985 148020 112 148015 minecraft:air
+cmd tp @s 148000.5 100 148000.5 -90 25
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken crystal
+cmd arcana level set 40
+cmd arcana tree take crystal_sentinel_1
+cmd arcana tree take crystal_sentinel_2
+cmd arcana tree take geode_sentinel
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd title @s clear
+wait 40
+cmd summon husk 148012.5 100 147998.5 {Tags:["eat"],PersistenceRequired:1b}
+cmd summon husk 148013.5 100 148000.5 {Tags:["eat"],PersistenceRequired:1b}
+cmd summon husk 148012.5 100 148002.5 {Tags:["eat"],PersistenceRequired:1b}
+cmd arcana creaturelevel @e[tag=eat] set 40
+wait 10
+select elementalarcana:geode_sentinel
+press
+release
+wait 15
+shot sentinel_grown
+wait 45
+camera back
+wait 2
+shot sentinel_taunt
+camera first
+cmd data get entity @s Health
+cmd execute as @e[type=elementalarcana:geode_sentinel] run data get entity @s Health
+cmd execute as @e[tag=eat] run data get entity @s Health
+wait 80
+cmd data get entity @s Health
+cmd execute as @e[type=elementalarcana:geode_sentinel] run data get entity @s Health
+cmd execute as @e[tag=eat] run data get entity @s Health
+wait 110
+shot sentinel_shattered
+cmd execute as @e[tag=eat] run data get entity @s Health
+cmd data get entity @s Health
+cmd kill @e[tag=eat]
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken fire
+cmd gamemode creative
+cmd effect clear @s
+wait 10
+quit

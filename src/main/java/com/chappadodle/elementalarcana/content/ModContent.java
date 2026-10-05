@@ -6,6 +6,7 @@ import com.chappadodle.elementalarcana.api.SpellProjectile;
 import com.chappadodle.elementalarcana.content.spell.EmberSprite;
 import com.chappadodle.elementalarcana.content.rift.RiftEntity;
 import com.chappadodle.elementalarcana.content.spell.CrystalSpire;
+import com.chappadodle.elementalarcana.content.spell.GeodeSentinel;
 import com.chappadodle.elementalarcana.content.spell.StormeyeEntity;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.particles.ColorParticleOption;
@@ -22,6 +23,7 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -46,6 +48,11 @@ public final class ModContent {
             ENTITY_TYPES.register("crystal_spire", () -> EntityType.Builder.<CrystalSpire>of(CrystalSpire::new, MobCategory.MISC)
                     .sized(1f, 1.8f).clientTrackingRange(8).updateInterval(20).fireImmune().noSave()
                     .build(ElementalArcana.MODID + ":crystal_spire"));
+    /** Crystal's Geode Sentinel (see GeodeSentinel): never saved. */
+    public static final DeferredHolder<EntityType<?>, EntityType<GeodeSentinel>> GEODE_SENTINEL =
+            ENTITY_TYPES.register("geode_sentinel", () -> EntityType.Builder.<GeodeSentinel>of(GeodeSentinel::new, MobCategory.MISC)
+                    .sized(1.2f, 2.6f).clientTrackingRange(10).updateInterval(5).fireImmune().noSave()
+                    .build(ElementalArcana.MODID + ":geode_sentinel"));
     public static final DeferredHolder<EntityType<?>, EntityType<RiftEntity>> RIFT =
             ENTITY_TYPES.register("rift", () -> EntityType.Builder.<RiftEntity>of(RiftEntity::new, MobCategory.MISC)
                     .sized(2.4f, 4.4f).clientTrackingRange(10).updateInterval(20).fireImmune().noSave()
@@ -244,5 +251,10 @@ public final class ModContent {
         SOUNDS.register(modEventBus);
         EFFECTS.register(modEventBus);
         PARTICLES.register(modEventBus);
+        modEventBus.addListener(ModContent::registerAttributes);
+    }
+
+    private static void registerAttributes(EntityAttributeCreationEvent event) {
+        event.put(GEODE_SENTINEL.get(), GeodeSentinel.createAttributes().build());
     }
 }

@@ -785,6 +785,36 @@ def stormcall_icon(size=16):
     return img
 
 
+def geode_sentinel_icon(size=16):
+    """Geode Sentinel: a tall violet crystal cluster standing guard, shards circling it, a ring at its foot."""
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    grid = [
+        ".......W........",
+        "......WLp.......",
+        "..s...LLp...s...",
+        ".sS...LMp...Ss..",
+        "......LMp.......",
+        "....W.LMp.W.....",
+        "...WLpLMpWLp....",
+        "...LMpLMpLMp....",
+        "...LMpLMdLMp....",
+        "..WLMdLMdLMdp...",
+        "..LMMdLMdLMMd...",
+        "..LMdddMddMMd...",
+        ".rrLMMMMMMMdrr..",
+        "rr..dddddddd..rr",
+        ".rr..........rr.",
+        "...rrrrrrrrrr...",
+    ]
+    colors = {"W": (255, 245, 255), "L": (226, 190, 255), "M": (176, 112, 240), "p": (130, 70, 196), "d": (92, 40, 150),
+              "s": (232, 208, 255), "S": (176, 112, 240), "r": (208, 140, 255)}
+    for y, row in enumerate(grid):
+        for x, ch in enumerate(row):
+            if ch in colors:
+                img.putpixel((x, y), (*colors[ch], 255))
+    return img
+
+
 def sanctuary_icon(size=16):
     """Sanctuary: a ring of light on the ground with a beam falling into its middle."""
     img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
@@ -1516,6 +1546,7 @@ def main():
     for path, make in ((ASSETS / "spell/bubble_prison.png", bubble_icon), (ASSETS / "spell/prism_ward.png", prism_ward_icon),
                        (ASSETS / "spell/thunderclap.png", thunderclap_icon), (ASSETS / "spell/sanctuary.png", sanctuary_icon),
                        (ASSETS / "spell/stormcall.png", stormcall_icon),
+                       (ASSETS / "spell/geode_sentinel.png", geode_sentinel_icon),
                        (ASSETS / "spell/flame_burst.png", pyronado_icon), (ASSETS / "spell/ember_sprite.png", ember_sprite_icon)):
         make().save(path)
         print("wrote", path.relative_to(ASSETS.parent.parent.parent.parent.parent.parent))

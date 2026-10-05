@@ -137,6 +137,41 @@
       ]
     },
     {
+      "id": "crystal_sentinel_1",
+      "type": "small",
+      "x": -486,
+      "y": 283,
+      "stat": "ward",
+      "amount": 2,
+      "links": [
+        "crystal_start"
+      ],
+      "element": "crystal"
+    },
+    {
+      "id": "crystal_sentinel_2",
+      "type": "small",
+      "x": -458,
+      "y": 311,
+      "stat": "affinity/earth",
+      "amount": 2,
+      "links": [
+        "crystal_sentinel_1"
+      ],
+      "element": "crystal"
+    },
+    {
+      "id": "geode_sentinel",
+      "type": "spell",
+      "x": -430,
+      "y": 339,
+      "spell": "elementalarcana:geode_sentinel",
+      "element": "crystal",
+      "links": [
+        "crystal_sentinel_2"
+      ]
+    },
+    {
       "id": "crystal_prism_bolt",
       "type": "path",
       "spell": "elementalarcana:prism_bolt",

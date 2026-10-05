@@ -1,0 +1,20 @@
+# The mod's bosses are in the common c:bosses tag, so Bubble Prison (and the Geode Sentinel's taunt)
+# leaves them be: a Fire Sovereign, a Magister and a zombie, all without AI; the tag matches the two
+# bosses, and /arcana bubble (which traps as the spell does) traps only the zombie.
+gamerule doMobSpawning false
+forceload add -8 -8 8 8
+fill -6 99 -6 6 99 6 minecraft:stone
+fill -6 100 -6 6 106 6 minecraft:air
+kill @e[type=!player]
+summon elementalarcana:fire_sovereign 0 100 0 {NoAI:1b,Tags:["eatest"]}
+summon elementalarcana:tower_magister 3 100 0 {NoAI:1b,Tags:["eatest"]}
+summon zombie -3 100 0 {NoAI:1b,Tags:["eatest","eazombie"]}
+sleep 1
+execute if entity @e[type=#c:bosses,tag=eatest]
+execute if entity @e[tag=eazombie,type=#c:bosses]
+arcana bubble @e[tag=eatest]
+sleep 1
+kill @e[tag=eatest]
+kill @e[type=!player]
+fill -6 99 -6 6 106 6 minecraft:air
+forceload remove all

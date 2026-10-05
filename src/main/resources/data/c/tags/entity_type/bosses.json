@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "values": [
+    "elementalarcana:fire_sovereign",
+    "elementalarcana:water_sovereign",
+    "elementalarcana:wind_sovereign",
+    "elementalarcana:earth_sovereign",
+    "elementalarcana:the_hollow",
+    "elementalarcana:tower_magister",
+    "elementalarcana:revenant",
+    "elementalarcana:fire_drake",
+    "elementalarcana:ice_drake",
+    "elementalarcana:lightning_drake",
+    "elementalarcana:water_drake",
+    "elementalarcana:wind_drake"
+  ]
+}

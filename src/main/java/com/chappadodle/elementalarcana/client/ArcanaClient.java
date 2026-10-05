@@ -361,6 +361,7 @@ public final class ArcanaClient {
             event.registerEntityRenderer(ModCreatures.golem(element), GolemRenderer::new);
         }
         event.registerEntityRenderer(ModContent.CRYSTAL_SPIRE.get(), CrystalSpireRenderer::new);
+        event.registerEntityRenderer(ModContent.GEODE_SENTINEL.get(), GeodeSentinelRenderer::new);
         for (Element element : Element.values()) {
             event.registerEntityRenderer(ModCreatures.wisp(element), WispRenderer::new);
             event.registerEntityRenderer(ModCreatures.familiar(element), WispRenderer::new);

@@ -60,8 +60,8 @@ public class CrystalSpireRenderer extends EntityRenderer<CrystalSpire> {
         poseStack.popPose();
     }
 
-    /** A six-sided shaft {@code height} tall and {@code radius} wide, its top fifth a point. */
-    private static void shaft(VertexConsumer buffer, PoseStack.Pose pose, float height, float radius, float red, float green, float blue) {
+    /** A six-sided shaft {@code height} tall and {@code radius} wide, its top fifth a point (the Geode Sentinel's too). */
+    static void shaft(VertexConsumer buffer, PoseStack.Pose pose, float height, float radius, float red, float green, float blue) {
         float body = height * 0.8f;
         for (int i = 0; i < SIDES; i++) {
             float a0 = Mth.TWO_PI * i / SIDES;

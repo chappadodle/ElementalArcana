@@ -221,6 +221,8 @@ crystal_xy = cluster("crystal", "earth", earth_ends["quake"], 135, "prism_bolt",
     ("facet", 45, [("stat", "ward"), ("stat", "affinity/earth"), ("stat", "focus"),
                    ("notable", ("crystal_prismatic_ward", {"ward": 6, "affinity/earth": 4}))]),
     ("geode", 90, [("stat", "potency"), ("stat", "affinity/earth"), ("spell", "prism_ward")]),
+    # Geode Sentinel (docs/superpowers/specs/2026-10-05-geode-sentinel-design.md).
+    ("sentinel", -90, [("stat", "ward"), ("stat", "affinity/earth"), ("spell", "geode_sentinel")]),
 ])
 
 # Smite levels on straight out from Radiance's start.
