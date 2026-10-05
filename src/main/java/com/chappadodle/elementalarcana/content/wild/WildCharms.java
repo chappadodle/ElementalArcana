@@ -32,6 +32,11 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.Map;
 import java.util.WeakHashMap;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
 
 /**
  * What the Trophies of the Wild do for whoever carries them (see their spec): the Heartwood
@@ -40,6 +45,7 @@ import java.util.WeakHashMap;
  */
 @EventBusSubscriber(modid = ElementalArcana.MODID)
 public final class WildCharms {
+    private static final ResourceLocation PEARL_SWIM = ElementalArcana.id("bog_pearl_swim");
     /** When each player was last hurt (game time), for the talisman's rest. */
     private static final Map<Player, Long> LAST_HURT = new WeakHashMap<>();
 
@@ -70,6 +76,11 @@ public final class WildCharms {
                 && carries(player, ModWild.HEARTWOOD_TALISMAN.get())) {
             rest(level, player);
         }
+        if (player.tickCount % 10 == 0) {
+            lurkersLungs(player, carries(player, ModWild.PEARL_CHARM.get()));
+        } else if (player.isUnderWater() && player.getAirSupply() < player.getMaxAirSupply() && carries(player, ModWild.PEARL_CHARM.get())) {
+            player.setAirSupply(player.getMaxAirSupply());
+        }
     }
 
     /** Still lava in a disc under the bearer's feet cools to crust; the crust right under them stays whole. */
@@ -96,6 +107,30 @@ public final class WildCharms {
                     level.playSound(null, pos, SoundEvents.LAVA_EXTINGUISH, SoundSource.BLOCKS, 0.3f, 1.4f);
                 }
             }
+        }
+    }
+
+    /** The Bog Pearl Charm: breath under water, and half again the swimming speed (only while carried). */
+    private static void lurkersLungs(Player player, boolean carried) {
+        AttributeInstance swim = player.getAttribute(NeoForgeMod.SWIM_SPEED);
+        if (swim != null) {
+            if (carried && !swim.hasModifier(PEARL_SWIM)) {
+                swim.addTransientModifier(new AttributeModifier(PEARL_SWIM, WildTrophyRules.SWIM_BOOST, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+            } else if (!carried && swim.hasModifier(PEARL_SWIM)) {
+                swim.removeModifier(PEARL_SWIM);
+            }
+        }
+        if (carried && player.isUnderWater()) {
+            player.setAirSupply(player.getMaxAirSupply());
+        }
+    }
+
+    /** The Plume of the Gale: short falls can't hurt its bearer. */
+    @SubscribeEvent
+    public static void onFall(LivingFallEvent event) {
+        if (event.getEntity() instanceof Player player && WildTrophyRules.fallWarded(event.getDistance())
+                && carries(player, ModWild.PLUME_CHARM.get())) {
+            event.setDamageMultiplier(0f);
         }
     }
 

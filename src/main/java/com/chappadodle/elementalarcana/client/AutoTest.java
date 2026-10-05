@@ -269,6 +269,7 @@ public final class AutoTest {
                     case "jump" -> minecraft.options.keyJump;
                     case "sneak" -> minecraft.options.keyShift;
                     case "forward" -> minecraft.options.keyUp;
+                    case "sprint" -> minecraft.options.keySprint;
                     default -> throw new IllegalArgumentException("unknown key: " + words[0]);
                 };
                 key.setDown(words.length > 1 && words[1].equals("down"));

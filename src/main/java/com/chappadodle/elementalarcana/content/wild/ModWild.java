@@ -82,6 +82,13 @@ public final class ModWild {
             () -> new WildCharmItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
     public static final DeferredItem<WildCharmItem> SALAMANDER_CHARM = ITEMS.register("salamander_charm",
             () -> new WildCharmItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    // Trophies II (docs/superpowers/specs/2026-10-05-wild-trophies-2-design.md).
+    public static final DeferredItem<WildCharmItem> PLUME_CHARM = ITEMS.register("plume_of_the_gale",
+            () -> new WildCharmItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    public static final DeferredItem<WildCharmItem> PRISM_CHARM = ITEMS.register("crawlers_prism",
+            () -> new WildCharmItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    public static final DeferredItem<WildCharmItem> PEARL_CHARM = ITEMS.register("bog_pearl_charm",
+            () -> new WildCharmItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
 
     /** Lava cooled under a Salamander Charm's bearer; it melts back on its own. */
     public static final DeferredBlock<LavaCrustBlock> LAVA_CRUST = BLOCKS.register("lava_crust", () -> new LavaCrustBlock(
@@ -115,6 +122,7 @@ public final class ModWild {
     /** For the creative tab: the eggs, the materials, then the charms they make. */
     public static List<DeferredItem<? extends Item>> items() {
         return List.of(TREANT_EGG, FROST_WRAITH_EGG, SALAMANDER_EGG, HARPY_EGG, CRAWLER_EGG, LURKER_EGG, HEARTWOOD, WRAITH_SILK,
-                SALAMANDER_SCALE, HARPY_PLUME, PRISM_CORE, BOG_PEARL, HEARTWOOD_TALISMAN, WRAITHSILK_VEIL, SALAMANDER_CHARM);
+                SALAMANDER_SCALE, HARPY_PLUME, PRISM_CORE, BOG_PEARL, HEARTWOOD_TALISMAN, WRAITHSILK_VEIL, SALAMANDER_CHARM,
+                PLUME_CHARM, PRISM_CHARM, PEARL_CHARM);
     }
 }

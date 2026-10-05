@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " T ",
+    "MEM"
+  ],
+  "key": {
+    "T": {
+      "item": "minecraft:slime_ball"
+    },
+    "M": {
+      "item": "elementalarcana:bog_pearl"
+    },
+    "E": {
+      "item": "elementalarcana:water_essence"
+    }
+  },
+  "result": {
+    "id": "elementalarcana:bog_pearl_charm",
+    "count": 1
+  }
+}

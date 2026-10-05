@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " T ",
+    "MEM"
+  ],
+  "key": {
+    "T": {
+      "item": "minecraft:feather"
+    },
+    "M": {
+      "item": "elementalarcana:harpy_plume"
+    },
+    "E": {
+      "item": "elementalarcana:wind_essence"
+    }
+  },
+  "result": {
+    "id": "elementalarcana:plume_of_the_gale",
+    "count": 1
+  }
+}

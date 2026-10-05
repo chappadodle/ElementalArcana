@@ -705,6 +705,62 @@ SAL_CHARM = [
 ]
 
 
+PLUME_CHARM = [
+    "................",
+    "............gg..",
+    "...........g..g.",
+    "...........g..g.",
+    "............gLL.",
+    "...........LFFL.",
+    "..........LFFFL.",
+    ".........LFFFL..",
+    "........LFFdL...",
+    ".......LFFdL....",
+    "......LFdFL.....",
+    "..w...LdFL......",
+    ".w.w.qdLL.......",
+    "..w.qq..........",
+    "...qq...........",
+    "................",
+]
+PRISM_CHARM = [
+    "................",
+    "......ssss......",
+    ".....s....s.....",
+    ".....s....s.....",
+    "......ssss......",
+    ".......LV.......",
+    "......LLVV......",
+    ".....LLVVVd.....",
+    "....LLVVHVdd....",
+    "....LVVVVVdd....",
+    ".....VVVVVd.....",
+    "......dVVd......",
+    ".......dd.......",
+    "................",
+    "................",
+    "................",
+]
+PEARL_CHARM = [
+    "................",
+    ".......cc.......",
+    "......c..c......",
+    "......c..c......",
+    ".......cc.......",
+    ".....bbbbbb.....",
+    "....bdddddPb....",
+    "...bdpHHpppPb...",
+    "...bdpHppppPb...",
+    "...bdppppppPb...",
+    "...bdpppppPPb...",
+    "....bdpPPPPb....",
+    ".....bbbbbb.....",
+    "................",
+    "................",
+    "................",
+]
+
+
 def crust():
     """The Cooling Crust: dark cooled rock, and its cracks for each of its four stages, wider and
     brighter as it ages (the cracks are drawn glowing, on their own layer)."""
@@ -787,6 +843,17 @@ def trophies():
     write_json(recipes / "heartwood_talisman.json", charm_recipe("heartwood_talisman", "minecraft:string", "heartwood", "earth"))
     write_json(recipes / "wraithsilk_veil.json", charm_recipe("wraithsilk_veil", "minecraft:phantom_membrane", "wraith_silk", "ice"))
     write_json(recipes / "salamander_charm.json", charm_recipe("salamander_charm", "minecraft:gold_nugget", "salamander_scale", "fire"))
+    icon(PLUME_CHARM, {"L": FEATHER_LIGHT, "F": FEATHER, "d": FEATHER_DARK, "q": (214, 176, 70), "g": (214, 176, 70),
+                       "w": (220, 240, 236)}).save(items / "plume_of_the_gale.png")
+    icon(PRISM_CHARM, {"L": CRYSTAL_LIGHT, "V": CRYSTAL, "d": CRYSTAL_DARK, "H": (255, 255, 255), "s": (190, 196, 206)}).save(
+        items / "crawlers_prism.png")
+    icon(PEARL_CHARM, {"b": (110, 80, 50), "d": (66, 84, 54), "p": (176, 196, 150), "P": (130, 150, 108), "H": (236, 246, 226),
+                       "c": (150, 120, 80)}).save(items / "bog_pearl_charm.png")
+    for name in ("plume_of_the_gale", "crawlers_prism", "bog_pearl_charm"):
+        write_json(models / f"{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{NS}item/{name}"}})
+    write_json(recipes / "plume_of_the_gale.json", charm_recipe("plume_of_the_gale", "minecraft:feather", "harpy_plume", "wind"))
+    write_json(recipes / "crawlers_prism.json", charm_recipe("crawlers_prism", "minecraft:amethyst_shard", "prism_core", "crystal"))
+    write_json(recipes / "bog_pearl_charm.json", charm_recipe("bog_pearl_charm", "minecraft:slime_ball", "bog_pearl", "water"))
 
 
 PLUME = [

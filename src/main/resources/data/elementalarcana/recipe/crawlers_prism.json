@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " T ",
+    "MEM"
+  ],
+  "key": {
+    "T": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "M": {
+      "item": "elementalarcana:prism_core"
+    },
+    "E": {
+      "item": "elementalarcana:crystal_essence"
+    }
+  },
+  "result": {
+    "id": "elementalarcana:crawlers_prism",
+    "count": 1
+  }
+}

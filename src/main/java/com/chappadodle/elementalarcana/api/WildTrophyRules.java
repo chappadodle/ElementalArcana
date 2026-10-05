@@ -26,7 +26,20 @@ public final class WildTrophyRules {
     public static final int CRUST_AGE_MAX_TICKS = 40;
     public static final int CRUST_MAX_AGE = 3;
 
+    // Trophies II (docs/superpowers/specs/2026-10-05-wild-trophies-2-design.md): the plume's leap and
+    // its ward on short falls, the prism's climb, the pearl's swimming.
+    public static final double LEAP_BOOST = 0.55;
+    public static final double LEAP_LIFT = 0.12;
+    public static final float LEAP_FALL_WARD = 8f;
+    public static final double CLIMB_SPEED = 0.2;
+    public static final double SWIM_BOOST = 0.5;
+
     private WildTrophyRules() {
+    }
+
+    /** Whether the plume keeps a fall of {@code distance} blocks from hurting. */
+    public static boolean fallWarded(float distance) {
+        return distance <= LEAP_FALL_WARD;
     }
 
     /** Whether the talisman's bearer rests: by day, under the open sky, on the earth, and left alone a while. */

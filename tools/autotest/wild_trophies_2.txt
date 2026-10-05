@@ -1,0 +1,94 @@
+# Trophies of the Wild II (see the spec), in survival on a stone platform at y 220 in fresh land:
+# 1: the Plume of the Gale: a sprinting jump east without it, then one with it (the landing
+#    positions logged: the second goes about twice as far), and a 7-block drop (health logged);
+# 2: the Crawler's Prism: walking into a 6-high wall (heights logged as the player climbs), a shot;
+# 3: the Bog Pearl Charm: 15 seconds under water (air logged: full), the swim speed attribute.
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd difficulty normal
+cmd gamemode creative
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd tp @s 118000.5 230 118000.5
+wait 80
+cmd fill 117970 219 117990 118030 219 118010 minecraft:stone
+cmd fill 117970 220 117990 118030 228 118010 minecraft:air
+cmd kill @e[type=!player,distance=..100]
+cmd clear @s
+cmd tp @s 117975.5 220 118000.5 -90 0
+wait 10
+cmd gamemode survival
+cmd effect give @s minecraft:saturation 900 0 true
+# 1: Leaps, without and with the plume.
+wait 20
+key sprint down
+key forward down
+wait 15
+key jump down
+wait 3
+key jump up
+wait 12
+key forward up
+key sprint up
+wait 20
+cmd data get entity @s Pos
+cmd give @s elementalarcana:plume_of_the_gale
+wait 10
+cmd tp @s 117975.5 220 118000.5 -90 0
+wait 20
+key sprint down
+key forward down
+wait 15
+key jump down
+wait 3
+key jump up
+wait 4
+shot plume_leap
+wait 8
+key forward up
+key sprint up
+wait 20
+cmd data get entity @s Pos
+cmd data get entity @s Health
+cmd tp @s 118020.5 227 118000.5 -90 0
+wait 30
+cmd data get entity @s Health
+# 2: Up a wall with the prism.
+cmd clear @s
+cmd give @s elementalarcana:crawlers_prism
+cmd fill 118010 220 117995 118010 225 118005 minecraft:stone
+cmd tp @s 118008.5 220 118000.5 -90 0
+wait 20
+key forward down
+wait 10
+cmd data get entity @s Pos[1]
+wait 10
+cmd data get entity @s Pos[1]
+camera back
+wait 5
+shot prism_climb
+wait 10
+cmd data get entity @s Pos[1]
+key forward up
+camera first
+cmd fill 118010 220 117995 118010 225 118005 minecraft:air
+# 3: Under water with the pearl.
+cmd clear @s
+cmd give @s elementalarcana:bog_pearl_charm
+cmd fill 117985 214 117995 117995 219 118005 minecraft:stone
+cmd fill 117986 215 117996 117994 219 118004 minecraft:water
+cmd tp @s 117990.5 215 118000.5 -90 0
+wait 300
+cmd data get entity @s Air
+cmd attribute @s neoforge:swim_speed get
+wait 10
+cmd fill 117985 214 117995 117995 219 118005 minecraft:air
+cmd tp @s 118000.5 220 118000.5
+cmd clear @s
+cmd gamemode creative
+cmd effect clear @s
+wait 10
+quit

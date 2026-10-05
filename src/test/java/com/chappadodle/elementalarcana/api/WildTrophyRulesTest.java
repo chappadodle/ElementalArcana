@@ -36,4 +36,11 @@ class WildTrophyRulesTest {
         assertEquals(3, WildTrophyRules.nextCrustAge(2));
         assertEquals(-1, WildTrophyRules.nextCrustAge(WildTrophyRules.CRUST_MAX_AGE));
     }
+
+    @Test
+    void thePlumeWardsFallsOfUpToEightBlocks() {
+        assertTrue(WildTrophyRules.fallWarded(8f));
+        assertFalse(WildTrophyRules.fallWarded(8.5f));
+        assertTrue(WildTrophyRules.LEAP_BOOST > 0 && WildTrophyRules.CLIMB_SPEED > 0 && WildTrophyRules.SWIM_BOOST > 0);
+    }
 }
