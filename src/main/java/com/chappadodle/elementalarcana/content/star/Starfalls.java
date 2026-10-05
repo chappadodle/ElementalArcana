@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.content.star;
 
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import com.chappadodle.elementalarcana.core.ArcanaServerConfig;
 import com.chappadodle.elementalarcana.api.ConfigRates;
 import com.chappadodle.elementalarcana.ElementalArcana;
@@ -61,6 +62,8 @@ public final class Starfalls {
     }
 
     private static final List<Pending> PENDING = new ArrayList<>();
+    /** The Overworld's day time when it last ticked (-1: not yet), so dusk is rolled for once as it passes, not every tick time stands still on it. */
+    private static long lastDayTime = -1;
     private static final List<Fall> FALLING = new ArrayList<>();
     private static final Set<BlockPos> PILLARS = new LinkedHashSet<>();
     private static final Map<ResourceKey<Level>, Set<BlockPos>> LANTERNS = new HashMap<>();
@@ -75,8 +78,10 @@ public final class Starfalls {
         }
         long now = level.getGameTime();
         long dayTime = level.getDayTime();
+        long before = lastDayTime < 0 ? dayTime : lastDayTime;
+        lastDayTime = dayTime;
         RandomSource random = level.getRandom();
-        if (StarfallRules.crosses(dayTime - 1, dayTime, StarfallRules.DUSK)) {
+        if (before != dayTime && StarfallRules.crosses(before, dayTime, StarfallRules.DUSK)) {
             for (ServerPlayer player : level.players()) {
                 if (MagicAttachments.get(player).isAwakened() && random.nextFloat() < ConfigRates.scaled(StarfallRules.NIGHT_CHANCE, ArcanaServerConfig.STARFALL.get())) {
                     PENDING.add(new Pending(player.getUUID(), now + StarfallRules.fallTime(random.nextDouble()) - StarfallRules.DUSK));
@@ -274,5 +279,11 @@ public final class Starfalls {
                 return;
             }
         }
+    }
+
+    @SubscribeEvent
+    public static void onServerStopped(ServerStoppedEvent event) {
+        PENDING.clear();
+        lastDayTime = -1;
     }
 }

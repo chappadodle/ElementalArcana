@@ -50,6 +50,10 @@ public final class ArcanaServerConfig {
             .comment("How often Elemental Golems rise, as a multiple of the usual chance (0: never).")
             .translation("elementalarcana.configuration.golems")
             .defineInRange("golems", 1.0, 0.0, 10.0);
+    public static final ModConfigSpec.DoubleValue WANDERING_MAGE = BUILDER
+            .comment("How often a Wandering Mage comes to an awakened player of a morning, as a multiple of the usual one morning in three (0: never; 3: every morning, if none is about).")
+            .translation("elementalarcana.configuration.wanderingMage")
+            .defineInRange("wanderingMage", 1.0, 0.0, 3.0);
 
     static {
         BUILDER.pop().comment("Magic").push("magic");

@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.client;
 
+import com.chappadodle.elementalarcana.content.wanderer.ModWanderer;
 import com.chappadodle.elementalarcana.api.DrakeRules;
 import com.chappadodle.elementalarcana.content.drake.ModDrakes;
 import com.chappadodle.elementalarcana.content.wild.ModWild;
@@ -364,6 +365,7 @@ public final class ArcanaClient {
         }
         event.registerEntityRenderer(ModContent.CRYSTAL_SPIRE.get(), CrystalSpireRenderer::new);
         event.registerEntityRenderer(ModContent.GEODE_SENTINEL.get(), GeodeSentinelRenderer::new);
+        event.registerEntityRenderer(ModWanderer.WANDERING_MAGE.get(), WanderingMageRenderer::new);
         for (Element element : Element.values()) {
             event.registerEntityRenderer(ModCreatures.wisp(element), WispRenderer::new);
             event.registerEntityRenderer(ModCreatures.familiar(element), WispRenderer::new);

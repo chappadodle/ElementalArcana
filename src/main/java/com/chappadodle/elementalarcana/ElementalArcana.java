@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana;
 
+import com.chappadodle.elementalarcana.content.wanderer.ModWanderer;
 import com.chappadodle.elementalarcana.core.ArcanaServerConfig;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.ModContainer;
@@ -75,6 +76,7 @@ public class ElementalArcana {
         ModPouch.register(modEventBus);
         ModSeeker.register(modEventBus);
         ModMentor.register(modEventBus);
+        ModWanderer.register(modEventBus);
         ModBrews.register(modEventBus);
         ModTabs.TABS.register(modEventBus);
     }

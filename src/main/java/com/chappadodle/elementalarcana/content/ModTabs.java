@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.content;
 
+import com.chappadodle.elementalarcana.content.wanderer.ModWanderer;
 import com.chappadodle.elementalarcana.api.DrakeRules;
 import com.chappadodle.elementalarcana.content.drake.ModDrakes;
 import com.chappadodle.elementalarcana.content.wild.ModWild;
@@ -110,6 +111,7 @@ public final class ModTabs {
                 output.accept(ModPouch.CHARM_POUCH.get());
                 output.accept(ModSeeker.SEEKERS_COMPASS.get());
                 output.accept(ModMentor.SENDING_STONE.get());
+                output.accept(ModWanderer.WANDERING_MAGE_EGG.get());
             })
             .build());
 

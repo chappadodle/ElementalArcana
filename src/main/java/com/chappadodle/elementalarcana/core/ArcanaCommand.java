@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.core;
 
+import com.chappadodle.elementalarcana.content.wanderer.WanderingMages;
 import com.chappadodle.elementalarcana.api.AttunementRank;
 import com.chappadodle.elementalarcana.api.AwakeningRules;
 import com.chappadodle.elementalarcana.api.BountyRules;
@@ -162,6 +163,7 @@ public final class ArcanaCommand {
                 .then(Commands.literal("mentor").then(Commands.argument("chapter", IntegerArgumentType.integer(0, MentorChapters.CHAPTERS.size()))
                         .executes(ctx -> setMentorChapter(ctx.getSource(), IntegerArgumentType.getInteger(ctx, "chapter")))))
                 .then(Commands.literal("config").executes(ctx -> showConfig(ctx.getSource())))
+                .then(Commands.literal("mage").executes(ctx -> callMage(ctx.getSource())))
                 .then(Commands.literal("tide")
                         .then(Commands.literal("start").executes(ctx -> {
                             ManaTides.force(ctx.getSource().getServer());
@@ -257,14 +259,23 @@ public final class ArcanaCommand {
         return bounty;
     }
 
+    /** /arcana mage: calls a Wandering Mage to the player now, whatever the morning's chance. */
+    private static int callMage(CommandSourceStack source) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        boolean came = WanderingMages.call(player.serverLevel(), player);
+        source.sendSuccess(() -> Component.literal(came ? "A wandering mage is on the way" : "No open ground near you for a wandering mage"), false);
+        return came ? 1 : 0;
+    }
+
     /** /arcana config: the server's settings for the mod in force (config/elementalarcana-server.toml, or the world's override). */
     private static int showConfig(CommandSourceStack source) {
         source.sendSuccess(() -> Component.literal(String.format(Locale.ROOT,
                 "Elemental Arcana settings: rifts x%.2f, starfall x%.2f, mana tides %s, wisps x%.2f, wild creatures x%.2f, drakes x%.2f, "
-                        + "golems x%.2f, natural awakening x%.2f, sending stone %s",
+                        + "golems x%.2f, wandering mages x%.2f, natural awakening x%.2f, sending stone %s",
                 ArcanaServerConfig.RIFTS.get(), ArcanaServerConfig.STARFALL.get(), ArcanaServerConfig.MANA_TIDES.get() ? "on" : "off",
                 ArcanaServerConfig.WISPS.get(), ArcanaServerConfig.WILD_CREATURES.get(), ArcanaServerConfig.DRAKES.get(),
-                ArcanaServerConfig.GOLEMS.get(), ArcanaServerConfig.NATURAL_AWAKENING.get(), ArcanaServerConfig.SENDING_STONE.get() ? "on" : "off")), false);
+                ArcanaServerConfig.GOLEMS.get(), ArcanaServerConfig.WANDERING_MAGE.get(), ArcanaServerConfig.NATURAL_AWAKENING.get(),
+                ArcanaServerConfig.SENDING_STONE.get() ? "on" : "off")), false);
         return 1;
     }
 

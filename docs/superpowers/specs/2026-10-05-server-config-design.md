@@ -23,6 +23,7 @@ more (a chance never passes certainty).
 | creatures | `wildCreatures` | 1 (0 to 10) | How often the Creatures of the Wild appear |
 | creatures | `drakes` | 1 (0 to 10) | How often a wild drake flies in (nests keep theirs) |
 | creatures | `golems` | 1 (0 to 10) | How often golems rise |
+| creatures | `wanderingMage` | 1 (0 to 3) | How often a Wandering Mage comes of a morning (added with it) |
 | magic | `naturalAwakening` | 1 (0 to 10) | How quickly magic wakes on its own (0: only a brush with an element, a Catalyst or a command) |
 | magic | `sendingStone` | on | Whether awakened players get the Sending Stone (the questline) |
 

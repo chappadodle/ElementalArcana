@@ -1,0 +1,15 @@
+# The Wandering Mage (see its spec): one summoned, its offers listed (three rumours, maps to the
+# nearest crypt, tower, sky isle, nest or ruin; four wares; one thing it buys). Its trades are made
+# when first asked for, here by reading it.
+gamerule doMobSpawning false
+forceload add -8 -8 8 8
+fill -6 99 -6 6 99 6 minecraft:stone
+fill -6 100 -6 6 106 6 minecraft:air
+kill @e[type=!player]
+summon elementalarcana:wandering_mage 0 100 0 {NoAI:1b,Tags:["eatest"]}
+sleep 1
+data get entity @e[tag=eatest,limit=1] Offers.Recipes
+sleep 2
+kill @e[tag=eatest]
+fill -6 99 -6 6 106 6 minecraft:air
+forceload remove all

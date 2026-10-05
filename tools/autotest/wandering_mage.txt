@@ -1,0 +1,39 @@
+# The Wandering Mage (see its spec), on a grass platform at noon: one called by command (the sense
+# logged: "You sense a wandering mage nearby, to the ..."), the mages about counted; another
+# summoned in front of the player and traded with (its screen, a shot); a close look at it (a shot).
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamemode creative
+cmd effect clear @s
+cmd tp @s 196000.5 110 196000.5 -90 0
+wait 80
+cmd fill 195980 99 195980 196020 99 196020 minecraft:grass_block
+cmd fill 195980 100 195980 196020 112 196020 minecraft:air
+cmd kill @e[type=elementalarcana:wandering_mage]
+cmd tp @s 196000.5 100 196000.5 -90 0
+cmd gamemode survival
+wait 20
+cmd arcana mage
+wait 20
+cmd execute if entity @e[type=elementalarcana:wandering_mage]
+cmd kill @e[type=elementalarcana:wandering_mage]
+cmd summon elementalarcana:wandering_mage 196003.5 100 196000.5 {NoAI:1b,Rotation:[90f,0f],Tags:["eat"]}
+wait 20
+look -90 10
+wait 5
+use
+wait 40
+shot mage_trades
+screen close
+wait 5
+cmd tp @s 196001.5 100 196000.5 -90 5
+wait 10
+shot mage_close
+cmd kill @e[tag=eat]
+cmd gamemode creative
+cmd fill 195980 99 195980 196020 112 196020 minecraft:air
+wait 10
+quit

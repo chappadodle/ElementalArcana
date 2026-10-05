@@ -154,6 +154,9 @@ ADVANCEMENTS = [
      "Buy something from an Arcanist, a villager who trades in magic", {
          "bought": {"trigger": "minecraft:villager_trade",
                     "conditions": {"item": {"items": "#" + NS + "arcanist_goods"}}}}, None),
+    ("rumours_on_the_road", "the_arcanist", item("minecraft:filled_map"), "task", "Rumours on the Road",
+     "Trade with a Wandering Mage", {
+         "traded": {"trigger": "minecraft:villager_trade", "conditions": {"villager": {"type": NS + "wandering_mage"}}}}, None),
     ("bounty_hunter", "the_arcanist", item("bounty_contract"), "task", "Bounty Hunter",
      "Hand in an Arcanist's bounty at an Arcane Lectern", magic("bounty"), None),
     ("liquid_mana", "the_arcanist", item("minecraft:potion", potion=NS + "mana_draught"), "task", "Liquid Mana",

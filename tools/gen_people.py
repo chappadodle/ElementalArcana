@@ -192,6 +192,28 @@ def arcanist_clothes():
         (TEXTURES / f"entity/{kind}/profession/arcanist.png.mcmeta").write_text(meta)
 
 
+
+# The Wandering Mage (docs/superpowers/specs/2026-10-06-wandering-mage-design.md): the Arcanist's cut
+# recoloured, midnight blue where the Arcanist's is violet and silver where it's gold.
+MAGE_COLORS = {
+    ROBE: (36, 52, 104), ROBE_DARK: (24, 34, 74), ROBE_LIGHT: (58, 80, 140), (30, 18, 56): (14, 20, 44),
+    GOLD: (206, 214, 228), GOLD_DARK: (140, 150, 170), STAR: (236, 240, 255),
+}
+
+
+def wandering_mage_clothes():
+    """The Wandering Mage's clothes, drawn over a wandering trader (the same villager model)."""
+    c = Canvas(seed=1201)
+    hat(c)
+    robe(c)
+    legs(c)
+    villager_arms(c)
+    px = c.px
+    for old, new in MAGE_COLORS.items():
+        mask = (px[..., 0] == old[0]) & (px[..., 1] == old[1]) & (px[..., 2] == old[2]) & (px[..., 3] > 0)
+        px[mask, :3] = new
+    save(c.image(), TEXTURES / "entity/wandering_mage.png")
+
 # ---- the Arcane Lectern and items (16x16) ----
 
 WOOD = (62, 40, 46)
@@ -485,6 +507,7 @@ def cottage(village, p):
 
 def main():
     arcanist_clothes()
+    wandering_mage_clothes()
     lectern_textures()
     items()
     for village, palette in VILLAGES.items():
