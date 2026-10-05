@@ -63,8 +63,8 @@ public final class PrismWards {
         reflect(projectile, warded);
     }
 
-    /** Turned back at whoever shot it (or straight back, if no one did), a tenth faster, and now the warded one's. */
-    private static void reflect(Projectile projectile, LivingEntity warded) {
+    /** Turned back at whoever shot it (or straight back, if no one did), a tenth faster, and now the warded one's (Refraction's too). */
+    public static void reflect(Projectile projectile, LivingEntity warded) {
         Vec3 velocity = projectile.getDeltaMovement();
         double speed = Math.max(0.6, velocity.length()) * 1.1;
         Entity shooter = projectile.getOwner();

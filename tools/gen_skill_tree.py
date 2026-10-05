@@ -205,7 +205,8 @@ def cluster(element, family, origin, angle, starter, arms):
 
 lightning_xy = cluster("lightning", "wind", wind_ends["dash"], -45, "chain_lightning", [
     ("storm", -45, [("stat", "potency"), ("stat", "affinity/wind"), ("stat", "focus"),
-                    ("notable", ("lightning_static_charge", {"potency": 6, "affinity/wind": 4}))]),
+                    ("notable", ("lightning_static_charge", {"potency": 6, "affinity/wind": 4})),
+                    ("keystone", ("lightning_conductor", "conductor"))]),
     ("spark", 45, [("stat", "focus"), ("stat", "affinity/wind"), ("spell", "thunderclap")]),
     # Stormcall (docs/superpowers/specs/2026-10-05-stormcall-design.md).
     ("cloud", 90, [("stat", "potency"), ("stat", "affinity/wind"), ("spell", "stormcall")]),
@@ -214,14 +215,16 @@ lightning_xy = cluster("lightning", "wind", wind_ends["dash"], -45, "chain_light
 path("lightning", "lightning", "lightning_chain_lightning", "chain_lightning", lightning_xy, -45, start_from="lightning_start")
 radiance_xy = cluster("radiance", "fire", fire_ends["burst"], 45, "smite", [
     ("dawn", -45, [("stat", "vitality"), ("stat", "affinity/fire"), ("stat", "reservoir"),
-                   ("notable", ("radiance_inner_light", {"vitality": 6, "affinity/fire": 4}))]),
+                   ("notable", ("radiance_inner_light", {"vitality": 6, "affinity/fire": 4})),
+                   ("keystone", ("radiance_sunborn", "sunborn"))]),
     ("halo", 45, [("stat", "ward"), ("stat", "affinity/fire"), ("spell", "sanctuary")]),
     # Dawnbreak (docs/superpowers/specs/2026-10-05-dawnbreak-design.md).
     ("sun", -90, [("stat", "vitality"), ("stat", "affinity/fire"), ("spell", "dawnbreak")]),
 ])
 crystal_xy = cluster("crystal", "earth", earth_ends["quake"], 135, "prism_bolt", [
     ("facet", 45, [("stat", "ward"), ("stat", "affinity/earth"), ("stat", "focus"),
-                   ("notable", ("crystal_prismatic_ward", {"ward": 6, "affinity/earth": 4}))]),
+                   ("notable", ("crystal_prismatic_ward", {"ward": 6, "affinity/earth": 4})),
+                   ("keystone", ("crystal_refraction", "refraction"))]),
     ("geode", 90, [("stat", "potency"), ("stat", "affinity/earth"), ("spell", "prism_ward")]),
     # Geode Sentinel (docs/superpowers/specs/2026-10-05-geode-sentinel-design.md).
     ("sentinel", -90, [("stat", "ward"), ("stat", "affinity/earth"), ("spell", "geode_sentinel")]),

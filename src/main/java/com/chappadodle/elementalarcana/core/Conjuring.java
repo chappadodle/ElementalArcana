@@ -6,6 +6,7 @@ import com.chappadodle.elementalarcana.api.Spell;
 import com.chappadodle.elementalarcana.api.SpellProjectile;
 import com.chappadodle.elementalarcana.api.event.SpellCastEvent;
 import com.chappadodle.elementalarcana.content.ManaWeather;
+import com.chappadodle.elementalarcana.content.KeystoneEvents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.neoforged.neoforge.common.NeoForge;
@@ -85,7 +86,7 @@ public final class Conjuring {
         if (pre.isCanceled() || !CastingService.canAfford(player, data, pre.manaCost())) {
             return;
         }
-        CastContext context = new CastContext(player, player.serverLevel(), InteractionHand.MAIN_HAND, data.spellPower(spell) * ManaWeather.powerFactor(player),
+        CastContext context = new CastContext(player, player.serverLevel(), InteractionHand.MAIN_HAND, data.spellPower(spell) * ManaWeather.powerFactor(player) * KeystoneEvents.lightFactor(player),
                 level, data.branches(spell));
         boolean first = session.held.isEmpty();
         SpellProjectile projectile = conjurer.conjure(context, session.seed);

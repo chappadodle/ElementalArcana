@@ -102,6 +102,17 @@
       "element": "radiance"
     },
     {
+      "id": "radiance_sunborn",
+      "type": "keystone",
+      "x": 715,
+      "y": 255,
+      "links": [
+        "radiance_inner_light"
+      ],
+      "keystone": "sunborn",
+      "element": "radiance"
+    },
+    {
       "id": "radiance_halo_1",
       "type": "small",
       "x": 515,

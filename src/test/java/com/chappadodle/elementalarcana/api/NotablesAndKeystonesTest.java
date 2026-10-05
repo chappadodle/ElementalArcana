@@ -74,4 +74,35 @@ class NotablesAndKeystonesTest {
         assertEquals(1f, Keystones.damageDealtFactor(held, false), 1e-6);
         assertEquals(1f, Keystones.damageDealtFactor(Set.of(), true), 1e-6);
     }
+
+    @Test
+    void conductorTradesManaForArcs() {
+        assertEquals(0.8f, Keystones.maxManaFactor(Set.of(Keystones.CONDUCTOR)), 1e-6);
+        assertEquals(0.75f * 0.8f, Keystones.maxManaFactor(Set.of(Keystones.CONDUCTOR, Keystones.WELLSPRING)), 1e-6);
+        assertEquals(0.35f, Keystones.CONDUCTOR_SHARE, 1e-6);
+    }
+
+    @Test
+    void sunbornFollowsTheLight() {
+        Set<String> held = Set.of(Keystones.SUNBORN);
+        assertEquals(1.25f, Keystones.lightFactor(held, 15), 1e-6);
+        assertEquals(1.25f, Keystones.lightFactor(held, 12), 1e-6);
+        assertEquals(1f, Keystones.lightFactor(held, 10), 1e-6);
+        assertEquals(1f, Keystones.lightFactor(held, 8), 1e-6);
+        assertEquals(0.8f, Keystones.lightFactor(held, 7), 1e-6);
+        assertEquals(0.8f, Keystones.lightFactor(held, 0), 1e-6);
+        assertEquals(1f, Keystones.lightFactor(Set.of(), 0), 1e-6);
+    }
+
+    @Test
+    void refractionTurnsBackEveryThird() {
+        Set<String> held = Set.of(Keystones.REFRACTION);
+        assertFalse(Keystones.refracts(held, 1));
+        assertFalse(Keystones.refracts(held, 2));
+        assertTrue(Keystones.refracts(held, 3));
+        assertTrue(Keystones.refracts(held, 6));
+        assertFalse(Keystones.refracts(Set.of(), 3));
+        assertEquals(1.2f, Keystones.meleeTakenFactor(held), 1e-6);
+        assertEquals(1f, Keystones.meleeTakenFactor(Set.of()), 1e-6);
+    }
 }

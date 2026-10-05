@@ -102,6 +102,17 @@
       "element": "lightning"
     },
     {
+      "id": "lightning_conductor",
+      "type": "keystone",
+      "x": 141,
+      "y": -601,
+      "links": [
+        "lightning_static_charge"
+      ],
+      "keystone": "conductor",
+      "element": "lightning"
+    },
+    {
       "id": "lightning_spark_1",
       "type": "small",
       "x": 181,

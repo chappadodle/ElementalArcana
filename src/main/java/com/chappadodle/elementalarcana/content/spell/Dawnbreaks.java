@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,6 +20,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -112,6 +114,16 @@ public final class Dawnbreaks {
             other.addEffect(new MobEffectInstance(MobEffects.GLOWING, 30, 0, false, false));
             level.sendParticles(ParticleTypes.END_ROD, other.getX(), other.getY(1.0), other.getZ(), 3, 0.2, 0.3, 0.2, 0.02);
         }
+    }
+
+    /** Whether {@code pos} is in a Dawnbreak's light (on the server; Sunborn counts it as daylight). */
+    public static boolean shines(Level level, BlockPos pos) {
+        for (Dawn dawn : ACTIVE) {
+            if (dawn.level() == level && dawn.at().distanceTo(Vec3.atCenterOf(pos)) <= RADIUS) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @SubscribeEvent

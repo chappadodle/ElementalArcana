@@ -21,6 +21,12 @@ public final class Keystones {
     public static final String WINTERS_GRASP = "winters_grasp";
     /** Spells (and conjured upkeep) cost health instead of mana, 1 heart per 20, and never cause Mana Sickness. */
     public static final String BLOOD_MAGIC = "blood_magic";
+    /** Every third projectile that would hit you turns back at its shooter; melee blows hurt you 20% more. */
+    public static final String REFRACTION = "refraction";
+    /** Your spell hits arc on to the nearest other foe within 5 blocks for 35% of their damage; 20% less max mana. */
+    public static final String CONDUCTOR = "conductor";
+    /** In bright light your spells hit 25% harder and you mend; in dim light they hit 20% weaker. */
+    public static final String SUNBORN = "sunborn";
 
     public static final float GLASS_CANNON_POWER = 1.3f;
     public static final double GLASS_CANNON_HEALTH = -0.3;
@@ -32,6 +38,18 @@ public final class Keystones {
     public static final double MOUNTAIN_HEART_SPEED = -0.15;
     public static final float WINTERS_GRASP_DAMAGE = 1.3f;
     public static final float WINTERS_GRASP_FIRE_TAKEN = 1.4f;
+    public static final int REFRACTION_EVERY = 3;
+    public static final float REFRACTION_MELEE_TAKEN = 1.2f;
+    public static final float CONDUCTOR_SHARE = 0.35f;
+    public static final double CONDUCTOR_REACH = 5;
+    public static final float CONDUCTOR_MANA = 0.8f;
+    /** Sunborn's bright light (this light level or more) and dim light (less than this). */
+    public static final int SUNBORN_BRIGHT = 12;
+    public static final int SUNBORN_DIM = 8;
+    public static final float SUNBORN_BRIGHT_POWER = 1.25f;
+    public static final float SUNBORN_DIM_POWER = 0.8f;
+    public static final int SUNBORN_MEND_TICKS = 60;
+    public static final float SUNBORN_MEND = 1f;
 
     private Keystones() {
     }
@@ -43,7 +61,26 @@ public final class Keystones {
 
     /** Multiplier on max mana. */
     public static float maxManaFactor(Set<String> keystones) {
-        return keystones.contains(WELLSPRING) ? WELLSPRING_MANA : 1f;
+        float factor = keystones.contains(WELLSPRING) ? WELLSPRING_MANA : 1f;
+        return keystones.contains(CONDUCTOR) ? factor * CONDUCTOR_MANA : factor;
+    }
+
+    /** Sunborn's multiplier on spell power at a light level (0 to 15): stronger in bright light, weaker in dim. */
+    public static float lightFactor(Set<String> keystones, int light) {
+        if (!keystones.contains(SUNBORN)) {
+            return 1f;
+        }
+        return light >= SUNBORN_BRIGHT ? SUNBORN_BRIGHT_POWER : light < SUNBORN_DIM ? SUNBORN_DIM_POWER : 1f;
+    }
+
+    /** Whether Refraction turns back the {@code count}th projectile to come at its holder (counting from 1). */
+    public static boolean refracts(Set<String> keystones, int count) {
+        return keystones.contains(REFRACTION) && count % REFRACTION_EVERY == 0;
+    }
+
+    /** Multiplier on melee damage this player takes. */
+    public static float meleeTakenFactor(Set<String> keystones) {
+        return keystones.contains(REFRACTION) ? REFRACTION_MELEE_TAKEN : 1f;
     }
 
     /** Multiplier on mana regen. */

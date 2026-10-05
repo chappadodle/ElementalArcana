@@ -102,6 +102,17 @@
       "element": "crystal"
     },
     {
+      "id": "crystal_refraction",
+      "type": "keystone",
+      "x": -715,
+      "y": 255,
+      "links": [
+        "crystal_prismatic_ward"
+      ],
+      "keystone": "refraction",
+      "element": "crystal"
+    },
+    {
       "id": "crystal_geode_1",
       "type": "small",
       "x": -543,
