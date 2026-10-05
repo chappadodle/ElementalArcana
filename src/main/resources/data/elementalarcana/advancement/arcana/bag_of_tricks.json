@@ -1,0 +1,38 @@
+{
+  "parent": "elementalarcana:arcana/awakening",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:charm_pouch"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.bag_of_tricks.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.bag_of_tricks.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "pouch": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "elementalarcana:charm_pouch",
+            "predicates": {
+              "minecraft:container": {
+                "items": {
+                  "size": {
+                    "min": 3
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

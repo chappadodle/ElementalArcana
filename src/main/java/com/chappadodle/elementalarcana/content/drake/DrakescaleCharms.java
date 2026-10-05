@@ -2,10 +2,10 @@ package com.chappadodle.elementalarcana.content.drake;
 
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Element;
+import com.chappadodle.elementalarcana.content.pouch.CharmPouches;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -21,15 +21,9 @@ public final class DrakescaleCharms {
     private DrakescaleCharms() {
     }
 
-    /** Whether {@code player} carries a charm of {@code element}. */
+    /** Whether {@code player} carries a charm of {@code element} (loose, or in a Charm Pouch). */
     public static boolean carries(Player player, Element element) {
-        Inventory inventory = player.getInventory();
-        for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
-            if (inventory.getItem(slot).getItem() instanceof DrakescaleCharmItem charm && charm.element() == element) {
-                return true;
-            }
-        }
-        return false;
+        return CharmPouches.carries(player, stack -> stack.getItem() instanceof DrakescaleCharmItem charm && charm.element() == element);
     }
 
     /** The element whose charm wards off {@code source}, or null. */

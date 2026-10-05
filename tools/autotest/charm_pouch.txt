@@ -1,0 +1,101 @@
+# Charm Pouch (see the spec), in survival on a stone platform at y 220 in fresh land:
+# 1: a Storm Sigil bound; the pouch opened from the hotbar (a shot); the sigil, a Fire Drakescale
+#    Charm and a Bog Pearl Charm shift-clicked in, a stick refused, the pouch's own slot clicked and
+#    number-key swapped (both ignored) (a shot); closed, the inventory logged (the pouch holding the
+#    three, the stick still out);
+# 2: what they do from inside the pouch: fire damage (health logged: unchanged), the movement and
+#    swim speed attributes (logged: the sigil's and the pearl's boosts);
+# 3: bundle-style: in the inventory screen, a Plume of the Gale right-clicked onto the pouch, then
+#    the pouch right-clicked onto a Crawler's Prism (both go in), the pouch's tooltip (a shot);
+# 4: the pouch gone, fire damage again (health logged: hurt this time).
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd difficulty normal
+cmd gamemode creative
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd tp @s 124000.5 230 124000.5
+wait 80
+cmd fill 123990 219 123990 124010 219 124010 minecraft:stone
+cmd fill 123990 220 123990 124010 228 124010 minecraft:air
+cmd kill @e[type=!player,distance=..100]
+cmd clear @s
+cmd tp @s 124000.5 220 124000.5 -90 0
+wait 10
+cmd gamemode survival
+cmd effect give @s minecraft:saturation 900 0 true
+cmd item replace entity @s hotbar.0 with elementalarcana:charm_pouch
+cmd item replace entity @s hotbar.1 with elementalarcana:storm_sigil
+cmd item replace entity @s hotbar.2 with elementalarcana:fire_drakescale_charm
+cmd item replace entity @s hotbar.3 with elementalarcana:bog_pearl_charm
+cmd item replace entity @s hotbar.4 with minecraft:stick
+cmd item replace entity @s hotbar.5 with elementalarcana:plume_of_the_gale
+cmd item replace entity @s hotbar.6 with elementalarcana:crawlers_prism
+wait 10
+# 1: Bind the sigil, open the pouch, fill it.
+slot 1
+use
+wait 10
+slot 0
+use
+wait 10
+shot pouch_open
+click 37 0 QUICK_MOVE
+wait 2
+click 38 0 QUICK_MOVE
+wait 2
+click 39 0 QUICK_MOVE
+wait 2
+click 40 0 QUICK_MOVE
+wait 2
+click 36 0 PICKUP
+wait 2
+click 41 0 SWAP
+wait 2
+click 36 0 THROW
+wait 5
+hover 1
+wait 5
+shot pouch_filled
+screen close
+wait 10
+cmd data get entity @s Inventory
+# 2: Working from inside.
+wait 20
+cmd attribute @s minecraft:generic.movement_speed get
+cmd attribute @s neoforge:swim_speed get
+cmd damage @s 4 minecraft:in_fire
+wait 10
+cmd data get entity @s Health
+# 3: Bundle-style, and the tooltip.
+screen inventory
+wait 10
+click 41 0 PICKUP
+wait 2
+click 36 1 PICKUP
+wait 2
+click 36 0 PICKUP
+wait 2
+click 42 1 PICKUP
+wait 2
+click 36 0 PICKUP
+wait 5
+hover 36
+wait 5
+shot pouch_tooltip
+screen close
+wait 10
+cmd data get entity @s Inventory[{Slot:0b}]
+# 4: Without it.
+cmd clear @s
+wait 20
+cmd damage @s 4 minecraft:in_fire
+wait 10
+cmd data get entity @s Health
+cmd gamemode creative
+cmd effect clear @s
+wait 10
+quit

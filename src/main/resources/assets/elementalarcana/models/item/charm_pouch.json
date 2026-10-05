@@ -1,0 +1,14 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "elementalarcana:item/charm_pouch"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "elementalarcana:filled": 1
+      },
+      "model": "elementalarcana:item/charm_pouch_filled"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "replace": false,
+  "values": [
+    "elementalarcana:fire_drakescale_charm",
+    "elementalarcana:water_drakescale_charm",
+    "elementalarcana:wind_drakescale_charm",
+    "elementalarcana:ice_drakescale_charm",
+    "elementalarcana:lightning_drakescale_charm",
+    "elementalarcana:heartwood_talisman",
+    "elementalarcana:wraithsilk_veil",
+    "elementalarcana:salamander_charm",
+    "elementalarcana:plume_of_the_gale",
+    "elementalarcana:crawlers_prism",
+    "elementalarcana:bog_pearl_charm",
+    "elementalarcana:ember_heart",
+    "elementalarcana:tidecallers_pearl",
+    "elementalarcana:rimeheart_locket",
+    "elementalarcana:feather_of_the_gale",
+    "elementalarcana:stoneheart_idol",
+    "elementalarcana:prism_of_the_deep",
+    "elementalarcana:storm_sigil",
+    "elementalarcana:sunstone",
+    "elementalarcana:revenants_phylactery"
+  ]
+}

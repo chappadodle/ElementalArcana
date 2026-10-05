@@ -7,6 +7,7 @@ import com.chappadodle.elementalarcana.api.Relic;
 import com.chappadodle.elementalarcana.api.RelicRules;
 import com.chappadodle.elementalarcana.api.SpellDamage;
 import com.chappadodle.elementalarcana.content.ModContent;
+import com.chappadodle.elementalarcana.content.pouch.CharmPouches;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.core.MagicData;
 import net.minecraft.ChatFormatting;
@@ -29,9 +30,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Enemy;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -49,7 +48,8 @@ import java.util.WeakHashMap;
 
 /**
  * The relics' powers (see the Relics spec). A player bears the relic they bound last of those bound
- * to them in their inventory (worked out once a tick); each power hooks the event it needs.
+ * to them in their inventory, or in a Charm Pouch there (worked out once a tick); each power hooks
+ * the event it needs.
  */
 @EventBusSubscriber(modid = ElementalArcana.MODID)
 public final class Relics {
@@ -58,8 +58,8 @@ public final class Relics {
     private static final String PRISM_READY = "elementalarcana_prism_ready";
     private static final Map<Player, Bearing> BEARINGS = new WeakHashMap<>();
 
-    /** The relic a player bears (and its stack), as of a game tick. */
-    private record Bearing(long time, @Nullable Relic relic, ItemStack stack) {
+    /** The relic a player bears (and where it lies: its stack, loose or pouched), as of a game tick. */
+    private record Bearing(long time, @Nullable Relic relic, @Nullable CharmPouches.Carried carried) {
     }
 
     private Relics() {
@@ -90,17 +90,15 @@ public final class Relics {
                 return cached;
             }
         }
-        Inventory inventory = player.getInventory();
-        ItemStack best = ItemStack.EMPTY;
+        CharmPouches.Carried best = null;
         Relic relic = null;
         long latest = Long.MIN_VALUE;
-        for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
-            ItemStack stack = inventory.getItem(slot);
-            if (stack.getItem() instanceof RelicItem item) {
-                RelicBond bond = stack.get(ModRelics.BOND.get());
+        for (CharmPouches.Carried carried : CharmPouches.carried(player)) {
+            if (carried.stack().getItem() instanceof RelicItem item) {
+                RelicBond bond = carried.stack().get(ModRelics.BOND.get());
                 if (bond != null && bond.owner().equals(player.getUUID()) && bond.boundAt() > latest) {
                     latest = bond.boundAt();
-                    best = stack;
+                    best = carried;
                     relic = item.relic();
                 }
             }
@@ -271,11 +269,11 @@ public final class Relics {
         Bearing bearing = bearing(player);
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (bearing.relic() != Relic.REVENANTS_PHYLACTERY || !RelicRules.ready(bearing.stack().getOrDefault(ModRelics.READY_AT.get(), 0L), now)) {
+        if (bearing.relic() != Relic.REVENANTS_PHYLACTERY || !RelicRules.ready(bearing.carried().stack().getOrDefault(ModRelics.READY_AT.get(), 0L), now)) {
             return;
         }
         event.setCanceled(true);
-        bearing.stack().set(ModRelics.READY_AT.get(), now + RelicRules.PHYLACTERY_COOLDOWN_TICKS);
+        bearing.carried().set(ModRelics.READY_AT.get(), now + RelicRules.PHYLACTERY_COOLDOWN_TICKS);
         player.setHealth(1f);
         player.clearFire();
         player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 1));

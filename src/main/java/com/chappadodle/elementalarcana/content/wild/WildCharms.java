@@ -3,6 +3,7 @@ package com.chappadodle.elementalarcana.content.wild;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.WildTrophyRules;
 import com.chappadodle.elementalarcana.content.ModContent;
+import com.chappadodle.elementalarcana.content.pouch.CharmPouches;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -16,7 +17,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -52,15 +52,9 @@ public final class WildCharms {
     private WildCharms() {
     }
 
-    /** Whether {@code player} carries {@code charm} anywhere in their inventory. */
+    /** Whether {@code player} carries {@code charm} anywhere in their inventory (or in a Charm Pouch there). */
     public static boolean carries(Player player, Item charm) {
-        Inventory inventory = player.getInventory();
-        for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
-            if (inventory.getItem(slot).is(charm)) {
-                return true;
-            }
-        }
-        return false;
+        return CharmPouches.carries(player, stack -> stack.is(charm));
     }
 
     @SubscribeEvent

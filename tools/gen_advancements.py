@@ -134,6 +134,10 @@ ADVANCEMENTS = [
     ("wild_at_heart", "into_the_wild", item("salamander_charm"), "goal", "Wild at Heart",
      "Make a Heartwood Talisman, a Wraithsilk Veil and a Salamander Charm",
      has(("heartwood_talisman", None), ("wraithsilk_veil", None), ("salamander_charm", None)), None),
+    ("bag_of_tricks", "awakening", item("charm_pouch"), "task", "Bag of Tricks",
+     "Carry a Charm Pouch with three charms or relics in it", {
+         "pouch": {"trigger": "minecraft:inventory_changed", "conditions": {"items": [{
+             "items": NS + "charm_pouch", "predicates": {"minecraft:container": {"items": {"size": {"min": 3}}}}}]}}}, None),
     ("lorekeeper", "awakening", item("minecraft:written_book"), "task", "Lorekeeper",
      "Find a page of the old story in a ruin", {
          "page": {"trigger": "minecraft:inventory_changed", "conditions": {"items": [{

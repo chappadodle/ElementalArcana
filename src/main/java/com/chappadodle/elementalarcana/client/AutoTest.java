@@ -20,6 +20,7 @@ import net.minecraft.advancements.AdvancementNode;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.MouseHandler;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -27,6 +28,7 @@ import net.minecraft.client.gui.screens.BackupConfirmScreen;
 import net.minecraft.client.multiplayer.ClientAdvancements;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
@@ -36,6 +38,9 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
@@ -56,6 +61,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.util.ObfuscationReflectionHelper;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.slf4j.Logger;
@@ -85,6 +91,9 @@ import java.util.Optional;
  *                          screens, the inventory, or the advancements on the mod's tab
  * hud on|off               show or hide the HUD
  * slot 2                   hold what's in hotbar slot 2 (0 to 8)
+ * click 37 0 QUICK_MOVE    click slot 37 of the open menu, as the player would: button 0 or 1 and
+ *                          a click type (PICKUP, QUICK_MOVE, SWAP, THROW...); default 0 PICKUP
+ * hover 36                 put the mouse over slot 36 of the open screen (for its tooltip)
  * camera first|back|front  the camera view
  * use                      right-click the creature or block under the crosshair (or, with
  *                          neither, use the held item)
@@ -231,6 +240,8 @@ public final class AutoTest {
             case "launch_one" -> PacketDistributor.sendToServer(CastSpellPayload.LAUNCH_ONE);
             case "launch_all" -> PacketDistributor.sendToServer(CastSpellPayload.LAUNCH_ALL);
             case "screen" -> openScreen(minecraft, argument);
+            case "click" -> click(minecraft, argument);
+            case "hover" -> hover(minecraft, Integer.parseInt(argument.trim()));
             case "jei_filter" -> {
                 if (ModList.get().isLoaded("jei")) {
                     JeiHooks.filter(argument);
@@ -291,6 +302,29 @@ public final class AutoTest {
             default -> LOGGER.warn("[autotest] unknown step: {}", line);
         }
         return true;
+    }
+
+    /** Clicks a slot of the open menu: "37 0 QUICK_MOVE" (the slot, a button, a click type). */
+    private static void click(Minecraft minecraft, String argument) {
+        String[] parts = argument.trim().split("\\s+");
+        int slot = Integer.parseInt(parts[0]);
+        int button = parts.length > 1 ? Integer.parseInt(parts[1]) : 0;
+        ClickType type = parts.length > 2 ? ClickType.valueOf(parts[2].toUpperCase(Locale.ROOT)) : ClickType.PICKUP;
+        AbstractContainerMenu menu = minecraft.player.containerMenu;
+        minecraft.gameMode.handleInventoryMouseClick(menu.containerId, slot, button, type, minecraft.player);
+        LOGGER.info("[autotest] click {} {} {}: now carrying {}", slot, button, type, menu.getCarried());
+    }
+
+    /** Puts the mouse over slot {@code index} of the open container screen (so its tooltip shows). */
+    private static void hover(Minecraft minecraft, int index) {
+        if (!(minecraft.screen instanceof AbstractContainerScreen<?> screen)) {
+            LOGGER.warn("[autotest] hover: no container screen open");
+            return;
+        }
+        Slot slot = screen.getMenu().getSlot(index);
+        double scale = minecraft.getWindow().getGuiScale();
+        ObfuscationReflectionHelper.setPrivateValue(MouseHandler.class, minecraft.mouseHandler, (screen.getGuiLeft() + slot.x + 8) * scale, "xpos");
+        ObfuscationReflectionHelper.setPrivateValue(MouseHandler.class, minecraft.mouseHandler, (screen.getGuiTop() + slot.y + 8) * scale, "ypos");
     }
 
     /** Runs {@code command} on the integrated server as the player, with full permissions. */
@@ -529,7 +563,14 @@ public final class AutoTest {
         switch (name) {
             case "status" -> minecraft.setScreen(new StatusScreen());
             case "stats" -> minecraft.setScreen(new StatsScreen(null));
-            case "close" -> minecraft.setScreen(null);
+            case "close" -> {
+                // A menu the server opened (a pouch, a chest) is closed the way the server expects: by telling it.
+                if (minecraft.screen instanceof AbstractContainerScreen<?>) {
+                    minecraft.player.closeContainer();
+                } else {
+                    minecraft.setScreen(null);
+                }
+            }
             case "journal" -> JournalBook.open(minecraft.player);
             case "inventory" -> minecraft.setScreen(new InventoryScreen(minecraft.player));
             case "advancements" -> {

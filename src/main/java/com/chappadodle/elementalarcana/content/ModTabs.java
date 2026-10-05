@@ -22,6 +22,7 @@ import com.chappadodle.elementalarcana.content.tower.GuardianCoreItem;
 import com.chappadodle.elementalarcana.content.tower.MageTowerStructure;
 import com.chappadodle.elementalarcana.content.tower.ModTowers;
 import com.chappadodle.elementalarcana.content.star.ModStars;
+import com.chappadodle.elementalarcana.content.pouch.ModPouch;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -104,6 +105,7 @@ public final class ModTabs {
                 output.accept(ModInfusion.ALTAR_ITEM.get());
                 ModCantrips.cantrips().forEach(cantrip -> output.accept(ModCantrips.scroll(cantrip)));
                 ModStars.items().forEach(item -> output.accept(item.get()));
+                output.accept(ModPouch.CHARM_POUCH.get());
             })
             .build());
 

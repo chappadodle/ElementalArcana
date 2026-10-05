@@ -1,0 +1,22 @@
+# Charm Pouch: a pouch with two charms and a relic in it (slots 0, 4 and 8), dropped and read back
+# (its contents kept, in their slots), matched by the advancement's predicate (three or more inside);
+# a relic matched by the charms tag, a stick not. The recipe and the tag load with the server (any
+# error would show in the log).
+gamerule doMobSpawning false
+forceload add -8 -8 8 8
+fill -4 99 -4 4 99 4 minecraft:stone
+fill -4 100 -4 4 104 4 minecraft:air
+kill @e[type=item]
+summon item 0 101 0 {Item:{id:"elementalarcana:charm_pouch",count:1,components:{"minecraft:container":[{slot:0,item:{id:"elementalarcana:fire_drakescale_charm",count:1}},{slot:4,item:{id:"elementalarcana:bog_pearl_charm",count:1}},{slot:8,item:{id:"elementalarcana:storm_sigil",count:1}}]}}}
+sleep 1
+execute as @e[type=item] run data get entity @s Item
+execute if items entity @e[type=item] contents elementalarcana:charm_pouch[minecraft:container~{items:{size:{min:3}}}]
+kill @e[type=item]
+summon item 0 101 0 {Item:{id:"elementalarcana:storm_sigil",count:1}}
+summon item 1 101 0 {Item:{id:"minecraft:stick",count:1}}
+sleep 1
+execute if items entity @e[type=item,nbt={Item:{id:"elementalarcana:storm_sigil"}}] contents #elementalarcana:charms
+execute if items entity @e[type=item,nbt={Item:{id:"minecraft:stick"}}] contents #elementalarcana:charms
+kill @e[type=item]
+fill -4 99 -4 4 104 4 minecraft:air
+forceload remove all
