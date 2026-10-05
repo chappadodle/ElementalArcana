@@ -77,7 +77,8 @@ import java.util.Optional;
  * A scripted test run of the game client, for checking visuals without anyone at the keyboard
  * (see tools/autotest.sh, which starts the game hidden in a virtual display). It does nothing
  * unless the game was started with {@code -Delementalarcana.autotest=true}. Once a world is loaded
- * it plays {@code <game dir>/autotest.txt}, one step per line:
+ * (or, with {@code -Delementalarcana.autotest.multiplayer=true}, once it has joined a server: see
+ * tools/mp_test.sh) it plays {@code <game dir>/autotest.txt}, one step per line:
  * <pre>
  * wait 40                  wait 40 ticks
  * cmd tp @s 0 100 0        run a command as the player (with full permissions)
@@ -127,6 +128,10 @@ import java.util.Optional;
 public final class AutoTest {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final boolean ENABLED = Boolean.getBoolean("elementalarcana.autotest");
+    /** Joined to a dedicated server (tools/mp_test.sh) rather than playing the test world. */
+    private static final boolean MULTIPLAYER = Boolean.getBoolean("elementalarcana.autotest.multiplayer");
+    /** Steps that work on the test's own (integrated) server, so can't run when joined to another. */
+    private static final java.util.Set<String> LOCAL_ONLY = java.util.Set.of("goto", "find", "crypt", "crypt_kit");
 
     private static List<String> steps;
     private static int index;
@@ -160,7 +165,7 @@ public final class AutoTest {
                 }
             }
         }
-        if (minecraft.player == null || minecraft.level == null || minecraft.getSingleplayerServer() == null) {
+        if (minecraft.player == null || minecraft.level == null || (!MULTIPLAYER && minecraft.getSingleplayerServer() == null)) {
             return;
         }
         if (minecraft.player.isDeadOrDying()) {
@@ -217,6 +222,10 @@ public final class AutoTest {
     private static boolean run(Minecraft minecraft, String line) {
         String[] parts = line.split("\\s+", 2);
         String argument = parts.length > 1 ? parts[1] : "";
+        if (MULTIPLAYER && LOCAL_ONLY.contains(parts[0].toLowerCase(Locale.ROOT))) {
+            LOGGER.warn("[autotest] {} needs the test's own server: skipped when joined to another", parts[0]);
+            return true;
+        }
         switch (parts[0].toLowerCase(Locale.ROOT)) {
             case "wait" -> {
                 waitTicks = Integer.parseInt(argument);
@@ -347,6 +356,11 @@ public final class AutoTest {
 
     /** Runs {@code command} on the integrated server as the player, with full permissions. */
     private static void command(Minecraft minecraft, String command) {
+        if (MULTIPLAYER) {
+            // Joined to a dedicated server: sent as the player would type it (tools/mp_test.sh makes them an operator).
+            minecraft.player.connection.sendCommand(command);
+            return;
+        }
         MinecraftServer server = minecraft.getSingleplayerServer();
         java.util.UUID id = minecraft.player.getUUID();
         server.execute(() -> {

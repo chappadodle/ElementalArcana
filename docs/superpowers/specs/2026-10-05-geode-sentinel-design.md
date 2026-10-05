@@ -13,8 +13,8 @@ draws enemies' attention yet; this does.
   from a new branch of the Crystal tree (two small nodes down and right of its start, then the
   spell).
 - **Growing**: a sentinel of violet crystal grows out of the ground where you look (up to 16
-  blocks; on the ground under that point): a cluster of shafts two and a half blocks tall, three
-  small shards circling its middle.
+  blocks; on the ground under that point, or at your feet if there's none within 32 blocks under
+  it): a cluster of shafts two and a half blocks tall, three small shards circling its middle.
 - **Taunt**: for 12 seconds, every hostile creature within 10 blocks of it that you may hurt turns
   on it, once a second, as a violet ring pulses out over the ground. Bosses pay it no mind.
 - **Sturdy**: 40 health plus 20 times your power, some armour; nothing pushes it or knocks it back;

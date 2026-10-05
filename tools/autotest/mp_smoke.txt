@@ -1,0 +1,131 @@
+# A smoke test played by a client joined to the dedicated server (run with tools/mp_test.sh): the
+# things that talk across the network, each once, on a grass platform far from spawn.
+# 1: a Fireball conjured and thrown (the cast payloads, the projectile drawn), a shot;
+# 2: the Charm Pouch opened (the server's menu, the client's screen), a charm shift-clicked in, closed
+#    (the pouch logged);
+# 3: the Seeker's Compass used (its components logged);
+# 4: the Sending Stone listened to (the server's chapter on the client's screen, a shot) and its
+#    reward taken (the claim sent back; the inventory logged);
+# 5: Stormcall, the Geode Sentinel and Dawnbreak cast near two husks (their cloud, crystal and sun
+#    drawn on a client that isn't the server; shots; the husks' health logged).
+hud on
+wait 40
+cmd gamemode creative
+cmd time set noon
+cmd weather clear
+cmd tp @s 166000.5 100 166000.5 -90 10
+wait 80
+cmd fill 165990 99 165985 166020 99 166015 minecraft:grass_block
+cmd fill 165990 100 165985 166020 112 166015 minecraft:air
+cmd tp @s 166000.5 100 166000.5 -90 10
+cmd gamemode survival
+cmd effect give @s minecraft:resistance 600 4 true
+cmd effect give @s minecraft:saturation 600 0 true
+cmd clear @s
+# 1: Fireball.
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken fire
+cmd arcana level set 40
+cmd arcana cooldowns reset
+cmd arcana mana fill
+wait 20
+select elementalarcana:fireball
+press
+wait 10
+release
+wait 5
+launch_one
+wait 10
+shot mp_fireball
+# 2: Charm Pouch.
+cmd item replace entity @s hotbar.0 with elementalarcana:charm_pouch
+cmd item replace entity @s hotbar.1 with elementalarcana:bog_pearl_charm
+wait 10
+slot 0
+use
+wait 15
+shot mp_pouch
+click 37 0 QUICK_MOVE
+wait 5
+screen close
+wait 10
+cmd data get entity @s Inventory[{Slot:0b}]
+# 3: Seeker's Compass.
+cmd item replace entity @s hotbar.2 with elementalarcana:seekers_compass
+wait 5
+slot 2
+wait 5
+use
+wait 40
+cmd data get entity @s SelectedItem
+# 4: Sending Stone.
+cmd arcana mentor 0
+cmd item replace entity @s hotbar.3 with elementalarcana:sending_stone
+wait 5
+slot 3
+wait 5
+use
+wait 15
+shot mp_stone
+button screen.elementalarcana.mentor.claim
+wait 15
+screen close
+wait 5
+cmd data get entity @s Inventory
+# 5: The three signature spells.
+cmd summon husk 166006.5 100 165998.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b}
+cmd summon husk 166007.5 100 166002.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b}
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken lightning
+cmd arcana awaken crystal
+cmd arcana awaken radiance
+cmd arcana level set 40
+cmd arcana tree take lightning_cloud_1
+cmd arcana tree take lightning_cloud_2
+cmd arcana tree take stormcall
+cmd arcana tree take crystal_sentinel_1
+cmd arcana tree take crystal_sentinel_2
+cmd arcana tree take geode_sentinel
+cmd arcana tree take radiance_sun_1
+cmd arcana tree take radiance_sun_2
+cmd arcana tree take dawnbreak
+cmd arcana cooldowns reset
+cmd arcana mana fill
+wait 20
+select elementalarcana:stormcall
+press
+release
+wait 10
+look -90 -40
+wait 5
+shot mp_stormcall
+look -90 25
+# (The server hears of the turn with the client's next movement: let it, before casting.)
+wait 3
+select elementalarcana:geode_sentinel
+press
+release
+wait 20
+shot mp_sentinel
+select elementalarcana:dawnbreak
+press
+release
+wait 40
+camera back
+look -90 -20
+wait 5
+shot mp_dawnbreak
+camera first
+wait 20
+cmd execute as @e[tag=eat] run data get entity @s Health
+cmd kill @e[tag=eat]
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken fire
+cmd gamemode creative
+cmd effect clear @s
+cmd fill 165990 99 165985 166020 112 166015 minecraft:air
+wait 20
+quit

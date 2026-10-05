@@ -7,6 +7,9 @@
 # The script's steps are read by client/AutoTest (see its Javadoc for the step list). The test
 # world is a copy of the dev server's world (run-server/world), made on first use.
 #
+# With EA_AUTOTEST_SERVER=<host> set (tools/mp_test.sh sets it), the client joins that server
+# instead of loading the test world.
+#
 # The hidden session is cut off from the desktop: everything here runs on a D-Bus session of its
 # own that can start no services (tools/autotest-dbus.conf), without the desktop's display, and
 # the hidden KWin reads an empty config directory. A second KWin on the desktop's bus, reading the
@@ -62,7 +65,7 @@ for _ in $(seq 1 50); do [[ -S "$XDG_RUNTIME_DIR/$SOCKET" ]] && break; sleep 0.2
 env -u DISPLAY WAYLAND_DISPLAY="$SOCKET" XDG_SESSION_TYPE=wayland \
   __EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/50_mesa.json __GLX_VENDOR_LIBRARY_NAME=mesa \
   LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe timeout 900 \
-  ./gradlew runAutotest --no-daemon --console=plain -q > "$LOG" 2>&1
+  ./gradlew runAutotest --no-daemon --console=plain -q ${EA_AUTOTEST_SERVER:+-PautotestServer=$EA_AUTOTEST_SERVER} > "$LOG" 2>&1
 kill "$KWIN" 2>/dev/null
 wait "$KWIN" 2>/dev/null
 echo "autotest finished (log: build/autotest.log)"

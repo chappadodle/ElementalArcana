@@ -104,7 +104,13 @@ neoForge {
             client()
             gameDirectory = project.file('run-autotest')
             systemProperty 'elementalarcana.autotest', 'true'
-            programArguments.addAll '--quickPlaySingleplayer', 'eatest', '--width', '1280', '--height', '720'
+            if (project.hasProperty('autotestServer')) {
+                // Joins that server instead of loading the test world (see tools/mp_test.sh).
+                systemProperty 'elementalarcana.autotest.multiplayer', 'true'
+                programArguments.addAll '--quickPlayMultiplayer', project.property('autotestServer').toString(), '--width', '1280', '--height', '720'
+            } else {
+                programArguments.addAll '--quickPlaySingleplayer', 'eatest', '--width', '1280', '--height', '720'
+            }
         }
 
         // This run config launches GameTestServer and runs all registered gametests, then exits.

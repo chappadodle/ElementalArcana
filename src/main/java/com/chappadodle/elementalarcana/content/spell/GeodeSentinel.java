@@ -77,7 +77,10 @@ public class GeodeSentinel extends LivingEntity {
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1);
     }
 
-    /** Grows {@code owner}'s sentinel on the ground under {@code at}, shattering the one they had. */
+    /**
+     * Grows {@code owner}'s sentinel on the ground under {@code at}, shattering the one they had. With
+     * no ground within 32 blocks under it (cast at the open sky), it grows at the owner's feet instead.
+     */
     public static void grow(ServerLevel level, LivingEntity owner, Vec3 at, float power) {
         UUID previous = BY_OWNER.get(owner.getUUID());
         if (previous != null && level.getEntity(previous) instanceof GeodeSentinel old) {
@@ -87,9 +90,9 @@ public class GeodeSentinel extends LivingEntity {
         if (sentinel == null) {
             return;
         }
-        BlockHitResult ground = level.clip(new ClipContext(at.add(0, 0.5, 0), at.subtract(0, 4, 0), ClipContext.Block.COLLIDER,
+        BlockHitResult ground = level.clip(new ClipContext(at.add(0, 0.5, 0), at.subtract(0, 32, 0), ClipContext.Block.COLLIDER,
                 ClipContext.Fluid.NONE, CollisionContext.empty()));
-        Vec3 foot = ground.getType() == HitResult.Type.BLOCK ? ground.getLocation() : at;
+        Vec3 foot = ground.getType() == HitResult.Type.BLOCK ? ground.getLocation() : owner.position();
         sentinel.owner = owner.getUUID();
         sentinel.power = power;
         AttributeInstance health = sentinel.getAttribute(Attributes.MAX_HEALTH);
