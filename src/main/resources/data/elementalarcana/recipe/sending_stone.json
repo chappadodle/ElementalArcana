@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:smooth_stone"
+    },
+    {
+      "item": "minecraft:amethyst_shard"
+    },
+    {
+      "tag": "elementalarcana:essences"
+    }
+  ],
+  "result": {
+    "id": "elementalarcana:sending_stone",
+    "count": 1
+  }
+}

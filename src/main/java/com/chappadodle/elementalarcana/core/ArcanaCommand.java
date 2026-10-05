@@ -31,6 +31,8 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.chappadodle.elementalarcana.api.MentorChapters;
+import com.chappadodle.elementalarcana.content.mentor.Mentor;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -157,6 +159,8 @@ public final class ArcanaCommand {
                 .then(cantripLearn())
                 .then(starfallCommand())
                 .then(Commands.literal("sanctum").then(Commands.literal("reset").executes(ctx -> resetSanctums(ctx.getSource()))))
+                .then(Commands.literal("mentor").then(Commands.argument("chapter", IntegerArgumentType.integer(0, MentorChapters.CHAPTERS.size()))
+                        .executes(ctx -> setMentorChapter(ctx.getSource(), IntegerArgumentType.getInteger(ctx, "chapter")))))
                 .then(Commands.literal("tide")
                         .then(Commands.literal("start").executes(ctx -> {
                             ManaTides.force(ctx.getSource().getServer());
@@ -250,6 +254,14 @@ public final class ArcanaCommand {
             bounty.then(kind);
         }
         return bounty;
+    }
+
+    /** Sets the player's chapter of Caelith's tale (past the last: the tale is told). */
+    private static int setMentorChapter(CommandSourceStack source, int chapter) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        Mentor.setChapter(player, chapter);
+        source.sendSuccess(() -> Component.literal("Caelith's tale: chapter " + chapter + " of " + MentorChapters.CHAPTERS.size()), false);
+        return 1;
     }
 
     private static int giveBounty(CommandSourceStack source, BountyRules.Task task, @Nullable Element element) throws CommandSyntaxException {

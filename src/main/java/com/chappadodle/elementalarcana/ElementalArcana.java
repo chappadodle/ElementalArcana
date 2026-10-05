@@ -26,6 +26,7 @@ import com.chappadodle.elementalarcana.network.ModNetwork;
 import com.chappadodle.elementalarcana.content.star.ModStars;
 import com.chappadodle.elementalarcana.content.pouch.ModPouch;
 import com.chappadodle.elementalarcana.content.seeker.ModSeeker;
+import com.chappadodle.elementalarcana.content.mentor.ModMentor;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -68,6 +69,7 @@ public class ElementalArcana {
         ModStars.register(modEventBus);
         ModPouch.register(modEventBus);
         ModSeeker.register(modEventBus);
+        ModMentor.register(modEventBus);
         ModBrews.register(modEventBus);
         ModTabs.TABS.register(modEventBus);
     }

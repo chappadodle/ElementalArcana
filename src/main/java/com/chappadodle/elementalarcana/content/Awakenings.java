@@ -5,6 +5,7 @@ import com.chappadodle.elementalarcana.api.AwakeningRules;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.SpellRegistries;
 import com.chappadodle.elementalarcana.api.SpellSchool;
+import com.chappadodle.elementalarcana.content.mentor.Mentor;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.core.MagicData;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -116,6 +117,8 @@ public final class Awakenings {
             player.sendSystemMessage(Component.translatable("message.elementalarcana.journal_given").withStyle(ChatFormatting.LIGHT_PURPLE));
             MagicAttachments.sync(player);
         }
+        // And a stone with a voice in it (see The Voice in the Stone spec).
+        Mentor.giveStone(player);
     }
 
     /** A puff of the element's colour around the player. */

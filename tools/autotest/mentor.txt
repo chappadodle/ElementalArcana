@@ -1,0 +1,68 @@
+# The Voice in the Stone (see the spec), in creative on a stone platform at y 220 in fresh land.
+# (A world where the player woke before the stone existed gives it on joining: logged at the start
+# of the first run.)
+# 1: the tale reset; listening at chapter 1 (a shot); the compass taken: the next chapter comes up
+#    in its place (a shot); the inventory logged;
+# 2: chapter 2's task (a shrine found) granted: the warm stone logged; listening (Caelith's answer,
+#    a shot); claimed (the XP and Essence logged);
+# 3: the last chapter (its task granted), claimed; the quiet stone (a shot).
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamemode creative
+cmd effect clear @s
+cmd tp @s 136000.5 230 136000.5 0 0
+wait 100
+cmd fill 135995 219 135995 136005 219 136005 minecraft:stone
+cmd fill 135995 220 135995 136005 225 136005 minecraft:air
+cmd tp @s 136000.5 220 136000.5 0 0
+wait 10
+cmd arcana awaken fire
+cmd arcana mentor 0
+cmd advancement revoke @s only elementalarcana:arcana/places_of_power
+cmd advancement revoke @s only elementalarcana:arcana/bound_again
+cmd clear @s
+cmd give @s elementalarcana:sending_stone
+slot 0
+wait 20
+# 1: The voice, and the compass.
+use
+wait 15
+shot mentor_voice
+button screen.elementalarcana.mentor.claim
+wait 15
+shot mentor_shrine_open
+screen close
+wait 5
+cmd data get entity @s Inventory
+# 2: A shrine found.
+cmd advancement grant @s only elementalarcana:arcana/places_of_power
+wait 10
+use
+wait 15
+shot mentor_shrine_done
+button screen.elementalarcana.mentor.claim
+wait 15
+screen close
+wait 5
+cmd data get entity @s Inventory
+# 3: The end of the tale.
+cmd arcana mentor 13
+cmd advancement grant @s only elementalarcana:arcana/bound_again
+wait 10
+use
+wait 15
+shot mentor_bound
+button screen.elementalarcana.mentor.claim
+wait 15
+shot mentor_quiet
+screen close
+wait 5
+cmd advancement revoke @s only elementalarcana:arcana/bound_again
+cmd advancement revoke @s only elementalarcana:arcana/places_of_power
+cmd clear @s
+cmd fill 135995 219 135995 136005 225 136005 minecraft:air
+wait 10
+quit

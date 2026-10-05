@@ -24,6 +24,7 @@ import com.chappadodle.elementalarcana.content.tower.ModTowers;
 import com.chappadodle.elementalarcana.content.star.ModStars;
 import com.chappadodle.elementalarcana.content.pouch.ModPouch;
 import com.chappadodle.elementalarcana.content.seeker.ModSeeker;
+import com.chappadodle.elementalarcana.content.mentor.ModMentor;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -108,6 +109,7 @@ public final class ModTabs {
                 ModStars.items().forEach(item -> output.accept(item.get()));
                 output.accept(ModPouch.CHARM_POUCH.get());
                 output.accept(ModSeeker.SEEKERS_COMPASS.get());
+                output.accept(ModMentor.SENDING_STONE.get());
             })
             .build());
 

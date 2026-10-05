@@ -8,7 +8,7 @@ public final class ModNetwork {
     }
 
     public static void register(RegisterPayloadHandlersEvent event) {
-        event.registrar("9")
+        event.registrar("10")
                 .playToServer(CastSpellPayload.TYPE, CastSpellPayload.STREAM_CODEC, CastSpellPayload::handle)
                 .playToServer(SelectSpellPayload.TYPE, SelectSpellPayload.STREAM_CODEC, SelectSpellPayload::handle)
                 .playToServer(DevActionPayload.TYPE, DevActionPayload.STREAM_CODEC, DevActionPayload::handle)
@@ -18,10 +18,12 @@ public final class ModNetwork {
                 .playToServer(AuraPayload.TYPE, AuraPayload.STREAM_CODEC, AuraPayload::handle)
                 .playToServer(GlidePayload.TYPE, GlidePayload.STREAM_CODEC, GlidePayload::handle)
                 .playToServer(RelicJumpPayload.TYPE, RelicJumpPayload.STREAM_CODEC, RelicJumpPayload::handle)
+                .playToServer(MentorClaimPayload.TYPE, MentorClaimPayload.STREAM_CODEC, MentorClaimPayload::handle)
                 .playToClient(ManaTidePayload.TYPE, ManaTidePayload.STREAM_CODEC, ManaTidePayload::handle)
                 .playToClient(SkillTreeSyncPayload.TYPE, SkillTreeSyncPayload.STREAM_CODEC, SkillTreeSyncPayload::handle)
                 .playToClient(ProspectPayload.TYPE, ProspectPayload.STREAM_CODEC, ProspectPayload::handle)
                 .playToClient(StarStreakPayload.TYPE, StarStreakPayload.STREAM_CODEC, StarStreakPayload::handle)
-                .playToClient(StarPillarsPayload.TYPE, StarPillarsPayload.STREAM_CODEC, StarPillarsPayload::handle);
+                .playToClient(StarPillarsPayload.TYPE, StarPillarsPayload.STREAM_CODEC, StarPillarsPayload::handle)
+                .playToClient(MentorPayload.TYPE, MentorPayload.STREAM_CODEC, MentorPayload::handle);
     }
 }

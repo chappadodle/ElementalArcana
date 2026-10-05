@@ -42,6 +42,8 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 
 **Seeker's Compass.** A compass, two amethyst shards and any Essence make a compass that finds things. Sneak and use it to choose what it seeks (shrines, ruins, crypts, mage towers, sanctums, drake nests or sky isles); use it, and its needle swings toward the nearest, however far, with word of which way and how far. It points there until you arrive, then settles.
 
+**The Voice in the Stone.** When your magic wakes you're given a **Sending Stone**, and someone speaks through it: Caelith, the last Keeper, who carried the Prime Key into the Hollow long ago and never came out. Use the stone to listen. Fourteen chapters lead from your first shrine, through the wisps, the Arcanists, the crypts, the towers and the Sovereigns' sanctums, to the Hollow itself, telling the old story as you go; each chapter's task is one of the mod's advancements, and each is worth XP and something for the road ahead (a Seeker's Compass, a Binding Charm, a Charm Pouch...). The stone grows warm when a task is done. Lost it? A smooth stone, an amethyst shard and any Essence make another.
+
 **Arcanists.** A villager profession for magic, in purple robes and a wide-brimmed hat. Its workstation is the **Arcane Lectern** (a lectern, an amethyst shard and two Essence, shapeless). Any unemployed villager near one takes the job, and about one village in three already has an Arcanist's cottage. Arcanists buy Essence and amethyst. They sell the Journal, wands and staves, robes, Essence of any element and Catalysts. Only they sell two rarities: the **Scroll of Unbinding** (Expert), which gives back every skill tree node you bought for free, and the **Tome of Insight** (Master), worth one bonus tree point.
 
 **Bounties.** Arcanists also post bounties: among their trades, a **Bounty Contract** for an emerald. Each asks one thing, harder at higher trade levels: slay creatures Attuned to an element (5 to 8), defeat wisps (3 to 5), slay a Magus, close a rift, or slay an Archmage. Carry it and it counts what you do (its tooltip shows how far along it is, and it glints once it's done); right-click any Arcane Lectern with a finished one for its reward: emeralds and experience, with Essence, Wisp Motes, a Tome of Insight, a Catalyst or a Scroll of Unbinding depending on the task.
@@ -191,6 +193,7 @@ python3 tools/gen_star.py       # the Fallen Star, Starstone, the Starlit Lanter
 python3 tools/gen_sky_isles.py  # the Sky Isles' structure, spread and loot
 python3 tools/gen_pouch.py      # the Charm Pouch's icons, screen, recipe and the charms tag; needs numpy and Pillow
 python3 tools/gen_seeker.py     # the Seeker's Compass's 32 frames and model, its recipe, the seekable structure tags; needs numpy and Pillow
+python3 tools/gen_mentor.py     # the Sending Stone's icon and recipe, and Caelith's words for each chapter; needs numpy and Pillow
 bash tools/gen_sounds.sh        # needs sox
 python3 tools/gen_spell_sounds.py  # needs numpy, scipy and sox
 ```

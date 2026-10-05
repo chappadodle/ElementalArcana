@@ -94,6 +94,8 @@ import java.util.Optional;
  * click 37 0 QUICK_MOVE    click slot 37 of the open menu, as the player would: button 0 or 1 and
  *                          a click type (PICKUP, QUICK_MOVE, SWAP, THROW...); default 0 PICKUP
  * hover 36                 put the mouse over slot 36 of the open screen (for its tooltip)
+ * button screen.elementalarcana.mentor.claim   press the open screen's button with that label
+ *                          (its translation key)
  * camera first|back|front  the camera view
  * use                      right-click the creature or block under the crosshair (or, with
  *                          neither, use the held item)
@@ -242,6 +244,7 @@ public final class AutoTest {
             case "screen" -> openScreen(minecraft, argument);
             case "click" -> click(minecraft, argument);
             case "hover" -> hover(minecraft, Integer.parseInt(argument.trim()));
+            case "button" -> pressButton(minecraft, argument.trim());
             case "jei_filter" -> {
                 if (ModList.get().isLoaded("jei")) {
                     JeiHooks.filter(argument);
@@ -325,6 +328,21 @@ public final class AutoTest {
         double scale = minecraft.getWindow().getGuiScale();
         ObfuscationReflectionHelper.setPrivateValue(MouseHandler.class, minecraft.mouseHandler, (screen.getGuiLeft() + slot.x + 8) * scale, "xpos");
         ObfuscationReflectionHelper.setPrivateValue(MouseHandler.class, minecraft.mouseHandler, (screen.getGuiTop() + slot.y + 8) * scale, "ypos");
+    }
+
+    /** Presses the open screen's button labelled by translation key {@code key}. */
+    private static void pressButton(Minecraft minecraft, String key) {
+        if (minecraft.screen != null) {
+            for (GuiEventListener child : minecraft.screen.children()) {
+                if (child instanceof Button button && button.active && button.getMessage().getContents() instanceof TranslatableContents text
+                        && text.getKey().equals(key)) {
+                    button.onPress();
+                    LOGGER.info("[autotest] pressed {}", key);
+                    return;
+                }
+            }
+        }
+        LOGGER.warn("[autotest] button: no {} to press", key);
     }
 
     /** Runs {@code command} on the integrated server as the player, with full permissions. */
