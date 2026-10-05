@@ -40,6 +40,8 @@ Innate elemental magic for **NeoForge 1.21.1**, built on a small, expandable fra
 
 **Charm Pouch.** Charms and relics work from anywhere in the inventory, and soon they fill it. A **Charm Pouch** (five leather, a string and a gold ingot) holds nine of them, the Drakescale Charms, the Trophies of the Wild and the relics (the item tag `elementalarcana:charms`), and they all keep working from inside it: the wards, the tricks, and the relic you bound last. Use it to open it (shift-click charms in and out), or right-click a charm onto it, or it onto a charm, as with a bundle; its tooltip shows what's inside.
 
+**Seeker's Compass.** A compass, two amethyst shards and any Essence make a compass that finds things. Sneak and use it to choose what it seeks (shrines, ruins, crypts, mage towers, sanctums, drake nests or sky isles); use it, and its needle swings toward the nearest, however far, with word of which way and how far. It points there until you arrive, then settles.
+
 **Arcanists.** A villager profession for magic, in purple robes and a wide-brimmed hat. Its workstation is the **Arcane Lectern** (a lectern, an amethyst shard and two Essence, shapeless). Any unemployed villager near one takes the job, and about one village in three already has an Arcanist's cottage. Arcanists buy Essence and amethyst. They sell the Journal, wands and staves, robes, Essence of any element and Catalysts. Only they sell two rarities: the **Scroll of Unbinding** (Expert), which gives back every skill tree node you bought for free, and the **Tome of Insight** (Master), worth one bonus tree point.
 
 **Bounties.** Arcanists also post bounties: among their trades, a **Bounty Contract** for an emerald. Each asks one thing, harder at higher trade levels: slay creatures Attuned to an element (5 to 8), defeat wisps (3 to 5), slay a Magus, close a rift, or slay an Archmage. Carry it and it counts what you do (its tooltip shows how far along it is, and it glints once it's done); right-click any Arcane Lectern with a finished one for its reward: emeralds and experience, with Essence, Wisp Motes, a Tome of Insight, a Catalyst or a Scroll of Unbinding depending on the task.
@@ -188,6 +190,7 @@ python3 tools/gen_cantrips.py   # the cantrips' icons, the scroll, the Mage Ligh
 python3 tools/gen_star.py       # the Fallen Star, Starstone, the Starlit Lantern, fragments and Wishing Stars; needs numpy and Pillow
 python3 tools/gen_sky_isles.py  # the Sky Isles' structure, spread and loot
 python3 tools/gen_pouch.py      # the Charm Pouch's icons, screen, recipe and the charms tag; needs numpy and Pillow
+python3 tools/gen_seeker.py     # the Seeker's Compass's 32 frames and model, its recipe, the seekable structure tags; needs numpy and Pillow
 bash tools/gen_sounds.sh        # needs sox
 python3 tools/gen_spell_sounds.py  # needs numpy, scipy and sox
 ```

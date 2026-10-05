@@ -138,6 +138,8 @@ ADVANCEMENTS = [
      "Carry a Charm Pouch with three charms or relics in it", {
          "pouch": {"trigger": "minecraft:inventory_changed", "conditions": {"items": [{
              "items": NS + "charm_pouch", "predicates": {"minecraft:container": {"items": {"size": {"min": 3}}}}}]}}}, None),
+    ("where_the_needle_points", "awakening", item("seekers_compass"), "task", "Where the Needle Points",
+     "Find a place with a Seeker's Compass", magic("seek_found"), None),
     ("lorekeeper", "awakening", item("minecraft:written_book"), "task", "Lorekeeper",
      "Find a page of the old story in a ruin", {
          "page": {"trigger": "minecraft:inventory_changed", "conditions": {"items": [{

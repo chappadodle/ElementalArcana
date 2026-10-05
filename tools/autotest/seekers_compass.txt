@@ -1,0 +1,68 @@
+# Seeker's Compass (see the spec), in creative on a stone platform at y 220 in fresh land:
+# 1: the compass given (seeking Shrines), sneak-used six times round to Sky Isles (the messages and
+#    the compass logged);
+# 2: used: the nearest sky isle sought (the message and the compass logged), the needle in hand
+#    facing south, west, north and east (shots);
+# 3: in spectator beside the isle (goto): the compass settles (the message logged, its target gone).
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamemode creative
+cmd effect clear @s
+cmd tp @s 130000.5 230 130000.5 0 0
+wait 100
+cmd fill 129995 219 129995 130005 219 130005 minecraft:stone
+cmd fill 129995 220 129995 130005 225 130005 minecraft:air
+cmd tp @s 130000.5 220 130000.5 0 0
+wait 10
+cmd clear @s
+cmd give @s elementalarcana:seekers_compass
+slot 0
+wait 10
+# 1: Choosing.
+key sneak down
+wait 5
+use
+wait 5
+use
+wait 5
+use
+wait 5
+use
+wait 5
+use
+wait 5
+use
+wait 5
+key sneak up
+wait 10
+cmd data get entity @s SelectedItem
+# 2: Seeking.
+use
+wait 60
+cmd data get entity @s SelectedItem
+look 0 10
+wait 10
+shot seeker_south
+look 90 10
+wait 10
+shot seeker_west
+look 180 10
+wait 10
+shot seeker_north
+look 270 10
+wait 10
+shot seeker_east
+# 3: Arriving.
+cmd gamemode spectator
+goto elementalarcana:sky_isle 10 0
+wait 60
+cmd data get entity @s SelectedItem
+wait 10
+cmd gamemode creative
+cmd clear @s
+cmd fill 129995 219 129995 130005 225 130005 minecraft:air
+wait 10
+quit

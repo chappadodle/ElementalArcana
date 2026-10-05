@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/awakening",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:seekers_compass"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.where_the_needle_points.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.where_the_needle_points.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "seek_found": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "seek_found"
+      }
+    }
+  }
+}

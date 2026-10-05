@@ -1,0 +1,11 @@
+# Seeker's Compass: each kind's structure tag finds its places, as the compass's search does (here
+# from the world's spawn); the recipe and the tags load with the server (any error would show in the
+# log).
+locate structure #elementalarcana:seekable/shrines
+locate structure #elementalarcana:seekable/ruins
+locate structure #elementalarcana:seekable/crypts
+locate structure #elementalarcana:seekable/mage_towers
+locate structure #elementalarcana:seekable/sanctums
+locate structure #elementalarcana:seekable/drake_nests
+locate structure #elementalarcana:seekable/sky_isles
+sleep 5
