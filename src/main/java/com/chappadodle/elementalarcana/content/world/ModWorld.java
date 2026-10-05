@@ -52,6 +52,11 @@ public final class ModWorld {
             STRUCTURE_TYPES.register("sky_isle", () -> () -> SkyIsleStructure.CODEC);
     public static final DeferredHolder<StructurePieceType, StructurePieceType> SKY_ISLE_PIECE =
             STRUCTURE_PIECES.register("sky_isle", () -> (StructurePieceType.ContextlessType) SkyIslePiece::new);
+    /** Wisp Rings (docs/superpowers/specs/2026-10-06-wisp-rings-design.md). */
+    public static final DeferredHolder<StructureType<?>, StructureType<WispRingStructure>> WISP_RING =
+            STRUCTURE_TYPES.register("wisp_ring", () -> () -> WispRingStructure.CODEC);
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> WISP_RING_PIECE =
+            STRUCTURE_PIECES.register("wisp_ring", () -> (StructurePieceType.ContextlessType) WispRingPiece::new);
 
     private ModWorld() {
     }

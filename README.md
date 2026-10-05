@@ -46,6 +46,8 @@ A magic mod that turns Minecraft into a fantasy adventure, for **NeoForge 1.21.1
 
 **Wandering Mages.** Now and then (a morning in three) a wandering mage comes to an awakened player, in a midnight-blue robe and a wide hat; you sense it, and which way. It stays two days, hides at night as the wandering trader does, and trades: three **rumours** (for emeralds and a compass: maps with a red X on the nearest crypt, mage tower, sky isle, drake nest or ruin), four wares from far away (Cantrip Scrolls, Wishing Stars, Star Fragments, rare Essence, a Seeker's Compass, a Charm Pouch...), and it buys Wisp Motes and Star Fragments.
 
+**Wisp Rings.** Rare rings of mushrooms and flowers on a band of dark podzol, round a mossy stone, grow in forests, meadows and plains (about one every 600 blocks). By night the wisps dance over them (seven little lights, the elements' colours) and they chime softly. Step into one at night and the wisps do something to you, once a night: two times in three a boon (Fey Luck, Wisp Sight, Moonlit Step, a gift, your mana filled), otherwise a trick (turned around and set down far off, shrunk to half your size for two minutes, or three cross wisps to fight).
+
 **Arcanists.** A villager profession for magic, in purple robes and a wide-brimmed hat. Its workstation is the **Arcane Lectern** (a lectern, an amethyst shard and two Essence, shapeless). Any unemployed villager near one takes the job, and about one village in three already has an Arcanist's cottage. Arcanists buy Essence and amethyst. They sell the Journal, wands and staves, robes, Essence of any element and Catalysts. Only they sell two rarities: the **Scroll of Unbinding** (Expert), which gives back every skill tree node you bought for free, and the **Tome of Insight** (Master), worth one bonus tree point.
 
 **Bounties.** Arcanists also post bounties: among their trades, a **Bounty Contract** for an emerald. Each asks one thing, harder at higher trade levels: slay creatures Attuned to an element (5 to 8), defeat wisps (3 to 5), slay a Magus, close a rift, or slay an Archmage. Carry it and it counts what you do (its tooltip shows how far along it is, and it glints once it's done); right-click any Arcane Lectern with a finished one for its reward: emeralds and experience, with Essence, Wisp Motes, a Tome of Insight, a Catalyst or a Scroll of Unbinding depending on the task.
@@ -195,6 +197,7 @@ python3 tools/gen_infusion.py   # the Infusion Altar; needs numpy and Pillow
 python3 tools/gen_cantrips.py   # the cantrips' icons, the scroll, the Mage Light, the scrolls' loot modifiers; needs numpy and Pillow
 python3 tools/gen_star.py       # the Fallen Star, Starstone, the Starlit Lantern, fragments and Wishing Stars; needs numpy and Pillow
 python3 tools/gen_sky_isles.py  # the Sky Isles' structure, spread and loot
+python3 tools/gen_wisp_rings.py # the Wisp Rings' structure, spread and biomes
 python3 tools/gen_pouch.py      # the Charm Pouch's icons, screen, recipe and the charms tag; needs numpy and Pillow
 python3 tools/gen_seeker.py     # the Seeker's Compass's 32 frames and model, its recipe, the seekable structure tags; needs numpy and Pillow
 python3 tools/gen_mentor.py     # the Sending Stone's icon and recipe, and Caelith's words for each chapter; needs numpy and Pillow

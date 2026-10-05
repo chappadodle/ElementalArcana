@@ -1,0 +1,7 @@
+{
+  "type": "elementalarcana:wisp_ring",
+  "biomes": "#elementalarcana:has_structure/wisp_rings",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none"
+}

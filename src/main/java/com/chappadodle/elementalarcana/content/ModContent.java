@@ -170,6 +170,9 @@ public final class ModContent {
     /** Dawnbreak's sun, for as long as it shines, in one particle (see DawnbreakOptions). */
     public static final DeferredHolder<ParticleType<?>, ParticleType<DawnbreakOptions>> DAWN_SUN =
             PARTICLES.register("dawn_sun", DawnbreakOptions::newType);
+    /** A Wisp Ring's dancing lights for a while, in one particle (see WispRingOptions). */
+    public static final DeferredHolder<ParticleType<?>, ParticleType<WispRingOptions>> WISP_RING =
+            PARTICLES.register("wisp_ring", WispRingOptions::newType);
 
     /** An icicle's whole shatter in one particle (see IceShatterOptions). */
     public static final DeferredHolder<ParticleType<?>, ParticleType<IceShatterOptions>> ICE_SHATTER =

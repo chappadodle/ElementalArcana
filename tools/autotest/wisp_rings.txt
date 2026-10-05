@@ -1,0 +1,35 @@
+# Wisp Rings (see their spec), at midnight, at the nearest ring that grew with the world (one placed
+# by /place is only blocks: the game doesn't know it as a ring). From six blocks south of it (its
+# lights, a shot); stepped into (the boon or trick logged, a shot); stepped out and in again the same
+# night (nothing more logged).
+hud on
+cmd time set midnight
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamemode creative
+cmd effect clear @s
+cmd tp @s 200008.5 160 200014.5 180 15
+wait 60
+goto elementalarcana:wisp_ring 6 8 6
+wait 40
+cmd execute at @s positioned over motion_blocking_no_leaves run tp @s ~ ~ ~ 180 20
+cmd gamemode survival
+wait 60
+shot ring_night
+cmd execute at @s run tp @s ~ ~ ~-5 180 35
+cmd execute at @s positioned over motion_blocking_no_leaves run tp @s ~ ~ ~
+wait 30
+shot ring_inside
+cmd execute at @s run tp @s ~ ~ ~7
+wait 30
+cmd execute at @s run tp @s ~ ~ ~-7
+cmd execute at @s positioned over motion_blocking_no_leaves run tp @s ~ ~ ~
+wait 30
+cmd attribute @s minecraft:generic.scale get
+cmd gamemode creative
+cmd effect clear @s
+cmd kill @e[type=!player,distance=..80]
+cmd time set noon
+wait 10
+quit

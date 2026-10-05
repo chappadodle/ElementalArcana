@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.client;
 
+import com.chappadodle.elementalarcana.client.particle.WispRingEmitter;
 import com.chappadodle.elementalarcana.content.wanderer.ModWanderer;
 import com.chappadodle.elementalarcana.api.DrakeRules;
 import com.chappadodle.elementalarcana.content.drake.ModDrakes;
@@ -283,6 +284,7 @@ public final class ArcanaClient {
         event.registerSpecial(ModContent.PYRONADO.get(), new PyronadoEmitter.Provider());
         event.registerSpecial(ModContent.STORMCLOUD.get(), new StormcloudParticle.Provider());
         event.registerSpecial(ModContent.DAWN_SUN.get(), new DawnSunParticle.Provider());
+        event.registerSpecial(ModContent.WISP_RING.get(), new WispRingEmitter.Provider());
         event.registerSpecial(ModContent.TSUNAMI.get(), new TsunamiParticle.Provider());
         event.registerSpecial(ModContent.TREMOR.get(), new TremorEmitter.Provider());
         event.registerSpriteSet(ModContent.ARC.get(), LightningArcParticle.Provider::new);

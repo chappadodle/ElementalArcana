@@ -105,6 +105,8 @@ ADVANCEMENTS = [
      "Receive a shrine's blessing", *any_of(BLESSINGS)),
     ("wisp_hunter", "awakening", item("wisp_mote"), "task", "Wisp Hunter",
      "Defeat a wisp", killed("#" + NS + "wisps"), None),
+    ("dancing_lights", "wisp_hunter", item("minecraft:red_mushroom"), "task", "Dancing Lights",
+     "Step into a wisp ring at night", magic("wisp_ring"), None),
     ("kindred_spirit", "wisp_hunter", item("binding_charm"), "goal", "Kindred Spirit",
      "Bind a wisp as your familiar", magic("familiar"), None),
     ("dragon_slayer", "awakening", item("fire_drake_scale"), "goal", "Dragon Slayer",

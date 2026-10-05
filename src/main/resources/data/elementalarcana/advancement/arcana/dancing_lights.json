@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/wisp_hunter",
+  "display": {
+    "icon": {
+      "id": "minecraft:red_mushroom"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.dancing_lights.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.dancing_lights.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "wisp_ring": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "wisp_ring"
+      }
+    }
+  }
+}

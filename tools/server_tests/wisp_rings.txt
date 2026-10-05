@@ -1,0 +1,18 @@
+# Wisp Rings (see their spec): one located (/locate), and one placed by command on the natural
+# ground at the middle of chunk 12,12 (200, 200: dry land in the dev world; a ring never grows over
+# water), its trees cleared first (a tree could stand where the stone goes). Its height is the
+# ground's, found here with "positioned over" (the top of what blocks movement: moss carpet is too
+# thin to count): the mossy stone at its middle, podzol under the ring three blocks out.
+locate structure elementalarcana:wisp_ring
+gamerule doMobSpawning false
+forceload add 184 184 215 215
+sleep 2
+fill 192 60 192 208 160 208 minecraft:air replace #minecraft:logs
+fill 192 60 192 208 160 208 minecraft:air replace #minecraft:leaves
+place structure elementalarcana:wisp_ring 200 100 200
+sleep 1
+execute positioned 200 0 200 positioned over motion_blocking_no_leaves if block ~ ~-1 ~ minecraft:mossy_cobblestone
+execute positioned 203 0 200 positioned over motion_blocking_no_leaves if block ~ ~-1 ~ minecraft:podzol
+execute positioned 197 0 200 positioned over motion_blocking_no_leaves if block ~ ~-1 ~ minecraft:podzol
+execute positioned 200 0 203 positioned over motion_blocking_no_leaves if block ~ ~-1 ~ minecraft:podzol
+forceload remove all
