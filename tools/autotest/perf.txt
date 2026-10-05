@@ -1,0 +1,105 @@
+# A busy fight, for a profile of the server: run with tools/mp_test.sh (a client joined to the
+# dedicated server). Tick times (/neoforge tps) logged quiet, then during the fight; the server's
+# Flight Recorder (/jfr) runs through the fight and saves to run-server/debug. The fight: two rifts
+# open, a mana tide rising, two dozen zombies, and a mage of Fire, Lightning and Radiance casting
+# Pyronado, Stormcall and Dawnbreak among them.
+hud on
+wait 40
+cmd gamemode creative
+cmd time set noon
+cmd weather clear
+cmd tp @s 184000.5 100 184000.5 -90 10
+wait 100
+cmd fill 183980 99 183980 184020 99 184020 minecraft:grass_block
+cmd fill 183980 100 183980 184020 115 184020 minecraft:air
+cmd tp @s 184000.5 100 184000.5 -90 10
+cmd gamemode survival
+cmd effect give @s minecraft:resistance 900 4 true
+cmd effect give @s minecraft:saturation 900 0 true
+cmd effect give @s minecraft:regeneration 900 4 true
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken fire
+cmd arcana awaken lightning
+cmd arcana awaken radiance
+cmd arcana level set 40
+cmd arcana tree take fire_burst_1
+cmd arcana tree take fire_burst_2
+cmd arcana tree take fire_burst_3
+cmd arcana tree take fire_burst_4
+cmd arcana tree take flame_burst
+cmd arcana tree take lightning_cloud_1
+cmd arcana tree take lightning_cloud_2
+cmd arcana tree take stormcall
+cmd arcana tree take radiance_sun_1
+cmd arcana tree take radiance_sun_2
+cmd arcana tree take dawnbreak
+cmd title @s clear
+wait 200
+# Quiet.
+cmd neoforge tps
+wait 100
+cmd neoforge tps
+# The fight.
+cmd jfr start
+cmd arcana tide start
+cmd arcana rift near
+cmd arcana rift near
+cmd summon zombie 184008 100 183996 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 184008 100 184000 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 184008 100 184004 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 183992 100 183996 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 183992 100 184000 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 183992 100 184004 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 183996 100 184008 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 184000 100 184008 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 184004 100 184008 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 183996 100 183992 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 184000 100 183992 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 184004 100 183992 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 184012 100 183994 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 184012 100 184006 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 183988 100 183994 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 183988 100 184006 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 183994 100 184012 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 184006 100 184012 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 183994 100 183988 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 184006 100 183988 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 184014 100 184000 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 183986 100 184000 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 184000 100 184014 {PersistenceRequired:1b,Tags:["eat"]}
+cmd summon zombie 184000 100 183986 {PersistenceRequired:1b,Tags:["eat"]}
+cmd arcana cooldowns reset
+cmd arcana mana fill
+wait 20
+select elementalarcana:flame_burst
+press
+release
+wait 40
+select elementalarcana:stormcall
+press
+release
+wait 40
+select elementalarcana:dawnbreak
+press
+release
+wait 100
+cmd neoforge tps
+wait 100
+cmd arcana mana fill
+cmd neoforge tps
+wait 100
+cmd neoforge tps
+cmd jfr stop
+wait 40
+cmd kill @e[tag=eat]
+cmd kill @e[type=!player,distance=..64]
+cmd arcana tide stop
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken fire
+cmd gamemode creative
+cmd effect clear @s
+cmd fill 183980 99 183980 184020 115 184020 minecraft:air
+wait 20
+quit
