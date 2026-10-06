@@ -35,7 +35,9 @@ import java.util.UUID;
 /**
  * The Circle's duels (see the Circle spec, part 3). A player holds a Mark of the Circle out to one
  * of an Enclave's mages: the wager. The mage goes to the Enclave's ring; once both are in it, a
- * count, and they fight, fair game for each other's spells (SpellTargets) till one yields (a blow
+ * count, and they fight, the mage at the player's level (the Archmagister a little above: a duel
+ * tests skill, not the land's strength), fair game for each other's spells (SpellTargets) till one
+ * yields (a blow
  * that would leave them below a fifth of their health stops there: no one dies of a duel), the
  * player steps out of the ring, or two minutes pass (a draw). Server-side and never saved: a
  * restart ends every bout.
@@ -207,6 +209,7 @@ public final class Duels {
                     next(bout, Phase.BOUT, now);
                     title(player, Component.translatable("circle.elementalarcana.duel.begin"));
                     bell(bout.level, bout.ring, 1f);
+                    mage.matchLevel(player);
                     mage.fight(player);
                 }
             }

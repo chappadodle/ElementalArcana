@@ -18,7 +18,9 @@ have beaten the Circle's mages.
 - **The Archmagister** takes the same challenge from a player who has won three duels (before
   that, they decline, and the mark stays the player's), stepping down into the ring by magic.
 - **The bout**: once both are in the ring, a bell, a three-second count in the middle of the
-  screen, a bell, and they fight: the mage casts its element's spells at the player, and the
+  screen, a bell, and they fight. The mage fights at the player's level (the Archmagister five
+  above): a duel tests skill, not the strength of the land the Enclave stands in, and its own
+  level comes back when the bout ends. It casts its element's spells at the player, and the
   player's spells hit it (for the length of the bout, and between the two of them only, a duel
   sets aside the rule that the Circle's magic and a player's spare each other). Others' spells
   still spare both.
@@ -47,7 +49,7 @@ have beaten the Circle's mages.
 
 | Piece | What it does |
 |---|---|
-| `api/DuelRules` | The yield share, the time, the reward by opponent, the wins the Archmagister asks for (tested) |
+| `api/DuelRules` | The yield share, the time, the duellist's level, the reward by opponent, the wins the Archmagister asks for (tested) |
 | `api/SpellTargets` | A duel's two are fair game for each other (a hook content code sets) |
 | `content/circle/Duels` | The bouts: challenge, the wait for the ring, the count, yielding, the end; events |
 | `content/circle/CircleMageEntity` | The challenge (a mark held out); in a bout, the player is its only target and the ring its bounds |

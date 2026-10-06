@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.10.0 — the Circle — 2026-10-06
+
+### The Circle
+
+- **Enclaves**: rare walled refuges of the mages who keep the old oaths, in plains, meadows and
+  forests: a white Spire (a library, the Archmagister's study, an observatory under a glass dome),
+  an herb garden of all eight herbs, a duelling ring, two Arcanists' cottages, a well and practice
+  targets. The Seeker's Compass finds them, and Wandering Mages sell rumours of them.
+- **Circle Mages**: four mages of four elements keep each Enclave. They greet you with a word that
+  follows your story and fight any monster that comes near, the Hollowed above all. Your spells fly
+  through them and theirs through you; a water mage even mends your wounds mid-fight. One who falls
+  is replaced the next day.
+- **Commissions**: the Archmagister has work for any mage whose magic is awake: a deed against the
+  Hollow's servants or the world's great foes, harder as your story goes on, paid in **Marks of the
+  Circle**.
+- **The Circle's stores** (sneak and use the Archmagister): Tomes of Insight, Scrolls of Unbinding,
+  the Hungerward Charm, brews, Wisp Motes, rumours of crypts, sanctums and sky isles, and the
+  **Sigil of the Circle**, which calls a Circle Mage to fight at your side for two minutes.
+- **Duels**: hold out a Mark to a Circle Mage and duel for it in the Enclave's ring, a fair fight
+  no one dies of (whoever is brought below a fifth of their health yields), fought at your own
+  level. Win three, and the Archmagister will face you.
+
+### Changes
+
+- A held spell now aims past anyone your magic spares (a pet, a Circle Mage) at the creature behind
+  them.
+- The mobs' water jets and healing take sides: monsters heal monsters, and the Circle's water mages
+  heal players and one another.
+- An Archmage on your side shows no boss bar.
+
 ## 0.9.0 (first beta) — 2026-10-06
 
 Elemental Arcana's first public build: innate elemental magic that turns Minecraft into a fantasy

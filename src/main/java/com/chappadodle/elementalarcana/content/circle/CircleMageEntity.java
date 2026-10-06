@@ -1,5 +1,8 @@
 package com.chappadodle.elementalarcana.content.circle;
 
+import com.chappadodle.elementalarcana.content.CreatureLevels;
+import com.chappadodle.elementalarcana.api.DuelRules;
+import com.chappadodle.elementalarcana.api.CreatureMagic;
 import com.chappadodle.elementalarcana.api.AttunementRank;
 import com.chappadodle.elementalarcana.api.CircleTalk;
 import com.chappadodle.elementalarcana.api.Element;
@@ -111,6 +114,8 @@ public class CircleMageEntity extends PathfinderMob implements MageAlly, Merchan
     private long lastDuelDay = -1;
     @Nullable
     private BlockPos duelRing;
+    /** Its own level (before its rank's bonus) while it fights a bout at the player's; -1 when not. */
+    private int levelBeforeDuel = -1;
 
     public CircleMageEntity(EntityType<? extends CircleMageEntity> type, Level level, boolean archmagister) {
         super(type, level);
@@ -198,6 +203,24 @@ public class CircleMageEntity extends PathfinderMob implements MageAlly, Merchan
         flash();
     }
 
+    /** The bout begun: it fights at {@code player}'s level (the Archmagister a little above), its own kept till the end. */
+    void matchLevel(Player player) {
+        if (levelBeforeDuel < 0) {
+            levelBeforeDuel = getData(MagicAttachments.CREATURE_LEVEL);
+        }
+        CreatureMagic magic = Attunement.get(this);
+        int bonus = magic == null ? 0 : magic.rank().bonusLevels();
+        CreatureLevels.setBaseLevel(this, DuelRules.duelLevel(MagicAttachments.get(player).level(), archmagister) - bonus);
+    }
+
+    /** Its own level again, after a bout fought at another's. */
+    private void restoreLevel() {
+        if (levelBeforeDuel >= 0) {
+            CreatureLevels.setBaseLevel(this, levelBeforeDuel);
+            levelBeforeDuel = -1;
+        }
+    }
+
     /** In a bout: {@code player} is its one foe, whatever else comes near. */
     void fight(Player player) {
         targetSelector.disableControlFlag(Goal.Flag.TARGET);
@@ -211,6 +234,7 @@ public class CircleMageEntity extends PathfinderMob implements MageAlly, Merchan
         duelRing = null;
         targetSelector.enableControlFlag(Goal.Flag.TARGET);
         setTarget(null);
+        restoreLevel();
         setHealth(getMaxHealth());
         clearFire();
         if (home != null) {
@@ -304,6 +328,10 @@ public class CircleMageEntity extends PathfinderMob implements MageAlly, Merchan
         // A new day, new stock (and new rumours), once no one's trading.
         if (offers != null && tradingPlayer == null && level().getDayTime() / 24000L != stockedDay) {
             offers = null;
+        }
+        // A bout's level kept past its end (the world was closed mid-bout): its own again.
+        if (levelBeforeDuel >= 0 && duelRing == null) {
+            restoreLevel();
         }
         // The Archmagister, away from the study (a bout's end missed, say) and in no bout: back there.
         if (archmagister && home != null && tickCount % 100 == 0 && distanceToSqr(home.getCenter()) > 64 && !Duels.busy(this)) {
@@ -640,6 +668,7 @@ public class CircleMageEntity extends PathfinderMob implements MageAlly, Merchan
             tag.putLong("leave_at", leaveAt);
         }
         tag.putLong("last_duel_day", lastDuelDay);
+        tag.putInt("level_before_duel", levelBeforeDuel);
         if (offers != null && !offers.isEmpty() && !level().isClientSide()) {
             tag.put("offers", MerchantOffers.CODEC.encodeStart(registryAccess().createSerializationContext(NbtOps.INSTANCE), offers).getOrThrow());
             tag.putLong("stocked_day", stockedDay);
@@ -659,6 +688,7 @@ public class CircleMageEntity extends PathfinderMob implements MageAlly, Merchan
         companion = tag.hasUUID("companion") ? tag.getUUID("companion") : null;
         leaveAt = tag.getLong("leave_at");
         lastDuelDay = tag.contains("last_duel_day") ? tag.getLong("last_duel_day") : -1;
+        levelBeforeDuel = tag.contains("level_before_duel") ? tag.getInt("level_before_duel") : -1;
         if (tag.contains("offers")) {
             MerchantOffers.CODEC.parse(registryAccess().createSerializationContext(NbtOps.INSTANCE), tag.get("offers"))
                     .result().ifPresent(saved -> offers = saved);

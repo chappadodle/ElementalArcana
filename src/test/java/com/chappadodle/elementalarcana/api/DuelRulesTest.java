@@ -45,6 +45,12 @@ class DuelRulesTest {
     }
 
     @Test
+    void aMageFightsAtThePlayersLevelAndTheArchmagisterAbove() {
+        assertEquals(20, DuelRules.duelLevel(20, false));
+        assertEquals(25, DuelRules.duelLevel(20, true));
+    }
+
+    @Test
     void theArchmagisterPaysMore() {
         assertEquals(2, DuelRules.prize(false));
         assertEquals(5, DuelRules.prize(true));

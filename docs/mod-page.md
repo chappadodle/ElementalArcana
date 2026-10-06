@@ -44,7 +44,13 @@ Magic sleeps in everyone. One day, it wakes in you.
   nights; Arcanist villagers trade in magic and post bounties; wandering mages sell rumours; glowmoths
   come to the herbs at night (bottle one for a lantern that never goes out), and skyrays glide over
   the sea, their wake bearing gliders up.
-- **Companions:** bind a wisp as a familiar; raise a drake from an egg and ride it.
+- **The Circle:** find an Enclave of the mages who keep the old oaths, a walled refuge round a
+  white Spire. Its mages greet you and fight beside you; its Archmagister gives you commissions
+  against the Hollow's servants, paid in Marks of the Circle, and sells what no one else does. Or
+  wager a Mark and duel its mages in the ring (no one dies of a duel), and, three wins later, the
+  Archmagister.
+- **Companions:** bind a wisp as a familiar; raise a drake from an egg and ride it; call a mage of
+  the Circle to your side with a Sigil.
 
 ## A story to follow
 

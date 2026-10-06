@@ -19,7 +19,7 @@ cmd gamerule doMobSpawning false
 cmd time set noon
 cmd effect clear @s
 cmd gamemode spectator
-cmd tp @s 1660000 160 1660000
+cmd tp @s 1720000 160 1720000
 wait 40
 goto elementalarcana:enclave 34 22 4
 wait 60
@@ -52,8 +52,9 @@ cmd execute at @p run tp @e[tag=d1] ~ ~ ~-3
 wait 25
 shot duel_count
 wait 55
-# 2. The bout.
+# 2. The bout (the mage at the player's level: its level logged, then its own again after).
 cmd data get entity @s Health
+cmd data get entity @e[tag=d1,limit=1] "neoforge:attachments"."elementalarcana:creature_level"
 cmd data merge entity @e[tag=d1,limit=1] {NoAI:1b}
 wait 10
 cmd execute as @p at @s run tp @s ~ ~ ~ facing entity @e[tag=d1,limit=1] feet
@@ -73,6 +74,7 @@ cmd data get entity @s Health
 cmd damage @e[tag=d1,limit=1] 1000 minecraft:player_attack by @p
 wait 5
 cmd data get entity @e[tag=d1,limit=1] Health
+cmd data get entity @e[tag=d1,limit=1] "neoforge:attachments"."elementalarcana:creature_level"
 cmd execute if items entity @s container.* elementalarcana:mark_of_the_circle
 cmd data merge entity @e[tag=d1,limit=1] {NoAI:0b}
 # 3. The same mage again, the same day.

@@ -22,7 +22,18 @@ public final class DuelRules {
     public static final double RING_RADIUS = 5.5;
     public static final double RING_LEAVE = 6.5;
 
+    /** How many levels above the player the Archmagister fights a duel. */
+    public static final int ARCHMAGISTER_EDGE = 5;
+
     private DuelRules() {
+    }
+
+    /**
+     * The level a Circle mage fights a duel at, against a player of {@code playerLevel}: the
+     * player's own (a duel tests skill, not the land's strength), the Archmagister a little above.
+     */
+    public static int duelLevel(int playerLevel, boolean archmagister) {
+        return archmagister ? playerLevel + ARCHMAGISTER_EDGE : playerLevel;
     }
 
     /** The marks a win pays besides the wager back: 2 from a mage, 5 from the Archmagister. */
