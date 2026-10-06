@@ -1,6 +1,6 @@
 # Elemental Arcana
 
-A magic mod that turns Minecraft into a fantasy adventure, for **NeoForge 1.21.1**. Magic is a power your character has, the way it works in RPGs and isekai: it wakes in you one day and grows as you use it, across eight elements, each with its spells, a skill tree, gear and relics. The world fills with places to find and things to fight (shrines and ley lines, ruins, crypts, mage towers, the Sovereigns' sanctums, sky isles, drake nests, rifts, falling stars, the creatures of the wild), and a voice in a sending stone leads you through it all, to the Hollow. The mod page's text is in [docs/mod-page.md](docs/mod-page.md).
+A magic mod that turns Minecraft into a fantasy adventure, for **NeoForge 1.21.1**. Magic is a power your character has, the way it works in RPGs and isekai: it wakes in you one day and grows as you use it, across eight elements, each with its spells, a skill tree, gear and relics. The world fills with places to find and things to fight (shrines and ley lines, ruins, crypts, mage towers, the Sovereigns' sanctums, sky isles, drake nests, rifts, falling stars, the creatures of the wild), and a voice in a sending stone leads you through it all, to the Hollow. The mod page's text is in [docs/mod-page.md](docs/mod-page.md), and what's in each release in [CHANGELOG.md](CHANGELOG.md).
 
 ## Playing
 

@@ -25,31 +25,39 @@ Magic sleeps in everyone. One day, it wakes in you.
 - **Gear and treasures.** Wands and staves up to an Archmage's, robes, relics of the first mages,
   charms from drakes and wild creatures (and a pouch to carry them in), Arcane Infusion for your
   weapons, brews, and everyday cantrips: a light, a way home, a mend.
+- **Herbs of the elements.** Emberblooms, moonlilies, skyplumes, deepcaps, frostcaps, prismleaves,
+  stormthistles and sunpetals grow where their element runs strong, glowing a little. Brew them
+  into tonics of Kinship: an element's spells stronger, its magic softer on you.
 
 ## A world full of magic
 
 - **Places to find:** elemental shrines joined by ley lines you can walk, ruins with the old story
   in their books, crypts sealed with rune gates where the first mages lie, mage towers and their
   Magisters, the four Sovereigns' sanctums, sky isles floating high over the land, drake nests on the
-  heights. A Seeker's Compass points the way.
+  heights, wisp rings where the wisps dance at night. A Seeker's Compass points the way, and Ley
+  Anchors you make bring the ley lines home.
 - **Things to fight:** wisps, golems, Attuned creatures that cast spells of their own, elemental
   rifts that tear open at night, Revenants, Magisters, Sovereigns, Elemental Drakes, and the
   Creatures of the Wild: treants, frost wraiths, salamanders, harpies, crystal crawlers, bog lurkers.
+  And the Hollowed, a cult that eats your mana, camped round dark obelisks and out hunting at dusk.
 - **Living world:** stars fall at night and leave fragments to find; mana tides swell every few
-  nights; Arcanist villagers trade in magic and post bounties.
+  nights; Arcanist villagers trade in magic and post bounties; wandering mages sell rumours; glowmoths
+  come to the herbs at night (bottle one for a lantern that never goes out), and skyrays glide over
+  the sea, their wake bearing gliders up.
 - **Companions:** bind a wisp as a familiar; raise a drake from an egg and ride it.
 
 ## A story to follow
 
 When your magic wakes, a stone in your pack begins to hum. Through it speaks Caelith, who carried a
-key into the Hollow long ago and never came back. Fourteen chapters lead you from your first shrine
+key into the Hollow long ago and never came back. Fifteen chapters lead you from your first shrine
 to the Hollow itself, and the old story unfolds as you go.
 
 ## For servers and modpacks
 
 - Tested in multiplayer, on a dedicated server.
-- Server settings: how often rifts, starfall, wisps, wild creatures, drakes and golems come, mana
-  tides, natural awakening, and the questline, each can be tuned or turned off.
+- Server settings: how often rifts, starfall, wisps, wild creatures, drakes, golems, wandering
+  mages, Hollowed patrols, glowmoths and skyrays come, mana tides, natural awakening, and the
+  questline, each can be tuned or turned off.
 - Works with JEI (recipes and where things come from), Jade (creatures' levels and elements), Veil
   (bloom on glowing spells), and LambDynamicLights or Sodium Dynamic Lights (spells light their
   surroundings). None of them are needed.
