@@ -159,6 +159,8 @@ ADVANCEMENTS = [
      "Close an elemental rift: hold out against all three of its waves", magic("rift_closed"), None),
     ("the_circle", "awakening", item("minecraft:chiseled_quartz_block"), "task", "The Circle",
      "Find an Enclave of the Circle, the mages who keep the old oaths", location(NS + "enclave"), None),
+    ("in_the_circles_service", "the_circle", item("mark_of_the_circle"), "task", "In the Circle's Service",
+     "Hand in a commission to the Archmagister of an Enclave", magic("commission"), None),
     ("the_arcanist", "awakening", item("arcane_lectern"), "task", "The Arcanist",
      "Buy something from an Arcanist, a villager who trades in magic", {
          "bought": {"trigger": "minecraft:villager_trade",

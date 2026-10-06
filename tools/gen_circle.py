@@ -7,7 +7,9 @@
 - the Enclave's structure (on the surface, the land shaped to it), its spread (rare, and kept clear
   of villages, shrines, mage towers and Hollowed camps), its biomes, the compass's tag for it, and
   its library's chest (the compass's tag for it is gen_seeker's);
-- the Circle Heart (chiseled quartz to look at) and the spawn eggs' models.
+- the Circle Heart (chiseled quartz to look at) and the spawn eggs' models;
+- (part 2) the Circle Commission (a sealed letter), the Mark of the Circle (a white-gold coin) and
+  the Sigil of the Circle (a gold medallion with a pale gem, on a ribbon), and their models.
 
 Run from the project root:  python3 tools/gen_circle.py
 """
@@ -46,6 +48,81 @@ def clothes(trim, trim_dark, star, seed):
         mask = (original[..., 0] == old[0]) & (original[..., 1] == old[1]) & (original[..., 2] == old[2]) & (original[..., 3] > 0)
         px[mask, :3] = new
     return c.image()
+
+
+# The part 2 items, drawn pixel by pixel (16 x 16).
+ITEM_PALETTE = {
+    ".": None,
+    "O": (92, 84, 72), "W": (238, 234, 224), "w": (212, 206, 192), "L": (172, 164, 146),
+    "G": (226, 186, 74), "g": (164, 120, 36), "Y": (255, 238, 156), "P": (250, 250, 252),
+    "B": (226, 240, 255), "b": (150, 182, 226), "R": (244, 244, 248), "r": (190, 190, 204),
+}
+COMMISSION = [
+    "................",
+    "................",
+    "................",
+    ".OOOOOOOOOOOOOO.",
+    ".OWLWWWWWWWWLwO.",
+    ".OWWLWWWWWWLWwO.",
+    ".OWWWLWWWWLWWwO.",
+    ".OWWWWLggLWWWwO.",
+    ".OWWWWgGYGgWWwO.",
+    ".OWWWWgGGGgWWwO.",
+    ".OWWWWWgggWWWwO.",
+    ".OWWWWWWWWWWWwO.",
+    ".OwwwwwwwwwwwwO.",
+    ".OOOOOOOOOOOOOO.",
+    "................",
+    "................",
+]
+MARK = [
+    "................",
+    "................",
+    ".....gggggg.....",
+    "....gGGGGGGg....",
+    "...gGYPPPPYGg...",
+    "..gGYPPPPPPYGg..",
+    "..gGPPPGGPPPGg..",
+    "..gGPPGPPGPPGg..",
+    "..gGPPGPPGPPGg..",
+    "..gGPPPGGPPPGg..",
+    "..gGYPPPPPPYGg..",
+    "...gGYPPPPYGg...",
+    "....gGGGGGGg....",
+    ".....gggggg.....",
+    "................",
+    "................",
+]
+SIGIL = [
+    ".....RR..RR.....",
+    "......RrrR......",
+    ".......rr.......",
+    ".....gggggg.....",
+    "....gGGGGGGg....",
+    "...gGYGGGGYGg...",
+    "...gGGGBBGGGg...",
+    "...gGGBPBBGGg...",
+    "...gGGBBBbGGg...",
+    "...gGGGbbGGGg...",
+    "...gGYGGGGYGg...",
+    "....gGGGGGGg....",
+    ".....gggggg.....",
+    "................",
+    "................",
+    "................",
+]
+
+
+def pixel_art(rows):
+    from PIL import Image
+    assert len(rows) == 16 and all(len(row) == 16 for row in rows), rows
+    image = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    for y, row in enumerate(rows):
+        for x, key in enumerate(row):
+            color = ITEM_PALETTE[key]
+            if color is not None:
+                image.putpixel((x, y), color + (255,))
+    return image
 
 
 def write_json(path, value):
@@ -90,6 +167,10 @@ def main():
             {"type": "minecraft:item", "name": "minecraft:book", "weight": 4,
              "functions": [{"function": "minecraft:enchant_randomly"}]}] + essences},
         {"rolls": 1, "entries": [{"type": "minecraft:empty", "weight": 3}, counted(NS + "tome_of_insight", 1, 1, 1)]}]})
+    items = ASSETS / "textures/item"
+    for name, rows in (("circle_commission", COMMISSION), ("mark_of_the_circle", MARK), ("sigil_of_the_circle", SIGIL)):
+        pixel_art(rows).save(items / f"{name}.png")
+        write_json(models / f"item/{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{NS}item/{name}"}})
     print("circle art and data written")
 
 

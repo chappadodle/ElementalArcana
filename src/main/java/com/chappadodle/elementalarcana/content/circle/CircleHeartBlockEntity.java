@@ -9,7 +9,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.level.Level;
@@ -139,7 +138,9 @@ public class CircleHeartBlockEntity extends BlockEntity {
     private void replaceFallen(ServerLevel level) {
         BlockPos floor = floor();
         AABB enclave = new AABB(floor).inflate(EnclavePiece.HALF + 8, EnclavePiece.TOP, EnclavePiece.HALF + 8);
-        List<CircleMageEntity> circle = level.getEntitiesOfClass(CircleMageEntity.class, enclave, LivingEntity::isAlive);
+        // The Enclave's own (not a sigil's mage someone brought along).
+        List<CircleMageEntity> circle = level.getEntitiesOfClass(CircleMageEntity.class, enclave,
+                mage -> mage.isAlive() && mage.companionId() == null);
         if (circle.stream().noneMatch(CircleMageEntity::isArchmagister)) {
             summon(level, ModCircle.ARCHMAGISTER.get(), Element.RADIANCE, study(), study());
             return;

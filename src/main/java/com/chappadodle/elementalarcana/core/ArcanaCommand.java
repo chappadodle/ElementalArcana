@@ -1,5 +1,8 @@
 package com.chappadodle.elementalarcana.core;
 
+import com.chappadodle.elementalarcana.content.circle.Commissions;
+import com.chappadodle.elementalarcana.content.circle.Commission;
+import com.chappadodle.elementalarcana.api.CommissionRules;
 import com.chappadodle.elementalarcana.content.wonder.Wonders;
 import com.chappadodle.elementalarcana.content.hollowed.HollowedPatrols;
 import com.chappadodle.elementalarcana.content.wanderer.WanderingMages;
@@ -163,6 +166,7 @@ public final class ArcanaCommand {
                 .then(Commands.literal("wisp").then(wispSpawn()))
                 .then(riftOpen())
                 .then(bountyGive())
+                .then(commissionGive())
                 .then(golemSpawn())
                 .then(wildSpawn())
                 .then(cantripLearn())
@@ -279,6 +283,28 @@ public final class ArcanaCommand {
             bounty.then(kind);
         }
         return bounty;
+    }
+
+    /** /arcana commission <task> [done]: gives the player a Circle Commission for that task (already finished, with done). */
+    private static LiteralArgumentBuilder<CommandSourceStack> commissionGive() {
+        LiteralArgumentBuilder<CommandSourceStack> commission = Commands.literal("commission");
+        for (CommissionRules.Task task : CommissionRules.Task.values()) {
+            commission.then(Commands.literal(task.id()).executes(ctx -> giveCommission(ctx.getSource(), task, false))
+                    .then(Commands.literal("done").executes(ctx -> giveCommission(ctx.getSource(), task, true))));
+        }
+        return commission;
+    }
+
+    private static int giveCommission(CommandSourceStack source, CommissionRules.Task task, boolean done) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        Commission commission = Commission.of(CommissionRules.offerFor(task));
+        ItemStack letter = Commissions.letter(done ? commission.finished() : commission);
+        Component name = letter.getHoverName();
+        if (!player.getInventory().add(letter)) {
+            player.drop(letter, false);
+        }
+        source.sendSuccess(() -> Component.translatable("commands.elementalarcana.commission_given", name), true);
+        return 1;
     }
 
     /** /arcana mage: calls a Wandering Mage to the player now, whatever the morning's chance. */

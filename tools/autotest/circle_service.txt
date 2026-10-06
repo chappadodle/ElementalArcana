@@ -1,0 +1,100 @@
+# The Circle, part 2 (see its spec): the Archmagister's commissions and stores, and a Sigil of the
+# Circle, at the nearest Enclave.
+# 1. The Archmagister (held still in the study) used: a commission handed out (counted); used again:
+#    a reminder, no second one (counted).
+# 2. A finished commission (from /arcana commission) handed in: its marks paid (counted).
+# 3. The stores (sneak and use): the trading screen (a shot); a sigil bought (counted).
+# 4. In the courtyard, the Enclave's mages held still, a sigil used: a mage of the Circle at the
+#    player's side (its time logged, a shot); a husk near, which it fights (the husk's health
+#    logged); its time cut short, it bows out (looked for after).
+hud on
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd time set noon
+cmd effect clear @s
+cmd gamemode spectator
+cmd tp @s 1060000 160 1060000
+wait 40
+goto elementalarcana:enclave 34 22 4
+wait 60
+cmd gamemode creative
+wait 60
+# 1. A commission from the Archmagister.
+find elementalarcana:circle_heart 40 0 8 3 180 10
+wait 30
+cmd execute as @e[type=elementalarcana:archmagister,limit=1,sort=nearest] run data merge entity @s {NoAI:1b}
+cmd execute as @e[type=elementalarcana:archmagister,limit=1,sort=nearest] at @p rotated ~ 0 run tp @s ^ ^ ^2.5 facing entity @p feet
+# (the game sees where the Archmagister went a few ticks later)
+wait 10
+cmd execute as @p at @s run tp @s ~ ~ ~ facing entity @e[type=elementalarcana:archmagister,limit=1,sort=nearest] feet
+wait 10
+cmd gamemode survival
+cmd effect give @s minecraft:resistance 900 4 true
+cmd arcana awaken fire
+cmd arcana level set 20
+cmd clear @s
+slot 0
+use
+wait 10
+cmd execute if items entity @s container.* elementalarcana:circle_commission
+use
+wait 10
+cmd execute if items entity @s container.* elementalarcana:circle_commission
+cmd clear @s elementalarcana:circle_commission
+# 2. A finished one handed in.
+cmd arcana commission obelisk done
+wait 5
+use
+wait 10
+cmd execute if items entity @s container.* elementalarcana:mark_of_the_circle
+cmd execute if items entity @s container.* elementalarcana:circle_commission
+# 3. The stores.
+cmd give @s elementalarcana:mark_of_the_circle 10
+key sneak down
+wait 5
+use
+wait 5
+key sneak up
+wait 30
+shot stores
+trade 0
+wait 5
+click 2 0 PICKUP
+wait 5
+screen close
+wait 10
+cmd execute if items entity @s container.* elementalarcana:sigil_of_the_circle
+cmd execute if items entity @s container.* elementalarcana:mark_of_the_circle
+# 4. A sigil's mage, in the courtyard.
+cmd execute as @e[type=elementalarcana:circle_mage,distance=..60] run data merge entity @s {NoAI:1b}
+find elementalarcana:circle_heart 40 0 1 12 180 0
+wait 30
+cmd clear @s elementalarcana:sigil_of_the_circle
+cmd item replace entity @s hotbar.4 with elementalarcana:sigil_of_the_circle
+slot 4
+look 180 -60
+wait 5
+use
+wait 10
+cmd execute as @e[type=elementalarcana:circle_mage,distance=..60] if data entity @s leave_at run data get entity @s leave_at
+cmd time query gametime
+cmd execute as @p at @s run tp @s ~ ~ ~ facing entity @e[type=elementalarcana:circle_mage,distance=..4,limit=1,sort=nearest] feet
+wait 10
+shot sigil
+cmd execute at @p run summon husk ~ ~ ~5 {Tags:["sh"],PersistenceRequired:1b,NoAI:1b}
+cmd arcana creaturelevel @e[tag=sh] set 1
+wait 100
+cmd data get entity @e[tag=sh,limit=1] Health
+shot sigil_fight
+cmd kill @e[tag=sh]
+cmd execute as @e[type=elementalarcana:circle_mage,distance=..60] if data entity @s leave_at store result entity @s leave_at long 1 run time query gametime
+wait 20
+cmd execute as @e[type=elementalarcana:circle_mage,distance=..60] if data entity @s leave_at run say a sigil's mage is still here
+cmd execute if entity @e[type=elementalarcana:circle_mage,distance=..60]
+cmd execute as @e[type=elementalarcana:circle_mage,distance=..60] run data merge entity @s {NoAI:0b}
+cmd execute as @e[type=elementalarcana:archmagister,distance=..60] run data merge entity @s {NoAI:0b}
+cmd gamemode creative
+cmd effect clear @s
+wait 10
+quit

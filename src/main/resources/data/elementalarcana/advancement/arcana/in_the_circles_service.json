@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/the_circle",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:mark_of_the_circle"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.in_the_circles_service.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.in_the_circles_service.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "commission": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "commission"
+      }
+    }
+  }
+}

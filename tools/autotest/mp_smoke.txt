@@ -158,7 +158,8 @@ cmd kill @e[type=elementalarcana:glowmoth]
 cmd kill @e[type=elementalarcana:skyray]
 cmd time set noon
 # 9: the Circle: a Circle Mage (of crystal) and the Archmagister drawn on the client (their robes by
-#    the element the server sends; a shot), and the mage greeted (its line in chat, logged).
+#    the element the server sends; a shot), the mage greeted (its line in chat, logged), and the
+#    Archmagister's stores opened (the server's trades on the client's screen; a shot).
 cmd summon elementalarcana:circle_mage 166003.5 100 166000.5 {element:5b,NoAI:1b,Tags:["cm"],Rotation:[90f,0f]}
 cmd summon elementalarcana:archmagister 166006.5 100 166002.5 {NoAI:1b,Tags:["cm"],Rotation:[90f,0f]}
 cmd tp @s 166000.5 100 166000.5 -90 0
@@ -166,6 +167,17 @@ wait 20
 shot mp_circle
 use
 wait 10
+cmd tp @s 166004.5 100 166002.5 -90 0
+wait 10
+key sneak down
+wait 5
+use
+wait 5
+key sneak up
+wait 30
+shot mp_stores
+screen close
+wait 5
 cmd kill @e[tag=cm]
 cmd arcana tree reset
 cmd arcana affinity reset

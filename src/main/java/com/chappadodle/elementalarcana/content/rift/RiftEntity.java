@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.content.rift;
 
+import com.chappadodle.elementalarcana.content.circle.Commissions;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.AttunementRank;
 import com.chappadodle.elementalarcana.api.Element;
@@ -315,6 +316,7 @@ public class RiftEntity extends Entity {
             if (player.distanceToSqr(this) < RiftRules.PRESENCE * RiftRules.PRESENCE) {
                 MagicTriggers.fire(player, "rift_closed", element().name().toLowerCase(Locale.ROOT), 1);
                 Bounties.riftClosed(player);
+                Commissions.riftClosed(player);
             }
         }
     }

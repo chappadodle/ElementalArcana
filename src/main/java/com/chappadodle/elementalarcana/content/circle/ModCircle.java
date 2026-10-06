@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.content.circle;
 
+import net.minecraft.world.item.Rarity;
+import net.minecraft.core.component.DataComponentType;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
@@ -23,7 +25,9 @@ import java.util.List;
 
 /**
  * The Circle (docs/superpowers/specs/2026-10-06-the-circle-enclave-design.md): the Enclave and its
- * piece, its heart, the Circle Mages and the Archmagister.
+ * piece, its heart, the Circle Mages and the Archmagister; and (part 2,
+ * 2026-10-06-the-circle-commissions-design.md) the commissions, the Marks of the Circle and the
+ * Sigil of the Circle.
  */
 public final class ModCircle {
     private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(ElementalArcana.MODID);
@@ -32,6 +36,19 @@ public final class ModCircle {
     private static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(Registries.ENTITY_TYPE, ElementalArcana.MODID);
     private static final DeferredRegister<StructureType<?>> STRUCTURE_TYPES = DeferredRegister.create(Registries.STRUCTURE_TYPE, ElementalArcana.MODID);
     private static final DeferredRegister<StructurePieceType> STRUCTURE_PIECES = DeferredRegister.create(Registries.STRUCTURE_PIECE, ElementalArcana.MODID);
+    private static final DeferredRegister.DataComponents COMPONENTS =
+            DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, ElementalArcana.MODID);
+
+    /** A Circle Commission's terms (see Commission). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Commission>> COMMISSION =
+            COMPONENTS.registerComponentType("commission", builder -> builder.persistent(Commission.CODEC).networkSynchronized(Commission.STREAM_CODEC));
+    public static final DeferredItem<CommissionItem> CIRCLE_COMMISSION = ITEMS.register("circle_commission",
+            () -> new CommissionItem(new Item.Properties().stacksTo(1)));
+    /** The Circle's coin: only commissions pay it, and the Archmagister's stores take it. */
+    public static final DeferredItem<Item> MARK = ITEMS.register("mark_of_the_circle",
+            () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
+    public static final DeferredItem<CircleSigilItem> SIGIL = ITEMS.register("sigil_of_the_circle",
+            () -> new CircleSigilItem(new Item.Properties().stacksTo(16).rarity(Rarity.RARE)));
 
     /** Unbreakable, like a tower's heart: the Enclave's heart stays where it was built. */
     public static final DeferredBlock<CircleHeartBlock> CIRCLE_HEART = BLOCKS.register("circle_heart", () -> new CircleHeartBlock(
@@ -65,6 +82,7 @@ public final class ModCircle {
         ENTITY_TYPES.register(modEventBus);
         STRUCTURE_TYPES.register(modEventBus);
         STRUCTURE_PIECES.register(modEventBus);
+        COMPONENTS.register(modEventBus);
         modEventBus.addListener(ModCircle::registerAttributes);
     }
 
@@ -75,6 +93,6 @@ public final class ModCircle {
 
     /** For the creative tab. */
     public static List<DeferredItem<? extends Item>> items() {
-        return List.of(CIRCLE_MAGE_EGG, ARCHMAGISTER_EGG);
+        return List.of(MARK, SIGIL, CIRCLE_MAGE_EGG, ARCHMAGISTER_EGG);
     }
 }

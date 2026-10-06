@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.client;
 
+import net.minecraft.network.protocol.game.ServerboundSelectTradePacket;
+import net.minecraft.client.gui.screens.inventory.MerchantScreen;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.core.Direction;
@@ -103,6 +105,8 @@ import java.util.Optional;
  * use                      right-click the creature or block under the crosshair (or, with
  *                          neither, use the held item)
  * hold_use 45              hold right click down for 45 ticks (items used over time)
+ * trade 0                  on the open trading screen, pick its first trade (the payment moves in,
+ *                          as clicking it would); then `click 2` takes what it sells
  * key jump down / key jump up   hold a movement key down (jump, sneak or forward), or let it go
  * goto elementalarcana:fire_shrine 18 14 [2]   stand 18 blocks south of the nearest such structure
  *                          and 14 above its base, looking at its middle, 2 blocks above the base
@@ -285,6 +289,16 @@ public final class AutoTest {
                     // Like a right click: if the block didn't take it, the item is used.
                     LOGGER.info("[autotest] use: the item ({} under the crosshair)", minecraft.hitResult == null ? "nothing" : minecraft.hitResult.getType());
                     minecraft.gameMode.useItem(minecraft.player, InteractionHand.MAIN_HAND);
+                }
+            }
+            case "trade" -> {
+                if (minecraft.screen instanceof MerchantScreen screen && minecraft.getConnection() != null) {
+                    int index = Integer.parseInt(argument.trim());
+                    screen.getMenu().setSelectionHint(index);
+                    screen.getMenu().tryMoveItems(index);
+                    minecraft.getConnection().send(new ServerboundSelectTradePacket(index));
+                } else {
+                    LOGGER.warn("[autotest] trade: no trading screen open");
                 }
             }
             case "hold_use" -> {

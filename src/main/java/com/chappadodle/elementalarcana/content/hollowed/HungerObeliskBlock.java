@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.content.hollowed;
 
+import com.chappadodle.elementalarcana.content.circle.Commissions;
 import com.chappadodle.elementalarcana.content.MagicTriggers;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
@@ -55,6 +56,7 @@ public class HungerObeliskBlock extends BaseEntityBlock {
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (player instanceof ServerPlayer serverPlayer) {
             MagicTriggers.fire(serverPlayer, "obelisk", null, 1);
+            Commissions.obeliskBroken(serverPlayer);
         }
         return super.playerWillDestroy(level, pos, state, player);
     }
