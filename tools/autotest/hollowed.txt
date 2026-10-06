@@ -1,0 +1,115 @@
+# The Hollowed (see their spec).
+# 1. The nearest camp (goto), from 18 blocks off in spectator mode: asleep, as a camp only wakes for
+#    someone playing (a shot); then in creative, near it: its people come (a shot).
+# 2. Mana eaten: the mage (survival, Resistance, level 20, a full pool) the quarry of a level-1 Acolyte
+#    seven blocks off; the pool logged every second for ten seconds (each bolt that lands eats 15,
+#    while the pool refills 4.4 a second); then the same with a Hungerward carried (each eats 7.5).
+# 3. A Herald's Pull: a level-1 Herald six blocks off (shots as it gathers the dark, and after; the
+#    mage's place logged before and after).
+# 4. A patrol called by command (logged).
+hud on
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning true
+cmd difficulty normal
+cmd time set noon
+cmd effect clear @s
+cmd gamemode spectator
+cmd tp @s 388000 140 388000
+wait 40
+goto elementalarcana:hollowed_camp 18 10 2
+wait 80
+shot camp
+cmd gamemode creative
+cmd execute at @s run tp @s ~ ~-4 ~-6
+wait 80
+shot camp_awake
+cmd gamerule doMobSpawning false
+# 2. Mana eaten, on a platform far off.
+cmd tp @s 361000.5 101 361000.5 180 10
+wait 40
+cmd fill 360990 100 360990 361010 100 361010 minecraft:grass_block
+cmd fill 360990 101 360990 361010 110 361010 minecraft:air
+cmd kill @e[type=!player,distance=..60]
+cmd tp @s 361000.5 101 361000.5 0 10
+cmd arcana awaken fire
+cmd arcana level set 20
+cmd clear @s elementalarcana:hungerward_charm
+cmd gamemode survival
+cmd effect give @s minecraft:resistance 900 4 true
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd arcana mana fill
+cmd summon elementalarcana:hollowed_acolyte 361000.5 101 361007.5 {Tags:["hw"],PersistenceRequired:1b}
+cmd arcana creaturelevel @e[tag=hw] set 1
+wait 5
+cmd arcana mana get
+wait 20
+cmd arcana mana get
+wait 20
+cmd arcana mana get
+wait 20
+cmd arcana mana get
+wait 20
+cmd arcana mana get
+wait 20
+cmd arcana mana get
+wait 20
+cmd arcana mana get
+wait 20
+cmd arcana mana get
+wait 20
+cmd arcana mana get
+wait 20
+cmd arcana mana get
+shot acolyte
+cmd give @s elementalarcana:hungerward_charm
+cmd arcana mana fill
+wait 5
+cmd arcana mana get
+wait 20
+cmd arcana mana get
+wait 20
+cmd arcana mana get
+wait 20
+cmd arcana mana get
+wait 20
+cmd arcana mana get
+wait 20
+cmd arcana mana get
+wait 20
+cmd arcana mana get
+wait 20
+cmd arcana mana get
+wait 20
+cmd arcana mana get
+wait 20
+cmd arcana mana get
+cmd kill @e[tag=hw]
+cmd kill @e[type=item]
+# 3. The Herald's Pull.
+cmd tp @s 361000.5 101 361000.5 0 10
+cmd summon elementalarcana:hollow_herald 361000.5 101 361006.5 {Tags:["hw"],PersistenceRequired:1b}
+cmd arcana creaturelevel @e[tag=hw] set 1
+wait 5
+cmd data get entity @s Pos
+wait 18
+shot herald_gathers
+wait 12
+shot herald_pulled
+cmd data get entity @s Pos
+wait 10
+cmd kill @e[tag=hw]
+cmd kill @e[type=item]
+# 4. A patrol.
+cmd arcana level set 30
+cmd arcana hollowed patrol
+wait 40
+cmd execute as @e[type=#elementalarcana:hollowed,distance=..60] run data get entity @s Pos
+cmd kill @e[type=#elementalarcana:hollowed,distance=..80]
+cmd kill @e[type=item]
+cmd clear @s elementalarcana:hungerward_charm
+cmd gamemode creative
+cmd effect clear @s
+cmd time set noon
+wait 10
+quit

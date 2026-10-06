@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.content.world;
 
+import net.minecraft.world.level.levelgen.structure.placement.StructurePlacementType;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.BlockItem;
@@ -27,6 +28,10 @@ public final class ModWorld {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, ElementalArcana.MODID);
     public static final DeferredRegister<StructureType<?>> STRUCTURE_TYPES = DeferredRegister.create(Registries.STRUCTURE_TYPE, ElementalArcana.MODID);
     public static final DeferredRegister<StructurePieceType> STRUCTURE_PIECES = DeferredRegister.create(Registries.STRUCTURE_PIECE, ElementalArcana.MODID);
+    public static final DeferredRegister<StructurePlacementType<?>> PLACEMENTS = DeferredRegister.create(Registries.STRUCTURE_PLACEMENT, ElementalArcana.MODID);
+    /** Random spread kept clear of other structure sets (SpreadAwayPlacement). */
+    public static final DeferredHolder<StructurePlacementType<?>, StructurePlacementType<SpreadAwayPlacement>> SPREAD_AWAY =
+            PLACEMENTS.register("spread_away", () -> () -> SpreadAwayPlacement.CODEC);
 
     /** Unbreakable, glowing: the shrine's power stays where it was found. */
     public static final DeferredBlock<ShrineCoreBlock> SHRINE_CORE = BLOCKS.register("shrine_core", () -> new ShrineCoreBlock(
@@ -67,6 +72,7 @@ public final class ModWorld {
         BLOCK_ENTITIES.register(modEventBus);
         STRUCTURE_TYPES.register(modEventBus);
         STRUCTURE_PIECES.register(modEventBus);
+        PLACEMENTS.register(modEventBus);
         LeyLines.ATTACHMENTS.register(modEventBus);
     }
 }

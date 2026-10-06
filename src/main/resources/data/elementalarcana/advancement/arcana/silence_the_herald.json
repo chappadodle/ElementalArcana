@@ -1,0 +1,27 @@
+{
+  "parent": "elementalarcana:arcana/the_hollowed",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:hungerward_charm"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.silence_the_herald.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.silence_the_herald.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "killed": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": {
+          "type": "elementalarcana:hollow_herald"
+        }
+      }
+    }
+  }
+}

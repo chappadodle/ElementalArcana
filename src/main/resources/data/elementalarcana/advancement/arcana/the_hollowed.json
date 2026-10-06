@@ -1,0 +1,27 @@
+{
+  "parent": "elementalarcana:arcana/awakening",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:hollow_shard"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.the_hollowed.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.the_hollowed.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "killed": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": {
+          "type": "#elementalarcana:hollowed"
+        }
+      }
+    }
+  }
+}

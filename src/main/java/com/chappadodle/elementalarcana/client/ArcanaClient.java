@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.client;
 
+import net.minecraft.client.renderer.entity.ThrownItemRenderer;
+import com.chappadodle.elementalarcana.content.hollowed.ModHollowed;
 import com.chappadodle.elementalarcana.client.particle.WispRingEmitter;
 import com.chappadodle.elementalarcana.content.wanderer.ModWanderer;
 import com.chappadodle.elementalarcana.api.DrakeRules;
@@ -374,6 +376,10 @@ public final class ArcanaClient {
         }
         event.registerEntityRenderer(ModTowers.ACOLYTE.get(), TowerMageRenderer::new);
         event.registerEntityRenderer(ModTowers.MAGISTER.get(), TowerMageRenderer::new);
+        event.registerEntityRenderer(ModHollowed.ACOLYTE.get(), context -> new HollowedRenderer<>(context, "acolyte", true));
+        event.registerEntityRenderer(ModHollowed.DEVOURER.get(), context -> new HollowedRenderer<>(context, "devourer", false));
+        event.registerEntityRenderer(ModHollowed.HERALD.get(), context -> new HollowedRenderer<>(context, "herald", true));
+        event.registerEntityRenderer(ModHollowed.HUNGER_BOLT.get(), context -> new ThrownItemRenderer<>(context, 1.25f, true));
         for (Element element : SovereignRules.ELEMENTS) {
             event.registerEntityRenderer(ModSanctums.sovereign(element), SovereignRenderer::new);
         }

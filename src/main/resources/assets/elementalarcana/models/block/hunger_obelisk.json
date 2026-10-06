@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "elementalarcana:block/hunger_obelisk_top",
+    "side": "elementalarcana:block/hunger_obelisk_side"
+  }
+}

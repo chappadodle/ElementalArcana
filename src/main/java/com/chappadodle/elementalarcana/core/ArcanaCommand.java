@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.core;
 
+import com.chappadodle.elementalarcana.content.hollowed.HollowedPatrols;
 import com.chappadodle.elementalarcana.content.wanderer.WanderingMages;
 import com.chappadodle.elementalarcana.api.AttunementRank;
 import com.chappadodle.elementalarcana.api.AwakeningRules;
@@ -135,6 +136,12 @@ public final class ArcanaCommand {
                         .then(Commands.literal("reset")
                                 .executes(ctx -> modify(ctx.getSource(), MagicData::clearAffinities, "commands.elementalarcana.affinity_reset"))))
                 .then(Commands.literal("mana")
+                        .then(Commands.literal("get").executes(ctx -> {
+                            MagicData data = MagicAttachments.get(ctx.getSource().getPlayerOrException());
+                            ctx.getSource().sendSuccess(() -> Component.literal(String.format(Locale.ROOT, "Mana: %.1f / %.1f", data.mana(),
+                                    data.maxMana())), false);
+                            return Math.round(data.mana());
+                        }))
                         .then(Commands.literal("fill")
                                 .executes(ctx -> modify(ctx.getSource(), MagicData::fillMana, "commands.elementalarcana.mana_set")))
                         .then(Commands.literal("set").then(Commands.argument("amount", FloatArgumentType.floatArg(0))
@@ -164,6 +171,7 @@ public final class ArcanaCommand {
                         .executes(ctx -> setMentorChapter(ctx.getSource(), IntegerArgumentType.getInteger(ctx, "chapter")))))
                 .then(Commands.literal("config").executes(ctx -> showConfig(ctx.getSource())))
                 .then(Commands.literal("mage").executes(ctx -> callMage(ctx.getSource())))
+                .then(Commands.literal("hollowed").then(Commands.literal("patrol").executes(ctx -> callPatrol(ctx.getSource()))))
                 .then(Commands.literal("tide")
                         .then(Commands.literal("start").executes(ctx -> {
                             ManaTides.force(ctx.getSource().getServer());
@@ -267,14 +275,23 @@ public final class ArcanaCommand {
         return came ? 1 : 0;
     }
 
+    /** /arcana hollowed patrol: a band of the Hollowed comes for you now, sized by your level. */
+    private static int callPatrol(CommandSourceStack source) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        int came = HollowedPatrols.send(player.serverLevel(), player);
+        source.sendSuccess(() -> Component.literal(came > 0 ? came + " of the Hollowed are coming" : "No open ground near you for them"), false);
+        return came;
+    }
+
     /** /arcana config: the server's settings for the mod in force (config/elementalarcana-server.toml, or the world's override). */
     private static int showConfig(CommandSourceStack source) {
         source.sendSuccess(() -> Component.literal(String.format(Locale.ROOT,
                 "Elemental Arcana settings: rifts x%.2f, starfall x%.2f, mana tides %s, wisps x%.2f, wild creatures x%.2f, drakes x%.2f, "
-                        + "golems x%.2f, wandering mages x%.2f, natural awakening x%.2f, sending stone %s",
+                        + "golems x%.2f, wandering mages x%.2f, Hollowed patrols x%.2f, natural awakening x%.2f, sending stone %s",
                 ArcanaServerConfig.RIFTS.get(), ArcanaServerConfig.STARFALL.get(), ArcanaServerConfig.MANA_TIDES.get() ? "on" : "off",
                 ArcanaServerConfig.WISPS.get(), ArcanaServerConfig.WILD_CREATURES.get(), ArcanaServerConfig.DRAKES.get(),
-                ArcanaServerConfig.GOLEMS.get(), ArcanaServerConfig.WANDERING_MAGE.get(), ArcanaServerConfig.NATURAL_AWAKENING.get(),
+                ArcanaServerConfig.GOLEMS.get(), ArcanaServerConfig.WANDERING_MAGE.get(), ArcanaServerConfig.HOLLOWED_PATROLS.get(),
+                ArcanaServerConfig.NATURAL_AWAKENING.get(),
                 ArcanaServerConfig.SENDING_STONE.get() ? "on" : "off")), false);
         return 1;
     }

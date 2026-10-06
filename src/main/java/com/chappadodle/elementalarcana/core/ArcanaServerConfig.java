@@ -54,6 +54,10 @@ public final class ArcanaServerConfig {
             .comment("How often a Wandering Mage comes to an awakened player of a morning, as a multiple of the usual one morning in three (0: never; 3: every morning, if none is about).")
             .translation("elementalarcana.configuration.wanderingMage")
             .defineInRange("wanderingMage", 1.0, 0.0, 3.0);
+    public static final ModConfigSpec.DoubleValue HOLLOWED_PATROLS = BUILDER
+            .comment("How often the Hollowed come hunting an awakened player of level 15 or more at dusk, as a multiple of the usual chance (8% at level 15, up to 20%; 0: never). Their camps are worldgen.")
+            .translation("elementalarcana.configuration.hollowedPatrols")
+            .defineInRange("hollowedPatrols", 1.0, 0.0, 5.0);
 
     static {
         BUILDER.pop().comment("Magic").push("magic");

@@ -30,6 +30,7 @@ public final class MentorChapters {
             new Chapter("revenant", task("laid_to_rest"), 2, List.of(new Reward("elementalarcana:charm_pouch", 1))),
             new Chapter("tower", task("tower"), 1, List.of()),
             new Chapter("magister", task("magister"), 2, List.of(new Reward("elementalarcana:wishing_star", 1))),
+            new Chapter("hollowed", task("the_hollowed"), 1, List.of(new Reward("elementalarcana:hungerward_charm", 1))),
             new Chapter("sanctum", task("sanctum"), 1, List.of()),
             new Chapter("sovereign", task("sovereign"), 2, List.of(new Reward("minecraft:golden_apple", 2))),
             new Chapter("hearts", task("four_hearts"), 2, List.of()),

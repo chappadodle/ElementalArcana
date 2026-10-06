@@ -173,6 +173,12 @@ ADVANCEMENTS = [
      "Brew a tonic from an herb of the elements", *any_of({
          tonic: {"trigger": "minecraft:brewed_potion", "conditions": {"potion": NS + tonic}}
          for tonic in (f"tonic_of_{name}" for name in TONICS)})),
+    ("the_hollowed", "awakening", item("hollow_shard"), "task", "The Hollowed",
+     "Defeat one of the Hollowed, who eat mana", killed("#" + NS + "hollowed"), None),
+    ("shattered_hunger", "the_hollowed", item("hunger_obelisk"), "goal", "Shattered Hunger",
+     "Break the Hunger Obelisk at the heart of a Hollowed camp", magic("obelisk"), None),
+    ("silence_the_herald", "the_hollowed", item("hungerward_charm"), "challenge", "Silence the Herald",
+     "Defeat a Hollow Herald", killed(NS + "hollow_herald"), None),
     ("crypt", "awakening", item("coffin"), "task", "Into the Crypt",
      "Go down into an arcane crypt, where the first mages lie", location(NS + "crypt"), None),
     ("runebreaker", "crypt", item("runestone"), "task", "Runebreaker",

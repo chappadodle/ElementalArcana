@@ -1,0 +1,7 @@
+{
+  "type": "elementalarcana:hollowed_camp",
+  "biomes": "#elementalarcana:has_structure/hollowed_camps",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_thin"
+}

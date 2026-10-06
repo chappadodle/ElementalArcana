@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/the_hollowed",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:hunger_obelisk"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.shattered_hunger.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.shattered_hunger.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "obelisk": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "obelisk"
+      }
+    }
+  }
+}

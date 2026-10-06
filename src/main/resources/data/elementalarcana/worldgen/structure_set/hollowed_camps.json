@@ -1,0 +1,21 @@
+{
+  "structures": [
+    {
+      "structure": "elementalarcana:hollowed_camp",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "elementalarcana:spread_away",
+    "spacing": 36,
+    "separation": 12,
+    "salt": 815243,
+    "keep_away": {
+      "sets": [
+        "minecraft:villages",
+        "elementalarcana:shrines"
+      ],
+      "chunk_count": 4
+    }
+  }
+}

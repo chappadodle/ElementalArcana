@@ -7,7 +7,8 @@
 # 4: the Sending Stone listened to (the server's chapter on the client's screen, a shot) and its
 #    reward taken (the claim sent back; the inventory logged);
 # 5: Stormcall, the Geode Sentinel and Dawnbreak cast near two husks (their cloud, crystal and sun
-#    drawn on a client that isn't the server; shots; the husks' health logged).
+#    drawn on a client that isn't the server; shots; the husks' health logged);
+# 6: herbs and a tonic; 7: the Hollowed (see those sections).
 hud on
 wait 40
 cmd gamemode creative
@@ -121,6 +122,29 @@ camera first
 wait 20
 cmd execute as @e[tag=eat] run data get entity @s Health
 cmd kill @e[tag=eat]
+# 6: Arcane Flora: a Sunpetal and a potted Deepcap set (the blocks drawn on a client that isn't the
+#    server), a Tonic of Dawn drunk (its Kinship logged).
+cmd setblock 166003 100 165996 elementalarcana:sunpetal
+cmd setblock 166003 100 165994 elementalarcana:potted_deepcap
+slot 0
+wait 5
+cmd item replace entity @s weapon.mainhand with minecraft:potion[minecraft:potion_contents={potion:"elementalarcana:tonic_of_dawn"}]
+wait 5
+hold_use 40
+wait 10
+cmd data get entity @s active_effects
+# 7: The Hollowed: a level-1 Acolyte throwing its bolts (drawn on the client) and a Herald (its bar);
+#    the mage's mana logged after.
+cmd arcana mana fill
+cmd summon elementalarcana:hollowed_acolyte 166007.5 100 166000.5 {Tags:["hw"],PersistenceRequired:1b}
+cmd summon elementalarcana:hollow_herald 166010.5 100 166004.5 {Tags:["hw"],PersistenceRequired:1b}
+cmd arcana creaturelevel @e[tag=hw] set 1
+look -90 10
+wait 70
+shot mp_hollowed
+cmd arcana mana get
+cmd kill @e[tag=hw]
+cmd kill @e[type=elementalarcana:hunger_bolt]
 cmd arcana tree reset
 cmd arcana affinity reset
 cmd arcana awaken fire

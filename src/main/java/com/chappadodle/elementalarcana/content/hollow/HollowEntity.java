@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.content.hollow;
 
+import com.chappadodle.elementalarcana.api.HollowedRules;
+import com.chappadodle.elementalarcana.content.hollowed.Hungerward;
 import com.chappadodle.elementalarcana.api.AttunementRank;
 import com.chappadodle.elementalarcana.api.CreatureMagic;
 import com.chappadodle.elementalarcana.api.Element;
@@ -178,7 +180,8 @@ public class HollowEntity extends SovereignEntity {
                 player -> player.isAlive() && !player.isCreative() && !player.isSpectator())) {
             MagicData data = MagicAttachments.get(player);
             boolean starving = HollowRules.starving(data.mana());
-            data.setMana(data.mana() - HollowRules.manaEaten(data.mana()));
+            // A Hungerward halves what it eats.
+            data.setMana(data.mana() - HollowRules.manaEaten(data.mana()) * (Hungerward.warded(player) ? HollowedRules.WARD_MANA_FACTOR : 1f));
             MagicAttachments.sync(player);
             if (starving) {
                 player.hurt(damageSources().source(ModHollow.HUNGER, this), HollowRules.STARVING_DAMAGE);
