@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.content;
 
+import com.chappadodle.elementalarcana.content.forge.ForgewardenEntity;
 import com.chappadodle.elementalarcana.content.crypt.RevenantEntity;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.AttunementRank;
@@ -30,7 +31,8 @@ import java.util.UUID;
  * An Archmage announces itself with a boss bar ("Zombie Archmage") for players within 32 blocks,
  * like the Wither's. The bar is purple for every element, so it doesn't give the element away. A
  * Sovereign's is its own: its name, in its element's colour, within 48 blocks, and it darkens the
- * sky. A pet, or a friend (the Circle's Archmagister: MageAlly), has none.
+ * sky. A pet, or a friend (the Circle's Archmagister: MageAlly), has none. The Forgewarden, keeper
+ * of a Cinder Forge, has its own: its title, in red, within 32 blocks.
  */
 @EventBusSubscriber(modid = ElementalArcana.MODID)
 public final class ArchmageBossBars {
@@ -61,6 +63,10 @@ public final class ArchmageBossBars {
             bar.setDarkenScreen(true);
             return bar;
         }
+        if (mob instanceof ForgewardenEntity) {
+            return new ServerBossEvent(Component.translatable("bossbar.elementalarcana.forgewarden"), BossEvent.BossBarColor.RED,
+                    BossEvent.BossBarOverlay.NOTCHED_10);
+        }
         return new ServerBossEvent(title(mob, magic), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS);
     }
 
@@ -71,7 +77,8 @@ public final class ArchmageBossBars {
             return;
         }
         CreatureMagic magic = Attunement.get(mob);
-        if (magic == null || magic.rank() != AttunementRank.ARCHMAGE || mob instanceof OwnableEntity pet && pet.getOwnerUUID() != null
+        if (magic == null || magic.rank() != AttunementRank.ARCHMAGE && !(mob instanceof ForgewardenEntity)
+                || mob instanceof OwnableEntity pet && pet.getOwnerUUID() != null
                 || mob instanceof MageAlly) {
             return;
         }

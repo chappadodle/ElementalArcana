@@ -1,0 +1,27 @@
+{
+  "parent": "elementalarcana:arcana/into_the_forge",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:ember_core"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.quench.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.quench.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "killed": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": {
+          "type": "elementalarcana:forgewarden"
+        }
+      }
+    }
+  }
+}

@@ -17,7 +17,8 @@ class SeekerRulesTest {
         }
         assertEquals("hollowed_camps", SeekerRules.next("sky_isles"));
         assertEquals("enclaves", SeekerRules.next("wisp_rings"));
-        assertEquals("shrines", SeekerRules.next("enclaves"));
+        assertEquals("cinder_forges", SeekerRules.next("enclaves"));
+        assertEquals("shrines", SeekerRules.next("cinder_forges"));
         assertEquals("shrines", SeekerRules.next("nonsense"));
         assertEquals("shrines", SeekerRules.known("nonsense"));
         assertEquals("crypts", SeekerRules.known("crypts"));

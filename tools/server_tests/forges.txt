@@ -1,0 +1,44 @@
+# The Ember Reaches, part 1: Cinder Forges (see the spec).
+# 1. The nearest forge located in the Nether, by its id and by the compass's tag.
+# 2. The Forgewarden on a stone floor high up, an iron golem beside it, which goes for it (a
+#    monster's magic spares monsters, so a golem is its foe here): it slams the golem (the golem's
+#    health logged).
+# 3. A husk farther off strikes it: it hurls magma at that one, a direct hit (health logged).
+# 4. Lava under it: it doesn't burn (its health logged before and after).
+execute in minecraft:the_nether run locate structure elementalarcana:cinder_forge
+execute in minecraft:the_nether run locate structure #elementalarcana:seekable/cinder_forges
+gamerule doMobSpawning false
+forceload add 0 0 31 15
+fill 0 199 0 31 199 15 minecraft:stone
+fill 0 200 0 31 210 15 minecraft:air
+summon elementalarcana:forgewarden 4 200 8 {Tags:["fw"],PersistenceRequired:1b,Rotation:[-90f,0f]}
+summon minecraft:iron_golem 8 200 8 {Tags:["fh"],PersistenceRequired:1b}
+arcana creaturelevel @e[tag=fw] set 30
+sleep 1
+data get entity @e[tag=fh,limit=1] Health
+sleep 8
+data get entity @e[tag=fh,limit=1] Health
+data get entity @e[tag=fw,limit=1] Health
+execute if entity @e[tag=fh] run say iron golem still standing
+execute unless entity @e[tag=fh] run say iron golem fallen
+kill @e[tag=fh]
+summon minecraft:husk 18 200 8 {Tags:["fh2"],PersistenceRequired:1b,NoAI:1b}
+arcana creaturelevel @e[tag=fh2] set 30
+sleep 1
+data get entity @e[tag=fh2,limit=1] Health
+damage @e[tag=fw,limit=1] 1 minecraft:mob_attack by @e[tag=fh2,limit=1]
+sleep 8
+data get entity @e[tag=fh2,limit=1] Health
+execute if entity @e[tag=fh2] run say far husk still standing
+execute unless entity @e[tag=fh2] run say far husk fallen
+kill @e[tag=fh2]
+tp @e[tag=fw] 4 200 8
+data get entity @e[tag=fw,limit=1] Health
+fill 3 199 7 5 199 9 minecraft:lava
+sleep 4
+data get entity @e[tag=fw,limit=1] Health
+kill @e[tag=fw]
+kill @e[type=item,x=8,y=200,z=8,distance=..24]
+kill @e[type=experience_orb,x=8,y=200,z=8,distance=..24]
+fill 0 199 0 31 210 15 minecraft:air
+forceload remove all

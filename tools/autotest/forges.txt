@@ -1,0 +1,32 @@
+# The Ember Reaches, part 1: Cinder Forges (see the spec), in the Nether.
+# 1. The nearest forge, from inside its hall in spectator mode (a shot): the dais and its anvil, the
+#    lava ring, the pillars, chains and lanterns.
+# 2. In creative mode (so it pays no heed), the Forgewarden wakes (logged) and rises in the hall (a
+#    shot from the dais).
+# 3. Brought below half its health, it turns molten (a shot; its speed logged).
+# 4. Killed: its Ember Core dropped (counted).
+hud on
+cmd gamemode spectator
+cmd execute in minecraft:the_nether run tp @s -2400 100 2400
+wait 60
+# (the forge's base is the plinth's foot, y 31: the hall's floor is 9 above it)
+goto elementalarcana:cinder_forge 9 13 11
+wait 80
+shot forge_hall
+cmd gamemode creative
+wait 60
+cmd execute as @e[type=elementalarcana:forgewarden,distance=..40] run data get entity @s Pos
+find elementalarcana:forge_heart 30 0 2 1 0 8
+wait 40
+shot forgewarden
+cmd execute as @e[type=elementalarcana:forgewarden,limit=1,sort=nearest] run data merge entity @s {Health:40f}
+wait 20
+cmd execute as @e[type=elementalarcana:forgewarden,limit=1,sort=nearest] run attribute @s minecraft:generic.movement_speed get
+shot forgewarden_molten
+cmd kill @e[type=elementalarcana:forgewarden,limit=1,sort=nearest]
+wait 30
+cmd execute if entity @e[type=item,distance=..40,nbt={Item:{id:"elementalarcana:ember_core"}}]
+cmd kill @e[type=item,distance=..40]
+cmd kill @e[type=experience_orb,distance=..40]
+wait 10
+quit

@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana;
 
+import com.chappadodle.elementalarcana.content.forge.ModForge;
 import com.chappadodle.elementalarcana.content.circle.ModCircle;
 import com.chappadodle.elementalarcana.content.wonder.ModWonders;
 import com.chappadodle.elementalarcana.content.hollowed.ModHollowed;
@@ -85,6 +86,7 @@ public class ElementalArcana {
         ModHollowed.register(modEventBus);
         ModWonders.register(modEventBus);
         ModCircle.register(modEventBus);
+        ModForge.register(modEventBus);
         ModBrews.register(modEventBus);
         ModTabs.TABS.register(modEventBus);
     }

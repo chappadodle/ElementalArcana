@@ -92,6 +92,19 @@ public class GolemEntity extends Monster implements ElementalOrb {
         }
     }
 
+    /** How near its foe must be for a slam, how far round where its arms land the slam reaches, and how far ahead of it they land. */
+    protected double reach() {
+        return GolemRules.REACH;
+    }
+
+    protected double slamRadius() {
+        return GolemRules.SLAM_RADIUS;
+    }
+
+    protected double slamAhead() {
+        return GolemRules.SLAM_AHEAD;
+    }
+
     /** Client: ticks since the current swing began (arms rising, then the blow), or a large number. */
     public float swingTicks(float partialTicks) {
         return tickCount - swingStart + partialTicks;
@@ -162,8 +175,8 @@ public class GolemEntity extends Monster implements ElementalOrb {
             return;
         }
         Vec3 look = Vec3.directionFromRotation(0, getYRot());
-        Vec3 at = position().add(look.scale(GolemRules.SLAM_AHEAD));
-        double radius = GolemRules.SLAM_RADIUS;
+        Vec3 at = position().add(look.scale(slamAhead()));
+        double radius = slamRadius();
         float damage = (float) getAttributeValue(Attributes.ATTACK_DAMAGE);
         for (LivingEntity victim : level.getEntitiesOfClass(LivingEntity.class, new AABB(at, at).inflate(radius, 2, radius),
                 e -> e != this && e.isAlive() && SpellTargets.canAffect(this, e) && e.position().distanceTo(at) <= radius + e.getBbWidth() / 2)) {
@@ -268,7 +281,7 @@ public class GolemEntity extends Monster implements ElementalOrb {
             if (target == null) {
                 return;
             }
-            if (distanceTo(target) <= GolemRules.REACH && cooldown <= 0) {
+            if (distanceTo(target) <= reach() && cooldown <= 0) {
                 windup = GolemRules.WINDUP_TICKS;
                 raise();
             } else if (--repath <= 0) {

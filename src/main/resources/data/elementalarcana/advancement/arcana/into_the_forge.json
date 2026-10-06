@@ -1,0 +1,29 @@
+{
+  "parent": "elementalarcana:arcana/awakening",
+  "display": {
+    "icon": {
+      "id": "minecraft:gilded_blackstone"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.into_the_forge.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.into_the_forge.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "found": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": {
+          "location": {
+            "structures": "elementalarcana:cinder_forge"
+          }
+        }
+      }
+    }
+  }
+}

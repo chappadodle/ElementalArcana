@@ -24,6 +24,8 @@ NS = "elementalarcana:"
 DRAKE_ELEMENTS = ("fire", "water", "wind", "ice", "lightning")
 WILD_CHARMS = ("heartwood_talisman", "wraithsilk_veil", "salamander_charm", "plume_of_the_gale", "crawlers_prism",
                "bog_pearl_charm")
+# Charms from elsewhere: the Hollowed's Hungerward, the Cinder Forges' Forgefire Charm.
+OTHER_CHARMS = ("hungerward_charm", "forgefire_charm")
 RELICS = ("ember_heart", "tidecallers_pearl", "rimeheart_locket", "feather_of_the_gale", "stoneheart_idol",
           "prism_of_the_deep", "storm_sigil", "sunstone", "revenants_phylactery")
 
@@ -197,7 +199,7 @@ def main():
         "key": {"S": {"item": "minecraft:string"}, "L": {"item": "minecraft:leather"}, "G": {"item": "minecraft:gold_ingot"}},
         "result": {"id": f"{NS}charm_pouch", "count": 1}})
     charms = ([f"{NS}{e}_drakescale_charm" for e in DRAKE_ELEMENTS] + [NS + name for name in WILD_CHARMS]
-              + [NS + name for name in RELICS])
+              + [NS + name for name in RELICS] + [NS + name for name in OTHER_CHARMS])
     write_json(DATA / "tags/item/charms.json", {"replace": False, "values": charms})
     print("pouch art and data written")
 

@@ -1,0 +1,20 @@
+{
+  "structures": [
+    {
+      "structure": "elementalarcana:cinder_forge",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "elementalarcana:spread_away",
+    "spacing": 56,
+    "separation": 20,
+    "salt": 731905,
+    "keep_away": {
+      "sets": [
+        "minecraft:nether_complexes"
+      ],
+      "chunk_count": 4
+    }
+  }
+}

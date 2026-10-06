@@ -34,6 +34,7 @@ KINDS = {
     "hollowed_camps": [NS + "hollowed_camp"],
     "wisp_rings": [NS + "wisp_ring"],
     "enclaves": [NS + "enclave"],
+    "cinder_forges": [NS + "cinder_forge"],
 }
 
 RIM_DARK = (92, 62, 24)
