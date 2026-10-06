@@ -1,0 +1,56 @@
+# Ley Anchors (see their spec): a Ley Anchor named "Home" (set by command with its name) on a small
+# platform, and 400 blocks off a shrine's core on another; both touched (the anchor's word on the
+# action bar: a shot), the ley menu opened at the shrine (Home listed among the places: a shot), the
+# journey to Home (position and mana logged before and after), arriving beside the anchor (a shot);
+# "A Place of Your Own" made along the way.
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamemode survival
+cmd effect clear @s
+cmd clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd effect give @s minecraft:resistance 900 4 true
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken fire
+cmd arcana level set 20
+cmd tp @s 900.5 100 400.5 90 30
+wait 60
+cmd fill 897 99 397 903 99 403 minecraft:polished_blackstone_bricks
+cmd fill 897 100 397 903 106 403 minecraft:air
+cmd setblock 900 100 400 elementalarcana:ley_anchor{CustomName:'"Home"'}
+cmd tp @s 900.5 100 402.5 180 25
+wait 10
+use
+wait 5
+shot anchor_touched
+cmd tp @s 500.5 100 400.5 90 30
+wait 60
+cmd fill 497 99 397 503 99 403 minecraft:polished_blackstone_bricks
+cmd fill 497 100 397 503 106 403 minecraft:air
+cmd setblock 500 100 400 minecraft:chiseled_polished_blackstone
+cmd setblock 500 101 400 elementalarcana:shrine_core[kind=earth]
+cmd tp @s 500.5 100 402.5 180 10
+wait 10
+use
+wait 10
+look 180 -8
+key sneak down
+wait 3
+use
+wait 2
+key sneak up
+wait 10
+shot ley_menu_home
+cmd arcana mana fill
+cmd data get entity @s Pos
+cmd ley 900 100 400
+wait 30
+shot arrived_home
+cmd data get entity @s Pos
+cmd arcana mana get
+wait 5
+quit

@@ -54,6 +54,8 @@ A magic mod that turns Minecraft into a fantasy adventure, for **NeoForge 1.21.1
 
 **Wonders of the Wild.** Gentle creatures that fight no one. At night glowmoths, their wings glowing in an element's colour, come to the herbs and flowers and circle any light; catch one in a glass bottle and set it down as a Moth Jar, a lantern that never goes out. High over the sea, skyrays glide in slow wide circles, five blocks from wingtip to wingtip, their spots glowing at night; glide near one (with elytra or Skyward Leap) and its wake bears you up, so you can follow them across the ocean.
 
+**Ley Anchors.** Make your own place on the ley lines: stone bricks, amethyst and an ender pearl make a Ley Anchor. Name it in an anvil, set it down at home and touch it; then travel to it from any shrine, or from it to any shrine or anchor you remember, as the shrines' ley lines run. Friends who touch it can use it too. The Seeker's Compass now also finds Hollowed camps and wisp rings, and Wandering Mages sell rumours of the camps.
+
 **Arcanists.** A villager profession for magic, in purple robes and a wide-brimmed hat. Its workstation is the **Arcane Lectern** (a lectern, an amethyst shard and two Essence, shapeless). Any unemployed villager near one takes the job, and about one village in three already has an Arcanist's cottage. Arcanists buy Essence and amethyst. They sell the Journal, wands and staves, robes, Essence of any element and Catalysts. Only they sell two rarities: the **Scroll of Unbinding** (Expert), which gives back every skill tree node you bought for free, and the **Tome of Insight** (Master), worth one bonus tree point.
 
 **Bounties.** Arcanists also post bounties: among their trades, a **Bounty Contract** for an emerald. Each asks one thing, harder at higher trade levels: slay creatures Attuned to an element (5 to 8), defeat wisps (3 to 5), slay a Magus, close a rift, or slay an Archmage. Carry it and it counts what you do (its tooltip shows how far along it is, and it glints once it's done); right-click any Arcane Lectern with a finished one for its reward: emeralds and experience, with Essence, Wisp Motes, a Tome of Insight, a Catalyst or a Scroll of Unbinding depending on the task.
@@ -207,6 +209,7 @@ python3 tools/gen_wisp_rings.py # the Wisp Rings' structure, spread and biomes
 python3 tools/gen_flora.py      # the herbs' art, blocks, tonic icons and where they grow
 python3 tools/gen_hollowed.py   # the Hollowed's art, loot, letters, camp and damage type
 python3 tools/gen_wonders.py    # the glowmoths', skyrays' and Moth Jar's art and models
+python3 tools/gen_anchors.py    # the Ley Anchor's art, model, loot and recipe
 python3 tools/gen_pouch.py      # the Charm Pouch's icons, screen, recipe and the charms tag; needs numpy and Pillow
 python3 tools/gen_seeker.py     # the Seeker's Compass's 32 frames and model, its recipe, the seekable structure tags; needs numpy and Pillow
 python3 tools/gen_mentor.py     # the Sending Stone's icon and recipe, and Caelith's words for each chapter; needs numpy and Pillow

@@ -42,6 +42,15 @@ public final class ModWorld {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ShrineCoreBlockEntity>> SHRINE_CORE_ENTITY =
             BLOCK_ENTITIES.register("shrine_core", () -> BlockEntityType.Builder.of(ShrineCoreBlockEntity::new, SHRINE_CORE.get()).build(null));
 
+    /** A mage's own place on the ley lines (docs/superpowers/specs/2026-10-06-ley-anchors-design.md). */
+    public static final DeferredBlock<LeyAnchorBlock> LEY_ANCHOR = BLOCKS.register("ley_anchor", () -> new LeyAnchorBlock(
+            BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(3f, 6f).requiresCorrectToolForDrops()
+                    .lightLevel(state -> 7).sound(SoundType.STONE).noOcclusion()));
+    public static final DeferredItem<BlockItem> LEY_ANCHOR_ITEM = ITEMS.register("ley_anchor",
+            () -> new BlockItem(LEY_ANCHOR.get(), new Item.Properties()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<LeyAnchorBlockEntity>> LEY_ANCHOR_ENTITY =
+            BLOCK_ENTITIES.register("ley_anchor", () -> BlockEntityType.Builder.of(LeyAnchorBlockEntity::new, LEY_ANCHOR.get()).build(null));
+
     public static final DeferredHolder<StructureType<?>, StructureType<ShrineStructure>> SHRINE =
             STRUCTURE_TYPES.register("shrine", () -> () -> ShrineStructure.CODEC);
     public static final DeferredHolder<StructurePieceType, StructurePieceType> SHRINE_PIECE =

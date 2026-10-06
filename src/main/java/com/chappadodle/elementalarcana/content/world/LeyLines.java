@@ -28,6 +28,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -43,6 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -51,16 +53,43 @@ import java.util.function.Supplier;
  * attachment, kept through death), and from any Shrine Core they can travel to any other they
  * remember: sneak and right-click the core for the ley menu (clickable lines in chat), each line
  * running {@code /ley <x> <y> <z>}. A journey costs mana by distance (LeyRules) and the lines take a
- * minute to settle after it.
+ * minute to settle after it. A mage's own Ley Anchors (see the Ley Anchors spec) are places on the
+ * network too: remembered when touched, travelled to and from as a shrine is.
  */
 @EventBusSubscriber(modid = ElementalArcana.MODID)
 public final class LeyLines {
-    /** A remembered shrine: where its core is, and its element. */
-    public record LeyShrine(BlockPos pos, ShrineKind kind) {
+    /** The colour of an anchor's line in the menu and its pillar of light: the amethyst's violet. */
+    public static final int ANCHOR_COLOR = 0xB57EDC;
+
+    /** A remembered place: a shrine (where its core is, and its element) or a Ley Anchor (where it is, and its name, if any). */
+    public record LeyShrine(BlockPos pos, Optional<ShrineKind> kind, Optional<String> anchor) {
         public static final Codec<LeyShrine> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 BlockPos.CODEC.fieldOf("pos").forGetter(LeyShrine::pos),
-                ShrineKind.CODEC.fieldOf("kind").forGetter(LeyShrine::kind)
+                ShrineKind.CODEC.optionalFieldOf("kind").forGetter(LeyShrine::kind),
+                Codec.STRING.optionalFieldOf("anchor").forGetter(LeyShrine::anchor)
         ).apply(instance, LeyShrine::new));
+
+        public static LeyShrine shrine(BlockPos pos, ShrineKind kind) {
+            return new LeyShrine(pos.immutable(), Optional.of(kind), Optional.empty());
+        }
+
+        public static LeyShrine anchor(BlockPos pos, String name) {
+            return new LeyShrine(pos.immutable(), Optional.empty(), Optional.of(name));
+        }
+
+        public int color() {
+            return kind.map(shrine -> shrine.element().color()).orElse(ANCHOR_COLOR);
+        }
+
+        /** What the menu calls it: "Fire Shrine", or the anchor's name ("Ley Anchor" if it has none). */
+        public Component title() {
+            return kind.map(LeyLines::name).orElseGet(() -> anchorTitle(anchor.orElse("")));
+        }
+
+        /** The key the "ley" advancement trigger gets: the shrine's element, or "anchor". */
+        public String trigger() {
+            return kind.map(ShrineKind::getSerializedName).orElse("anchor");
+        }
     }
 
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENTS =
@@ -81,9 +110,24 @@ public final class LeyLines {
         List<LeyShrine> memory = player.getData(MEMORY);
         if (memory.stream().noneMatch(shrine -> shrine.pos().equals(pos))) {
             List<LeyShrine> more = new ArrayList<>(memory);
-            more.add(new LeyShrine(pos.immutable(), kind));
+            more.add(LeyShrine.shrine(pos, kind));
             player.setData(MEMORY, List.copyOf(more));
         }
+    }
+
+    /** Remembers the Ley Anchor at {@code pos} by its {@code name} (or remembers it anew, renamed); whether it was already known. */
+    public static boolean rememberAnchor(ServerPlayer player, BlockPos pos, String name) {
+        List<LeyShrine> memory = player.getData(MEMORY);
+        boolean known = memory.stream().anyMatch(place -> place.pos().equals(pos));
+        List<LeyShrine> more = new ArrayList<>(memory.stream().filter(place -> !place.pos().equals(pos)).toList());
+        more.add(LeyShrine.anchor(pos, name));
+        player.setData(MEMORY, List.copyOf(more));
+        return known;
+    }
+
+    /** An anchor's name in the menu: its own, or "Ley Anchor". */
+    public static Component anchorTitle(String name) {
+        return name.isEmpty() ? Component.translatable("block.elementalarcana.ley_anchor") : Component.literal(name);
     }
 
     private static void forget(ServerPlayer player, BlockPos pos) {
@@ -112,10 +156,10 @@ public final class LeyLines {
             double distance = Math.sqrt(dx * dx + dz * dz);
             int cost = LeyRules.manaCost(distance);
             String command = "/ley " + shrine.pos().getX() + " " + shrine.pos().getY() + " " + shrine.pos().getZ();
-            Component line = Component.literal("  ").append(Component.translatable("message.elementalarcana.ley.entry", name(shrine.kind()),
+            Component line = Component.literal("  ").append(Component.translatable("message.elementalarcana.ley.entry", shrine.title(),
                             String.format(Locale.ROOT, "%,d", Math.round(distance)),
                             Component.translatable("direction.elementalarcana." + LeyRules.direction(dx, dz)), cost))
-                    .withStyle(style -> style.withColor(shrine.kind().element().color())
+                    .withStyle(style -> style.withColor(shrine.color())
                             .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command))
                             .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                                     Component.translatable("message.elementalarcana.ley.hover", cost))));
@@ -147,8 +191,8 @@ public final class LeyLines {
         LeyShrine destination = player.getData(MEMORY).stream().filter(shrine -> shrine.pos().equals(target)).findFirst().orElseThrow();
         BlockPos here = nearestCore(level, player.blockPosition());
         double distance = Math.sqrt(Math.pow(target.getX() - here.getX(), 2) + Math.pow(target.getZ() - here.getZ(), 2));
-        // The far shrine must still be there (this loads its ground, if it isn't loaded).
-        if (!level.getBlockState(target).is(ModWorld.SHRINE_CORE.get())) {
+        // The far shrine or anchor must still be there (this loads its ground, if it isn't loaded).
+        if (!isPlace(level.getBlockState(target))) {
             forget(player, target);
             player.displayClientMessage(Component.translatable("message.elementalarcana.ley.gone"), true);
             return 0;
@@ -158,7 +202,7 @@ public final class LeyLines {
             return 0;
         }
         Vec3 arrival = arrival(level, target);
-        int color = destination.kind().element().color();
+        int color = destination.color();
         pillar(level, player.position(), color);
         Vec3 core = Vec3.atCenterOf(target);
         float yaw = (float) Math.toDegrees(Math.atan2(-(core.x - arrival.x), core.z - arrival.z));
@@ -166,7 +210,7 @@ public final class LeyLines {
         player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 40, 0, false, false, true));
         pillar(level, arrival, color);
         SETTLED_AT.put(player.getUUID(), level.getGameTime() + LeyRules.COOLDOWN_TICKS);
-        MagicTriggers.fire(player, "ley", destination.kind().getSerializedName(), 1);
+        MagicTriggers.fire(player, "ley", destination.trigger(), 1);
         return 1;
     }
 
@@ -193,14 +237,19 @@ public final class LeyLines {
         return null;
     }
 
-    /** The Shrine Core within reach of {@code at}, or null. */
+    /** Whether a block is a place on the ley lines: a Shrine Core or a Ley Anchor. */
+    private static boolean isPlace(BlockState state) {
+        return state.is(ModWorld.SHRINE_CORE.get()) || state.is(ModWorld.LEY_ANCHOR.get());
+    }
+
+    /** The Shrine Core or Ley Anchor within reach of {@code at}, or null. */
     @Nullable
     private static BlockPos nearestCore(ServerLevel level, BlockPos at) {
         int reach = (int) Math.ceil(LeyRules.REACH);
         BlockPos best = null;
         double bestDistance = LeyRules.REACH * LeyRules.REACH;
         for (BlockPos pos : BlockPos.betweenClosed(at.offset(-reach, -reach, -reach), at.offset(reach, reach, reach))) {
-            if (level.getBlockState(pos).is(ModWorld.SHRINE_CORE.get()) && pos.distSqr(at) <= bestDistance) {
+            if (isPlace(level.getBlockState(pos)) && pos.distSqr(at) <= bestDistance) {
                 best = pos.immutable();
                 bestDistance = pos.distSqr(at);
             }
@@ -208,10 +257,13 @@ public final class LeyLines {
         return best;
     }
 
-    /** Where a traveller arrives: two blocks out from the core on the shrine's platform, wherever there's room. */
+    /**
+     * Where a traveller arrives: two blocks out from the core on the shrine's platform (or from an
+     * anchor, beside it on its ground), wherever there's room.
+     */
     private static Vec3 arrival(ServerLevel level, BlockPos core) {
         for (Direction side : Direction.Plane.HORIZONTAL) {
-            for (int down = 1; down <= 3; down++) {
+            for (int down = 0; down <= 3; down++) {
                 BlockPos feet = core.relative(side, 2).below(down);
                 if (level.getBlockState(feet).getCollisionShape(level, feet).isEmpty()
                         && level.getBlockState(feet.above()).getCollisionShape(level, feet.above()).isEmpty()

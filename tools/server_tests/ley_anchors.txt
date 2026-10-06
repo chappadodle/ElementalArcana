@@ -1,0 +1,16 @@
+# Ley Anchors (see their spec): one set with the name "Home" (its block entity's name logged), then
+# broken as a player's hand would (setblock destroy): the item it leaves keeps the name (logged).
+# And the Seeker's Compass's two new kinds find something (/locate by their tags).
+forceload add 0 0 15 15
+fill 0 199 0 15 199 15 minecraft:stone
+fill 0 200 0 15 205 15 minecraft:air
+setblock 4 200 4 elementalarcana:ley_anchor{CustomName:'"Home"'}
+data get block 4 200 4 CustomName
+setblock 4 200 4 minecraft:air destroy
+sleep 1
+data get entity @e[type=item,limit=1,x=4,y=200,z=4,distance=..3] Item
+kill @e[type=item,x=4,y=200,z=4,distance=..5]
+fill 0 199 0 15 205 15 minecraft:air
+locate structure #elementalarcana:seekable/hollowed_camps
+locate structure #elementalarcana:seekable/wisp_rings
+forceload remove all

@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.compat.jei;
 
+import com.chappadodle.elementalarcana.content.world.ModWorld;
 import com.chappadodle.elementalarcana.content.wonder.ModWonders;
 import com.chappadodle.elementalarcana.content.hollowed.ModHollowed;
 import com.chappadodle.elementalarcana.content.flora.ModFlora;
@@ -84,6 +85,7 @@ public class ArcanaJeiPlugin implements IModPlugin {
         registration.addIngredientInfo(ModHollowed.HOLLOW_SHARD.get(), info("hollow_shard"));
         registration.addIngredientInfo(ModHollowed.HUNGERWARD.get(), info("hungerward_charm"));
         registration.addItemStackInfo(ModWonders.items().subList(0, Element.values().length), info("bottled_glowmoth"));
+        registration.addIngredientInfo(ModWorld.LEY_ANCHOR_ITEM.get(), info("ley_anchor"));
     }
 
     @Override

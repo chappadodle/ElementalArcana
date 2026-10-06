@@ -29,7 +29,8 @@ final class WanderingMageTrades {
     private static final List<Element> RARE_ESSENCES = List.of(Element.CRYSTAL, Element.LIGHTNING, Element.RADIANCE);
 
     static final VillagerTrades.ItemListing[] RUMOURS = {
-            rumour("crypts", 14), rumour("mage_towers", 16), rumour("sky_isles", 12), rumour("drake_nests", 16), rumour("ruins", 10)};
+            rumour("crypts", 14), rumour("mage_towers", 16), rumour("sky_isles", 12), rumour("drake_nests", 16), rumour("ruins", 10),
+            rumour("hollowed_camps", 12)};
 
     static final VillagerTrades.ItemListing[] WARES = {
             sell(WanderingMageTrades::anyCantripScroll, 12, 2),

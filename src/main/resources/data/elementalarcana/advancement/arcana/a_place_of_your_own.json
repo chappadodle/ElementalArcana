@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/ley_walker",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:ley_anchor"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.a_place_of_your_own.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.a_place_of_your_own.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "ley_anchor": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "ley_anchor"
+      }
+    }
+  }
+}

@@ -104,6 +104,8 @@ ADVANCEMENTS = [
      "Find an elemental shrine", location("#" + NS + "shrines"), None),
     ("ley_walker", "places_of_power", item("minecraft:ender_pearl"), "task", "Ley Walker",
      "Walk a ley line from one shrine to another", magic("ley"), None),
+    ("a_place_of_your_own", "ley_walker", item("ley_anchor"), "task", "A Place of Your Own",
+     "Touch a Ley Anchor, and bring the ley lines home", magic("ley_anchor"), None),
     ("blessed", "places_of_power", item("earth_essence"), "task", "Blessed",
      "Receive a shrine's blessing", *any_of(BLESSINGS)),
     ("wisp_hunter", "awakening", item("wisp_mote"), "task", "Wisp Hunter",
