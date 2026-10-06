@@ -58,6 +58,14 @@ public final class ArcanaServerConfig {
             .comment("How often the Hollowed come hunting an awakened player of level 15 or more at dusk, as a multiple of the usual chance (8% at level 15, up to 20%; 0: never). Their camps are worldgen.")
             .translation("elementalarcana.configuration.hollowedPatrols")
             .defineInRange("hollowedPatrols", 1.0, 0.0, 5.0);
+    public static final ModConfigSpec.DoubleValue GLOWMOTHS = BUILDER
+            .comment("How often glowmoths come to the herbs and flowers near a player at night, as a multiple of the usual chance (0: never).")
+            .translation("elementalarcana.configuration.glowmoths")
+            .defineInRange("glowmoths", 1.0, 0.0, 5.0);
+    public static final ModConfigSpec.DoubleValue SKYRAYS = BUILDER
+            .comment("How often a skyray comes within sight of a player out over the sea, as a multiple of the usual chance (0: never).")
+            .translation("elementalarcana.configuration.skyrays")
+            .defineInRange("skyrays", 1.0, 0.0, 5.0);
 
     static {
         BUILDER.pop().comment("Magic").push("magic");

@@ -1,0 +1,33 @@
+# Wonders of the Wild (see their spec): at midnight, a glowmoth of each element and a skyray
+# summoned high in the air (their health logged), then killed; a Moth Jar of each element set on a
+# stone floor (each checked), cleared; the server settings list glowmoths and skyrays.
+time set midnight
+gamerule doMobSpawning false
+forceload add 0 0 15 15
+fill 0 199 0 15 199 15 minecraft:stone
+fill 0 200 0 15 208 15 minecraft:air
+summon elementalarcana:glowmoth 1 202 3 {Tags:["ww"],element:0b}
+summon elementalarcana:glowmoth 3 202 3 {Tags:["ww"],element:1b}
+summon elementalarcana:glowmoth 5 202 3 {Tags:["ww"],element:2b}
+summon elementalarcana:glowmoth 7 202 3 {Tags:["ww"],element:3b}
+summon elementalarcana:glowmoth 9 202 3 {Tags:["ww"],element:4b}
+summon elementalarcana:glowmoth 11 202 3 {Tags:["ww"],element:5b}
+summon elementalarcana:glowmoth 13 202 3 {Tags:["ww"],element:6b}
+summon elementalarcana:glowmoth 15 202 3 {Tags:["ww"],element:7b}
+summon elementalarcana:skyray 8 205 10 {Tags:["ww"]}
+setblock 1 200 1 elementalarcana:moth_jar[element=0]
+setblock 3 200 1 elementalarcana:moth_jar[element=1]
+setblock 5 200 1 elementalarcana:moth_jar[element=2]
+setblock 7 200 1 elementalarcana:moth_jar[element=3]
+setblock 9 200 1 elementalarcana:moth_jar[element=4]
+setblock 11 200 1 elementalarcana:moth_jar[element=5]
+setblock 13 200 1 elementalarcana:moth_jar[element=6]
+setblock 15 200 1 elementalarcana:moth_jar[element=7]
+sleep 2
+execute as @e[tag=ww] run data get entity @s Health
+execute if block 1 200 1 elementalarcana:moth_jar[element=0]
+execute if block 15 200 1 elementalarcana:moth_jar[element=7]
+kill @e[tag=ww]
+fill 0 199 0 15 208 15 minecraft:air
+arcana config
+forceload remove all

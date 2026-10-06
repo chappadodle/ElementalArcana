@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "elementalarcana:item/bottled_glowmoth",
+    "layer1": "elementalarcana:item/bottled_glowmoth_moth"
+  }
+}

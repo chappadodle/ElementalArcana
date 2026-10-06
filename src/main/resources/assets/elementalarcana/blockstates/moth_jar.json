@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "element=0": {
+      "model": "elementalarcana:block/moth_jar"
+    },
+    "element=1": {
+      "model": "elementalarcana:block/moth_jar"
+    },
+    "element=2": {
+      "model": "elementalarcana:block/moth_jar"
+    },
+    "element=3": {
+      "model": "elementalarcana:block/moth_jar"
+    },
+    "element=4": {
+      "model": "elementalarcana:block/moth_jar"
+    },
+    "element=5": {
+      "model": "elementalarcana:block/moth_jar"
+    },
+    "element=6": {
+      "model": "elementalarcana:block/moth_jar"
+    },
+    "element=7": {
+      "model": "elementalarcana:block/moth_jar"
+    }
+  }
+}

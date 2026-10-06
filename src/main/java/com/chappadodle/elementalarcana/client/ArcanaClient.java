@@ -1,5 +1,8 @@
 package com.chappadodle.elementalarcana.client;
 
+import com.chappadodle.elementalarcana.content.wonder.BottledGlowmothItem;
+import com.chappadodle.elementalarcana.content.wonder.MothJarBlock;
+import com.chappadodle.elementalarcana.content.wonder.ModWonders;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import com.chappadodle.elementalarcana.content.hollowed.ModHollowed;
 import com.chappadodle.elementalarcana.client.particle.WispRingEmitter;
@@ -342,6 +345,9 @@ public final class ArcanaClient {
                 })), ModCrypts.GLYPH.get());
         event.register((state, level, pos, tintIndex) -> tintIndex != 0 ? -1
                 : FastColor.ARGB32.opaque(state.getValue(GraveFlameBlock.ELEMENT).element().color()), ModCrypts.GRAVE_FLAME.get());
+        // A Moth Jar's moth: its element's colour.
+        event.register((state, level, pos, tintIndex) -> tintIndex != 0 ? -1
+                : FastColor.ARGB32.opaque(MothJarBlock.element(state).color()), ModWonders.MOTH_JAR.get());
     }
 
     private static int dimmed(int color, float share) {
@@ -356,6 +362,9 @@ public final class ArcanaClient {
             return tintIndex == 1 && element != null ? FastColor.ARGB32.opaque(element.color()) : -1;
         }, ModGear.APPRENTICE_WAND.get(), ModGear.ADEPT_STAFF.get(), ModGear.MASTER_STAFF.get(), ModGear.ARCHMAGE_STAFF.get(),
                 ModTowers.GUARDIAN_CORE.get(), ModSanctums.SOVEREIGN_HEART.get());
+        // A Bottled Glowmoth's moth (its second layer): its element's colour.
+        event.register((stack, tintIndex) -> tintIndex == 1 ? FastColor.ARGB32.opaque(BottledGlowmothItem.elementOf(stack).color()) : -1,
+                ModWonders.BOTTLED_GLOWMOTH.get());
     }
 
     @SubscribeEvent
@@ -380,6 +389,8 @@ public final class ArcanaClient {
         event.registerEntityRenderer(ModHollowed.DEVOURER.get(), context -> new HollowedRenderer<>(context, "devourer", false));
         event.registerEntityRenderer(ModHollowed.HERALD.get(), context -> new HollowedRenderer<>(context, "herald", true));
         event.registerEntityRenderer(ModHollowed.HUNGER_BOLT.get(), context -> new ThrownItemRenderer<>(context, 1.25f, true));
+        event.registerEntityRenderer(ModWonders.GLOWMOTH.get(), GlowmothRenderer::new);
+        event.registerEntityRenderer(ModWonders.SKYRAY.get(), SkyrayRenderer::new);
         for (Element element : SovereignRules.ELEMENTS) {
             event.registerEntityRenderer(ModSanctums.sovereign(element), SovereignRenderer::new);
         }
@@ -412,6 +423,8 @@ public final class ArcanaClient {
         event.registerLayerDefinition(HarpyModel.LAYER, HarpyModel::createLayer);
         event.registerLayerDefinition(CrystalCrawlerModel.LAYER, CrystalCrawlerModel::createLayer);
         event.registerLayerDefinition(BogLurkerModel.LAYER, BogLurkerModel::createLayer);
+        event.registerLayerDefinition(GlowmothModel.LAYER, GlowmothModel::createLayer);
+        event.registerLayerDefinition(SkyrayModel.LAYER, SkyrayModel::createLayer);
     }
 
     // Load every projectile spell's 3D model, including models from addon spells.

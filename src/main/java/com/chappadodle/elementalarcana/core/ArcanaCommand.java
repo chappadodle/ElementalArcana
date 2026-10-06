@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.core;
 
+import com.chappadodle.elementalarcana.content.wonder.Wonders;
 import com.chappadodle.elementalarcana.content.hollowed.HollowedPatrols;
 import com.chappadodle.elementalarcana.content.wanderer.WanderingMages;
 import com.chappadodle.elementalarcana.api.AttunementRank;
@@ -172,6 +173,19 @@ public final class ArcanaCommand {
                 .then(Commands.literal("config").executes(ctx -> showConfig(ctx.getSource())))
                 .then(Commands.literal("mage").executes(ctx -> callMage(ctx.getSource())))
                 .then(Commands.literal("hollowed").then(Commands.literal("patrol").executes(ctx -> callPatrol(ctx.getSource()))))
+                .then(Commands.literal("wonders")
+                        .then(Commands.literal("moths").executes(ctx -> {
+                            ServerPlayer player = ctx.getSource().getPlayerOrException();
+                            int came = Wonders.bringMoths(player.serverLevel(), player);
+                            ctx.getSource().sendSuccess(() -> Component.literal(came + " glowmoths came"), false);
+                            return came;
+                        }))
+                        .then(Commands.literal("skyray").executes(ctx -> {
+                            ServerPlayer player = ctx.getSource().getPlayerOrException();
+                            boolean came = Wonders.bringSkyray(player.serverLevel(), player, true);
+                            ctx.getSource().sendSuccess(() -> Component.literal(came ? "A skyray came" : "No skyray came"), false);
+                            return came ? 1 : 0;
+                        })))
                 .then(Commands.literal("tide")
                         .then(Commands.literal("start").executes(ctx -> {
                             ManaTides.force(ctx.getSource().getServer());
@@ -287,10 +301,12 @@ public final class ArcanaCommand {
     private static int showConfig(CommandSourceStack source) {
         source.sendSuccess(() -> Component.literal(String.format(Locale.ROOT,
                 "Elemental Arcana settings: rifts x%.2f, starfall x%.2f, mana tides %s, wisps x%.2f, wild creatures x%.2f, drakes x%.2f, "
-                        + "golems x%.2f, wandering mages x%.2f, Hollowed patrols x%.2f, natural awakening x%.2f, sending stone %s",
+                        + "golems x%.2f, wandering mages x%.2f, Hollowed patrols x%.2f, glowmoths x%.2f, skyrays x%.2f, "
+                        + "natural awakening x%.2f, sending stone %s",
                 ArcanaServerConfig.RIFTS.get(), ArcanaServerConfig.STARFALL.get(), ArcanaServerConfig.MANA_TIDES.get() ? "on" : "off",
                 ArcanaServerConfig.WISPS.get(), ArcanaServerConfig.WILD_CREATURES.get(), ArcanaServerConfig.DRAKES.get(),
                 ArcanaServerConfig.GOLEMS.get(), ArcanaServerConfig.WANDERING_MAGE.get(), ArcanaServerConfig.HOLLOWED_PATROLS.get(),
+                ArcanaServerConfig.GLOWMOTHS.get(), ArcanaServerConfig.SKYRAYS.get(),
                 ArcanaServerConfig.NATURAL_AWAKENING.get(),
                 ArcanaServerConfig.SENDING_STONE.get() ? "on" : "off")), false);
         return 1;

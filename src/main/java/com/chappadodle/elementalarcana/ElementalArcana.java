@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana;
 
+import com.chappadodle.elementalarcana.content.wonder.ModWonders;
 import com.chappadodle.elementalarcana.content.hollowed.ModHollowed;
 import com.chappadodle.elementalarcana.content.flora.ModFlora;
 import com.chappadodle.elementalarcana.content.wanderer.ModWanderer;
@@ -81,6 +82,7 @@ public class ElementalArcana {
         ModWanderer.register(modEventBus);
         ModFlora.register(modEventBus);
         ModHollowed.register(modEventBus);
+        ModWonders.register(modEventBus);
         ModBrews.register(modEventBus);
         ModTabs.TABS.register(modEventBus);
     }

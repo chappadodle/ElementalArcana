@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/skyward",
+  "display": {
+    "icon": {
+      "id": "minecraft:phantom_membrane"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.on_the_skyrays_wake.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.on_the_skyrays_wake.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "skyray_wake": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "skyray_wake"
+      }
+    }
+  }
+}

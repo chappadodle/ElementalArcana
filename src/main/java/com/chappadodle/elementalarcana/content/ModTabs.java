@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.content;
 
+import com.chappadodle.elementalarcana.content.wonder.ModWonders;
 import com.chappadodle.elementalarcana.content.hollowed.ModHollowed;
 import com.chappadodle.elementalarcana.content.flora.ModFlora;
 import com.chappadodle.elementalarcana.content.wanderer.ModWanderer;
@@ -117,6 +118,7 @@ public final class ModTabs {
                 ModFlora.herbItems().forEach(herb -> output.accept(herb));
                 ModFlora.tonics().forEach(tonic -> output.accept(PotionContents.createItemStack(Items.POTION, tonic)));
                 ModHollowed.items().forEach(item -> output.accept(item.get()));
+                ModWonders.items().forEach(stack -> output.accept(stack));
             })
             .build());
 

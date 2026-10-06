@@ -8,7 +8,7 @@
 #    reward taken (the claim sent back; the inventory logged);
 # 5: Stormcall, the Geode Sentinel and Dawnbreak cast near two husks (their cloud, crystal and sun
 #    drawn on a client that isn't the server; shots; the husks' health logged);
-# 6: herbs and a tonic; 7: the Hollowed (see those sections).
+# 6: herbs and a tonic; 7: the Hollowed; 8: the wonders of the wild (see those sections).
 hud on
 wait 40
 cmd gamemode creative
@@ -145,6 +145,17 @@ shot mp_hollowed
 cmd arcana mana get
 cmd kill @e[tag=hw]
 cmd kill @e[type=elementalarcana:hunger_bolt]
+# 8: Wonders of the Wild: a glowmoth, a Moth Jar and a skyray (drawn on the client; a shot).
+cmd time set midnight
+cmd summon elementalarcana:glowmoth 166004.5 101.5 166000.5 {element:5b}
+cmd setblock 166004 100 166002 elementalarcana:moth_jar[element=3]
+cmd summon elementalarcana:skyray 166012.5 106 166000.5 {NoAI:1b}
+look -90 -5
+wait 20
+shot mp_wonders
+cmd kill @e[type=elementalarcana:glowmoth]
+cmd kill @e[type=elementalarcana:skyray]
+cmd time set noon
 cmd arcana tree reset
 cmd arcana affinity reset
 cmd arcana awaken fire

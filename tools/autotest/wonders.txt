@@ -1,0 +1,96 @@
+# Wonders of the Wild (see their spec).
+# 1. Midnight on a grass platform far out, with herbs, flowers and a lantern: glowmoths called by
+#    command (how many logged); after a while to find the light, a shot.
+# 2. One bottled (the hand logged: a Bottled Glowmoth), set down as a Moth Jar (checked), a shot.
+# 3. Noon: a skyray called near by command (where logged), then held still overhead: a shot looking up.
+# 4. The wake, with elytra: a glide south from 160 past nothing (the height logged after two
+#    seconds), then the same glide past a still skyray (summoned without AI) 10 blocks down the
+#    line (higher after two seconds: it bore the glider up; the advancement made).
+hud on
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd weather clear
+cmd gamemode creative
+cmd effect clear @s
+cmd tp @s 300000.5 101 300000.5 0 20
+wait 40
+cmd kill @e[type=!player,distance=..60]
+cmd fill 299990 100 299990 300010 100 300010 minecraft:grass_block
+cmd fill 299990 101 299990 300010 110 300010 minecraft:air
+cmd setblock 300000 101 300004 elementalarcana:sunpetal
+cmd setblock 300002 101 300004 elementalarcana:emberbloom
+cmd setblock 299998 101 300004 minecraft:poppy
+cmd setblock 300001 101 300006 minecraft:lantern
+cmd setblock 299999 101 300006 elementalarcana:skyplume
+cmd time set midnight
+wait 20
+cmd tp @s 300000.5 101 300000.5 0 20
+cmd arcana wonders moths
+wait 5
+cmd arcana wonders moths
+wait 160
+shot moths
+# 2. Bottling one.
+cmd item replace entity @s weapon.mainhand with minecraft:glass_bottle
+wait 5
+cmd execute as @e[type=elementalarcana:glowmoth,limit=1,sort=nearest] run data merge entity @s {NoAI:1b}
+cmd execute as @e[type=elementalarcana:glowmoth,limit=1,sort=nearest] at @s run tp @s 300000.5 102.2 300002.5
+cmd tp @s 300000.5 101 300000.5 0 10
+wait 3
+use
+wait 10
+cmd data get entity @s SelectedItem
+cmd setblock 300003 101 300002 elementalarcana:moth_jar[element=5]
+cmd tp @s 300003.5 101.5 299999.5 0 35
+wait 20
+shot moth_jar
+cmd execute if block 300003 101 300002 elementalarcana:moth_jar run say jar set
+# 3. A skyray.
+cmd kill @e[type=elementalarcana:glowmoth]
+cmd time set noon
+cmd arcana wonders skyray
+wait 20
+cmd execute as @e[type=elementalarcana:skyray,limit=1,sort=nearest] run data get entity @s Pos
+cmd execute as @e[type=elementalarcana:skyray,limit=1,sort=nearest] run data merge entity @s {NoAI:1b}
+cmd execute as @e[type=elementalarcana:skyray,limit=1,sort=nearest] run tp @s 300000.5 109 300009.5 160 0
+cmd tp @s 300000.5 101 300000.5 0 -40
+wait 20
+shot skyray
+cmd kill @e[type=elementalarcana:skyray]
+# 4. The wake.
+cmd item replace entity @s armor.chest with minecraft:elytra
+cmd gamemode survival
+cmd effect give @s minecraft:resistance 600 4 true
+cmd effect give @s minecraft:slow_falling 1 0 true
+cmd tp @s 300000.5 160 299980.5 0 15
+wait 8
+key jump down
+wait 2
+key jump up
+wait 2
+key jump down
+wait 2
+key jump up
+wait 40
+cmd data get entity @s Pos
+cmd summon elementalarcana:skyray 300000.5 157 299992.5 {NoAI:1b,Tags:["wake"]}
+cmd tp @s 300000.5 160 299980.5 0 15
+cmd effect give @s minecraft:slow_falling 1 0 true
+wait 8
+key jump down
+wait 2
+key jump up
+wait 2
+key jump down
+wait 2
+key jump up
+wait 40
+cmd data get entity @s Pos
+shot wake
+cmd kill @e[tag=wake]
+cmd item replace entity @s armor.chest with minecraft:air
+cmd gamemode creative
+cmd effect clear @s
+cmd time set noon
+wait 20
+quit

@@ -1,0 +1,28 @@
+{
+  "parent": "elementalarcana:arcana/herbalist",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:bottled_glowmoth",
+      "components": {
+        "elementalarcana:element": "radiance"
+      }
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.glowing_company.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.glowing_company.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "glowmoth_bottled": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "glowmoth_bottled"
+      }
+    }
+  }
+}
