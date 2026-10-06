@@ -4,6 +4,7 @@ import com.chappadodle.elementalarcana.content.crypt.RevenantEntity;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.AttunementRank;
 import com.chappadodle.elementalarcana.api.CreatureMagic;
+import com.chappadodle.elementalarcana.api.MageAlly;
 import com.chappadodle.elementalarcana.content.sanctum.SovereignEntity;
 import com.chappadodle.elementalarcana.content.tower.TowerMageEntity;
 import net.minecraft.network.chat.Component;
@@ -29,7 +30,7 @@ import java.util.UUID;
  * An Archmage announces itself with a boss bar ("Zombie Archmage") for players within 32 blocks,
  * like the Wither's. The bar is purple for every element, so it doesn't give the element away. A
  * Sovereign's is its own: its name, in its element's colour, within 48 blocks, and it darkens the
- * sky.
+ * sky. A pet, or a friend (the Circle's Archmagister: MageAlly), has none.
  */
 @EventBusSubscriber(modid = ElementalArcana.MODID)
 public final class ArchmageBossBars {
@@ -70,7 +71,8 @@ public final class ArchmageBossBars {
             return;
         }
         CreatureMagic magic = Attunement.get(mob);
-        if (magic == null || magic.rank() != AttunementRank.ARCHMAGE || mob instanceof OwnableEntity pet && pet.getOwnerUUID() != null) {
+        if (magic == null || magic.rank() != AttunementRank.ARCHMAGE || mob instanceof OwnableEntity pet && pet.getOwnerUUID() != null
+                || mob instanceof MageAlly) {
             return;
         }
         ServerBossEvent bar = BARS.computeIfAbsent(mob.getUUID(), id -> create(mob, magic));

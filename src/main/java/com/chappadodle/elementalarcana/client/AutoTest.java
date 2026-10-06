@@ -112,6 +112,8 @@ import java.util.Optional;
  *                          down (searched for from where the player is, like goto)
  * find elementalarcana:arcane_lectern 80   look for that block within 80 blocks (and 60 below to
  *                          20 above); log where, and view the first from 8 blocks south, 5 up
+ * find elementalarcana:circle_heart 40 0 8 3 180 10   the same, but stand 0 east, 8 up and 3
+ *                          south of the first (from its middle), facing yaw 180, pitch 10
  * crypt gate:1 3 0 0 10    stand in a room of the nearest crypt (searched for like goto the first
  *                          time, then the same crypt for the rest of the run): the second
  *                          (index 1, default 0) rune gate; 3 blocks back from its middle, 0 up,
@@ -274,12 +276,14 @@ public final class AutoTest {
                 if (minecraft.gameMode == null) {
                     LOGGER.warn("[autotest] use: no game mode");
                 } else if (minecraft.hitResult instanceof EntityHitResult hit) {
-                    minecraft.gameMode.interact(minecraft.player, hit.getEntity(), InteractionHand.MAIN_HAND);
+                    LOGGER.info("[autotest] use: {} -> {}", hit.getEntity().getName().getString(),
+                            minecraft.gameMode.interact(minecraft.player, hit.getEntity(), InteractionHand.MAIN_HAND));
                 } else if (minecraft.hitResult instanceof BlockHitResult hit && hit.getType() == HitResult.Type.BLOCK
                         && minecraft.gameMode.useItemOn(minecraft.player, InteractionHand.MAIN_HAND, hit).consumesAction()) {
                     LOGGER.info("[autotest] use: used the block");
                 } else {
                     // Like a right click: if the block didn't take it, the item is used.
+                    LOGGER.info("[autotest] use: the item ({} under the crosshair)", minecraft.hitResult == null ? "nothing" : minecraft.hitResult.getType());
                     minecraft.gameMode.useItem(minecraft.player, InteractionHand.MAIN_HAND);
                 }
             }
@@ -615,8 +619,13 @@ public final class AutoTest {
             LOGGER.info("[autotest] find {}: {}", parts[0], found.isEmpty() ? "none" : found);
             if (!found.isEmpty()) {
                 BlockPos first = found.get(0);
-                player.teleportTo(level, first.getX() + 0.5, first.getY() + 5, first.getZ() + 8.5, 180f,
-                        (float) Math.toDegrees(Math.atan2(5 + player.getEyeHeight() - 0.5, 8)));
+                if (parts.length >= 7) {
+                    player.teleportTo(level, first.getX() + 0.5 + Double.parseDouble(parts[2]), first.getY() + Double.parseDouble(parts[3]),
+                            first.getZ() + 0.5 + Double.parseDouble(parts[4]), Float.parseFloat(parts[5]), Float.parseFloat(parts[6]));
+                } else {
+                    player.teleportTo(level, first.getX() + 0.5, first.getY() + 5, first.getZ() + 8.5, 180f,
+                            (float) Math.toDegrees(Math.atan2(5 + player.getEyeHeight() - 0.5, 8)));
+                }
             }
         });
     }

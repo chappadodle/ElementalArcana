@@ -2,6 +2,8 @@ package com.chappadodle.elementalarcana.content.mob;
 
 import com.chappadodle.elementalarcana.api.AttunementRank;
 import com.chappadodle.elementalarcana.api.Element;
+import com.chappadodle.elementalarcana.api.MageAlly;
+import com.chappadodle.elementalarcana.api.SpellTargets;
 import com.chappadodle.elementalarcana.content.Whirlpool;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -12,27 +14,35 @@ import net.minecraft.world.entity.monster.Enemy;
 
 import java.util.List;
 
-/** Water: Adepts spray a jet, Magi heal the other monsters around them, Archmages open a whirlpool under you. */
+/**
+ * Water: Adepts spray a jet, Magi heal their side around them (other monsters; for the Circle's
+ * mages, players and the other mages), Archmages open a whirlpool under you.
+ */
 public final class WaterMobSpells {
     public static final List<MobSpell> ALL = List.of(new JetBurst(), new CloseBurst(Element.WATER), new HealAllies(), new Maelstrom());
 
     private static final double HEAL_RADIUS = 8;
     private static final float HEAL_AMOUNT = 4f;
-    // Heal only when some other monster nearby is below this share of its health.
+    // Heal only when some other ally nearby is below this share of its health.
     private static final float HEAL_BELOW = 0.7f;
     // A healed creature can't be healed again (by any healer) for this long, so several Magi
-    // together still give each monster at most 4 health per 10 seconds.
+    // together still give each ally at most 4 health per 10 seconds.
     private static final int HEAL_LOCK_TICKS = 200;
     private static final String TAG_HEALED_UNTIL = "ea_mob_healed_until";
 
     private WaterMobSpells() {
     }
 
-    /** Other monsters nearby that are hurt and haven't been healed recently. Never the caster itself. */
+    /**
+     * Others on the caster's side nearby that are hurt and haven't been healed recently: other
+     * monsters for a monster; for one of the mages' allies (MageAlly), players, their pets and the
+     * other allies. Never the caster itself.
+     */
     private static List<LivingEntity> alliesToHeal(Mob caster) {
         long now = caster.level().getGameTime();
         return caster.level().getEntitiesOfClass(LivingEntity.class, caster.getBoundingBox().inflate(HEAL_RADIUS),
-                entity -> entity != caster && entity instanceof Enemy && entity.isAlive() && entity.distanceTo(caster) <= HEAL_RADIUS
+                entity -> entity != caster && (caster instanceof MageAlly ? SpellTargets.spares(caster, entity) : entity instanceof Enemy)
+                        && entity.isAlive() && !entity.isSpectator() && entity.distanceTo(caster) <= HEAL_RADIUS
                         && entity.getHealth() < entity.getMaxHealth() * HEAL_BELOW
                         && now >= entity.getPersistentData().getLong(TAG_HEALED_UNTIL));
     }

@@ -16,7 +16,8 @@ class SeekerRulesTest {
             assertEquals(SeekerRules.KINDS.get(i % SeekerRules.KINDS.size()), kind);
         }
         assertEquals("hollowed_camps", SeekerRules.next("sky_isles"));
-        assertEquals("shrines", SeekerRules.next("wisp_rings"));
+        assertEquals("enclaves", SeekerRules.next("wisp_rings"));
+        assertEquals("shrines", SeekerRules.next("enclaves"));
         assertEquals("shrines", SeekerRules.next("nonsense"));
         assertEquals("shrines", SeekerRules.known("nonsense"));
         assertEquals("crypts", SeekerRules.known("crypts"));

@@ -11,7 +11,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.level.ClipContext;
@@ -148,8 +147,9 @@ public class SpellProjectile extends ThrowableProjectile {
 
     /**
      * What the caster is aiming at: the first entity or block under their crosshair, up to 64
-     * blocks away. Held projectiles float off to the side, so they aim at this point rather than
-     * flying parallel to the caster's view.
+     * blocks away (looking past anyone their magic spares, as their spells fly through them: a pet,
+     * a mage of the Circle). Held projectiles float off to the side, so they aim at this point
+     * rather than flying parallel to the caster's view.
      */
     public static Vec3 crosshairTarget(ServerPlayer caster) {
         Vec3 eye = caster.getEyePosition();
@@ -159,7 +159,7 @@ public class SpellProjectile extends ThrowableProjectile {
         Vec3 blockHit = block.getLocation();
         EntityHitResult entity = ProjectileUtil.getEntityHitResult(caster, eye, blockHit,
                 caster.getBoundingBox().expandTowards(look.scale(AIM_RANGE)).inflate(1.0),
-                target -> !target.isSpectator() && target.isPickable(), eye.distanceToSqr(blockHit));
+                target -> !target.isSpectator() && target.isPickable() && !SpellTargets.spares(caster, target), eye.distanceToSqr(blockHit));
         return entity != null ? entity.getEntity().getBoundingBox().getCenter() : blockHit;
     }
 
@@ -379,14 +379,12 @@ public class SpellProjectile extends ThrowableProjectile {
     }
 
     // Vanilla lets a projectile hit its own shooter once it has flown clear of them (arrows shot
-    // straight up, returning boomerangs...). A spell never hits its own caster, nor their pets.
+    // straight up, returning boomerangs...). A spell never hits its own caster, nor whom their magic
+    // spares (their pets, the mages' allies: SpellTargets.spares); it flies on through them.
     @Override
     protected boolean canHitEntity(Entity target) {
         Entity owner = getOwner();
-        if (owner != null && target instanceof OwnableEntity pet && owner.getUUID().equals(pet.getOwnerUUID())) {
-            return false;
-        }
-        return super.canHitEntity(target) && target != owner && !piercedIds.contains(target.getId());
+        return super.canHitEntity(target) && target != owner && !SpellTargets.spares(owner, target) && !piercedIds.contains(target.getId());
     }
 
     @Override

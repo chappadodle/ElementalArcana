@@ -8,7 +8,8 @@
 #    reward taken (the claim sent back; the inventory logged);
 # 5: Stormcall, the Geode Sentinel and Dawnbreak cast near two husks (their cloud, crystal and sun
 #    drawn on a client that isn't the server; shots; the husks' health logged);
-# 6: herbs and a tonic; 7: the Hollowed; 8: the wonders of the wild (see those sections).
+# 6: herbs and a tonic; 7: the Hollowed; 8: the wonders of the wild; 9: the Circle (see those
+#    sections).
 hud on
 wait 40
 cmd gamemode creative
@@ -156,6 +157,16 @@ shot mp_wonders
 cmd kill @e[type=elementalarcana:glowmoth]
 cmd kill @e[type=elementalarcana:skyray]
 cmd time set noon
+# 9: the Circle: a Circle Mage (of crystal) and the Archmagister drawn on the client (their robes by
+#    the element the server sends; a shot), and the mage greeted (its line in chat, logged).
+cmd summon elementalarcana:circle_mage 166003.5 100 166000.5 {element:5b,NoAI:1b,Tags:["cm"],Rotation:[90f,0f]}
+cmd summon elementalarcana:archmagister 166006.5 100 166002.5 {NoAI:1b,Tags:["cm"],Rotation:[90f,0f]}
+cmd tp @s 166000.5 100 166000.5 -90 0
+wait 20
+shot mp_circle
+use
+wait 10
+cmd kill @e[tag=cm]
 cmd arcana tree reset
 cmd arcana affinity reset
 cmd arcana awaken fire

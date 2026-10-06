@@ -1,0 +1,23 @@
+{
+  "structures": [
+    {
+      "structure": "elementalarcana:enclave",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "elementalarcana:spread_away",
+    "spacing": 80,
+    "separation": 30,
+    "salt": 905117,
+    "keep_away": {
+      "sets": [
+        "minecraft:villages",
+        "elementalarcana:shrines",
+        "elementalarcana:mage_towers",
+        "elementalarcana:hollowed_camps"
+      ],
+      "chunk_count": 6
+    }
+  }
+}

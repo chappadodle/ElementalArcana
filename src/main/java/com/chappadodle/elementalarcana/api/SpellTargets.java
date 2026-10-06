@@ -2,6 +2,7 @@ package com.chappadodle.elementalarcana.api;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
@@ -19,8 +20,10 @@ import java.util.function.Predicate;
  * Who a spell's area effects (splash, burning ground, whirlpools, bursts) may hurt, given who cast
  * it. A player's magic spares other players (they can still be hit directly by a projectile) and
  * their own pets, a familiar's is its master's, and a monster's magic spares other monsters. The
- * caster is never affected. Also: which creature a
- * caster is aiming at.
+ * mages' allies (the Circle's mages, MageAlly) stand with players: a player's magic never touches
+ * them, and theirs touches only monsters and whatever they're fighting. The caster is never
+ * affected. Also: whom a spell spares even with a direct hit, and which creature a caster is
+ * aiming at.
  */
 public final class SpellTargets {
 
@@ -28,21 +31,38 @@ public final class SpellTargets {
     }
 
     public static boolean canAffect(@Nullable Entity owner, LivingEntity target) {
-        if (target == owner || !target.isAlive()) {
+        if (target == owner || !target.isAlive() || spares(owner, target)) {
             return false;
         }
         // A familiar's magic is its master's.
         if (owner instanceof OwnableEntity pet && pet.getOwner() instanceof Player master) {
-            return target != master && canAffect(master, target);
+            return canAffect(master, target);
         }
         if (owner instanceof Enemy) {
             return !(target instanceof Enemy);
         }
-        // A mage's magic spares their own pets (wolves, cats, horses, familiars).
-        if (owner instanceof Player player && target instanceof OwnableEntity pet && player.getUUID().equals(pet.getOwnerUUID())) {
-            return false;
+        if (owner instanceof MageAlly) {
+            return target instanceof Enemy || owner instanceof Mob mob && target == mob.getTarget();
         }
         return !(target instanceof Player);
+    }
+
+    /**
+     * Whom a spell never touches, even with a direct hit: a player's own pets and the mages' allies
+     * (a familiar's master too, and whom the master's magic spares), and for an ally's magic,
+     * players, their pets and the other allies.
+     */
+    public static boolean spares(@Nullable Entity owner, Entity target) {
+        if (owner instanceof OwnableEntity pet && pet.getOwner() instanceof Player master) {
+            return target == master || spares(master, target);
+        }
+        if (owner instanceof MageAlly) {
+            return target instanceof Player || target instanceof MageAlly || target instanceof OwnableEntity pet && pet.getOwnerUUID() != null;
+        }
+        if (owner instanceof Player player) {
+            return target instanceof MageAlly || target instanceof OwnableEntity pet && player.getUUID().equals(pet.getOwnerUUID());
+        }
+        return false;
     }
 
     /**

@@ -45,9 +45,10 @@ public class BubblePrisonSpell extends Spell {
         return CastResult.SUCCESS;
     }
 
-    /** The nearest creature the caster is looking at, in sight and trappable, or null. */
+    /** The nearest creature the caster is looking at, in sight and trappable (not one their magic spares), or null. */
     @Nullable
     private static LivingEntity targetUnderCrosshair(ServerPlayer caster) {
-        return SpellTargets.underCrosshair(caster, RANGE, AIM_LEEWAY, BubblePrisons::canTrap);
+        return SpellTargets.underCrosshair(caster, RANGE, AIM_LEEWAY,
+                target -> BubblePrisons.canTrap(target) && !SpellTargets.spares(caster, target));
     }
 }

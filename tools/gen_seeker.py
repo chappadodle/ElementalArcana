@@ -33,6 +33,7 @@ KINDS = {
     "sky_isles": [NS + "sky_isle"],
     "hollowed_camps": [NS + "hollowed_camp"],
     "wisp_rings": [NS + "wisp_ring"],
+    "enclaves": [NS + "enclave"],
 }
 
 RIM_DARK = (92, 62, 24)

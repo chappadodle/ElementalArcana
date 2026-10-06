@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.client;
 
+import com.chappadodle.elementalarcana.content.circle.ModCircle;
 import com.chappadodle.elementalarcana.content.wonder.BottledGlowmothItem;
 import com.chappadodle.elementalarcana.content.wonder.MothJarBlock;
 import com.chappadodle.elementalarcana.content.wonder.ModWonders;
@@ -391,6 +392,8 @@ public final class ArcanaClient {
         event.registerEntityRenderer(ModHollowed.HUNGER_BOLT.get(), context -> new ThrownItemRenderer<>(context, 1.25f, true));
         event.registerEntityRenderer(ModWonders.GLOWMOTH.get(), GlowmothRenderer::new);
         event.registerEntityRenderer(ModWonders.SKYRAY.get(), SkyrayRenderer::new);
+        event.registerEntityRenderer(ModCircle.CIRCLE_MAGE.get(), CircleMageRenderer::new);
+        event.registerEntityRenderer(ModCircle.ARCHMAGISTER.get(), CircleMageRenderer::new);
         for (Element element : SovereignRules.ELEMENTS) {
             event.registerEntityRenderer(ModSanctums.sovereign(element), SovereignRenderer::new);
         }

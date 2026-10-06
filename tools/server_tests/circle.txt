@@ -1,0 +1,27 @@
+# The Circle, part 1 (see its spec).
+# 1. The nearest Enclave located (/locate), by its id and by the compass's tag.
+# 2. A Circle Mage summoned beside a zombie on a stone floor high up: the mage fights it (the
+#    zombie's health logged, then again twelve seconds later, or that it has fallen).
+locate structure elementalarcana:enclave
+locate structure #elementalarcana:seekable/enclaves
+gamerule doMobSpawning false
+forceload add 0 0 15 15
+fill 0 199 0 15 199 15 minecraft:stone
+fill 0 200 0 15 206 15 minecraft:air
+summon elementalarcana:circle_mage 3 200 8 {Tags:["cm"],PersistenceRequired:1b}
+summon minecraft:zombie 9 200 8 {Tags:["cz"],PersistenceRequired:1b}
+arcana creaturelevel @e[tag=cm] set 10
+arcana creaturelevel @e[tag=cz] set 1
+sleep 1
+data get entity @e[tag=cz,limit=1] Health
+sleep 12
+data get entity @e[tag=cz,limit=1] Health
+data get entity @e[tag=cm,limit=1] Pos
+data get entity @e[tag=cz,limit=1] Pos
+execute if entity @e[tag=cz] run say zombie still standing
+execute unless entity @e[tag=cz] run say zombie fallen
+kill @e[tag=cm]
+kill @e[tag=cz]
+kill @e[type=item,x=8,y=200,z=8,distance=..12]
+fill 0 199 0 15 206 15 minecraft:air
+forceload remove all

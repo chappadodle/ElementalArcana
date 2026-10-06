@@ -30,7 +30,7 @@ final class WanderingMageTrades {
 
     static final VillagerTrades.ItemListing[] RUMOURS = {
             rumour("crypts", 14), rumour("mage_towers", 16), rumour("sky_isles", 12), rumour("drake_nests", 16), rumour("ruins", 10),
-            rumour("hollowed_camps", 12)};
+            rumour("hollowed_camps", 12), rumour("enclaves", 10)};
 
     static final VillagerTrades.ItemListing[] WARES = {
             sell(WanderingMageTrades::anyCantripScroll, 12, 2),

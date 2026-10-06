@@ -4,6 +4,7 @@ import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.ElementalReactions;
 import com.chappadodle.elementalarcana.api.SpellDamage;
+import com.chappadodle.elementalarcana.api.SpellTargets;
 import com.chappadodle.elementalarcana.content.HydroStreamOptions;
 import com.chappadodle.elementalarcana.content.spell.HydroJetSpell;
 import net.minecraft.server.level.ServerLevel;
@@ -25,7 +26,9 @@ import java.util.List;
 
 /**
  * A Water Adept's Hydro Jet: a one-second stream from the mob at its target, hitting the first
- * creature on the line five times (pushing it back and soaking it). Server-side, never saved.
+ * creature on the line five times (pushing it back and soaking it); it streams through those the
+ * mob's magic spares (SpellTargets.spares: for the Circle's mages, players and one another).
+ * Server-side, never saved.
  */
 @EventBusSubscriber(modid = ElementalArcana.MODID)
 public final class MobJet {
@@ -69,7 +72,7 @@ public final class MobJet {
         BlockHitResult block = level.clip(new ClipContext(origin, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, caster));
         Vec3 stop = block.getType() == HitResult.Type.MISS ? end : block.getLocation();
         EntityHitResult hit = ProjectileUtil.getEntityHitResult(level, caster, origin, stop, new AABB(origin, stop).inflate(1),
-                entity -> entity instanceof LivingEntity && entity != caster && entity.isAlive(), 0.3f);
+                entity -> entity instanceof LivingEntity && entity != caster && entity.isAlive() && !SpellTargets.spares(caster, entity), 0.3f);
         if (hit != null) {
             stop = hit.getEntity().getBoundingBox().inflate(0.3).clip(origin, stop).orElse(hit.getLocation());
         }

@@ -1,0 +1,103 @@
+# The Circle, part 1 (see its spec).
+# 1. The nearest Enclave (goto), from 30 blocks south and 20 up in spectator mode: its walls, Spire
+#    and courtyard (a shot); its people come when someone is near (the mage logged, a shot from the
+#    courtyard).
+# 2. A Circle Mage greeted (its line logged).
+# 3. A Fireball thrown through a mage at a husk behind it (aimed past the mage): the mage unhurt and
+#    the husk hit (their health logged), and the mages fight the husk.
+# 4. The well and the practice targets (shots); inside the Spire: the library (a shot), the study
+#    with the Archmagister (a shot; greeted: the line logged, a shot).
+# 5. A fallen mage replaced: one killed (the mages counted), a day passes on the clock, and a new
+#    one comes in at the gate (counted again, and where they all are logged).
+hud on
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd time set noon
+cmd effect clear @s
+cmd gamemode spectator
+cmd tp @s 1000000 160 1000000
+wait 40
+goto elementalarcana:enclave 34 22 4
+wait 80
+shot enclave
+cmd gamemode creative
+cmd execute at @s run tp @s ~ ~-21 ~-24 180 10
+wait 80
+cmd execute as @e[type=elementalarcana:circle_mage,distance=..60] run data get entity @s Pos
+cmd execute as @e[type=elementalarcana:archmagister,distance=..60] run data get entity @s Pos
+cmd execute as @e[type=minecraft:villager,distance=..60] run data get entity @s VillagerData.profession
+shot courtyard
+# 2. A greeting (faced feet to feet: a level look, as the tp's facing is from the feet).
+cmd gamemode survival
+cmd effect give @s minecraft:resistance 900 4 true
+cmd arcana awaken fire
+cmd arcana level set 20
+cmd execute as @e[type=elementalarcana:circle_mage,limit=1,sort=nearest] run data merge entity @s {NoAI:1b}
+cmd execute as @e[type=elementalarcana:circle_mage,limit=1,sort=nearest] at @s rotated ~ 0 run tp @p ^ ^ ^2 facing entity @s feet
+wait 10
+use
+wait 10
+use
+wait 10
+shot greeting
+# 3. A Fireball through a mage at a husk (all the mages held still till it lands).
+cmd execute as @e[type=elementalarcana:circle_mage,distance=..60] run data merge entity @s {NoAI:1b}
+cmd execute as @e[type=elementalarcana:circle_mage,limit=1,sort=nearest] run data get entity @s Health
+cmd execute as @e[type=elementalarcana:circle_mage,limit=1,sort=nearest] at @s rotated ~ 0 run summon husk ^ ^ ^-4 {Tags:["ch"],PersistenceRequired:1b,NoAI:1b}
+cmd arcana creaturelevel @e[tag=ch] set 1
+cmd arcana cooldowns reset
+cmd arcana mana fill
+wait 5
+select elementalarcana:fireball
+press
+wait 5
+release
+wait 5
+launch_one
+wait 10
+cmd data get entity @e[tag=ch,limit=1] Health
+wait 30
+cmd execute as @e[type=elementalarcana:circle_mage,limit=1,sort=nearest] run data get entity @s Health
+cmd execute as @e[type=elementalarcana:circle_mage,distance=..60] run data merge entity @s {NoAI:0b}
+cmd data merge entity @e[tag=ch,limit=1] {NoAI:0b}
+wait 100
+cmd execute if entity @e[tag=ch] run say husk still standing
+cmd kill @e[tag=ch]
+# 4. The well, the targets, the Spire and the Archmagister.
+cmd gamemode creative
+find elementalarcana:circle_heart 40 12 1 6 180 15
+wait 30
+shot well
+find elementalarcana:circle_heart 40 -9 1 0 90 5
+wait 30
+shot targets
+find elementalarcana:circle_heart 40 0 1 3 180 5
+wait 30
+shot library
+find elementalarcana:circle_heart 40 0 8 3 180 10
+wait 30
+cmd execute as @e[type=elementalarcana:archmagister,limit=1,sort=nearest] run data merge entity @s {NoAI:1b}
+cmd execute as @e[type=elementalarcana:archmagister,limit=1,sort=nearest] at @p rotated ~ 0 run tp @s ^ ^ ^2.5 facing entity @p feet
+# (the game sees where the Archmagister went a few ticks later)
+wait 10
+cmd execute as @p at @s run tp @s ~ ~ ~ facing entity @e[type=elementalarcana:archmagister,limit=1,sort=nearest] feet
+wait 20
+shot study
+cmd gamemode survival
+use
+wait 10
+shot archmagister
+# 5. One that falls is replaced, a day later.
+cmd execute as @e[type=elementalarcana:circle_mage,limit=1,sort=nearest] run kill @s
+wait 5
+cmd execute if entity @e[type=elementalarcana:circle_mage,distance=..60]
+cmd time add 24000
+wait 100
+cmd execute if entity @e[type=elementalarcana:circle_mage,distance=..60]
+cmd execute as @e[type=elementalarcana:circle_mage,distance=..60] run data get entity @s Pos
+cmd time set noon
+cmd gamemode creative
+cmd effect clear @s
+wait 10
+quit

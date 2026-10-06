@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.content;
 
+import com.chappadodle.elementalarcana.content.circle.ModCircle;
 import com.chappadodle.elementalarcana.content.world.ModWorld;
 import com.chappadodle.elementalarcana.content.wonder.ModWonders;
 import com.chappadodle.elementalarcana.content.hollowed.ModHollowed;
@@ -121,6 +122,7 @@ public final class ModTabs {
                 ModHollowed.items().forEach(item -> output.accept(item.get()));
                 ModWonders.items().forEach(stack -> output.accept(stack));
                 output.accept(ModWorld.LEY_ANCHOR_ITEM.get());
+                ModCircle.items().forEach(item -> output.accept(item.get()));
             })
             .build());
 
