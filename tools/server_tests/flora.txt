@@ -1,0 +1,86 @@
+# Arcane Flora (see its spec).
+# 1. Every herb's patch placed by command (/place feature, twice each) on a 9x9 plot of its own
+#    ground high in the air, the Moonlily's on an 11x11 pool walled in stone; then each plot's herbs
+#    counted (cleared with fill: "Successfully filled N" for every one, never "No blocks").
+# 2. Every tonic brewed: eight brewing stands, an Awkward Potion, a herb and blaze powder in each;
+#    20 seconds later each holds its tonic (its potion_contents in the output).
+# 3. Kinship's ward: two husks, one with Earth Kinship, each hit for 10 by earth magic; the kin one
+#    loses a fifth less (both healths logged). Earth, since fire magic would also set them burning;
+#    both at level 1, since creatures are born a level or two either side of their zone's.
+# The sand of the Emberbloom's plot rests on stone (it falls otherwise). Fill can only clear 32768
+# blocks at once, so the area is cleared in two halves.
+time set noon
+gamerule doMobSpawning false
+forceload add 0 0 63 63
+fill 0 196 0 31 207 63 minecraft:air
+fill 32 196 0 63 207 63 minecraft:air
+fill 2 198 2 10 198 10 minecraft:stone
+fill 2 199 2 10 199 10 minecraft:sand
+fill 14 199 2 22 199 10 minecraft:grass_block
+fill 26 199 2 34 199 10 minecraft:stone
+fill 38 199 2 46 199 10 minecraft:snow_block
+fill 2 199 14 10 199 22 minecraft:calcite
+fill 14 199 14 22 199 22 minecraft:grass_block
+fill 26 199 14 34 199 22 minecraft:grass_block
+fill 36 198 12 48 199 24 minecraft:stone
+fill 37 199 13 47 199 23 minecraft:water
+place feature elementalarcana:emberbloom_patch 6 200 6
+place feature elementalarcana:emberbloom_patch 6 200 6
+place feature elementalarcana:skyplume_patch 18 200 6
+place feature elementalarcana:skyplume_patch 18 200 6
+place feature elementalarcana:deepcap_patch 30 200 6
+place feature elementalarcana:deepcap_patch 30 200 6
+place feature elementalarcana:frostcap_patch 42 200 6
+place feature elementalarcana:frostcap_patch 42 200 6
+place feature elementalarcana:prismleaf_patch 6 200 18
+place feature elementalarcana:prismleaf_patch 6 200 18
+place feature elementalarcana:stormthistle_patch 18 200 18
+place feature elementalarcana:stormthistle_patch 18 200 18
+place feature elementalarcana:sunpetal_patch 30 200 18
+place feature elementalarcana:sunpetal_patch 30 200 18
+place feature elementalarcana:moonlily_patch 42 200 18
+place feature elementalarcana:moonlily_patch 42 200 18
+sleep 1
+fill 0 200 0 63 200 63 minecraft:air replace elementalarcana:emberbloom
+fill 0 200 0 63 200 63 minecraft:air replace elementalarcana:skyplume
+fill 0 200 0 63 200 63 minecraft:air replace elementalarcana:deepcap
+fill 0 200 0 63 200 63 minecraft:air replace elementalarcana:frostcap
+fill 0 200 0 63 200 63 minecraft:air replace elementalarcana:prismleaf
+fill 0 200 0 63 200 63 minecraft:air replace elementalarcana:stormthistle
+fill 0 200 0 63 200 63 minecraft:air replace elementalarcana:sunpetal
+fill 0 200 0 63 200 63 minecraft:air replace elementalarcana:moonlily
+setblock 2 205 40 minecraft:brewing_stand{Items:[{Slot:0b,id:"minecraft:potion",count:1,components:{"minecraft:potion_contents":{potion:"minecraft:awkward"}}},{Slot:3b,id:"elementalarcana:emberbloom",count:1},{Slot:4b,id:"minecraft:blaze_powder",count:1}]}
+setblock 5 205 40 minecraft:brewing_stand{Items:[{Slot:0b,id:"minecraft:potion",count:1,components:{"minecraft:potion_contents":{potion:"minecraft:awkward"}}},{Slot:3b,id:"elementalarcana:moonlily",count:1},{Slot:4b,id:"minecraft:blaze_powder",count:1}]}
+setblock 8 205 40 minecraft:brewing_stand{Items:[{Slot:0b,id:"minecraft:potion",count:1,components:{"minecraft:potion_contents":{potion:"minecraft:awkward"}}},{Slot:3b,id:"elementalarcana:skyplume",count:1},{Slot:4b,id:"minecraft:blaze_powder",count:1}]}
+setblock 11 205 40 minecraft:brewing_stand{Items:[{Slot:0b,id:"minecraft:potion",count:1,components:{"minecraft:potion_contents":{potion:"minecraft:awkward"}}},{Slot:3b,id:"elementalarcana:deepcap",count:1},{Slot:4b,id:"minecraft:blaze_powder",count:1}]}
+setblock 14 205 40 minecraft:brewing_stand{Items:[{Slot:0b,id:"minecraft:potion",count:1,components:{"minecraft:potion_contents":{potion:"minecraft:awkward"}}},{Slot:3b,id:"elementalarcana:frostcap",count:1},{Slot:4b,id:"minecraft:blaze_powder",count:1}]}
+setblock 17 205 40 minecraft:brewing_stand{Items:[{Slot:0b,id:"minecraft:potion",count:1,components:{"minecraft:potion_contents":{potion:"minecraft:awkward"}}},{Slot:3b,id:"elementalarcana:prismleaf",count:1},{Slot:4b,id:"minecraft:blaze_powder",count:1}]}
+setblock 20 205 40 minecraft:brewing_stand{Items:[{Slot:0b,id:"minecraft:potion",count:1,components:{"minecraft:potion_contents":{potion:"minecraft:awkward"}}},{Slot:3b,id:"elementalarcana:stormthistle",count:1},{Slot:4b,id:"minecraft:blaze_powder",count:1}]}
+setblock 23 205 40 minecraft:brewing_stand{Items:[{Slot:0b,id:"minecraft:potion",count:1,components:{"minecraft:potion_contents":{potion:"minecraft:awkward"}}},{Slot:3b,id:"elementalarcana:sunpetal",count:1},{Slot:4b,id:"minecraft:blaze_powder",count:1}]}
+fill 30 204 38 40 204 46 minecraft:stone
+summon minecraft:husk 32 205 42 {NoAI:1b,PersistenceRequired:1b,Tags:["flora_kin"]}
+summon minecraft:husk 38 205 42 {NoAI:1b,PersistenceRequired:1b,Tags:["flora_plain"]}
+arcana creaturelevel @e[tag=flora_kin] set 1
+arcana creaturelevel @e[tag=flora_plain] set 1
+effect give @e[tag=flora_kin] elementalarcana:earth_kinship 60 0
+effect give @e[tag=flora_plain] elementalarcana:fire_kinship 60 1
+sleep 1
+damage @e[tag=flora_kin,limit=1] 10 elementalarcana:earth_spell
+damage @e[tag=flora_plain,limit=1] 10 elementalarcana:earth_spell
+sleep 1
+data get entity @e[tag=flora_kin,limit=1] Health
+data get entity @e[tag=flora_plain,limit=1] Health
+sleep 22
+data get block 2 205 40 Items[0].components
+data get block 5 205 40 Items[0].components
+data get block 8 205 40 Items[0].components
+data get block 11 205 40 Items[0].components
+data get block 14 205 40 Items[0].components
+data get block 17 205 40 Items[0].components
+data get block 20 205 40 Items[0].components
+data get block 23 205 40 Items[0].components
+kill @e[tag=flora_kin]
+kill @e[tag=flora_plain]
+fill 0 196 0 31 207 63 minecraft:air
+fill 32 196 0 63 207 63 minecraft:air
+forceload remove all

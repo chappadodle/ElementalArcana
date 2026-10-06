@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.content.people;
 
+import com.chappadodle.elementalarcana.content.flora.ModFlora;
+import com.chappadodle.elementalarcana.api.Herb;
 import com.chappadodle.elementalarcana.content.Attunement;
 import com.chappadodle.elementalarcana.api.BountyRules;
 import com.chappadodle.elementalarcana.ElementalArcana;
@@ -63,12 +65,14 @@ public final class ArcanistTrades {
         // Novice
         trades.get(1).add(buy(random -> new ItemCost(ModItems.essence(anyElement(random)), 2), 1, 12, 2));
         trades.get(1).add(buy(random -> new ItemCost(Items.AMETHYST_SHARD, 4), 1, 16, 2));
+        trades.get(1).add(buy(random -> new ItemCost(ModFlora.item(anyHerb(random)), 6), 1, 16, 2));
         trades.get(1).add(sell(random -> new ItemStack(ModItems.JOURNAL.get()), 1, new ItemCost(Items.BOOK, 1), 12, 1));
         trades.get(1).add(sell(random -> ModTabs.focusOf(ModGear.APPRENTICE_WAND.get(), anyElement(random)), 4, null, 6, 3));
         // Apprentice
         trades.get(2).add(buy(random -> new ItemCost(Items.GLOWSTONE_DUST, 4), 1, 16, 5));
         trades.get(2).add(sell(random -> new ItemStack(ModItems.essence(anyElement(random))), 5, null, 8, 5));
         trades.get(2).add(sell(random -> PotionContents.createItemStack(Items.POTION, ModBrews.MANA_DRAUGHT), 2, null, 12, 5));
+        trades.get(2).add(sell(random -> PotionContents.createItemStack(Items.POTION, ModFlora.tonic(anyHerb(random))), 3, null, 8, 5));
         trades.get(2).add(sell(ArcanistTrades::anyCantripScroll, 10, new ItemCost(Items.PAPER, 1), 3, 5));
         trades.get(2).add(sell(random -> new ItemStack(oneOf(random, ModGear.APPRENTICE_HOOD.get(), ModGear.APPRENTICE_ROBE.get(),
                 ModGear.APPRENTICE_TROUSERS.get(), ModGear.APPRENTICE_BOOTS.get())), 6, null, 4, 5));
@@ -128,6 +132,10 @@ public final class ArcanistTrades {
     private static ItemStack anyCantripScroll(RandomSource random) {
         List<Spell> cantrips = ModCantrips.cantrips();
         return ModCantrips.scroll(cantrips.get(random.nextInt(cantrips.size())));
+    }
+
+    private static Herb anyHerb(RandomSource random) {
+        return Herb.values()[random.nextInt(Herb.values().length)];
     }
 
     private static Item oneOf(RandomSource random, Item... items) {

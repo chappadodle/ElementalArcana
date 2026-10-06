@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.client;
 
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.core.Direction;
 import com.chappadodle.elementalarcana.core.MagicAttachments;
 import com.chappadodle.elementalarcana.content.ModItems;
@@ -106,6 +108,8 @@ import java.util.Optional;
  *                          and 14 above its base, looking at its middle, 2 blocks above the base
  *                          (default 0); it's searched for from where the player is, and the
  *                          script waits for the search
+ * biome minecraft:desert 20   stand 20 blocks over the ground of the nearest such biome, looking
+ *                          down (searched for from where the player is, like goto)
  * find elementalarcana:arcane_lectern 80   look for that block within 80 blocks (and 60 below to
  *                          20 above); log where, and view the first from 8 blocks south, 5 up
  * crypt gate:1 3 0 0 10    stand in a room of the nearest crypt (searched for like goto the first
@@ -131,7 +135,7 @@ public final class AutoTest {
     /** Joined to a dedicated server (tools/mp_test.sh) rather than playing the test world. */
     private static final boolean MULTIPLAYER = Boolean.getBoolean("elementalarcana.autotest.multiplayer");
     /** Steps that work on the test's own (integrated) server, so can't run when joined to another. */
-    private static final java.util.Set<String> LOCAL_ONLY = java.util.Set.of("goto", "find", "crypt", "crypt_kit");
+    private static final java.util.Set<String> LOCAL_ONLY = java.util.Set.of("goto", "biome", "find", "crypt", "crypt_kit");
 
     private static List<String> steps;
     private static int index;
@@ -298,6 +302,7 @@ public final class AutoTest {
                 key.setDown(words.length > 1 && words[1].equals("down"));
             }
             case "goto" -> gotoStructure(minecraft, argument);
+            case "biome" -> gotoBiome(minecraft, argument);
             case "find" -> findBlock(minecraft, argument);
             case "crypt" -> cryptRoom(minecraft, argument);
             case "crypt_kit" -> cryptKit(minecraft, argument);
@@ -426,6 +431,41 @@ public final class AutoTest {
         float pitch = (float) Math.toDegrees(Math.atan2(height + player.getEyeHeight() - aim, distance));
         player.teleportTo(level, x, y, z, 180f, pitch);
         LOGGER.info("[autotest] goto {}: found at {} {} {}", key.location(), middle.getX(), box.minY(), middle.getZ());
+    }
+
+    /**
+     * Finds the nearest biome of a kind (like /locate biome, from where the player is) and puts the
+     * player {@code height} blocks over the ground there, looking down. Its chunk generates on the way.
+     */
+    private static void gotoBiome(Minecraft minecraft, String argument) {
+        String[] parts = argument.split("\\s+");
+        ResourceKey<Biome> key = ResourceKey.create(Registries.BIOME, ResourceLocation.parse(parts[0]));
+        double height = parts.length > 1 ? Double.parseDouble(parts[1]) : 20;
+        MinecraftServer server = minecraft.getSingleplayerServer();
+        java.util.UUID id = minecraft.player.getUUID();
+        serverBusy = true;
+        server.execute(() -> {
+            try {
+                ServerPlayer player = server.getPlayerList().getPlayer(id);
+                if (player == null) {
+                    return;
+                }
+                ServerLevel level = player.serverLevel();
+                Pair<BlockPos, Holder<Biome>> found = level.findClosestBiome3d(biome -> biome.is(key), player.blockPosition(), 6400, 32, 64);
+                if (found == null) {
+                    LOGGER.warn("[autotest] biome: no {} nearby", key.location());
+                    return;
+                }
+                BlockPos at = found.getFirst();
+                // Generated first: the height of a chunk that isn't there yet reads as the world's floor.
+                level.getChunk(at.getX() >> 4, at.getZ() >> 4);
+                int ground = level.getHeight(Heightmap.Types.MOTION_BLOCKING, at.getX(), at.getZ());
+                player.teleportTo(level, at.getX() + 0.5, ground + height, at.getZ() + 0.5, 180f, 60f);
+                LOGGER.info("[autotest] biome {}: found at {} {} {}", key.location(), at.getX(), ground, at.getZ());
+            } finally {
+                serverBusy = false;
+            }
+        });
     }
 
     /** Runs {@code task} on the server as the player; the script waits for it. */

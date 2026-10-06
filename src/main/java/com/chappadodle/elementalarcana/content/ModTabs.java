@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.content;
 
+import com.chappadodle.elementalarcana.content.flora.ModFlora;
 import com.chappadodle.elementalarcana.content.wanderer.ModWanderer;
 import com.chappadodle.elementalarcana.api.DrakeRules;
 import com.chappadodle.elementalarcana.content.drake.ModDrakes;
@@ -112,6 +113,8 @@ public final class ModTabs {
                 output.accept(ModSeeker.SEEKERS_COMPASS.get());
                 output.accept(ModMentor.SENDING_STONE.get());
                 output.accept(ModWanderer.WANDERING_MAGE_EGG.get());
+                ModFlora.herbItems().forEach(herb -> output.accept(herb));
+                ModFlora.tonics().forEach(tonic -> output.accept(PotionContents.createItemStack(Items.POTION, tonic)));
             })
             .build());
 

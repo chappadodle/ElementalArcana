@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.compat.jei;
 
+import com.chappadodle.elementalarcana.content.flora.ModFlora;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.SovereignRules;
@@ -77,6 +78,7 @@ public class ArcanaJeiPlugin implements IModPlugin {
         registration.addIngredientInfo(ModStars.STARLIT_LANTERN_ITEM.get(), info("starlit_lantern"));
         registration.addIngredientInfo(ModInfusion.ALTAR_ITEM.get(), info("infusion_altar"));
         registration.addItemStackInfo(ModCantrips.cantrips().stream().map(ModCantrips::scroll).toList(), info("cantrip_scroll"));
+        registration.addItemStackInfo(stacks(ModFlora.herbItems()), info("herb"));
     }
 
     @Override

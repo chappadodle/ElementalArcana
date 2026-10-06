@@ -1,0 +1,99 @@
+{
+  "parent": "elementalarcana:arcana/awakening",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:emberbloom"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.herbalist.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.herbalist.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "emberbloom": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "elementalarcana:emberbloom"
+          }
+        ]
+      }
+    },
+    "moonlily": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "elementalarcana:moonlily"
+          }
+        ]
+      }
+    },
+    "skyplume": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "elementalarcana:skyplume"
+          }
+        ]
+      }
+    },
+    "deepcap": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "elementalarcana:deepcap"
+          }
+        ]
+      }
+    },
+    "frostcap": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "elementalarcana:frostcap"
+          }
+        ]
+      }
+    },
+    "prismleaf": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "elementalarcana:prismleaf"
+          }
+        ]
+      }
+    },
+    "stormthistle": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "elementalarcana:stormthistle"
+          }
+        ]
+      }
+    },
+    "sunpetal": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "elementalarcana:sunpetal"
+          }
+        ]
+      }
+    }
+  }
+}

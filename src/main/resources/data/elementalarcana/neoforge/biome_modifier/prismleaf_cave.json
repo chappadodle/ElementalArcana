@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#elementalarcana:flora/prismleaf_cave",
+  "features": "elementalarcana:prismleaf_cave_patch",
+  "step": "vegetal_decoration"
+}

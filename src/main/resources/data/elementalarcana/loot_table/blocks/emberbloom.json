@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:block",
+  "random_sequence": "elementalarcana:blocks/emberbloom",
+  "pools": [
+    {
+      "rolls": 1,
+      "bonus_rolls": 0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "elementalarcana:emberbloom"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ]
+    }
+  ]
+}

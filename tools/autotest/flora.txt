@@ -1,0 +1,110 @@
+# Arcane Flora (see its spec). A garden in the air far out: the eight herbs in a row on their own
+# grounds (sand on stone, grass, stone, snow, calcite, grass, grass, and a pool for the Moonlily),
+# and the seven that pot, potted, behind them. The last run's garden is cleared before the ground is
+# laid again (a herb whose ground is replaced pops off as an item, as a flower does), and none may
+# lie about ("stray items" would be said).
+# 1. By day (a shot): the Sunpetal open, the Moonlily shut.
+# 2. At night (a shot): random ticks sped up for a few seconds so they turn: the Sunpetal shut, the
+#    Moonlily open and glowing; the glowing herbs lit. Then close up (from spectator mode, so the
+#    camera doesn't fall): the Moonlily, and the herbs with their motes.
+# 3. Kinship's power: a Smite on a fresh level-40 husk, then another after a Tonic of Dawn's Radiance
+#    Kinship (the damage logged: a fifth more).
+hud on
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd time set noon
+cmd gamemode creative
+cmd effect clear @s
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd effect give @s minecraft:resistance 900 4 true
+cmd effect give @s minecraft:saturation 900 0 true
+cmd tp @s 240000.5 151 239999.5 0 30
+wait 60
+cmd kill @e[type=!player,distance=..60]
+cmd fill 239986 151 239994 240014 158 240030 minecraft:air
+cmd fill 239986 149 239994 240014 149 240030 minecraft:stone
+cmd fill 239986 150 239994 240014 150 240030 minecraft:grass_block
+cmd setblock 239992 150 240006 minecraft:sand
+cmd setblock 239996 150 240006 minecraft:stone
+cmd setblock 239998 150 240006 minecraft:snow_block
+cmd setblock 240000 150 240006 minecraft:calcite
+cmd fill 240005 150 240005 240007 150 240007 minecraft:water
+cmd setblock 239992 151 240006 elementalarcana:emberbloom
+cmd setblock 239994 151 240006 elementalarcana:skyplume
+cmd setblock 239996 151 240006 elementalarcana:deepcap
+cmd setblock 239998 151 240006 elementalarcana:frostcap
+cmd setblock 240000 151 240006 elementalarcana:prismleaf
+cmd setblock 240002 151 240006 elementalarcana:stormthistle
+cmd setblock 240004 151 240006 elementalarcana:sunpetal
+cmd setblock 240006 151 240006 elementalarcana:moonlily
+cmd setblock 239992 151 240009 elementalarcana:potted_emberbloom
+cmd setblock 239994 151 240009 elementalarcana:potted_skyplume
+cmd setblock 239996 151 240009 elementalarcana:potted_deepcap
+cmd setblock 239998 151 240009 elementalarcana:potted_frostcap
+cmd setblock 240000 151 240009 elementalarcana:potted_prismleaf
+cmd setblock 240002 151 240009 elementalarcana:potted_stormthistle
+cmd setblock 240004 151 240009 elementalarcana:potted_sunpetal
+cmd tp @s 239999.5 151 239999.5 0 28
+wait 40
+cmd execute if entity @e[type=item,distance=..40] run say stray items
+shot garden_day
+cmd time set midnight
+cmd gamerule randomTickSpeed 200
+wait 60
+cmd gamerule randomTickSpeed 3
+wait 20
+shot garden_night
+cmd execute if block 240004 151 240006 elementalarcana:sunpetal[open=false] run say sunpetal shut
+cmd execute if block 240006 151 240006 elementalarcana:moonlily[open=true] run say moonlily open
+cmd gamemode spectator
+cmd tp @s 240006.5 153.2 240003.6 0 52
+wait 20
+shot moonlily_night
+cmd tp @s 239995.5 152.4 240003.8 0 32
+wait 20
+shot herbs_night_close
+cmd gamemode creative
+# Kinship's power.
+cmd time set noon
+cmd tp @s 240000.5 151 240018.5 0 20
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken radiance
+cmd arcana level set 40
+cmd arcana cooldowns reset
+cmd arcana mana fill
+cmd gamemode survival
+cmd title @s clear
+wait 20
+cmd summon husk 240000.5 151 240022.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b}
+cmd arcana creaturelevel @e[tag=eat] set 40
+wait 5
+cmd execute as @e[tag=eat] run data get entity @s Health
+select elementalarcana:smite
+press
+release
+wait 40
+cmd execute as @e[tag=eat] run data get entity @s Health
+cmd kill @e[tag=eat]
+cmd effect give @s elementalarcana:radiance_kinship 120 0
+cmd arcana cooldowns reset
+cmd arcana mana fill
+wait 20
+cmd summon husk 240000.5 151 240022.5 {NoAI:1b,Tags:["eat"],PersistenceRequired:1b}
+cmd arcana creaturelevel @e[tag=eat] set 40
+wait 5
+cmd execute as @e[tag=eat] run data get entity @s Health
+select elementalarcana:smite
+press
+release
+wait 40
+cmd execute as @e[tag=eat] run data get entity @s Health
+cmd kill @e[tag=eat]
+cmd arcana tree reset
+cmd arcana affinity reset
+cmd arcana awaken fire
+cmd gamemode creative
+cmd effect clear @s
+wait 10
+quit

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "open=true": {
+      "model": "elementalarcana:block/sunpetal"
+    },
+    "open=false": {
+      "model": "elementalarcana:block/sunpetal_closed"
+    }
+  }
+}

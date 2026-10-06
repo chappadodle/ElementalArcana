@@ -61,6 +61,9 @@ def any_of(criteria):
     return criteria, [list(criteria)]
 
 
+# Arcane Flora's herbs and the names of their tonics (tools/gen_flora.py).
+HERBS = ["emberbloom", "moonlily", "skyplume", "deepcap", "frostcap", "prismleaf", "stormthistle", "sunpetal"]
+TONICS = ["embers", "tides", "gales", "stone", "frost", "prisms", "storms", "dawn"]
 TICK = {"tick": {"trigger": "minecraft:tick"}}
 BLESSINGS = {name: crit for name, crit in
              ((f"{e}_blessing", {"trigger": "minecraft:effects_changed",
@@ -164,6 +167,12 @@ ADVANCEMENTS = [
     ("liquid_mana", "the_arcanist", item("minecraft:potion", potion=NS + "mana_draught"), "task", "Liquid Mana",
      "Brew a Mana Draught", {"brewed": {"trigger": "minecraft:brewed_potion",
                                         "conditions": {"potion": NS + "mana_draught"}}}, None),
+    ("herbalist", "awakening", item("emberbloom"), "task", "Herbalist",
+     "Gather an herb of every element", has(*((herb, None) for herb in HERBS)), None),
+    ("kinship", "herbalist", item("minecraft:potion", potion=NS + "tonic_of_embers"), "task", "Kinship",
+     "Brew a tonic from an herb of the elements", *any_of({
+         tonic: {"trigger": "minecraft:brewed_potion", "conditions": {"potion": NS + tonic}}
+         for tonic in (f"tonic_of_{name}" for name in TONICS)})),
     ("crypt", "awakening", item("coffin"), "task", "Into the Crypt",
      "Go down into an arcane crypt, where the first mages lie", location(NS + "crypt"), None),
     ("runebreaker", "crypt", item("runestone"), "task", "Runebreaker",

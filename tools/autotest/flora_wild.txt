@@ -1,0 +1,50 @@
+# Arcane Flora growing wild (see its spec): from far out in new land, the nearest of a biome each
+# herb grows in (the biome step), then the nearest of that herb there (the find step logs up to five
+# and views the first from 8 blocks south and 5 up): a shot of each. Deepcaps grow on cave floors, so
+# they're only looked for (logged), not shot. In spectator mode, so the camera doesn't fall.
+hud on
+cmd gamemode spectator
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd tp @s 400000 140 400000
+wait 40
+biome minecraft:desert 30
+wait 200
+find elementalarcana:emberbloom 120
+wait 40
+shot wild_emberbloom
+biome minecraft:swamp 30
+wait 200
+find elementalarcana:moonlily 120
+wait 40
+shot wild_moonlily
+biome minecraft:windswept_hills 30
+wait 200
+find elementalarcana:skyplume 120
+wait 40
+shot wild_skyplume
+find elementalarcana:deepcap 120
+biome minecraft:snowy_plains 30
+wait 200
+find elementalarcana:frostcap 120
+wait 40
+shot wild_frostcap
+biome minecraft:windswept_gravelly_hills 30
+wait 200
+find elementalarcana:prismleaf 120
+wait 40
+shot wild_prismleaf
+biome minecraft:savanna_plateau 30
+wait 200
+find elementalarcana:stormthistle 120
+wait 40
+shot wild_stormthistle
+biome minecraft:meadow 30
+wait 200
+find elementalarcana:sunpetal 120
+wait 40
+shot wild_sunpetal
+cmd gamemode creative
+wait 10
+quit

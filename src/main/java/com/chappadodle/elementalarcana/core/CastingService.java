@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.core;
 
+import com.chappadodle.elementalarcana.content.flora.Kinships;
 import com.chappadodle.elementalarcana.api.CastContext;
 import com.chappadodle.elementalarcana.api.CastResult;
 import com.chappadodle.elementalarcana.api.ConjureSpell;
@@ -124,7 +125,7 @@ public final class CastingService {
             }
         }
 
-        CastContext context = new CastContext(player, player.serverLevel(), InteractionHand.MAIN_HAND, data.spellPower(spell) * ManaWeather.powerFactor(player) * KeystoneEvents.lightFactor(player),
+        CastContext context = new CastContext(player, player.serverLevel(), InteractionHand.MAIN_HAND, castPower(player, data, spell),
                 spellLevel, data.branches(spell));
         CastResult result = spell.cast(context);
         if (!result.success()) {
@@ -151,6 +152,15 @@ public final class CastingService {
     /** Creative mode and the dev menu's free casting: no mana, no cooldowns. */
     static boolean isFree(ServerPlayer player, MagicData data) {
         return player.isCreative() || data.freeCast();
+    }
+
+    /**
+     * A cast's power: the player's spell power (Potency, Affinity, keystones), times the mana weather
+     * where they stand, the Sunborn keystone's light and Kinship with the spell's element (a tonic).
+     */
+    public static float castPower(ServerPlayer player, MagicData data, Spell spell) {
+        return data.spellPower(spell) * ManaWeather.powerFactor(player) * KeystoneEvents.lightFactor(player)
+                * Kinships.powerFactor(player, spell);
     }
 
     /**

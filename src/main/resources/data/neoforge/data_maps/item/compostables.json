@@ -1,0 +1,28 @@
+{
+  "values": {
+    "elementalarcana:emberbloom": {
+      "chance": 0.65
+    },
+    "elementalarcana:moonlily": {
+      "chance": 0.65
+    },
+    "elementalarcana:skyplume": {
+      "chance": 0.65
+    },
+    "elementalarcana:deepcap": {
+      "chance": 0.65
+    },
+    "elementalarcana:frostcap": {
+      "chance": 0.65
+    },
+    "elementalarcana:prismleaf": {
+      "chance": 0.65
+    },
+    "elementalarcana:stormthistle": {
+      "chance": 0.65
+    },
+    "elementalarcana:sunpetal": {
+      "chance": 0.65
+    }
+  }
+}

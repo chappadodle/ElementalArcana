@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#elementalarcana:flora/stormthistle",
+  "features": "elementalarcana:stormthistle_patch",
+  "step": "vegetal_decoration"
+}

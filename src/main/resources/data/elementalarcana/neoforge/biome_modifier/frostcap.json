@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#elementalarcana:flora/frostcap",
+  "features": "elementalarcana:frostcap_patch",
+  "step": "vegetal_decoration"
+}

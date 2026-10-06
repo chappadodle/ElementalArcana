@@ -1,0 +1,12 @@
+{
+  "values": [
+    "#minecraft:sand",
+    "#minecraft:terracotta",
+    "#minecraft:dirt",
+    "minecraft:netherrack",
+    "#minecraft:nylium",
+    "minecraft:soul_soil",
+    "minecraft:basalt",
+    "minecraft:blackstone"
+  ]
+}
