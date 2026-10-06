@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/the_circle",
+  "display": {
+    "icon": {
+      "id": "minecraft:bell"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.first_blood_politely.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.first_blood_politely.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "duel_won": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "duel_won"
+      }
+    }
+  }
+}

@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.core;
 
+import com.chappadodle.elementalarcana.content.circle.ModCircle;
 import com.chappadodle.elementalarcana.content.circle.Commissions;
 import com.chappadodle.elementalarcana.content.circle.Commission;
 import com.chappadodle.elementalarcana.api.CommissionRules;
@@ -167,6 +168,14 @@ public final class ArcanaCommand {
                 .then(riftOpen())
                 .then(bountyGive())
                 .then(commissionGive())
+                // For testing: how many duels the player has won (the Archmagister fights only those with three).
+                .then(Commands.literal("duels").then(Commands.argument("wins", IntegerArgumentType.integer(0)).executes(ctx -> {
+                    ServerPlayer player = ctx.getSource().getPlayerOrException();
+                    int wins = IntegerArgumentType.getInteger(ctx, "wins");
+                    player.setData(ModCircle.DUEL_WINS, wins);
+                    ctx.getSource().sendSuccess(() -> Component.literal("Duels won: " + wins), false);
+                    return wins;
+                })))
                 .then(golemSpawn())
                 .then(wildSpawn())
                 .then(cantripLearn())

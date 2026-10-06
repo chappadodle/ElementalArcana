@@ -161,6 +161,10 @@ ADVANCEMENTS = [
      "Find an Enclave of the Circle, the mages who keep the old oaths", location(NS + "enclave"), None),
     ("in_the_circles_service", "the_circle", item("mark_of_the_circle"), "task", "In the Circle's Service",
      "Hand in a commission to the Archmagister of an Enclave", magic("commission"), None),
+    ("first_blood_politely", "the_circle", item("minecraft:bell"), "task", "First Blood, Politely",
+     "Win a duel against a mage of the Circle in an Enclave's ring", magic("duel_won"), None),
+    ("the_archmagister_yields", "first_blood_politely", item("sigil_of_the_circle"), "challenge", "The Archmagister Yields",
+     "Win a duel against the Archmagister", magic("duel_won", key="archmagister"), None),
     ("the_arcanist", "awakening", item("arcane_lectern"), "task", "The Arcanist",
      "Buy something from an Arcanist, a villager who trades in magic", {
          "bought": {"trigger": "minecraft:villager_trade",

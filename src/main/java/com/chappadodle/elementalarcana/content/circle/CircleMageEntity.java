@@ -58,6 +58,7 @@ import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
@@ -76,7 +77,8 @@ import java.util.UUID;
  * The Archmagister also hands out and takes in commissions (Commissions), and, used by someone
  * sneaking, opens the Circle's stores (a vanilla merchant, CircleStores). A mage called by a Sigil
  * of the Circle has no Spire: it follows the one it serves, takes on their foes, and bows out when
- * its time is up (CircleSigilItem).
+ * its time is up (CircleSigilItem). An Enclave's mage (the Archmagister too) offered a Mark of the
+ * Circle takes it as a wager and duels for it in the Enclave's ring, once a day (Duels).
  */
 public class CircleMageEntity extends PathfinderMob implements MageAlly, Merchant {
     private static final EntityDataAccessor<Byte> ELEMENT = SynchedEntityData.defineId(CircleMageEntity.class, EntityDataSerializers.BYTE);
@@ -105,6 +107,10 @@ public class CircleMageEntity extends PathfinderMob implements MageAlly, Merchan
     @Nullable
     private MerchantOffers offers;
     private long stockedDay = -1;
+    /** The day it last fought a duel (one a day), and the ring of the bout it's promised to (or null). */
+    private long lastDuelDay = -1;
+    @Nullable
+    private BlockPos duelRing;
 
     public CircleMageEntity(EntityType<? extends CircleMageEntity> type, Level level, boolean archmagister) {
         super(type, level);
@@ -154,6 +160,84 @@ public class CircleMageEntity extends PathfinderMob implements MageAlly, Merchan
         return companion == null ? null : level().getPlayerByUUID(companion);
     }
 
+    /** Where its Enclave's ring is (the middle, where duellists stand), or null if it has no Enclave. */
+    @Nullable
+    BlockPos ring() {
+        if (home == null || companion != null) {
+            return null;
+        }
+        // The Archmagister keeps to the study: seven up from the courtyard's floor, a step north.
+        BlockPos floor = archmagister ? home.below(EnclavePiece.STOREY + 1).south() : home;
+        return floor.offset(12, 0, -12);
+    }
+
+    long lastDuelDay() {
+        return lastDuelDay;
+    }
+
+    void markDuelled(long day) {
+        lastDuelDay = day;
+    }
+
+    /** Promised to a bout: off to the ring (the Archmagister steps there at once, by magic). */
+    void goToRing(BlockPos ring) {
+        duelRing = ring;
+        restrictTo(ring, 5);
+        if (archmagister) {
+            stepInto(ring);
+        } else {
+            getNavigation().moveTo(ring.getX() + 0.5, ring.getY(), ring.getZ() + 0.5, 1.0);
+        }
+    }
+
+    /** Into the ring by magic, a few steps north of its middle: a flash where it was, and where it lands. */
+    void stepInto(BlockPos ring) {
+        flash();
+        moveTo(ring.getX() + 0.5, ring.getY(), ring.getZ() - 2.5, getYRot(), getXRot());
+        getNavigation().stop();
+        flash();
+    }
+
+    /** In a bout: {@code player} is its one foe, whatever else comes near. */
+    void fight(Player player) {
+        targetSelector.disableControlFlag(Goal.Flag.TARGET);
+        if (getTarget() != player) {
+            setTarget(player);
+        }
+    }
+
+    /** The bout over: whole again, and back to its post (the Archmagister to the study, by magic). */
+    void endDuel() {
+        duelRing = null;
+        targetSelector.enableControlFlag(Goal.Flag.TARGET);
+        setTarget(null);
+        setHealth(getMaxHealth());
+        clearFire();
+        if (home != null) {
+            restrictTo(home, archmagister ? 4 : HOME_RADIUS);
+            if (archmagister) {
+                goHome();
+            }
+        }
+    }
+
+    /** The Archmagister, back to the study by magic. */
+    private void goHome() {
+        if (home != null) {
+            flash();
+            moveTo(home.getX() + 0.5, home.getY(), home.getZ() + 0.5, getYRot(), getXRot());
+            getNavigation().stop();
+            flash();
+        }
+    }
+
+    private void flash() {
+        if (level() instanceof ServerLevel server) {
+            server.sendParticles(ParticleTypes.END_ROD, getX(), getY() + 1, getZ(), 16, 0.3, 0.6, 0.3, 0.05);
+            server.playSound(null, getX(), getY(), getZ(), SoundEvents.ILLUSIONER_MIRROR_MOVE, SoundSource.NEUTRAL, 0.8f, 1.2f);
+        }
+    }
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
@@ -166,6 +250,7 @@ public class CircleMageEntity extends PathfinderMob implements MageAlly, Merchan
         goalSelector.addGoal(1, new StandForTradeGoal());
         goalSelector.addGoal(1, new CastMobSpellGoal(this));
         goalSelector.addGoal(2, new FollowCompanionGoal());
+        goalSelector.addGoal(2, new DuelFootworkGoal());
         goalSelector.addGoal(3, new KeepDistanceGoal(this, 4, 9));
         goalSelector.addGoal(5, new MoveTowardsRestrictionGoal(this, 0.6));
         goalSelector.addGoal(8, new WaterAvoidingRandomStrollGoal(this, 0.45));
@@ -219,6 +304,10 @@ public class CircleMageEntity extends PathfinderMob implements MageAlly, Merchan
         // A new day, new stock (and new rumours), once no one's trading.
         if (offers != null && tradingPlayer == null && level().getDayTime() / 24000L != stockedDay) {
             offers = null;
+        }
+        // The Archmagister, away from the study (a bout's end missed, say) and in no bout: back there.
+        if (archmagister && home != null && tickCount % 100 == 0 && distanceToSqr(home.getCenter()) > 64 && !Duels.busy(this)) {
+            goHome();
         }
     }
 
@@ -289,7 +378,8 @@ public class CircleMageEntity extends PathfinderMob implements MageAlly, Merchan
     /**
      * Used: it greets the player, a line by their story so far. The Archmagister takes a finished
      * commission instead, and after greeting gives one (or a word on the one carried); used by
-     * someone sneaking, the Archmagister opens the Circle's stores.
+     * someone sneaking, the Archmagister opens the Circle's stores. Held out a Mark of the Circle,
+     * an Enclave's mage takes it as a duel's wager (Duels).
      */
     @Override
     protected InteractionResult mobInteract(Player player, InteractionHand hand) {
@@ -298,7 +388,10 @@ public class CircleMageEntity extends PathfinderMob implements MageAlly, Merchan
         }
         if (player instanceof ServerPlayer serverPlayer) {
             getLookControl().setLookAt(player, 30f, 30f);
-            if (archmagister && player.isSecondaryUseActive()) {
+            ItemStack held = player.getItemInHand(hand);
+            if (held.is(ModCircle.MARK.get()) && companion == null && !player.isSecondaryUseActive()) {
+                Duels.challenge(this, serverPlayer, held);
+            } else if (archmagister && player.isSecondaryUseActive()) {
                 setTradingPlayer(player);
                 openTradingScreen(player, Component.translatable("merchant.elementalarcana.circle_stores"), 0);
             } else if (!(archmagister && Commissions.handIn(this, serverPlayer))) {
@@ -414,6 +507,57 @@ public class CircleMageEntity extends PathfinderMob implements MageAlly, Merchan
         }
     }
 
+    /**
+     * In a bout: footwork that keeps to the ring (a casting mage's usual footwork circles its foe
+     * wherever that leads), to a spot a few steps from the ring's middle on the far side from the
+     * foe, give or take, now and then.
+     */
+    private final class DuelFootworkGoal extends Goal {
+        private int repath;
+
+        DuelFootworkGoal() {
+            setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+        }
+
+        @Override
+        public boolean canUse() {
+            return duelRing != null && getTarget() != null && getTarget().isAlive();
+        }
+
+        @Override
+        public boolean requiresUpdateEveryTick() {
+            return true;
+        }
+
+        @Override
+        public void start() {
+            repath = 0;
+        }
+
+        @Override
+        public void stop() {
+            getNavigation().stop();
+        }
+
+        @Override
+        public void tick() {
+            LivingEntity foe = getTarget();
+            if (foe == null || duelRing == null) {
+                return;
+            }
+            getLookControl().setLookAt(foe, 30f, 30f);
+            if (--repath > 0) {
+                return;
+            }
+            repath = 15 + getRandom().nextInt(15);
+            Vec3 middle = Vec3.atBottomCenterOf(duelRing);
+            Vec3 away = position().subtract(foe.position());
+            double angle = Math.atan2(away.z, away.x) + (getRandom().nextDouble() - 0.5) * 1.6;
+            double reach = 2.5 + getRandom().nextDouble() * 2;
+            getNavigation().moveTo(middle.x + Math.cos(angle) * reach, middle.y, middle.z + Math.sin(angle) * reach, 0.9);
+        }
+    }
+
     /** A sigil's mage keeping near the one it serves (and leaving a fight that has drawn it too far). */
     private final class FollowCompanionGoal extends Goal {
         private int repath;
@@ -495,6 +639,7 @@ public class CircleMageEntity extends PathfinderMob implements MageAlly, Merchan
             tag.putUUID("companion", companion);
             tag.putLong("leave_at", leaveAt);
         }
+        tag.putLong("last_duel_day", lastDuelDay);
         if (offers != null && !offers.isEmpty() && !level().isClientSide()) {
             tag.put("offers", MerchantOffers.CODEC.encodeStart(registryAccess().createSerializationContext(NbtOps.INSTANCE), offers).getOrThrow());
             tag.putLong("stocked_day", stockedDay);
@@ -513,6 +658,7 @@ public class CircleMageEntity extends PathfinderMob implements MageAlly, Merchan
         nameIndex = tag.contains("name") ? tag.getInt("name") : -1;
         companion = tag.hasUUID("companion") ? tag.getUUID("companion") : null;
         leaveAt = tag.getLong("leave_at");
+        lastDuelDay = tag.contains("last_duel_day") ? tag.getLong("last_duel_day") : -1;
         if (tag.contains("offers")) {
             MerchantOffers.CODEC.parse(registryAccess().createSerializationContext(NbtOps.INSTANCE), tag.get("offers"))
                     .result().ifPresent(saved -> offers = saved);

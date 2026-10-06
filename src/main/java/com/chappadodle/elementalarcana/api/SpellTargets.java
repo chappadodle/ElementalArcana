@@ -14,6 +14,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 /**
@@ -21,17 +22,31 @@ import java.util.function.Predicate;
  * it. A player's magic spares other players (they can still be hit directly by a projectile) and
  * their own pets, a familiar's is its master's, and a monster's magic spares other monsters. The
  * mages' allies (the Circle's mages, MageAlly) stand with players: a player's magic never touches
- * them, and theirs touches only monsters and whatever they're fighting. The caster is never
- * affected. Also: whom a spell spares even with a direct hit, and which creature a caster is
- * aiming at.
+ * them, and theirs touches only monsters and whatever they're fighting. Two who are fighting a duel
+ * (the Circle's) are fair game for each other, whatever else holds. The caster is never affected.
+ * Also: whom a spell spares even with a direct hit, and which creature a caster is aiming at.
  */
 public final class SpellTargets {
+
+    /** Whether two creatures are fighting a duel with each other (set by content code: the Circle's duels). */
+    private static BiPredicate<Entity, Entity> duelling = (a, b) -> false;
 
     private SpellTargets() {
     }
 
+    /** Sets who is fighting a duel with whom (the Circle's duels). */
+    public static void duels(BiPredicate<Entity, Entity> test) {
+        duelling = test;
+    }
+
     public static boolean canAffect(@Nullable Entity owner, LivingEntity target) {
-        if (target == owner || !target.isAlive() || spares(owner, target)) {
+        if (target == owner || !target.isAlive()) {
+            return false;
+        }
+        if (owner != null && duelling.test(owner, target)) {
+            return true;
+        }
+        if (spares(owner, target)) {
             return false;
         }
         // A familiar's magic is its master's.
@@ -53,6 +68,9 @@ public final class SpellTargets {
      * players, their pets and the other allies.
      */
     public static boolean spares(@Nullable Entity owner, Entity target) {
+        if (owner != null && duelling.test(owner, target)) {
+            return false;
+        }
         if (owner instanceof OwnableEntity pet && pet.getOwner() instanceof Player master) {
             return target == master || spares(master, target);
         }

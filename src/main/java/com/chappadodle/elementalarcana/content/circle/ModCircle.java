@@ -1,12 +1,13 @@
 package com.chappadodle.elementalarcana.content.circle;
 
-import net.minecraft.world.item.Rarity;
-import net.minecraft.core.component.DataComponentType;
 import com.chappadodle.elementalarcana.ElementalArcana;
+import com.mojang.serialization.Codec;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -14,20 +15,24 @@ import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * The Circle (docs/superpowers/specs/2026-10-06-the-circle-enclave-design.md): the Enclave and its
  * piece, its heart, the Circle Mages and the Archmagister; and (part 2,
  * 2026-10-06-the-circle-commissions-design.md) the commissions, the Marks of the Circle and the
- * Sigil of the Circle.
+ * Sigil of the Circle; and (part 3, 2026-10-06-the-circle-duels-design.md) the duel wins a player
+ * has.
  */
 public final class ModCircle {
     private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(ElementalArcana.MODID);
@@ -38,6 +43,12 @@ public final class ModCircle {
     private static final DeferredRegister<StructurePieceType> STRUCTURE_PIECES = DeferredRegister.create(Registries.STRUCTURE_PIECE, ElementalArcana.MODID);
     private static final DeferredRegister.DataComponents COMPONENTS =
             DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, ElementalArcana.MODID);
+    private static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES =
+            DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, ElementalArcana.MODID);
+
+    /** The duels a player has won (the Archmagister fights only those who have won three); kept through death. */
+    public static final Supplier<AttachmentType<Integer>> DUEL_WINS = ATTACHMENT_TYPES.register("duel_wins",
+            () -> AttachmentType.builder(() -> 0).serialize(Codec.INT).copyOnDeath().build());
 
     /** A Circle Commission's terms (see Commission). */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Commission>> COMMISSION =
@@ -83,7 +94,9 @@ public final class ModCircle {
         STRUCTURE_TYPES.register(modEventBus);
         STRUCTURE_PIECES.register(modEventBus);
         COMPONENTS.register(modEventBus);
+        ATTACHMENT_TYPES.register(modEventBus);
         modEventBus.addListener(ModCircle::registerAttributes);
+        Duels.init();
     }
 
     private static void registerAttributes(EntityAttributeCreationEvent event) {

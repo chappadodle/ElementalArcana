@@ -1,0 +1,26 @@
+{
+  "parent": "elementalarcana:arcana/first_blood_politely",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:sigil_of_the_circle"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.the_archmagister_yields.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.the_archmagister_yields.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "duel_won": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "duel_won",
+        "key": "archmagister"
+      }
+    }
+  }
+}

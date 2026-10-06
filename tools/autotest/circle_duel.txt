@@ -1,0 +1,136 @@
+# The Circle, part 3 (see its spec): duels, at the nearest Enclave.
+# 1. A mage (held still) offered a Mark of the Circle: it takes the wager (the marks counted); the
+#    player steps into the ring and the mage is set there; the count (a shot).
+# 2. The bout: a second of it, the mage's spells at the player (health logged); then, the mage held
+#    still, the player's Fireball at it (its health logged; a shot); a heavy blow (/damage) brings it
+#    to a fifth and it yields: whole again after (its health logged), the wager back and two marks
+#    won (counted).
+# 3. The same mage challenged again: refused (one bout a day; the marks counted).
+# 4. Another mage challenged, and held still: it can't walk to the ring, so after ten seconds it
+#    steps in by magic; the player steps out of the ring once the bout has begun: a yield, the wager
+#    kept (the marks counted).
+# 5. The Archmagister declines a player who has won one duel of the three asked (the marks counted);
+#    with three won, accepts, steps into the ring by magic (where logged); the player steps out: a
+#    yield, and the Archmagister goes back to the study by magic (where logged).
+hud on
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd time set noon
+cmd effect clear @s
+cmd gamemode spectator
+cmd tp @s 1660000 160 1660000
+wait 40
+goto elementalarcana:enclave 34 22 4
+wait 60
+cmd gamemode creative
+# Into the courtyard, so the Enclave's people come.
+find elementalarcana:circle_heart 40 0 1 10 180 0
+wait 60
+cmd gamemode survival
+cmd effect give @s minecraft:instant_health 1 5 true
+cmd effect give @s minecraft:resistance 900 3 true
+cmd arcana awaken fire
+cmd arcana level set 20
+cmd arcana duels 0
+cmd clear @s
+slot 0
+cmd item replace entity @s weapon.mainhand with elementalarcana:mark_of_the_circle 3
+# 1. The challenge.
+cmd execute as @e[type=elementalarcana:circle_mage,limit=1,sort=nearest] run data merge entity @s {NoAI:1b,Tags:["d1"]}
+# (far from spawn the land's creatures are strong: a fair fight for a level 20 player)
+cmd arcana creaturelevel @e[tag=d1] set 10
+cmd execute as @e[tag=d1] at @s rotated ~ 0 run tp @p ^ ^ ^2 facing entity @s feet
+wait 10
+use
+wait 5
+cmd execute if items entity @s container.* elementalarcana:mark_of_the_circle
+cmd data merge entity @e[tag=d1,limit=1] {NoAI:0b}
+find elementalarcana:circle_heart 40 12 1 -9 180 0
+wait 10
+cmd execute at @p run tp @e[tag=d1] ~ ~ ~-3
+wait 25
+shot duel_count
+wait 55
+# 2. The bout.
+cmd data get entity @s Health
+cmd data merge entity @e[tag=d1,limit=1] {NoAI:1b}
+wait 10
+cmd execute as @p at @s run tp @s ~ ~ ~ facing entity @e[tag=d1,limit=1] feet
+wait 3
+cmd arcana cooldowns reset
+cmd arcana mana fill
+select elementalarcana:fireball
+press
+wait 5
+release
+wait 3
+launch_one
+wait 15
+cmd data get entity @e[tag=d1,limit=1] Health
+shot duel_bout
+cmd data get entity @s Health
+cmd damage @e[tag=d1,limit=1] 1000 minecraft:player_attack by @p
+wait 5
+cmd data get entity @e[tag=d1,limit=1] Health
+cmd execute if items entity @s container.* elementalarcana:mark_of_the_circle
+cmd data merge entity @e[tag=d1,limit=1] {NoAI:0b}
+# 3. The same mage again, the same day.
+slot 0
+cmd execute as @e[tag=d1] run data merge entity @s {NoAI:1b}
+# (it was walking home: the game sees where it stopped a few ticks later)
+wait 10
+cmd execute as @e[tag=d1] at @s rotated ~ 0 run tp @p ^ ^ ^2 facing entity @s feet
+wait 10
+cmd execute as @e[tag=d1] run data get entity @s Pos
+cmd data get entity @s Pos
+shot rematch
+use
+wait 5
+cmd execute if items entity @s container.* elementalarcana:mark_of_the_circle
+cmd data merge entity @e[tag=d1,limit=1] {NoAI:0b}
+# 4. Another mage; the player steps out once the bout has begun.
+cmd execute as @e[type=elementalarcana:circle_mage,tag=!d1,limit=1,sort=nearest] run data merge entity @s {NoAI:1b,Tags:["d2"]}
+cmd execute as @e[tag=d2] at @s rotated ~ 0 run tp @p ^ ^ ^2 facing entity @s feet
+wait 10
+use
+wait 5
+cmd execute if items entity @s container.* elementalarcana:mark_of_the_circle
+find elementalarcana:circle_heart 40 12 1 -9 180 0
+wait 215
+cmd execute as @e[tag=d2] run data get entity @s Pos
+wait 75
+find elementalarcana:circle_heart 40 12 1 2 180 0
+wait 10
+cmd execute if items entity @s container.* elementalarcana:mark_of_the_circle
+cmd data merge entity @e[tag=d2,limit=1] {NoAI:0b}
+# 5. The Archmagister.
+find elementalarcana:circle_heart 40 0 8 3 180 10
+wait 30
+cmd execute as @e[type=elementalarcana:archmagister,limit=1,sort=nearest] run data merge entity @s {NoAI:1b}
+cmd execute as @e[type=elementalarcana:archmagister,limit=1,sort=nearest] at @p rotated ~ 0 run tp @s ^ ^ ^2.5 facing entity @p feet
+wait 10
+cmd execute as @p at @s run tp @s ~ ~ ~ facing entity @e[type=elementalarcana:archmagister,limit=1,sort=nearest] feet
+wait 10
+slot 0
+use
+wait 5
+cmd execute if items entity @s container.* elementalarcana:mark_of_the_circle
+cmd arcana duels 3
+use
+wait 5
+cmd execute if items entity @s container.* elementalarcana:mark_of_the_circle
+cmd execute as @e[type=elementalarcana:archmagister,limit=1,sort=nearest] run data get entity @s Pos
+find elementalarcana:circle_heart 40 12 1 -9 180 0
+wait 100
+shot duel_archmagister
+find elementalarcana:circle_heart 40 12 1 2 180 0
+wait 20
+cmd execute as @e[type=elementalarcana:archmagister,distance=..60] run data get entity @s Pos
+cmd execute as @e[type=elementalarcana:archmagister,distance=..60] run data merge entity @s {NoAI:0b}
+cmd tag @e[tag=d1] remove d1
+cmd tag @e[tag=d2] remove d2
+cmd gamemode creative
+cmd effect clear @s
+wait 10
+quit
