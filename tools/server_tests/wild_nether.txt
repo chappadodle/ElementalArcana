@@ -1,0 +1,56 @@
+# The Creatures of the Nether (see their spec).
+# 1. A Cinder Hound called by the test command: its pack comes with it (counted), Attuned to Fire
+#    (logged).
+# 2. An Ash Wraith on a floor high up: a plain blow, then one of water (drowning): the water's
+#    doubled (health logged after each).
+# 3. A hound beside an iron golem (which goes for monsters; weakened, so the hound lives to bite):
+#    it bites back and the golem burns (the golem's fire and health logged).
+# 4. A hound standing in water is hurt by it (health logged).
+gamerule doMobSpawning false
+# (the ground 20 to 40 blocks round where it's called must be loaded for it to come)
+forceload add -48 -48 63 63
+sleep 2
+execute positioned 8 200 8 run arcana wild hound
+sleep 1
+execute if entity @e[type=elementalarcana:cinder_hound]
+execute as @e[type=elementalarcana:cinder_hound,limit=1] run data get entity @s "neoforge:attachments"."elementalarcana:creature_magic"
+kill @e[type=elementalarcana:cinder_hound]
+forceload remove all
+forceload add 0 0 31 15
+fill 0 199 0 31 199 15 minecraft:stone
+fill 0 200 0 31 210 15 minecraft:air
+summon elementalarcana:ash_wraith 4 201 8 {Tags:["aw"],PersistenceRequired:1b,NoAI:1b}
+arcana creaturelevel @e[tag=aw] set 30
+sleep 1
+data get entity @e[tag=aw,limit=1] Health
+damage @e[tag=aw,limit=1] 4 minecraft:generic
+sleep 1
+data get entity @e[tag=aw,limit=1] Health
+damage @e[tag=aw,limit=1] 4 minecraft:drown
+sleep 1
+data get entity @e[tag=aw,limit=1] Health
+kill @e[tag=aw]
+summon elementalarcana:cinder_hound 10 200 8 {Tags:["ch"],PersistenceRequired:1b}
+summon minecraft:iron_golem 13 200 8 {Tags:["ig"],PersistenceRequired:1b}
+arcana creaturelevel @e[tag=ch] set 30
+# (weakened, so the hound lives long enough to bite back)
+effect give @e[tag=ig] minecraft:weakness 60 4 true
+sleep 4
+data get entity @e[tag=ig,limit=1] Fire
+sleep 4
+data get entity @e[tag=ig,limit=1] Health
+execute if entity @e[tag=ch] run say hound still standing
+kill @e[tag=ch]
+kill @e[tag=ig]
+summon elementalarcana:cinder_hound 20 200 8 {Tags:["cw"],PersistenceRequired:1b,NoAI:1b}
+arcana creaturelevel @e[tag=cw] set 30
+sleep 1
+data get entity @e[tag=cw,limit=1] Health
+setblock 20 200 8 minecraft:water
+sleep 4
+data get entity @e[tag=cw,limit=1] Health
+kill @e[tag=cw]
+kill @e[type=item,x=16,y=200,z=8,distance=..24]
+kill @e[type=experience_orb,x=16,y=200,z=8,distance=..24]
+fill 0 199 0 31 210 15 minecraft:air
+forceload remove all

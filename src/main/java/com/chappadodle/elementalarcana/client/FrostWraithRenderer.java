@@ -13,12 +13,12 @@ import net.minecraft.resources.ResourceLocation;
  * Draws a Frost Wraith half seen (its texture is translucent, FrostWraithModel), with a faint glow
  * of its own and cold blue eyes burning in its hood. It casts no shadow.
  */
-public class FrostWraithRenderer extends MobRenderer<FrostWraithEntity, FrostWraithModel> {
+public class FrostWraithRenderer extends MobRenderer<FrostWraithEntity, FrostWraithModel<FrostWraithEntity>> {
     private static final ResourceLocation TEXTURE = ElementalArcana.id("textures/entity/wild/frost_wraith.png");
     private static final RenderType EYES = RenderType.eyes(ElementalArcana.id("textures/entity/wild/frost_wraith_eyes.png"));
 
     public FrostWraithRenderer(EntityRendererProvider.Context context) {
-        super(context, new FrostWraithModel(context.bakeLayer(FrostWraithModel.LAYER)), 0f);
+        super(context, new FrostWraithModel<>(context.bakeLayer(FrostWraithModel.LAYER)), 0f);
         addLayer(new EyesLayer<>(this) {
             @Override
             public RenderType renderType() {

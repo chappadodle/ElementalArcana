@@ -25,7 +25,7 @@ DRAKE_ELEMENTS = ("fire", "water", "wind", "ice", "lightning")
 WILD_CHARMS = ("heartwood_talisman", "wraithsilk_veil", "salamander_charm", "plume_of_the_gale", "crawlers_prism",
                "bog_pearl_charm")
 # Charms from elsewhere: the Hollowed's Hungerward, the Cinder Forges' Forgefire Charm.
-OTHER_CHARMS = ("hungerward_charm", "forgefire_charm")
+OTHER_CHARMS = ("hungerward_charm", "forgefire_charm", "ashen_shroud", "houndstooth_charm")
 RELICS = ("ember_heart", "tidecallers_pearl", "rimeheart_locket", "feather_of_the_gale", "stoneheart_idol",
           "prism_of_the_deep", "storm_sigil", "sunstone", "revenants_phylactery")
 

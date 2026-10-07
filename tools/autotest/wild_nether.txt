@@ -1,0 +1,47 @@
+# The Creatures of the Nether (see their spec), in the Nether.
+# 1. An Ash Wraith and a Cinder Hound on a floor of soul soil, held still (a shot).
+# 2. The Ashen Shroud: a skeleton near the player, the shroud carried: no arrows (health logged
+#    after five seconds); the shroud put away: arrows (health logged).
+# 3. The Houndstooth Charm carried in the Nether: the player's speed (logged), and without it.
+hud on
+cmd gamemode creative
+cmd execute in minecraft:the_nether run tp @s 600.5 100 610.5 180 10
+wait 60
+cmd fill 594 99 594 612 99 616 minecraft:soul_soil
+cmd fill 594 100 594 612 108 616 minecraft:air
+cmd kill @e[type=!player,distance=..40]
+cmd summon elementalarcana:ash_wraith 602 101.5 603 {NoAI:1b,Tags:["nw"]}
+cmd summon elementalarcana:cinder_hound 598 100 604 {NoAI:1b,Tags:["nw"]}
+cmd tp @s 600.5 100 610.5 180 8
+wait 30
+shot nether_creatures
+cmd kill @e[tag=nw]
+# 2. The Ashen Shroud.
+cmd gamemode survival
+cmd effect give @s minecraft:instant_health 1 5 true
+cmd effect give @s minecraft:resistance 900 1 true
+cmd clear @s
+slot 0
+cmd item replace entity @s hotbar.8 with elementalarcana:ashen_shroud
+cmd summon minecraft:skeleton 600.5 100 602.5 {Tags:["sk"],PersistenceRequired:1b}
+wait 100
+cmd data get entity @s Health
+cmd execute if entity @e[type=arrow,distance=..20]
+cmd clear @s elementalarcana:ashen_shroud
+cmd kill @e[type=arrow]
+wait 100
+cmd data get entity @s Health
+cmd execute if entity @e[type=arrow,distance=..20]
+cmd kill @e[tag=sk]
+cmd kill @e[type=arrow]
+# 3. The Houndstooth Charm.
+cmd item replace entity @s hotbar.8 with elementalarcana:houndstooth_charm
+wait 20
+cmd attribute @s minecraft:generic.movement_speed get
+cmd clear @s elementalarcana:houndstooth_charm
+wait 20
+cmd attribute @s minecraft:generic.movement_speed get
+cmd gamemode creative
+cmd effect clear @s
+wait 10
+quit

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " C ",
+    "FGF",
+    " F "
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:chain"
+    },
+    "F": {
+      "item": "elementalarcana:cinder_fang"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    }
+  },
+  "result": {
+    "id": "elementalarcana:houndstooth_charm",
+    "count": 1
+  }
+}

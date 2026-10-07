@@ -1,7 +1,7 @@
 package com.chappadodle.elementalarcana.client;
 
+import net.minecraft.world.entity.Mob;
 import com.chappadodle.elementalarcana.ElementalArcana;
-import com.chappadodle.elementalarcana.content.wild.FrostWraithEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;
@@ -20,9 +20,10 @@ import net.minecraft.util.Mth;
  * A Frost Wraith (64x64 texture, tools/gen_wild.py): a hooded head with a dark face, a narrow body,
  * a robe widening below the waist and trailing off into ragged tatters, and two long sleeves with
  * no hands. Drawn translucent. It bobs as it floats, its tatters and sleeves stream behind it, and
- * it reaches out with both sleeves when it attacks.
+ * it reaches out with both sleeves when it attacks. Any wraith wears it (the Ash Wraith too, in its
+ * own skin).
  */
-public class FrostWraithModel extends EntityModel<FrostWraithEntity> {
+public class FrostWraithModel<T extends Mob> extends EntityModel<T> {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(ElementalArcana.id("frost_wraith"), "main");
 
     private final ModelPart root;
@@ -65,12 +66,12 @@ public class FrostWraithModel extends EntityModel<FrostWraithEntity> {
     }
 
     @Override
-    public void prepareMobModel(FrostWraithEntity wraith, float limbSwing, float limbSwingAmount, float partialTick) {
+    public void prepareMobModel(T wraith, float limbSwing, float limbSwingAmount, float partialTick) {
         attack = wraith.getAttackAnim(partialTick);
     }
 
     @Override
-    public void setupAnim(FrostWraithEntity wraith, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void setupAnim(T wraith, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         float bob = Mth.sin(ageInTicks * 0.1f) * 1.2f;
         root.y = -4 + bob;
         head.yRot = netHeadYaw * Mth.DEG_TO_RAD;

@@ -66,6 +66,8 @@ A magic mod that turns Minecraft into a fantasy adventure, for **NeoForge 1.21.1
 
 **Tempering.** Every Cinder Forge's dais holds an **Ember Anvil** (and you can make one: an anvil, an Ember Core, two polished blackstone and three magma blocks). Use it holding a wand, a staff or a piece of a mage's robe, with an Ember Core and five levels of experience to spend, and the piece is tempered: each of its stats grows by one, up to three tempers (an Adept Staff of Fire tempered three times gives Potency +7, Focus +5, Fire Affinity +9). The forges' storerooms hold a spare Ember Core now and then.
 
+**Creatures of the Nether.** **Ash Wraiths**, kin of the frost wraiths in ash-grey and soul fire, drift over the soul sand valleys: they circle you casting fire spells, and once you burn, their touch withers you; water and ice tear them. **Cinder Hounds** hunt the hot wastes in packs of two to four: they run you down and leap, their bite sets you alight, and hurting one brings the pack; water and rain hurt them. Their trophies: the **Ashen Shroud** (Soul Ash round a Phantom Membrane; carried, the undead don't notice you unless you strike them first) and the **Houndstooth Charm** (Cinder Fangs and gold on a chain; carried, you run a sixth faster in the Nether).
+
 **Arcanists.** A villager profession for magic, in purple robes and a wide-brimmed hat. Its workstation is the **Arcane Lectern** (a lectern, an amethyst shard and two Essence, shapeless). Any unemployed villager near one takes the job, and about one village in three already has an Arcanist's cottage. Arcanists buy Essence and amethyst. They sell the Journal, wands and staves, robes, Essence of any element and Catalysts. Only they sell two rarities: the **Scroll of Unbinding** (Expert), which gives back every skill tree node you bought for free, and the **Tome of Insight** (Master), worth one bonus tree point.
 
 **Bounties.** Arcanists also post bounties: among their trades, a **Bounty Contract** for an emerald. Each asks one thing, harder at higher trade levels: slay creatures Attuned to an element (5 to 8), defeat wisps (3 to 5), slay a Magus, close a rift, or slay an Archmage. Carry it and it counts what you do (its tooltip shows how far along it is, and it glints once it's done); right-click any Arcane Lectern with a finished one for its reward: emeralds and experience, with Essence, Wisp Motes, a Tome of Insight, a Catalyst or a Scroll of Unbinding depending on the task.
@@ -222,6 +224,7 @@ python3 tools/gen_wonders.py    # the glowmoths', skyrays' and Moth Jar's art an
 python3 tools/gen_anchors.py    # the Ley Anchor's art, model, loot and recipe
 python3 tools/gen_circle.py     # the Circle's robes, the Enclave's data and library chest
 python3 tools/gen_forge.py      # the Forgewarden's skin, the forge's items, structure, loot and recipe
+python3 tools/gen_nether.py     # the Ash Wraith's and the Cinder Hound's skins, their trophies, loot and lands
 python3 tools/gen_pouch.py      # the Charm Pouch's icons, screen, recipe and the charms tag; needs numpy and Pillow
 python3 tools/gen_seeker.py     # the Seeker's Compass's 32 frames and model, its recipe, the seekable structure tags; needs numpy and Pillow
 python3 tools/gen_mentor.py     # the Sending Stone's icon and recipe, and Caelith's words for each chapter; needs numpy and Pillow

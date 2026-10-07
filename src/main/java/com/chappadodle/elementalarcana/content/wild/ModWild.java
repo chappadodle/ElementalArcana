@@ -52,6 +52,14 @@ public final class ModWild {
             () -> EntityType.Builder.of(BogLurkerEntity::new, MobCategory.MONSTER).sized(1.4f, 0.7f).eyeHeight(0.6f)
                     .clientTrackingRange(8).build(ElementalArcana.MODID + ":bog_lurker"));
 
+    // Creatures of the Nether (docs/superpowers/specs/2026-10-07-nether-creatures-design.md).
+    public static final DeferredHolder<EntityType<?>, EntityType<AshWraithEntity>> ASH_WRAITH = ENTITY_TYPES.register("ash_wraith",
+            () -> EntityType.Builder.of(AshWraithEntity::new, MobCategory.MONSTER).sized(0.7f, 2.2f).eyeHeight(1.95f).fireImmune()
+                    .clientTrackingRange(8).build(ElementalArcana.MODID + ":ash_wraith"));
+    public static final DeferredHolder<EntityType<?>, EntityType<CinderHoundEntity>> CINDER_HOUND = ENTITY_TYPES.register("cinder_hound",
+            () -> EntityType.Builder.of(CinderHoundEntity::new, MobCategory.MONSTER).sized(0.7f, 1.0f).eyeHeight(0.8f).fireImmune()
+                    .clientTrackingRange(8).build(ElementalArcana.MODID + ":cinder_hound"));
+
     public static final DeferredItem<DeferredSpawnEggItem> TREANT_EGG = ITEMS.register("thornwood_treant_spawn_egg",
             () -> new DeferredSpawnEggItem(TREANT, 0x5A3F24, 0x4E8A2E, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> FROST_WRAITH_EGG = ITEMS.register("frost_wraith_spawn_egg",
@@ -74,6 +82,13 @@ public final class ModWild {
     public static final DeferredItem<Item> HARPY_PLUME = ITEMS.register("harpy_plume", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
     public static final DeferredItem<Item> PRISM_CORE = ITEMS.register("prism_core", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
     public static final DeferredItem<Item> BOG_PEARL = ITEMS.register("bog_pearl", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
+    public static final DeferredItem<DeferredSpawnEggItem> ASH_WRAITH_EGG = ITEMS.register("ash_wraith_spawn_egg",
+            () -> new DeferredSpawnEggItem(ASH_WRAITH, 0x5E5C64, 0x50E2FF, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> CINDER_HOUND_EGG = ITEMS.register("cinder_hound_spawn_egg",
+            () -> new DeferredSpawnEggItem(CINDER_HOUND, 0x322C2E, 0xFF7A20, new Item.Properties()));
+    public static final DeferredItem<Item> SOUL_ASH = ITEMS.register("soul_ash", () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
+    public static final DeferredItem<Item> CINDER_FANG = ITEMS.register("cinder_fang",
+            () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON).fireResistant()));
 
     /** Trophies of the Wild (docs/superpowers/specs/2026-10-04-wild-trophies-design.md): each creature's trick, carried. */
     public static final DeferredItem<WildCharmItem> HEARTWOOD_TALISMAN = ITEMS.register("heartwood_talisman",
@@ -89,6 +104,12 @@ public final class ModWild {
             () -> new WildCharmItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
     public static final DeferredItem<WildCharmItem> PEARL_CHARM = ITEMS.register("bog_pearl_charm",
             () -> new WildCharmItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+
+    // The Creatures of the Nether's trophies (NetherCharms).
+    public static final DeferredItem<WildCharmItem> ASHEN_SHROUD = ITEMS.register("ashen_shroud",
+            () -> new WildCharmItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    public static final DeferredItem<WildCharmItem> HOUNDSTOOTH_CHARM = ITEMS.register("houndstooth_charm",
+            () -> new WildCharmItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE).fireResistant()));
 
     /** Lava cooled under a Salamander Charm's bearer; it melts back on its own. */
     public static final DeferredBlock<LavaCrustBlock> LAVA_CRUST = BLOCKS.register("lava_crust", () -> new LavaCrustBlock(
@@ -117,12 +138,14 @@ public final class ModWild {
         event.put(HARPY.get(), HarpyEntity.createAttributes().build());
         event.put(CRAWLER.get(), CrystalCrawlerEntity.createAttributes().build());
         event.put(LURKER.get(), BogLurkerEntity.createAttributes().build());
+        event.put(ASH_WRAITH.get(), AshWraithEntity.createAttributes().build());
+        event.put(CINDER_HOUND.get(), CinderHoundEntity.createAttributes().build());
     }
 
     /** For the creative tab: the eggs, the materials, then the charms they make. */
     public static List<DeferredItem<? extends Item>> items() {
         return List.of(TREANT_EGG, FROST_WRAITH_EGG, SALAMANDER_EGG, HARPY_EGG, CRAWLER_EGG, LURKER_EGG, HEARTWOOD, WRAITH_SILK,
                 SALAMANDER_SCALE, HARPY_PLUME, PRISM_CORE, BOG_PEARL, HEARTWOOD_TALISMAN, WRAITHSILK_VEIL, SALAMANDER_CHARM,
-                PLUME_CHARM, PRISM_CHARM, PEARL_CHARM);
+                PLUME_CHARM, PRISM_CHARM, PEARL_CHARM, ASH_WRAITH_EGG, CINDER_HOUND_EGG, SOUL_ASH, CINDER_FANG, ASHEN_SHROUD, HOUNDSTOOTH_CHARM);
     }
 }

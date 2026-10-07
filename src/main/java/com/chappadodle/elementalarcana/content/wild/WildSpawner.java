@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.content.wild;
 
+import com.chappadodle.elementalarcana.api.NetherCreatureRules;
 import com.chappadodle.elementalarcana.core.ArcanaServerConfig;
 import com.chappadodle.elementalarcana.api.ConfigRates;
 import com.chappadodle.elementalarcana.ElementalArcana;
@@ -44,6 +45,8 @@ public final class WildSpawner {
     public static final TagKey<Biome> SALAMANDER_LANDS = TagKey.create(Registries.BIOME, ElementalArcana.id("wild/salamander"));
     public static final TagKey<Biome> HARPY_LANDS = TagKey.create(Registries.BIOME, ElementalArcana.id("wild/gale_harpy"));
     public static final TagKey<Biome> LURKER_LANDS = TagKey.create(Registries.BIOME, ElementalArcana.id("wild/bog_lurker"));
+    public static final TagKey<Biome> ASH_WRAITH_LANDS = TagKey.create(Registries.BIOME, ElementalArcana.id("wild/ash_wraith"));
+    public static final TagKey<Biome> HOUND_LANDS = TagKey.create(Registries.BIOME, ElementalArcana.id("wild/cinder_hound"));
     /** A wild creature's chance at the server's rate for them. */
     private static double wild(float chance) {
         return ConfigRates.scaled(chance, ArcanaServerConfig.WILD_CREATURES.get());
@@ -53,7 +56,7 @@ public final class WildSpawner {
 
     /** Every kind, for the spawner and the test command. */
     public enum Kind {
-        TREANT, WRAITH, SALAMANDER, HARPY, CRAWLER, LURKER
+        TREANT, WRAITH, SALAMANDER, HARPY, CRAWLER, LURKER, ASH_WRAITH, HOUND
     }
 
     private WildSpawner() {
@@ -87,6 +90,14 @@ public final class WildSpawner {
                 trySpawn(level, Kind.LURKER, player.position(), random, false);
             }
         }
+        if (level.dimension() == Level.NETHER) {
+            if (random.nextFloat() < wild(NetherCreatureRules.ASH_WRAITH_CHANCE)) {
+                trySpawn(level, Kind.ASH_WRAITH, player.position(), random, false);
+            }
+            if (random.nextFloat() < wild(NetherCreatureRules.HOUND_CHANCE)) {
+                trySpawn(level, Kind.HOUND, player.position(), random, false);
+            }
+        }
         if ((level.dimension() == Level.OVERWORLD || level.dimension() == Level.NETHER) && random.nextFloat() < wild(WildRules.SALAMANDER_CHANCE)) {
             trySpawn(level, Kind.SALAMANDER, player.position(), random, false);
         }
@@ -117,15 +128,30 @@ public final class WildSpawner {
             }
             BlockPos at = switch (kind) {
                 case WRAITH -> pos.above(3 + random.nextInt(3));
+                case ASH_WRAITH -> pos.above(2 + random.nextInt(2));
                 case HARPY -> pos.above(10 + random.nextInt(7));
                 default -> pos;
             };
             Mob mob = type(kind).spawn(level, at, forced ? MobSpawnType.COMMAND : MobSpawnType.NATURAL);
             if (mob != null) {
+                if (kind == Kind.HOUND) {
+                    packMates(level, at, random, forced);
+                }
                 return mob;
             }
         }
         return null;
+    }
+
+    /** A hound's pack: one to three more, close by (where there's room). */
+    private static void packMates(ServerLevel level, BlockPos first, RandomSource random, boolean forced) {
+        int more = NetherCreatureRules.packSize(random.nextDouble()) - 1;
+        for (int i = 0, tries = 0; i < more && tries < 12; tries++) {
+            BlockPos pos = place(level, Kind.HOUND, first.getX() + random.nextInt(5) - 2, first.getY(), first.getZ() + random.nextInt(5) - 2);
+            if (pos != null && type(Kind.HOUND).spawn(level, pos, forced ? MobSpawnType.COMMAND : MobSpawnType.NATURAL) != null) {
+                i++;
+            }
+        }
     }
 
     public static EntityType<? extends Mob> type(Kind kind) {
@@ -136,6 +162,8 @@ public final class WildSpawner {
             case HARPY -> ModWild.HARPY.get();
             case CRAWLER -> ModWild.CRAWLER.get();
             case LURKER -> ModWild.LURKER.get();
+            case ASH_WRAITH -> ModWild.ASH_WRAITH.get();
+            case HOUND -> ModWild.CINDER_HOUND.get();
         };
     }
 
@@ -146,6 +174,8 @@ public final class WildSpawner {
             case SALAMANDER -> level.getBiome(pos).is(SALAMANDER_LANDS);
             case HARPY -> level.getBiome(pos).is(HARPY_LANDS);
             case LURKER -> level.getBiome(pos).is(LURKER_LANDS);
+            case ASH_WRAITH -> level.getBiome(pos).is(ASH_WRAITH_LANDS);
+            case HOUND -> level.getBiome(pos).is(HOUND_LANDS);
             // Deep in the dark: under the crawler's height and out of the light.
             case CRAWLER -> pos.getY() < WildRules.CRAWLER_MAX_Y && level.getBrightness(LightLayer.SKY, pos) == 0
                     && level.getBrightness(LightLayer.BLOCK, pos) <= 7;
@@ -191,7 +221,8 @@ public final class WildSpawner {
         int height = switch (kind) {
             case TREANT -> 3;
             case WRAITH, HARPY -> 5;
-            case SALAMANDER, CRAWLER, LURKER -> 1;
+            case ASH_WRAITH -> 4;
+            case SALAMANDER, CRAWLER, LURKER, HOUND -> 1;
         };
         for (BlockPos p : BlockPos.betweenClosed(pos.offset(-radius, 0, -radius), pos.offset(radius, height - 1, radius))) {
             BlockState state = level.getBlockState(p);

@@ -407,6 +407,8 @@ public final class ArcanaClient {
         }
         event.registerEntityRenderer(ModWild.TREANT.get(), TreantRenderer::new);
         event.registerEntityRenderer(ModWild.FROST_WRAITH.get(), FrostWraithRenderer::new);
+        event.registerEntityRenderer(ModWild.ASH_WRAITH.get(), AshWraithRenderer::new);
+        event.registerEntityRenderer(ModWild.CINDER_HOUND.get(), CinderHoundRenderer::new);
         event.registerEntityRenderer(ModWild.SALAMANDER.get(), SalamanderRenderer::new);
         event.registerEntityRenderer(ModWild.HARPY.get(), HarpyRenderer::new);
         event.registerEntityRenderer(ModWild.CRAWLER.get(), CrystalCrawlerRenderer::new);
@@ -424,6 +426,7 @@ public final class ArcanaClient {
         event.registerLayerDefinition(DrakeModel.LAYER, DrakeModel::createLayer);
         event.registerLayerDefinition(TreantModel.LAYER, TreantModel::createLayer);
         event.registerLayerDefinition(FrostWraithModel.LAYER, FrostWraithModel::createLayer);
+        event.registerLayerDefinition(CinderHoundModel.LAYER, CinderHoundModel::createLayer);
         event.registerLayerDefinition(SalamanderModel.LAYER, SalamanderModel::createLayer);
         event.registerLayerDefinition(HarpyModel.LAYER, HarpyModel::createLayer);
         event.registerLayerDefinition(CrystalCrawlerModel.LAYER, CrystalCrawlerModel::createLayer);
