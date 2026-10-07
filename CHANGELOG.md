@@ -1,5 +1,50 @@
 # Changelog
 
+## 0.11.0 — the Ember Reaches — 2026-10-07
+
+The Nether gets its own magic.
+
+### Cinder Forges
+
+- **The forges**: the first mages' smithies in the nether wastes, carved out of the netherrack over
+  the lava sea: a vaulted hall of blackstone, a ring of lava round an anvil on a dais, the forge's
+  tools, storerooms behind iron bars, tunnels out to the caves. The Seeker's Compass finds them in
+  the Nether.
+- **The Forgewarden**, the forge's keeper, wakes when you come near: a construct of blackstone and
+  magma nearly twice a golem's size that slams the floor, hurls magma at those who keep their
+  distance, vents fire all round it and turns molten at half its strength. Fire and lava don't touch
+  it; water and ice hurt it most.
+- **Ember Cores** it leaves make the **Forgefire Charm** (fire and lava harm you a third less, and you
+  burn out twice as fast) and burn in a furnace as long as a bucket of lava.
+
+### Tempering
+
+- Every forge's dais holds an **Ember Anvil** (and you can make one with an Ember Core). Use it with a
+  wand, a staff or a piece of a mage's robe, an Ember Core and five levels of experience: the piece
+  is tempered, each of its stats one higher, up to three tempers.
+
+### Creatures of the Nether
+
+- **Ash Wraiths** drift over the soul sand valleys, casting fire spells; once you burn, their touch
+  withers you. Water and ice tear them. Their Soul Ash makes the **Ashen Shroud**: carried, the
+  undead don't notice you unless you strike them first.
+- **Cinder Hounds** hunt the hot wastes in packs of two to four; their bite burns, and hurting one
+  brings the pack. Their fangs make the **Houndstooth Charm**: carried, you run a sixth faster in the
+  Nether.
+
+### Caelith's tale
+
+- Two new chapters between the Hollowed and the seals: **The Ones Who Stayed** (find an Enclave of
+  the Circle) and **Where Fire Was Worked** (find a Cinder Forge in the Nether). The tale now has 17
+  chapters.
+- A player's place in the tale is saved by chapter, so new chapters never move anyone; worlds from
+  0.9 and 0.10 keep their place.
+
+### Changes
+
+- The Charm Pouch now takes the Hungerward Charm.
+- JEI info pages for the Circle's and the Ember Reaches' items.
+
 ## 0.10.0 — the Circle — 2026-10-06
 
 ### The Circle

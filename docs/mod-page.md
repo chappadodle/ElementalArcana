@@ -24,7 +24,8 @@ Magic sleeps in everyone. One day, it wakes in you.
 - **Elements react.** Melt, Vaporize, Freeze, Swirl, Crystallize: soak a foe, then freeze it solid.
 - **Gear and treasures.** Wands and staves up to an Archmage's, robes, relics of the first mages,
   charms from drakes and wild creatures (and a pouch to carry them in), Arcane Infusion for your
-  weapons, brews, and everyday cantrips: a light, a way home, a mend.
+  weapons, tempering at the Nether's Ember Anvils, brews, and everyday cantrips: a light, a way
+  home, a mend.
 - **Herbs of the elements.** Emberblooms, moonlilies, skyplumes, deepcaps, frostcaps, prismleaves,
   stormthistles and sunpetals grow where their element runs strong, glowing a little. Brew them
   into tonics of Kinship: an element's spells stronger, its magic softer on you.
@@ -34,11 +35,13 @@ Magic sleeps in everyone. One day, it wakes in you.
 - **Places to find:** elemental shrines joined by ley lines you can walk, ruins with the old story
   in their books, crypts sealed with rune gates where the first mages lie, mage towers and their
   Magisters, the four Sovereigns' sanctums, sky isles floating high over the land, drake nests on the
-  heights, wisp rings where the wisps dance at night. A Seeker's Compass points the way, and Ley
-  Anchors you make bring the ley lines home.
+  heights, wisp rings where the wisps dance at night, and in the Nether, the Cinder Forges of the
+  first mages' smiths. A Seeker's Compass points the way, and Ley Anchors you make bring the ley
+  lines home.
 - **Things to fight:** wisps, golems, Attuned creatures that cast spells of their own, elemental
   rifts that tear open at night, Revenants, Magisters, Sovereigns, Elemental Drakes, and the
-  Creatures of the Wild: treants, frost wraiths, salamanders, harpies, crystal crawlers, bog lurkers.
+  Creatures of the Wild: treants, frost wraiths, salamanders, harpies, crystal crawlers, bog lurkers;
+  in the Nether, the Forgewarden, Ash Wraiths and packs of Cinder Hounds.
   And the Hollowed, a cult that eats your mana, camped round dark obelisks and out hunting at dusk.
 - **Living world:** stars fall at night and leave fragments to find; mana tides swell every few
   nights; Arcanist villagers trade in magic and post bounties; wandering mages sell rumours; glowmoths
@@ -55,8 +58,9 @@ Magic sleeps in everyone. One day, it wakes in you.
 ## A story to follow
 
 When your magic wakes, a stone in your pack begins to hum. Through it speaks Caelith, who carried a
-key into the Hollow long ago and never came back. Fifteen chapters lead you from your first shrine
-to the Hollow itself, and the old story unfolds as you go.
+key into the Hollow long ago and never came back. Seventeen chapters lead you from your first shrine,
+by way of the Circle's Enclaves and the Nether's forges, to the Hollow itself, and the old story
+unfolds as you go.
 
 ## For servers and modpacks
 
