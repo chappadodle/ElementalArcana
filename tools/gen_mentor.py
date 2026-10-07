@@ -81,6 +81,33 @@ CHAPTERS = {
         "made of.\n\nYou are ready for this. I wouldn't send you if you weren't.",
         "Defeat a tower's Magister",
         "Well done. Truly.\n\nNow you're ready to hear the rest: why I'm where I am, and why the seals are failing."),
+    "hollowed": (
+        "The Hollowed",
+        "First, the ones who want the seals to fail. When the hunger stirred, some heard it and answered. It hollowed "
+        "them out: they make no mana now, they eat it. They camp where the seals are thin, round obelisks that drink at "
+        "the cracks, and at dusk they hunt people like you.\n\nDefeat one of the Hollowed. Keep your mana close.",
+        "Defeat one of the Hollowed",
+        "Now you know what we're up against: not only a hunger, but people who feed it. Break their obelisks where you "
+        "find them, and keep their shards: a ward made of the Hollow's own dark keeps it from eating you. Here, I had "
+        "one made.\n\nBut you won't stand against them alone."),
+    "circle": (
+        "The Ones Who Stayed",
+        "Not all of my order slept or fell. Some kept the oaths in the open, generation after generation: the Circle. "
+        "They keep Enclaves, walled gardens round a white Spire, far apart and hard to find.\n\nFind one. Sneak and use "
+        "the compass until it seeks Enclaves. Tell their Archmagister I sent you; they'll know the name.",
+        "Find an Enclave of the Circle",
+        "They're still keeping the oaths. I didn't dare hope.\n\nThe Archmagister will have work for you, and their "
+        "mages will stand with you against the Hollowed. Take these: the Circle's own coin, so you don't come "
+        "empty-handed."),
+    "forge": (
+        "Where Fire Was Worked",
+        "Our staves and robes were not made up here. Down in the Nether, over the lava sea, our smiths kept forges, "
+        "and the fire there was older than ours.\n\nGo through to the Nether and find a Cinder Forge. The compass knows "
+        "them there. Its keeper won't know you: be ready.",
+        "Find a Cinder Forge",
+        "The forge still burns, after all this time. The anvil on its dais can temper what you carry: an Ember Core "
+        "and a little of your strength, and your staff or your robes will hold more.\n\nTake this core for your "
+        "first. Then, when you're ready: the seals themselves."),
     "sanctum": (
         "The Seals",
         "When we broke the Prime, the Hollow choked on the pieces and slept. Four of us swore to keep it sleeping: "

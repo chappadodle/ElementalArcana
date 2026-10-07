@@ -44,6 +44,28 @@ class MentorChaptersTest {
     }
 
     @Test
+    void placesAreSavedByIdAndOldNumbersStillFindTheirChapter() {
+        for (int place = 0; place <= MentorChapters.CHAPTERS.size(); place++) {
+            assertEquals(place, MentorChapters.placeOf(MentorChapters.idOf(place)));
+        }
+        assertEquals(MentorChapters.CHAPTERS.size(), MentorChapters.placeOf(MentorChapters.DONE));
+        assertEquals(0, MentorChapters.placeOf("no such chapter"));
+        // 0.10's number 9 was the Seals (sanctum); 15 and up, the tale told.
+        assertEquals("sanctum", MentorChapters.idOf(MentorChapters.placeOfLegacy(9)));
+        assertEquals("hollowed", MentorChapters.idOf(MentorChapters.placeOfLegacy(8)));
+        assertTrue(MentorChapters.finished(MentorChapters.placeOfLegacy(15)));
+        assertEquals(0, MentorChapters.placeOfLegacy(0));
+    }
+
+    @Test
+    void theCircleAndTheForgesComeBetweenTheHollowedAndTheSeals() {
+        int hollowed = MentorChapters.placeOf("hollowed");
+        assertEquals("circle", MentorChapters.idOf(hollowed + 1));
+        assertEquals("forge", MentorChapters.idOf(hollowed + 2));
+        assertEquals("sanctum", MentorChapters.idOf(hollowed + 3));
+    }
+
+    @Test
     void xpIsLevelsWorth() {
         MentorChapters.Chapter shrine = MentorChapters.CHAPTERS.get(1);
         MentorChapters.Chapter bound = MentorChapters.CHAPTERS.get(MentorChapters.CHAPTERS.size() - 1);

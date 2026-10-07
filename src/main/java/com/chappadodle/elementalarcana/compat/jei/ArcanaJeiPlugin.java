@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.compat.jei;
 
+import com.chappadodle.elementalarcana.content.forge.ModForge;
+import com.chappadodle.elementalarcana.content.circle.ModCircle;
 import com.chappadodle.elementalarcana.content.world.ModWorld;
 import com.chappadodle.elementalarcana.content.wonder.ModWonders;
 import com.chappadodle.elementalarcana.content.hollowed.ModHollowed;
@@ -86,6 +88,16 @@ public class ArcanaJeiPlugin implements IModPlugin {
         registration.addIngredientInfo(ModHollowed.HUNGERWARD.get(), info("hungerward_charm"));
         registration.addItemStackInfo(ModWonders.items().subList(0, Element.values().length), info("bottled_glowmoth"));
         registration.addIngredientInfo(ModWorld.LEY_ANCHOR_ITEM.get(), info("ley_anchor"));
+        registration.addIngredientInfo(ModCircle.MARK.get(), info("mark_of_the_circle"));
+        registration.addIngredientInfo(ModCircle.SIGIL.get(), info("sigil_of_the_circle"));
+        registration.addIngredientInfo(ModCircle.CIRCLE_COMMISSION.get(), info("circle_commission"));
+        registration.addIngredientInfo(ModForge.EMBER_CORE.get(), info("ember_core"));
+        registration.addIngredientInfo(ModForge.FORGEFIRE_CHARM.get(), info("forgefire_charm"));
+        registration.addIngredientInfo(ModForge.EMBER_ANVIL_ITEM.get(), info("ember_anvil"));
+        registration.addIngredientInfo(ModWild.SOUL_ASH.get(), info("soul_ash"));
+        registration.addIngredientInfo(ModWild.CINDER_FANG.get(), info("cinder_fang"));
+        registration.addIngredientInfo(ModWild.ASHEN_SHROUD.get(), info("ashen_shroud"));
+        registration.addIngredientInfo(ModWild.HOUNDSTOOTH_CHARM.get(), info("houndstooth_charm"));
     }
 
     @Override

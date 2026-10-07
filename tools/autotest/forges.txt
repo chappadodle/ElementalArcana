@@ -7,7 +7,7 @@
 # 4. Killed: its Ember Core dropped (counted).
 hud on
 cmd gamemode spectator
-cmd execute in minecraft:the_nether run tp @s -2400 100 2400
+cmd execute in minecraft:the_nether run tp @s 9000 100 -9000
 wait 60
 # (the forge's base is the plinth's foot, y 31: the hall's floor is 9 above it)
 goto elementalarcana:cinder_forge 9 13 11
@@ -28,5 +28,7 @@ wait 30
 cmd execute if entity @e[type=item,distance=..40,nbt={Item:{id:"elementalarcana:ember_core"}}]
 cmd kill @e[type=item,distance=..40]
 cmd kill @e[type=experience_orb,distance=..40]
+# Back to the Overworld, where the other tests start.
+cmd execute in minecraft:overworld run tp @s 0 100 0
 wait 10
 quit

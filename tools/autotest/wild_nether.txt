@@ -43,5 +43,7 @@ wait 20
 cmd attribute @s minecraft:generic.movement_speed get
 cmd gamemode creative
 cmd effect clear @s
+# Back to the Overworld, where the other tests start.
+cmd execute in minecraft:overworld run tp @s 0 100 0
 wait 10
 quit

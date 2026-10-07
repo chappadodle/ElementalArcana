@@ -7,7 +7,7 @@ cmd gamerule doDaylightCycle false
 cmd gamerule doMobSpawning false
 cmd gamemode spectator
 cmd effect clear @s
-cmd tp @s 172000.5 200 172000.5
+cmd execute in minecraft:overworld run tp @s 172000.5 200 172000.5
 wait 100
 # Places.
 goto elementalarcana:fire_shrine 16 9 2
@@ -19,6 +19,9 @@ shot gallery_sky_isle
 goto elementalarcana:mage_tower 30 12 10
 wait 100
 shot gallery_tower
+goto elementalarcana:enclave 34 22 4
+wait 100
+shot gallery_enclave
 # Spells, on a platform of grass.
 cmd tp @s 178000.5 110 178000.5 -90 0
 wait 80
@@ -91,6 +94,17 @@ shot gallery_dawnbreak
 camera first
 cmd kill @e[tag=eat]
 cmd time set 1000
+# The Nether: a Cinder Forge's hall (its base is the plinth's foot: the floor is 9 above it), seen
+# in spectator mode (so its keeper sleeps on, and nothing burns).
+cmd gamemode spectator
+cmd execute in minecraft:the_nether run tp @s 23000.5 100 23000.5
+wait 80
+goto elementalarcana:cinder_forge 9 13 11
+wait 100
+shot gallery_forge
+cmd execute in minecraft:overworld run tp @s 178000.5 102 178000.5
+cmd gamemode creative
+wait 40
 # Screens.
 hud on
 screen tree

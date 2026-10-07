@@ -31,6 +31,8 @@ public final class MentorChapters {
             new Chapter("tower", task("tower"), 1, List.of()),
             new Chapter("magister", task("magister"), 2, List.of(new Reward("elementalarcana:wishing_star", 1))),
             new Chapter("hollowed", task("the_hollowed"), 1, List.of(new Reward("elementalarcana:hungerward_charm", 1))),
+            new Chapter("circle", task("the_circle"), 1, List.of(new Reward("elementalarcana:mark_of_the_circle", 3))),
+            new Chapter("forge", task("into_the_forge"), 1, List.of(new Reward("elementalarcana:ember_core", 1))),
             new Chapter("sanctum", task("sanctum"), 1, List.of()),
             new Chapter("sovereign", task("sovereign"), 2, List.of(new Reward("minecraft:golden_apple", 2))),
             new Chapter("hearts", task("four_hearts"), 2, List.of()),
@@ -38,7 +40,37 @@ public final class MentorChapters {
             new Chapter("hollow", task("into_the_hollow"), 1, List.of()),
             new Chapter("bound", task("bound_again"), 3, List.of(new Reward("minecraft:enchanted_golden_apple", 1))));
 
+    /** Past the last chapter: the tale is told. */
+    public static final String DONE = "done";
+    /** The chapters' order in 0.9 and 0.10, which saved a player's place in the tale by number. */
+    static final List<String> LEGACY_ORDER = List.of("voice", "shrine", "wisps", "arcanist", "crypt", "revenant", "tower", "magister",
+            "hollowed", "sanctum", "sovereign", "hearts", "key", "hollow", "bound");
+
     private MentorChapters() {
+    }
+
+    /** The place in the tale of the chapter called {@code id} ({@link #DONE}: past the end; an unknown one: the start). */
+    public static int placeOf(String id) {
+        if (DONE.equals(id)) {
+            return CHAPTERS.size();
+        }
+        for (int i = 0; i < CHAPTERS.size(); i++) {
+            if (CHAPTERS.get(i).id().equals(id)) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    /** The id a place in the tale is saved by. */
+    public static String idOf(int place) {
+        Chapter chapter = at(place);
+        return chapter != null ? chapter.id() : place >= CHAPTERS.size() ? DONE : CHAPTERS.get(0).id();
+    }
+
+    /** A place saved by number in 0.9 or 0.10: where that chapter is now. */
+    public static int placeOfLegacy(int number) {
+        return number >= LEGACY_ORDER.size() ? CHAPTERS.size() : placeOf(LEGACY_ORDER.get(Math.max(0, number)));
     }
 
     private static String task(String advancement) {

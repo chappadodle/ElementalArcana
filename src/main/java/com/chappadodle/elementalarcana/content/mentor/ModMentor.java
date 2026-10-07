@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.content.mentor;
 
+import com.mojang.datafixers.util.Either;
+import com.chappadodle.elementalarcana.api.MentorChapters;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -24,8 +26,12 @@ public final class ModMentor {
     /** A player's place in the tale (the chapter they're on), and whether they've been given a stone. */
     public record Tale(int chapter, boolean stoneGiven) {
         public static final Tale START = new Tale(0, false);
+        /** A place in the tale, saved by its chapter's id (0.9 and 0.10 saved a number: read through their order). */
+        private static final Codec<Integer> PLACE = Codec.either(Codec.INT, Codec.STRING).xmap(
+                saved -> saved.map(MentorChapters::placeOfLegacy, MentorChapters::placeOf),
+                place -> Either.right(MentorChapters.idOf(place)));
         public static final Codec<Tale> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.INT.fieldOf("chapter").forGetter(Tale::chapter),
+                PLACE.fieldOf("chapter").forGetter(Tale::chapter),
                 Codec.BOOL.fieldOf("stone_given").forGetter(Tale::stoneGiven)
         ).apply(instance, Tale::new));
     }
