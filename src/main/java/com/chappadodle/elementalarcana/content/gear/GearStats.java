@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.content.gear;
 
+import com.chappadodle.elementalarcana.content.forge.ModForge;
+import com.chappadodle.elementalarcana.api.TemperRules;
 import com.chappadodle.elementalarcana.content.relic.Relics;
 import com.chappadodle.elementalarcana.api.Element;
 import com.chappadodle.elementalarcana.api.StatGear;
@@ -22,7 +24,8 @@ import java.util.Map;
  * The stat points a player's gear adds: every piece worn in its own slot, and the better of the
  * foci held in the two hands, as long as the player's level meets the item's requirement. A shrine's
  * blessing adds here too (+5 Affinity of its element family and +2 Potency), and so do the Elixirs
- * of Focus and Warding, and the relic the player bears (see Relics).
+ * of Focus and Warding, and the relic the player bears (see Relics). A piece tempered at an Ember
+ * Anvil adds one more to each of its stats a temper (TemperRules).
  */
 public final class GearStats {
     private static final int BLESSING_AFFINITY = 5;
@@ -38,7 +41,7 @@ public final class GearStats {
         for (EquipmentSlot slot : ARMOR) {
             ItemStack stack = player.getItemBySlot(slot);
             if (stack.getItem() instanceof StatGear gear && gear.countsIn(slot) && data.level() >= gear.requiredLevel()) {
-                gear.statBonus(stack).forEach((key, value) -> stats.merge(key, value, Integer::sum));
+                bonus(gear, stack).forEach((key, value) -> stats.merge(key, value, Integer::sum));
             }
         }
         ItemStack best = ItemStack.EMPTY;
@@ -52,7 +55,7 @@ public final class GearStats {
             }
         }
         if (!best.isEmpty()) {
-            ((StatGear) best.getItem()).statBonus(best).forEach((key, value) -> stats.merge(key, value, Integer::sum));
+            bonus((StatGear) best.getItem(), best).forEach((key, value) -> stats.merge(key, value, Integer::sum));
         }
         for (Element family : new Element[]{Element.FIRE, Element.WATER, Element.WIND, Element.EARTH}) {
             if (player.hasEffect(ModContent.blessing(family))) {
@@ -64,6 +67,11 @@ public final class GearStats {
         elixir(player, ModBrews.WARDING, "ward", stats);
         Relics.addStats(player, stats);
         return stats;
+    }
+
+    /** A piece's stat points, tempered as it is. */
+    public static Map<String, Integer> bonus(StatGear gear, ItemStack stack) {
+        return TemperRules.tempered(gear.statBonus(stack), stack.getOrDefault(ModForge.TEMPERED.get(), 0));
     }
 
     /** An elixir drunk (see ModBrews): its stat, more for a strong one. */

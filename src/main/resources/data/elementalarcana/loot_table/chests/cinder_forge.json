@@ -120,6 +120,11 @@
         },
         {
           "type": "minecraft:item",
+          "name": "elementalarcana:ember_core",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
           "name": "minecraft:book",
           "weight": 3,
           "functions": [

@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/into_the_forge",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:ember_anvil"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.tempered.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.tempered.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "tempered": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "tempered"
+      }
+    }
+  }
+}

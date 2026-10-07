@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " E ",
+    "BAB",
+    "MMM"
+  ],
+  "key": {
+    "E": {
+      "item": "elementalarcana:ember_core"
+    },
+    "B": {
+      "item": "minecraft:polished_blackstone"
+    },
+    "A": {
+      "item": "minecraft:anvil"
+    },
+    "M": {
+      "item": "minecraft:magma_block"
+    }
+  },
+  "result": {
+    "id": "elementalarcana:ember_anvil",
+    "count": 1
+  }
+}

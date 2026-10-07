@@ -7,7 +7,9 @@
 - the Forge Heart's model (polished blackstone to look at);
 - the Cinder Forge's structure (in the nether wastes), its spread (rare, kept clear of fortresses and
   bastions), its storerooms' chest and the Forgewarden's loot;
-- the Forgefire Charm's recipe, and the Ember Core as furnace fuel (as long as a bucket of lava).
+- the Forgefire Charm's recipe, and the Ember Core as furnace fuel (as long as a bucket of lava);
+- (part 2) the Ember Anvil's textures (dark iron and blackstone, an ember inlay on its face), model,
+  loot, recipe and pickaxe tag; an Ember Core now and then in the forge's storerooms.
 
 Run from the project root:  python3 tools/gen_forge.py
 """
@@ -124,6 +126,36 @@ def forgewarden(seed):
     return Image.fromarray(img, "RGBA"), Image.fromarray(glow, "RGBA"), Image.fromarray(molten, "RGBA")
 
 
+def anvil_textures(seed):
+    """The Ember Anvil's body (dark iron and blackstone, gold flecks, a vein of magma) and its face (an ember inlay)."""
+    rng = np.random.default_rng(seed)
+    body = np.zeros((16, 16, 4), dtype=np.uint8)
+    for y in range(16):
+        for x in range(16):
+            base = 46 + int(rng.integers(-7, 8))
+            body[y, x] = (base + 4, base, base + 8, 255)
+            if x in (0, 15) or y in (0, 15):
+                body[y, x, :3] = [max(0, int(v) - 14) for v in body[y, x, :3]]
+            if rng.random() < 0.04:
+                body[y, x] = (196, 150, 52, 255)
+    vx = int(rng.integers(3, 12))
+    for y in range(4, 13):
+        body[y, vx] = (226, 96, 24, 255)
+        vx = max(1, min(14, vx + int(rng.integers(-1, 2))))
+    top = body.copy()
+    middle = 7.5
+    for y in range(16):
+        for x in range(16):
+            d = abs(x - middle) + abs(y - middle)
+            if 3.0 <= d <= 4.0:
+                top[y, x] = (255, 132, 32, 255)
+            elif d < 1.5:
+                top[y, x] = (255, 214, 110, 255)
+            elif 1.5 <= d < 3.0 and (x + y) % 2 == 0:
+                top[y, x] = (176, 70, 20, 255)
+    return Image.fromarray(body, "RGBA"), Image.fromarray(top, "RGBA")
+
+
 def write_json(path, value):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, indent=2) + "\n")
@@ -163,7 +195,7 @@ def main():
         {"rolls": {"type": "minecraft:uniform", "min": 4, "max": 7}, "entries": [
             counted("minecraft:gold_ingot", 2, 6, 10), counted("minecraft:iron_ingot", 2, 6, 8), counted("minecraft:gold_nugget", 4, 12, 8),
             counted("minecraft:blaze_powder", 1, 4, 6), counted("minecraft:magma_cream", 1, 3, 5), counted(NS + "fire_essence", 1, 3, 6),
-            counted("minecraft:obsidian", 1, 3, 4), counted("minecraft:netherite_scrap", 1, 1, 1),
+            counted("minecraft:obsidian", 1, 3, 4), counted("minecraft:netherite_scrap", 1, 1, 1), counted(NS + "ember_core", 1, 1, 2),
             {"type": "minecraft:item", "name": "minecraft:book", "weight": 3, "functions": [{"function": "minecraft:enchant_randomly"}]}]},
         {"rolls": 1, "entries": [{"type": "minecraft:empty", "weight": 4}, counted(NS + "tome_of_insight", 1, 1, 1)]}]})
     # The Ember Cores are its own to drop (ForgewardenEntity); the rest is the loot table's.
@@ -178,6 +210,28 @@ def main():
                 "B": {"item": "minecraft:blaze_powder"}},
         "result": {"id": NS + "forgefire_charm", "count": 1}})
     write_json(NEOFORGE / "data_maps/item/furnace_fuels.json", {"values": {NS + "ember_core": {"burn_time": 20000}}})
+    body, top = anvil_textures(4200)
+    body.save(ASSETS / "textures/block/ember_anvil.png")
+    top.save(ASSETS / "textures/block/ember_anvil_top.png")
+    write_json(models / "block/ember_anvil.json", {"parent": "minecraft:block/template_anvil", "textures": {
+        "body": f"{NS}block/ember_anvil", "particle": f"{NS}block/ember_anvil", "top": f"{NS}block/ember_anvil_top"}})
+    write_json(models / "item/ember_anvil.json", {"parent": f"{NS}block/ember_anvil"})
+    write_json(ASSETS / "blockstates/ember_anvil.json", {"variants": {
+        "facing=east": {"model": f"{NS}block/ember_anvil", "y": 270}, "facing=north": {"model": f"{NS}block/ember_anvil", "y": 180},
+        "facing=south": {"model": f"{NS}block/ember_anvil"}, "facing=west": {"model": f"{NS}block/ember_anvil", "y": 90}}})
+    write_json(DATA / "loot_table/blocks/ember_anvil.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [
+        {"type": "minecraft:item", "name": NS + "ember_anvil"}], "conditions": [{"condition": "minecraft:survives_explosion"}]}],
+        "random_sequence": NS + "blocks/ember_anvil"})
+    write_json(DATA / "recipe/ember_anvil.json", {
+        "type": "minecraft:crafting_shaped", "category": "misc", "pattern": [" E ", "BAB", "MMM"],
+        "key": {"E": {"item": NS + "ember_core"}, "B": {"item": "minecraft:polished_blackstone"}, "A": {"item": "minecraft:anvil"},
+                "M": {"item": "minecraft:magma_block"}},
+        "result": {"id": NS + "ember_anvil", "count": 1}})
+    pickaxe = ROOT / "src/main/resources/data/minecraft/tags/block/mineable/pickaxe.json"
+    tag = json.loads(pickaxe.read_text()) if pickaxe.exists() else {"replace": False, "values": []}
+    if NS + "ember_anvil" not in tag["values"]:
+        tag["values"].append(NS + "ember_anvil")
+    write_json(pickaxe, tag)
     print("forge art and data written")
 
 

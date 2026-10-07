@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/template_anvil",
+  "textures": {
+    "body": "elementalarcana:block/ember_anvil",
+    "particle": "elementalarcana:block/ember_anvil",
+    "top": "elementalarcana:block/ember_anvil_top"
+  }
+}

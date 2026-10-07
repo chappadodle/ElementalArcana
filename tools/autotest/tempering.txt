@@ -1,0 +1,57 @@
+# The Ember Reaches, part 2: tempering (see the Ember Anvil spec).
+# 1. An Ember Anvil set down on a platform high up; a Fire Adept Staff held, three Ember Cores and
+#    twenty levels carried: tempered three times (the staff's tempers, the cores and the levels
+#    logged after each).
+# 2. A fourth time: refused (as far as it goes), nothing spent (logged).
+# 3. The anvil (a shot) and the staff's tooltip (a shot); the Stats screen, the staff held (a shot).
+hud on
+cmd gamemode creative
+cmd tp @s 30000.5 200 30000.5 0 30
+wait 40
+cmd fill 29996 199 29996 30005 199 30005 minecraft:stone
+cmd fill 29996 200 29996 30005 205 30005 minecraft:air
+cmd setblock 30000 200 30002 elementalarcana:ember_anvil[facing=east]
+cmd gamemode survival
+cmd effect give @s minecraft:resistance 900 4 true
+cmd clear @s
+cmd xp set @s 20 levels
+slot 0
+cmd item replace entity @s hotbar.0 with elementalarcana:adept_staff[elementalarcana:element="fire"]
+cmd item replace entity @s hotbar.1 with elementalarcana:ember_core 3
+cmd tp @s 30000.5 200 30000.5 0 30
+wait 20
+shot ember_anvil
+use
+wait 10
+cmd data get entity @s SelectedItem.components."elementalarcana:tempered"
+cmd execute if items entity @s container.* elementalarcana:ember_core
+cmd xp query @s levels
+use
+wait 10
+use
+wait 10
+cmd data get entity @s SelectedItem.components."elementalarcana:tempered"
+cmd execute if items entity @s container.* elementalarcana:ember_core
+cmd xp query @s levels
+use
+wait 10
+cmd data get entity @s SelectedItem.components."elementalarcana:tempered"
+cmd xp query @s levels
+screen inventory
+wait 10
+hover 36
+wait 10
+shot tempered_tooltip
+screen close
+wait 10
+screen stats
+wait 20
+shot tempered_stats
+screen close
+cmd clear @s
+cmd setblock 30000 200 30002 minecraft:air
+cmd fill 29996 199 29996 30005 199 30005 minecraft:air
+cmd gamemode creative
+cmd effect clear @s
+wait 10
+quit

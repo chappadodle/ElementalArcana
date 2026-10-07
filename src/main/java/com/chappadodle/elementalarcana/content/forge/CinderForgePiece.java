@@ -11,7 +11,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
-import net.minecraft.world.level.block.AnvilBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.FurnaceBlock;
@@ -31,8 +30,8 @@ import net.minecraft.world.level.storage.loot.LootTable;
  * a vault, on a basalt plinth down to the lava sea; its wall of blackstone bricks, with arches north
  * and south where tunnels run out to the Nether's caves, and iron bars east and west before two
  * storerooms with a chest each; polished basalt pillars, chains and soul lanterns, the forge's tools
- * between the pillars, a ring of lava crossed by four bridges, and in the middle, on a dais, an
- * anvil with the Forge Heart under it. Every choice comes from the forge's seed and each block's
+ * between the pillars, a ring of lava crossed by four bridges, and in the middle, on a dais, the
+ * Ember Anvil with the Forge Heart under it. Every choice comes from the forge's seed and each block's
  * place, so it comes out the same whichever chunk is built first.
  */
 public class CinderForgePiece extends StructurePiece {
@@ -219,7 +218,7 @@ public class CinderForgePiece extends StructurePiece {
                 }
             }
         }
-        put(level, box, Blocks.ANVIL.defaultBlockState().setValue(AnvilBlock.FACING, Direction.NORTH), cx, cy + 2, cz);
+        put(level, box, ModForge.EMBER_ANVIL.get().defaultBlockState().setValue(EmberAnvilBlock.FACING, Direction.NORTH), cx, cy + 2, cz);
         put(level, box, ModForge.FORGE_HEART.get().defaultBlockState(), cx, cy, cz);
     }
 

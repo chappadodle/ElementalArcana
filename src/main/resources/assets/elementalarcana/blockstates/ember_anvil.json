@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "elementalarcana:block/ember_anvil",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "elementalarcana:block/ember_anvil",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "elementalarcana:block/ember_anvil"
+    },
+    "facing=west": {
+      "model": "elementalarcana:block/ember_anvil",
+      "y": 90
+    }
+  }
+}

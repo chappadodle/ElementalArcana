@@ -159,6 +159,8 @@ ADVANCEMENTS = [
      "Close an elemental rift: hold out against all three of its waves", magic("rift_closed"), None),
     ("into_the_forge", "awakening", item("minecraft:gilded_blackstone"), "task", "Into the Forge",
      "Find a Cinder Forge, a ruined smithy of the first mages over the Nether's lava sea", location(NS + "cinder_forge"), None),
+    ("tempered", "into_the_forge", item("ember_anvil"), "task", "Tempered",
+     "Temper a focus or a piece of a mage's robe at an Ember Anvil", magic("tempered"), None),
     ("quench", "into_the_forge", item("ember_core"), "challenge", "Quench",
      "Defeat a Forgewarden, the keeper of a Cinder Forge", killed(NS + "forgewarden"), None),
     ("the_circle", "awakening", item("minecraft:chiseled_quartz_block"), "task", "The Circle",

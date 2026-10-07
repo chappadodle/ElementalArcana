@@ -1,5 +1,9 @@
 package com.chappadodle.elementalarcana.content.forge;
 
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.core.component.DataComponentType;
+import com.mojang.serialization.Codec;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.content.wild.WildCharmItem;
 import net.minecraft.core.registries.Registries;
@@ -26,7 +30,8 @@ import java.util.List;
 /**
  * The Ember Reaches, part 1 (docs/superpowers/specs/2026-10-06-cinder-forges-design.md): the Cinder
  * Forge and its piece, the Forge Heart, the Forgewarden, the Ember Core it leaves and the Forgefire
- * Charm made from one.
+ * Charm made from one; and part 2 (2026-10-07-ember-anvil-design.md): the Ember Anvil and the
+ * tempered component it gives gear.
  */
 public final class ModForge {
     private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(ElementalArcana.MODID);
@@ -35,6 +40,17 @@ public final class ModForge {
     private static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(Registries.ENTITY_TYPE, ElementalArcana.MODID);
     private static final DeferredRegister<StructureType<?>> STRUCTURE_TYPES = DeferredRegister.create(Registries.STRUCTURE_TYPE, ElementalArcana.MODID);
     private static final DeferredRegister<StructurePieceType> STRUCTURE_PIECES = DeferredRegister.create(Registries.STRUCTURE_PIECE, ElementalArcana.MODID);
+    private static final DeferredRegister.DataComponents COMPONENTS =
+            DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, ElementalArcana.MODID);
+
+    /** How many times a focus or a piece of robe has been tempered at an Ember Anvil (TemperRules). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> TEMPERED =
+            COMPONENTS.registerComponentType("tempered", builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+    public static final DeferredBlock<EmberAnvilBlock> EMBER_ANVIL = BLOCKS.register("ember_anvil", () -> new EmberAnvilBlock(
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).requiresCorrectToolForDrops().strength(5f, 1200f)
+                    .sound(SoundType.ANVIL).lightLevel(state -> 7).noOcclusion()));
+    public static final DeferredItem<BlockItem> EMBER_ANVIL_ITEM = ITEMS.register("ember_anvil",
+            () -> new BlockItem(EMBER_ANVIL.get(), new Item.Properties().fireResistant()));
 
     /** Unbreakable, like a tower's heart: the forge's heart stays where it was built. */
     public static final DeferredBlock<ForgeHeartBlock> FORGE_HEART = BLOCKS.register("forge_heart", () -> new ForgeHeartBlock(
@@ -70,6 +86,7 @@ public final class ModForge {
         ENTITY_TYPES.register(modEventBus);
         STRUCTURE_TYPES.register(modEventBus);
         STRUCTURE_PIECES.register(modEventBus);
+        COMPONENTS.register(modEventBus);
         modEventBus.addListener(ModForge::registerAttributes);
     }
 
@@ -79,6 +96,6 @@ public final class ModForge {
 
     /** For the creative tab. */
     public static List<DeferredItem<? extends Item>> items() {
-        return List.of(EMBER_CORE, FORGEFIRE_CHARM, FORGEWARDEN_EGG);
+        return List.of(EMBER_CORE, FORGEFIRE_CHARM, EMBER_ANVIL_ITEM, FORGEWARDEN_EGG);
     }
 }
