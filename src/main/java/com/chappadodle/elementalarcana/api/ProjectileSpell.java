@@ -73,6 +73,19 @@ public interface ProjectileSpell {
         return new Vec3(0.55, 0.15, 0.9);
     }
 
+    /**
+     * Where {@code projectile} floats as its own caster sees it in first person (only on their
+     * client: everyone else sees it at {@link #holdOffset}). By default the same spot.
+     */
+    default Vec3 firstPersonHoldOffset(SpellProjectile projectile, int slot, int count) {
+        return holdOffset(slot, count);
+    }
+
+    /** How big a held projectile is drawn before its own caster's eyes, as a share of its size. */
+    default float firstPersonScale() {
+        return 1f;
+    }
+
     // ---- client-side visuals ----
 
     /**

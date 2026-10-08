@@ -295,6 +295,28 @@ public class FireballSpell extends Spell implements ProjectileSpell, ConjureSpel
         };
     }
 
+    /**
+     * Seen through its caster's own eyes, a fireball keeps to the lower corners of the screen (the
+     * third of Triple Flames below the crosshair, not over it), and Sunfire's sun hangs high ahead
+     * instead of round the camera.
+     */
+    @Override
+    public Vec3 firstPersonHoldOffset(SpellProjectile fireball, int slot, int count) {
+        if (fireball.visualScale() > 2f) {
+            return new Vec3(0, 1.5, 2.8);
+        }
+        return switch (slot) {
+            case 1 -> new Vec3(-0.6, -0.42, 1.0);
+            case 2 -> new Vec3(0, -0.62, 1.15);
+            default -> new Vec3(count > 1 ? 0.6 : 0.55, -0.42, count > 1 ? 1.0 : 1.05);
+        };
+    }
+
+    @Override
+    public float firstPersonScale() {
+        return 0.55f;
+    }
+
     // ---- visuals and sounds (client only, see FireballEffects and FireballSounds) ----
 
     @Override

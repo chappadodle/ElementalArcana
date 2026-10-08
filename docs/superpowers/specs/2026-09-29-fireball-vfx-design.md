@@ -188,19 +188,19 @@ in its A/B. It's built in two play-tests:
 
 | Moment | Heat 1–2 | Heat 3–4 | Cluster | Meteor | Sunfire | Phoenix |
 |---|---|---|---|---|---|---|
-| Conjure | flint + firecharge, soft | firecharge, lower | + fuse hiss (TNT prime, quiet) | + grindstone | — | + phantom flap, high |
+| Conjure | flint + firecharge, soft | firecharge, lower | + fuse hiss (TNT prime, quiet) | + grindstone | — | + parrot wingbeat |
 | Held loop | blaze burn, quiet | blaze burn, louder and lower | fuse sizzle | blaze burn, low | blaze burn, deep | blaze burn |
-| Fully grown | firecharge | firecharge + blaze shoot, soft | fuse crackle | firecharge, low | — | firecharge |
-| Throw | blaze shoot | + ghast shoot, soft | snowball-style toss | ghast shoot, low | ghast shoot + blaze shoot | blaze shoot + phantom swoop |
-| Flight loop | elytra wind, quiet | elytra wind + blaze burn | fuse sizzle | wind, low and heavy | wind + deep burn | wind + wingbeats (flaps) |
-| Impact | small explosion, high pitch | explosion + firework blast | firework blast and twinkle per bomblet | big explosion, low, + debris | huge explosion, low, + blast | explosion + phantom cry |
+| Fully grown | firecharge | firecharge + blaze shoot, soft | fuse crackle | firecharge, low | — | firecharge + a soft blaze-call |
+| Throw | blaze shoot | + ghast shoot, soft | snowball-style toss | ghast shoot, low | ghast shoot + blaze shoot | blaze shoot + dragon wingbeat + cry |
+| Flight loop | elytra wind, quiet | elytra wind + blaze burn | fuse sizzle | wind, low and heavy | wind + deep burn | wind + dragon wingbeats, high |
+| Impact | small explosion, high pitch | explosion + firework blast | firework blast and twinkle per bomblet | big explosion, low, + debris | huge explosion, low, + blast | explosion + cry, low |
 
 - **★ signature sounds (4b), synthesized:**
   - Sunfire: a solar hum (held loop), a launch surge and a detonation with a long tail
   - Meteor: an incoming roar (flight loop) and a ground-shaking impact with a rumble
-  - Phoenix: a cry. The first synthesized version was rejected in its A/B, so Phoenix keeps its
-    vanilla mix for now. The cry is to be reworked later, and may be a case for the AI sound
-    model.
+  - Phoenix: a cry. The first synthesized version was rejected in its A/B. Reworked (0.12) in
+    vanilla sounds instead of the phantom's: the cry is a parrot's blaze call (pitched up as it's
+    thrown, down on impact), the wings the ender dragon's beat pitched high.
 - **A/B:** a client config option, `signatureSounds` (default on), swaps each ★ sound for its
   vanilla mix, and takes effect immediately.
 
@@ -287,3 +287,20 @@ around them. Without either, nothing changes, and neither mod's classes are touc
 - **Screen space with several held fireballs:** a full set, especially the Lv 8+ heat looks, can
   fill a large part of the screen. They could be made more subtle while held, for example smaller
   or with dimmer glow halos in first person. The user said to leave it for now.
+
+## Held fireballs in first person (0.12)
+
+A held fireball used to float 0.8 blocks in front of its caster's eyes at full size, so one took a
+quarter of their screen, Triple Flames put one over the crosshair, and Sunfire's sun swallowed the
+whole view. Now, on the caster's own client in first person only (everyone else, and the caster in
+third person, sees it as before):
+
+- it's drawn at 55% of its size, and its particles gather round that smaller ball;
+- it floats lower and a little further out, in the bottom corners of the screen (the third of
+  Triple Flames below the crosshair, not above it);
+- Sunfire's sun hangs high ahead (1.5 up, 2.8 out) instead of round the camera.
+
+The server still places it at its usual spot, so it's thrown from where everyone else sees it.
+Any held spell can do the same (`ProjectileSpell#firstPersonHoldOffset`, `#firstPersonScale`);
+`SpellProjectile.firstPersonView`, set by the client, says whose eyes this client looks through.
+`tools/autotest/held_fireball.txt` shows each held formation in first and third person.

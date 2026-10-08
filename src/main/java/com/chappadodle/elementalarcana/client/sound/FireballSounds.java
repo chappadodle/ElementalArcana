@@ -68,13 +68,16 @@ public final class FireballSounds {
             List.of(layer(SoundEvents.ELYTRA_FLYING, 0.7f, 0.7f), layer(SoundEvents.BLAZE_BURN, 0.9f, 0.45f)),
             List.of(layer(EXPLODE, 4.0f, 0.5f), layer(SoundEvents.FIREWORK_ROCKET_LARGE_BLAST, 2.5f, 0.6f),
                     layer(SoundEvents.LIGHTNING_BOLT_IMPACT, 2.0f, 0.8f)));
+    // Phoenix: a bird of fire. Its cry is a parrot's blaze call, its wings the dragon's beat, pitched up.
     private static final Mix PHOENIX = new Mix(
-            List.of(layer(SoundEvents.FIRECHARGE_USE, 0.4f, 1.2f), layer(SoundEvents.PHANTOM_FLAP, 0.4f, 1.6f)),
+            List.of(layer(SoundEvents.FIRECHARGE_USE, 0.4f, 1.2f), layer(SoundEvents.PARROT_FLY, 0.6f, 0.9f)),
             List.of(layer(SoundEvents.BLAZE_BURN, 0.4f, 1.0f)),
-            List.of(layer(SoundEvents.FIRECHARGE_USE, 0.6f, 1.3f)),
-            List.of(layer(SoundEvents.BLAZE_SHOOT, 0.8f, 1.1f), layer(SoundEvents.PHANTOM_SWOOP, 0.6f, 1.3f)),
-            List.of(layer(SoundEvents.ELYTRA_FLYING, 0.35f, 1.2f), layer(SoundEvents.PHANTOM_FLAP, 0.4f, 1.4f)),
-            List.of(layer(EXPLODE, 1.0f, 1.1f), layer(SoundEvents.PHANTOM_AMBIENT, 0.8f, 1.5f)));
+            List.of(layer(SoundEvents.FIRECHARGE_USE, 0.6f, 1.3f), layer(SoundEvents.PARROT_IMITATE_BLAZE, 0.35f, 1.4f)),
+            List.of(layer(SoundEvents.BLAZE_SHOOT, 0.8f, 1.1f), layer(SoundEvents.ENDER_DRAGON_FLAP, 0.6f, 1.7f),
+                    layer(SoundEvents.PARROT_IMITATE_BLAZE, 0.7f, 1.15f)),
+            List.of(layer(SoundEvents.ELYTRA_FLYING, 0.3f, 1.2f), layer(SoundEvents.ENDER_DRAGON_FLAP, 0.3f, 1.9f)),
+            List.of(layer(EXPLODE, 1.0f, 1.1f), layer(SoundEvents.PARROT_IMITATE_BLAZE, 1.0f, 0.8f),
+                    layer(SoundEvents.FIRECHARGE_USE, 0.6f, 0.8f)));
     // With signature sounds on (ArcanaClientConfig#SIGNATURE_SOUNDS), the synthesized ones take over
     // the biggest moments; the vanilla mixes above stay as the alternative.
     private static final Mix SUN_SIGNATURE = new Mix(

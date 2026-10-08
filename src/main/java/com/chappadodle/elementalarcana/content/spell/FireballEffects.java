@@ -70,7 +70,7 @@ public final class FireballEffects {
 
     /** How big the fireball is drawn, matching SpellProjectileRenderer. */
     private static float size(SpellProjectile fireball) {
-        return Mth.lerp(fireball.charge(0f), 0.35f, 1f) * fireball.visualScale();
+        return Mth.lerp(fireball.charge(0f), 0.35f, 1f) * fireball.visualScale() * fireball.viewScale();
     }
 
     // ---- held ----

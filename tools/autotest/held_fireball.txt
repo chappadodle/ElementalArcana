@@ -1,0 +1,63 @@
+# Held fireballs as their caster sees them (first person) and as others see them (third person):
+# one fireball (Lv1), Twin Flames (Lv4), Triple Flames (Lv8) and Sunfire (Lv10), each fully grown.
+# The first-person shots show how much of the screen a held fireball takes.
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamemode creative
+cmd effect clear @s
+cmd tp @s 0.5 100 0.5 -90 0
+wait 40
+cmd kill @e[type=!player]
+cmd fill -8 99 -12 30 99 12 minecraft:grass_block
+cmd fill -8 100 -12 30 110 12 minecraft:air
+cmd arcana tree reset
+cmd arcana awaken fire
+cmd arcana level set 40
+cmd arcana spell elementalarcana:fireball 1
+cmd arcana mana fill
+cmd arcana cooldowns reset
+cmd title @s clear
+cmd tp @s 0.5 100 0.5 -90 0
+select elementalarcana:fireball
+press
+wait 40
+shot held_one_fp
+camera back
+wait 5
+shot held_one_tp
+camera first
+release
+wait 20
+cmd arcana spell elementalarcana:fireball 4
+cmd arcana mana fill
+cmd arcana cooldowns reset
+press
+wait 40
+shot held_twin_fp
+release
+wait 20
+cmd arcana spell elementalarcana:fireball 8 meteor
+cmd arcana mana fill
+cmd arcana cooldowns reset
+press
+wait 40
+shot held_triple_fp
+camera back
+wait 5
+shot held_triple_tp
+camera first
+release
+wait 20
+cmd arcana spell elementalarcana:fireball 10 meteor sunfire
+cmd arcana mana fill
+cmd arcana cooldowns reset
+press
+wait 60
+shot held_sun_fp
+release
+wait 40
+cmd kill @e[type=!player]
+quit

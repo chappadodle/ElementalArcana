@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * One projectile entity for every {@link ProjectileSpell}: it stores which spell fired it
@@ -45,6 +46,14 @@ public class SpellProjectile extends ThrowableProjectile {
     // Which look the spell gives this projectile (see ProjectileSpell#model(int), #glow(int)).
     private static final EntityDataAccessor<Integer> VARIANT = SynchedEntityData.defineId(SpellProjectile.class, EntityDataSerializers.INT);
     private static final double AIM_RANGE = 64.0;
+
+    /**
+     * Whether an entity is the one this client looks out of in first person (set by the client at
+     * setup; on a dedicated server, never). A held projectile seen from its own caster's eyes floats
+     * where {@link ProjectileSpell#firstPersonHoldOffset} puts it, drawn at
+     * {@link ProjectileSpell#firstPersonScale}, so it doesn't fill their screen.
+     */
+    public static Predicate<Entity> firstPersonView = entity -> false;
 
     private float power = 1f;
     private int releasedAt;
@@ -163,13 +172,37 @@ public class SpellProjectile extends ThrowableProjectile {
         return entity != null ? entity.getEntity().getBoundingBox().getCenter() : blockHit;
     }
 
-    /** Where this held projectile floats for {@code owner} at the given partial tick. */
+    /**
+     * Where this held projectile floats for {@code owner} at the given partial tick (on the caster's
+     * own client in first person, its first-person spot: see {@link #firstPersonView}).
+     */
     public Vec3 holdPosition(Entity owner, ProjectileSpell spell, float partialTick) {
-        return holdPosition(owner, spell, entityData.get(SLOT), entityData.get(SLOT_COUNT), partialTick);
+        int slot = entityData.get(SLOT);
+        int count = entityData.get(SLOT_COUNT);
+        if (seenFromOwnEyes(owner)) {
+            return holdPosition(owner, spell.firstPersonHoldOffset(this, slot, count), partialTick);
+        }
+        return holdPosition(owner, spell, slot, count, partialTick);
+    }
+
+    /** Whether this is held and seen through its caster's own eyes, on the caster's client. */
+    private boolean seenFromOwnEyes(@Nullable Entity owner) {
+        return owner != null && isHeld() && level().isClientSide() && firstPersonView.test(owner);
+    }
+
+    /** How much smaller to draw it than its size: held before its caster's own eyes, a little; else not at all. */
+    public float viewScale() {
+        ProjectileSpell spell = spell();
+        return spell != null && seenFromOwnEyes(getOwner()) ? spell.firstPersonScale() : 1f;
     }
 
     /** Where a held projectile in formation slot {@code slot} of {@code count} floats for {@code owner}. */
     public static Vec3 holdPosition(Entity owner, ProjectileSpell spell, int slot, int count, float partialTick) {
+        return holdPosition(owner, spell.holdOffset(slot, count), partialTick);
+    }
+
+    /** {@code offset} from {@code owner}'s eyes: x to the right, y up, z forward along their look. */
+    private static Vec3 holdPosition(Entity owner, Vec3 offset, float partialTick) {
         Vec3 forward = owner.getViewVector(partialTick);
         Vec3 right = new Vec3(-forward.z, 0, forward.x);
         if (right.lengthSqr() < 1.0e-4) {
@@ -178,7 +211,6 @@ public class SpellProjectile extends ThrowableProjectile {
         }
         right = right.normalize();
         Vec3 up = right.cross(forward);
-        Vec3 offset = spell.holdOffset(slot, count);
         return owner.getEyePosition(partialTick)
                 .add(right.scale(offset.x))
                 .add(up.scale(offset.y))

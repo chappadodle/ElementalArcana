@@ -57,7 +57,7 @@ public class SpellProjectileRenderer extends EntityRenderer<SpellProjectile> {
         direction = direction.normalize();
         float yaw = (float) Mth.atan2(direction.x, direction.z);
         float pitch = (float) -Mth.atan2(direction.y, Math.sqrt(direction.x * direction.x + direction.z * direction.z));
-        float scale = Mth.lerp(projectile.charge(partialTick), MIN_SCALE, 1f) * projectile.visualScale();
+        float scale = Mth.lerp(projectile.charge(partialTick), MIN_SCALE, 1f) * projectile.visualScale() * projectile.viewScale();
 
         ProjectileVisuals.Visual visual = spell instanceof Spell asSpell ? ProjectileVisuals.get(asSpell) : null;
         if (visual != null) {

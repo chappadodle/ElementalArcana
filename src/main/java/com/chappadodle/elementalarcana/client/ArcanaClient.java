@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.client;
 
+import com.chappadodle.elementalarcana.api.SpellProjectile;
 import com.chappadodle.elementalarcana.content.forge.ModForge;
 import com.chappadodle.elementalarcana.content.circle.ModCircle;
 import com.chappadodle.elementalarcana.content.wonder.BottledGlowmothItem;
@@ -146,6 +147,11 @@ public final class ArcanaClient {
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
+            // Held spells seen through their caster's own eyes keep out of the way (see SpellProjectile).
+            SpellProjectile.firstPersonView = entity -> {
+                Minecraft minecraft = Minecraft.getInstance();
+                return entity == minecraft.getCameraEntity() && minecraft.options.getCameraType().isFirstPerson();
+            };
             DynamicLights.init();
             ProjectileVisuals.register(ModSpells.WIND_BLADE.get(), WindSlashRenderer::render);
             ProjectileVisuals.register(ModSpells.HYDRO_JET.get(), WaterSpearRenderer::render);
