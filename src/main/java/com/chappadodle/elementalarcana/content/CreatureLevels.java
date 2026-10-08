@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.content;
 
+import net.minecraft.world.entity.EntityType;
 import com.chappadodle.elementalarcana.ElementalArcana;
 import com.chappadodle.elementalarcana.api.CreatureMagic;
 import com.chappadodle.elementalarcana.api.ManaWeatherRules;
@@ -26,7 +27,7 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
 /**
  * Every creature has a level (see ZoneLevels): set from where it is on its first tick, plus its
- * rank's bonus levels if it's Attuned. Players use their own level. A creature's stats follow the
+ * rank's bonus levels if it's Attuned (a story boss: a fixed bonus instead). Players use their own level. A creature's stats follow the
  * shared rules (StatRules): a third of its points each in Vitality, Ward and Potency. Vitality is
  * applied to its max health here; Ward and Potency in LevelCombat.
  */
@@ -34,6 +35,8 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent;
 public final class CreatureLevels {
     /** Biomes worth +10 levels (the deep dark). */
     public static final TagKey<Biome> DANGEROUS = TagKey.create(Registries.BIOME, ElementalArcana.id("dangerous"));
+    /** The story's bosses, which stand a fixed few levels above their place (Progression#bonusLevels). */
+    public static final TagKey<EntityType<?>> STORY_BOSSES = TagKey.create(Registries.ENTITY_TYPE, ElementalArcana.id("story_bosses"));
     private static final ResourceLocation VITALITY = ElementalArcana.id("creature_vitality");
     // The health bonus Attuned creatures had before ranks became bonus levels; removed on sight.
     private static final ResourceLocation LEGACY_HEALTH = ElementalArcana.id("attunement_health");
@@ -62,7 +65,8 @@ public final class CreatureLevels {
 
     private static int withRank(LivingEntity entity, int base) {
         CreatureMagic magic = entity.hasData(MagicAttachments.CREATURE_MAGIC) ? entity.getData(MagicAttachments.CREATURE_MAGIC) : null;
-        return Math.clamp(base + (magic == null ? 0 : magic.rank().bonusLevels()), 1, Progression.MAX_LEVEL);
+        int bonus = Progression.bonusLevels(magic == null ? null : magic.rank(), entity.getType().is(STORY_BOSSES));
+        return Math.clamp(base + bonus, 1, Progression.MAX_LEVEL);
     }
 
     /** Sets a creature's zone level (before its rank's bonus) and updates its stats. */

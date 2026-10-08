@@ -59,7 +59,7 @@ public class HollowEntity extends SovereignEntity {
     /** 670 before Vitality: about 1020 at level 70, just under the game's cap on health (1024). */
     public static AttributeSupplier.Builder createAttributes() {
         return SovereignEntity.createAttributes()
-                .add(Attributes.MAX_HEALTH, 670)
+                .add(Attributes.MAX_HEALTH, 520)
                 .add(Attributes.ARMOR, 12)
                 .add(Attributes.FOLLOW_RANGE, 48);
     }

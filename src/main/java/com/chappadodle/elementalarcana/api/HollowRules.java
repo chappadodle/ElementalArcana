@@ -9,7 +9,7 @@ import java.util.List;
 public final class HollowRules {
     /** The forms it fights in, a quarter of its health each, in this order. */
     public static final List<Element> FORMS = List.of(Element.FIRE, Element.WATER, Element.WIND, Element.EARTH);
-    /** Its level before its Archmage bonus: it is level 70. */
+    /** Its level before its story-boss bonus: it is level 60. */
     public static final int BASE_LEVEL = 50;
     /** How far its hunger reaches, and the mana it eats from each a second (health, once there's none). */
     public static final double HUNGER_RADIUS = 24;

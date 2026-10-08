@@ -8,7 +8,8 @@ package com.chappadodle.elementalarcana.api;
  * <li>Overworld: 1 to 5 near world spawn, +1 every 150 blocks away (up to +30); caves (by depth below
  * sea level, up to +10), structures (+5) and dangerous biomes (+10) add up to +15 more.</li>
  * <li>Nether: 25 to 50, rising with distance from its centre and in structures.</li>
- * <li>End: 60 and up, rising toward the outer islands.</li>
+ * <li>End: 40 on the central island (where the dragon waits), rising 1 every 40 blocks out to 85 on the
+ * far outer islands.</li>
  * </ul>
  */
 public final class ZoneLevels {
@@ -29,7 +30,7 @@ public final class ZoneLevels {
                 yield 1 + spread + Math.min(30, (int) (distance / 150)) + extra;
             }
             case NETHER -> Math.clamp(25 + spread + (int) (distance / 50) + (inStructure ? 5 : 0), 25, 50);
-            case END -> 60 + spread + Math.min(30, (int) (distance / 100));
+            case END -> 40 + spread + Math.min(45, (int) (distance / 40));
         };
         return Math.clamp(level, 1, Progression.MAX_LEVEL);
     }

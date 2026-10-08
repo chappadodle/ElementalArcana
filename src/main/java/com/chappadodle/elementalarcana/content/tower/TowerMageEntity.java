@@ -51,7 +51,7 @@ import org.jetbrains.annotations.Nullable;
 public class TowerMageEntity extends AbstractIllager {
     private static final EntityDataAccessor<Byte> ELEMENT = SynchedEntityData.defineId(TowerMageEntity.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Boolean> CASTING = SynchedEntityData.defineId(TowerMageEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final int BLINK_COOLDOWN_TICKS = 80;
+    private static final int BLINK_COOLDOWN_TICKS = 160;
 
     private final boolean magister;
     @Nullable

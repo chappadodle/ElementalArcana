@@ -1,5 +1,11 @@
 package com.chappadodle.elementalarcana.client;
 
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.network.protocol.game.ServerboundSelectTradePacket;
 import net.minecraft.client.gui.screens.inventory.MerchantScreen;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -148,6 +154,12 @@ public final class AutoTest {
     private static int waitTicks;
     private static int respawnCooldown;
     private static int holdUseTicks;
+    // A fight (the `fight` step): the foe's type, ticks left, and the cast cycle (press, hold, release, gap).
+    private static EntityType<?> fightType;
+    private static int fightTicks;
+    private static int fightCycle;
+    private static int fightHold;
+    private static int fightGap;
     private static boolean finished;
     /** A step's work running on the server (a structure search can take seconds), which the script waits for. */
     private static volatile boolean serverBusy;
@@ -203,6 +215,10 @@ public final class AutoTest {
         if (holdUseTicks > 0 && --holdUseTicks == 0) {
             minecraft.options.keyUse.setDown(false);
         }
+        if (fightTicks > 0) {
+            fightTick(minecraft);
+            return;
+        }
         if (serverBusy) {
             return;
         }
@@ -226,6 +242,41 @@ public final class AutoTest {
         }
         LOGGER.info("[autotest] done");
         finished = true;
+    }
+
+    /** One tick of a fight: aim at the foe, and press, release or throw on the cast cycle. Ends when it falls. */
+    private static void fightTick(Minecraft minecraft) {
+        LocalPlayer player = minecraft.player;
+        LivingEntity foe = null;
+        double best = 48 * 48;
+        for (Entity entity : minecraft.level.entitiesForRendering()) {
+            if (entity.getType() == fightType && entity instanceof LivingEntity living && living.isAlive()
+                    && entity.distanceToSqr(player) < best) {
+                best = entity.distanceToSqr(player);
+                foe = living;
+            }
+        }
+        if (foe == null || --fightTicks <= 0) {
+            PacketDistributor.sendToServer(CastSpellPayload.RELEASE);
+            PacketDistributor.sendToServer(CastSpellPayload.LAUNCH_ALL);
+            fightTicks = 0;
+            LOGGER.info("[autotest] fight over ({})", foe == null ? "no foe standing" : "time");
+            return;
+        }
+        Vec3 to = foe.getBoundingBox().getCenter().subtract(player.getEyePosition());
+        float yaw = (float) (Mth.atan2(to.z, to.x) * Mth.RAD_TO_DEG) - 90f;
+        float pitch = (float) (-Mth.atan2(to.y, Math.sqrt(to.x * to.x + to.z * to.z)) * Mth.RAD_TO_DEG);
+        player.setYRot(yaw);
+        player.setYHeadRot(yaw);
+        player.setXRot(pitch);
+        int phase = fightCycle++ % (fightHold + fightGap + 1);
+        if (phase == 0) {
+            PacketDistributor.sendToServer(CastSpellPayload.PRESS);
+        } else if (phase == fightHold) {
+            PacketDistributor.sendToServer(CastSpellPayload.RELEASE);
+        } else if (phase == fightHold + 1) {
+            PacketDistributor.sendToServer(CastSpellPayload.LAUNCH_ALL);
+        }
     }
 
     /** Runs one step; returns false when the script should pause (a wait, or the game closing). */
@@ -300,6 +351,17 @@ public final class AutoTest {
                 } else {
                     LOGGER.warn("[autotest] trade: no trading screen open");
                 }
+            }
+            case "fight" -> {
+                // fight <entity type> <seconds> <hold ticks> <gap ticks>: face the nearest one and cast the
+                // selected spell at it again and again (press, hold, release, throw what's held, wait).
+                String[] fight = argument.trim().split("\\s+");
+                fightType = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(fight[0]));
+                fightTicks = Integer.parseInt(fight[1]) * 20;
+                fightHold = Math.max(1, Integer.parseInt(fight[2]));
+                fightGap = Math.max(1, Integer.parseInt(fight[3]));
+                fightCycle = 0;
+                return false;
             }
             case "hold_use" -> {
                 // Right click held down (for items used over time, like the Prime Key), let go after the wait.

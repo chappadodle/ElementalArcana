@@ -20,6 +20,7 @@ import com.chappadodle.elementalarcana.content.Attunement;
 import com.chappadodle.elementalarcana.content.Awakenings;
 import com.chappadodle.elementalarcana.content.BubblePrisons;
 import com.chappadodle.elementalarcana.content.CreatureLevels;
+import com.chappadodle.elementalarcana.content.Gauge;
 import com.chappadodle.elementalarcana.content.ManaTides;
 import com.chappadodle.elementalarcana.content.SkillTreeLoader;
 import com.chappadodle.elementalarcana.content.creature.ModCreatures;
@@ -177,6 +178,17 @@ public final class ArcanaCommand {
                     return wins;
                 })))
                 .then(golemSpawn())
+                // For balance testing: the damage a player deals and takes in a fight (see Gauge).
+                .then(Commands.literal("gauge")
+                        .then(Commands.literal("start").executes(ctx -> {
+                            Gauge.start(ctx.getSource().getPlayerOrException());
+                            ctx.getSource().sendSuccess(() -> Component.literal("Gauge started"), false);
+                            return 1;
+                        }))
+                        .then(Commands.literal("stop")
+                                .executes(ctx -> gaugeStop(ctx.getSource(), null))
+                                .then(Commands.argument("foe", EntityArgument.entity())
+                                        .executes(ctx -> gaugeStop(ctx.getSource(), EntityArgument.getEntity(ctx, "foe"))))))
                 .then(wildSpawn())
                 .then(cantripLearn())
                 .then(starfallCommand())
@@ -645,6 +657,12 @@ public final class ArcanaCommand {
         PlayerStats.apply(player);
         MagicAttachments.sync(player);
         source.sendSuccess(() -> Component.translatable(messageKey), false);
+        return 1;
+    }
+
+    private static int gaugeStop(CommandSourceStack source, Entity foe) throws CommandSyntaxException {
+        Component report = Gauge.stop(source.getPlayerOrException(), foe instanceof LivingEntity living ? living : null);
+        source.sendSuccess(() -> report, false);
         return 1;
     }
 }

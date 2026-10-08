@@ -18,6 +18,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ProgressionTest {
 
     @Test
+    void storyBossesStandTenAboveTheirPlaceWhateverTheirRank() {
+        assertEquals(10, Progression.bonusLevels(AttunementRank.ARCHMAGE, true));
+        assertEquals(10, Progression.bonusLevels(null, true));
+        assertEquals(20, Progression.bonusLevels(AttunementRank.ARCHMAGE, false));
+        assertEquals(8, Progression.bonusLevels(AttunementRank.MAGUS, false));
+        assertEquals(0, Progression.bonusLevels(null, false));
+    }
+
+    @Test
     void cooldownsShrinkSixPercentPerSpellLevel() {
         assertEquals(60, cooldownTicks(60, 1));
         assertEquals(46, cooldownTicks(60, 5));   // 60 x 0.76 = 45.6

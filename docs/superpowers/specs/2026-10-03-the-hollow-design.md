@@ -40,7 +40,7 @@ hunger's damage. Whoever dies in the Hollow wakes at home as usual.
 `HollowEntity`: the hunger made a shape, a Sovereign's form gone black (the Sovereign model at
 three times size: a void mask, a violet core). It rises from the maw when a player arrives and it
 is not already there. Level 70 (its own boss bar, "The Hollow", purple, darkening the sky), about
-1020 health (670 before Vitality: the game caps health at 1024), armour 12, no knockback, immune
+1020 health (670 before Vitality: the game caps health at 1024; since the balance pass, level 60 and 520 before Vitality, about 750), armour 12, no knockback, immune
 to fire, drowning and falls.
 
 - **It wears what it ate.** It fights in four forms, a quarter of its health each: Fire, Water, Wind,

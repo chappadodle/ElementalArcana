@@ -11,7 +11,7 @@ public final class ForgewardenRules {
     public static final double SPEED = 0.22;
     /** How much faster it walks molten (a share of its speed). */
     public static final double MOLTEN_SPEED = 0.4;
-    public static final double SLAM_DAMAGE = 12;
+    public static final double SLAM_DAMAGE = 9;
     /** Its slam's reach and the ring of cinders it raises (a golem's are 3 and 2.5). */
     public static final double REACH = 4.0;
     public static final double SLAM_RADIUS = 4.0;
@@ -21,9 +21,9 @@ public final class ForgewardenRules {
     public static final int HURL_COOLDOWN_TICKS = 100;
     /** Fire bursts from its seams all round it, now and then, if anyone is this near. */
     public static final double VENT_RADIUS = 5;
-    public static final float VENT_DAMAGE = 6f;
+    public static final float VENT_DAMAGE = 4f;
     public static final int VENT_COOLDOWN_TICKS = 220;
-    public static final int VENT_BURN_SECONDS = 5;
+    public static final int VENT_BURN_SECONDS = 3;
     /** Molten, it leaves burning ground this often. */
     public static final int TRAIL_TICKS = 10;
     /** How near a player comes to the forge's heart before it wakes, and how far it chases from it. */

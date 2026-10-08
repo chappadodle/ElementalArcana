@@ -17,8 +17,8 @@ class SovereignRulesTest {
     }
 
     @Test
-    void theWeakestSovereignIsLevelFifty() {
-        assertEquals(50, SovereignRules.baseLevel(1) + AttunementRank.ARCHMAGE.bonusLevels());
+    void theWeakestSovereignIsLevelForty() {
+        assertEquals(40, SovereignRules.baseLevel(1) + Progression.bonusLevels(AttunementRank.ARCHMAGE, true));
     }
 
     @Test

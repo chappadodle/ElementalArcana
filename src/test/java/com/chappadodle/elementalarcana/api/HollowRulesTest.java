@@ -22,8 +22,8 @@ class HollowRulesTest {
     }
 
     @Test
-    void itIsLevelSeventy() {
-        assertEquals(70, HollowRules.BASE_LEVEL + AttunementRank.ARCHMAGE.bonusLevels());
+    void itIsLevelSixty() {
+        assertEquals(60, HollowRules.BASE_LEVEL + Progression.bonusLevels(AttunementRank.ARCHMAGE, true));
     }
 
     @Test

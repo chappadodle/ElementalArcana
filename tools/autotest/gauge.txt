@@ -1,0 +1,446 @@
+# The balance gauge (written by tools/gen_gauge.py: edit that, not this). Each fight: a build for
+# the player's level, a foe at a set level 12 blocks ahead, the player standing and casting at it
+# while /arcana gauge counts the damage both ways (the player is kept standing; the report says
+# when they would have fallen).
+hud on
+cmd time set noon
+cmd weather clear
+cmd gamerule doDaylightCycle false
+cmd gamerule doMobSpawning false
+cmd gamerule doMobLoot false
+cmd gamemode survival
+cmd arcana affinity reset
+cmd tp @s 0.5 100 0.5 0 0
+wait 40
+
+# a crypt's Revenant in a level-15 zone (story boss: 25; its element is random), against a player of 20
+cmd kill @e[type=!player]
+cmd kill @e[type=item]
+cmd fill -21 99 -13 21 99 37 minecraft:stone
+cmd fill -21 100 -13 21 112 37 minecraft:barrier
+cmd fill -20 100 -12 20 112 36 minecraft:air
+cmd tp @s 0.5 100 0.5 0 0
+cmd effect clear @s
+cmd arcana affinity reset
+cmd arcana tree reset
+cmd arcana stats reset
+cmd arcana awaken fire
+cmd arcana level set 20
+cmd arcana stats spend 8 potency
+cmd arcana stats spend 6 vitality
+cmd arcana stats spend 4 ward
+cmd arcana stats spend 1 focus
+cmd arcana spell elementalarcana:fireball 5 cluster
+cmd arcana tree take fire_burst_1
+cmd arcana tree take fire_ember_1
+cmd arcana tree take fire_spoke
+cmd arcana tree take fire_sprite_1
+cmd arcana tree take fire_burst_2
+cmd arcana tree take fire_ember_2
+cmd arcana tree take core_8
+cmd arcana tree take fire_burst_3
+cmd arcana tree take fire_ember_3
+cmd arcana tree take core_7
+cmd arcana tree take core_9
+cmd arcana tree take fire_burst_4
+cmd arcana tree take fire_kindled_soul
+cmd arcana tree take core_6
+cmd arcana tree take core_10
+cmd item replace entity @s weapon.mainhand with elementalarcana:adept_staff[elementalarcana:element="fire"]
+cmd item replace entity @s armor.head with elementalarcana:adept_hood
+cmd item replace entity @s armor.chest with elementalarcana:adept_robe
+cmd item replace entity @s armor.legs with elementalarcana:adept_trousers
+cmd item replace entity @s armor.feet with elementalarcana:adept_boots
+cmd arcana mana fill
+cmd arcana cooldowns reset
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd summon elementalarcana:revenant 0.5 100 12.5
+cmd arcana creaturelevel @e[type=elementalarcana:revenant] set 15
+cmd arcana creaturelevel @e[type=elementalarcana:revenant]
+wait 20
+select elementalarcana:fireball
+cmd arcana gauge start
+fight elementalarcana:revenant 150 20 10
+wait 5
+cmd arcana gauge stop
+wait 10
+
+# another Revenant
+cmd kill @e[type=!player]
+cmd kill @e[type=item]
+cmd fill -21 99 -13 21 99 37 minecraft:stone
+cmd fill -21 100 -13 21 112 37 minecraft:barrier
+cmd fill -20 100 -12 20 112 36 minecraft:air
+cmd tp @s 0.5 100 0.5 0 0
+cmd effect clear @s
+cmd arcana affinity reset
+cmd arcana tree reset
+cmd arcana stats reset
+cmd arcana awaken fire
+cmd arcana level set 20
+cmd arcana stats spend 8 potency
+cmd arcana stats spend 6 vitality
+cmd arcana stats spend 4 ward
+cmd arcana stats spend 1 focus
+cmd arcana spell elementalarcana:fireball 5 cluster
+cmd arcana tree take fire_burst_1
+cmd arcana tree take fire_ember_1
+cmd arcana tree take fire_spoke
+cmd arcana tree take fire_sprite_1
+cmd arcana tree take fire_burst_2
+cmd arcana tree take fire_ember_2
+cmd arcana tree take core_8
+cmd arcana tree take fire_burst_3
+cmd arcana tree take fire_ember_3
+cmd arcana tree take core_7
+cmd arcana tree take core_9
+cmd arcana tree take fire_burst_4
+cmd arcana tree take fire_kindled_soul
+cmd arcana tree take core_6
+cmd arcana tree take core_10
+cmd item replace entity @s weapon.mainhand with elementalarcana:adept_staff[elementalarcana:element="fire"]
+cmd item replace entity @s armor.head with elementalarcana:adept_hood
+cmd item replace entity @s armor.chest with elementalarcana:adept_robe
+cmd item replace entity @s armor.legs with elementalarcana:adept_trousers
+cmd item replace entity @s armor.feet with elementalarcana:adept_boots
+cmd arcana mana fill
+cmd arcana cooldowns reset
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd summon elementalarcana:revenant 0.5 100 12.5
+cmd arcana creaturelevel @e[type=elementalarcana:revenant] set 15
+cmd arcana creaturelevel @e[type=elementalarcana:revenant]
+wait 20
+select elementalarcana:fireball
+cmd arcana gauge start
+fight elementalarcana:revenant 150 20 10
+wait 5
+cmd arcana gauge stop
+wait 10
+
+# a tower's Magister in a level-15 zone (25), against a player of 20
+cmd kill @e[type=!player]
+cmd kill @e[type=item]
+cmd fill -21 99 -13 21 99 37 minecraft:stone
+cmd fill -21 100 -13 21 112 37 minecraft:barrier
+cmd fill -20 100 -12 20 112 36 minecraft:air
+cmd tp @s 0.5 100 0.5 0 0
+cmd effect clear @s
+cmd arcana affinity reset
+cmd arcana tree reset
+cmd arcana stats reset
+cmd arcana awaken fire
+cmd arcana level set 20
+cmd arcana stats spend 8 potency
+cmd arcana stats spend 6 vitality
+cmd arcana stats spend 4 ward
+cmd arcana stats spend 1 focus
+cmd arcana spell elementalarcana:fireball 5 cluster
+cmd arcana tree take fire_burst_1
+cmd arcana tree take fire_ember_1
+cmd arcana tree take fire_spoke
+cmd arcana tree take fire_sprite_1
+cmd arcana tree take fire_burst_2
+cmd arcana tree take fire_ember_2
+cmd arcana tree take core_8
+cmd arcana tree take fire_burst_3
+cmd arcana tree take fire_ember_3
+cmd arcana tree take core_7
+cmd arcana tree take core_9
+cmd arcana tree take fire_burst_4
+cmd arcana tree take fire_kindled_soul
+cmd arcana tree take core_6
+cmd arcana tree take core_10
+cmd item replace entity @s weapon.mainhand with elementalarcana:adept_staff[elementalarcana:element="fire"]
+cmd item replace entity @s armor.head with elementalarcana:adept_hood
+cmd item replace entity @s armor.chest with elementalarcana:adept_robe
+cmd item replace entity @s armor.legs with elementalarcana:adept_trousers
+cmd item replace entity @s armor.feet with elementalarcana:adept_boots
+cmd arcana mana fill
+cmd arcana cooldowns reset
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd summon elementalarcana:tower_magister 0.5 100 12.5
+cmd arcana creaturelevel @e[type=elementalarcana:tower_magister] set 15
+cmd arcana creaturelevel @e[type=elementalarcana:tower_magister]
+wait 20
+select elementalarcana:fireball
+cmd arcana gauge start
+fight elementalarcana:tower_magister 150 20 10
+wait 5
+cmd arcana gauge stop
+wait 10
+
+# the Forgewarden of a Nether forge (zone 35), against a player of 30
+cmd kill @e[type=!player]
+cmd kill @e[type=item]
+cmd fill -21 99 -13 21 99 37 minecraft:stone
+cmd fill -21 100 -13 21 112 37 minecraft:barrier
+cmd fill -20 100 -12 20 112 36 minecraft:air
+cmd tp @s 0.5 100 0.5 0 0
+cmd effect clear @s
+cmd arcana affinity reset
+cmd arcana tree reset
+cmd arcana stats reset
+cmd arcana awaken water
+cmd arcana level set 30
+cmd arcana stats spend 12 potency
+cmd arcana stats spend 9 vitality
+cmd arcana stats spend 6 ward
+cmd arcana stats spend 2 focus
+cmd arcana spell elementalarcana:hydro_jet 7
+cmd arcana tree take water_deep_1
+cmd arcana tree take water_rain_1
+cmd arcana tree take water_spoke
+cmd arcana tree take water_spring_1
+cmd arcana tree take water_deep_2
+cmd arcana tree take water_rain_2
+cmd arcana tree take core_15
+cmd arcana tree take water_spring_2
+cmd arcana tree take water_deep_3
+cmd arcana tree take core_14
+cmd arcana tree take core_16
+cmd arcana tree take water_deep_reserves
+cmd arcana tree take water_deep_4
+cmd arcana tree take core_13
+cmd arcana tree take core_17
+cmd arcana tree take water_deep_5
+cmd arcana tree take core_12
+cmd arcana tree take core_18
+cmd arcana tree take water_deep_6
+cmd arcana tree take core_11
+cmd arcana tree take core_19
+cmd arcana tree take ice_gate
+cmd arcana tree take core_10
+cmd item replace entity @s weapon.mainhand with elementalarcana:adept_staff[elementalarcana:element="water"]
+cmd item replace entity @s armor.head with elementalarcana:adept_hood
+cmd item replace entity @s armor.chest with elementalarcana:adept_robe
+cmd item replace entity @s armor.legs with elementalarcana:adept_trousers
+cmd item replace entity @s armor.feet with elementalarcana:adept_boots
+cmd arcana mana fill
+cmd arcana cooldowns reset
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd summon elementalarcana:forgewarden 0.5 100 12.5
+cmd arcana creaturelevel @e[type=elementalarcana:forgewarden] set 35
+cmd arcana creaturelevel @e[type=elementalarcana:forgewarden]
+wait 20
+select elementalarcana:hydro_jet
+cmd arcana gauge start
+fight elementalarcana:forgewarden 150 30 10
+wait 5
+cmd arcana gauge stop
+wait 10
+
+# Vulkhar, a Sovereign at its least (30, story boss: 40), against a player of 35
+cmd kill @e[type=!player]
+cmd kill @e[type=item]
+cmd fill -21 99 -13 21 99 37 minecraft:stone
+cmd fill -21 100 -13 21 112 37 minecraft:barrier
+cmd fill -20 100 -12 20 112 36 minecraft:air
+cmd tp @s 0.5 100 0.5 0 0
+cmd effect clear @s
+cmd arcana affinity reset
+cmd arcana tree reset
+cmd arcana stats reset
+cmd arcana awaken water
+cmd arcana level set 35
+cmd arcana stats spend 14 potency
+cmd arcana stats spend 10 vitality
+cmd arcana stats spend 7 ward
+cmd arcana stats spend 3 focus
+cmd arcana spell elementalarcana:hydro_jet 8
+cmd arcana tree take water_deep_1
+cmd arcana tree take water_rain_1
+cmd arcana tree take water_spoke
+cmd arcana tree take water_spring_1
+cmd arcana tree take water_deep_2
+cmd arcana tree take water_rain_2
+cmd arcana tree take core_15
+cmd arcana tree take water_spring_2
+cmd arcana tree take water_deep_3
+cmd arcana tree take core_14
+cmd arcana tree take core_16
+cmd arcana tree take water_deep_reserves
+cmd arcana tree take water_deep_4
+cmd arcana tree take core_13
+cmd arcana tree take core_17
+cmd arcana tree take water_deep_5
+cmd arcana tree take core_12
+cmd arcana tree take core_18
+cmd arcana tree take water_deep_6
+cmd arcana tree take core_11
+cmd arcana tree take core_19
+cmd arcana tree take ice_gate
+cmd arcana tree take core_10
+cmd arcana tree take core_arcane_vigor
+cmd arcana tree take core_20
+cmd arcana tree take core_9
+cmd arcana tree take core_21
+cmd item replace entity @s weapon.mainhand with elementalarcana:master_staff[elementalarcana:element="water"]
+cmd item replace entity @s armor.head with elementalarcana:master_hood
+cmd item replace entity @s armor.chest with elementalarcana:master_robe
+cmd item replace entity @s armor.legs with elementalarcana:master_trousers
+cmd item replace entity @s armor.feet with elementalarcana:master_boots
+cmd arcana mana fill
+cmd arcana cooldowns reset
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd summon elementalarcana:fire_sovereign 0.5 100 12.5
+cmd arcana creaturelevel @e[type=elementalarcana:fire_sovereign] set 30
+cmd arcana creaturelevel @e[type=elementalarcana:fire_sovereign]
+wait 20
+select elementalarcana:hydro_jet
+cmd arcana gauge start
+fight elementalarcana:fire_sovereign 180 30 10
+wait 5
+cmd arcana gauge stop
+wait 10
+
+# Caelum, likewise
+cmd kill @e[type=!player]
+cmd kill @e[type=item]
+cmd fill -21 99 -13 21 99 37 minecraft:stone
+cmd fill -21 100 -13 21 112 37 minecraft:barrier
+cmd fill -20 100 -12 20 112 36 minecraft:air
+cmd tp @s 0.5 100 0.5 0 0
+cmd effect clear @s
+cmd arcana affinity reset
+cmd arcana tree reset
+cmd arcana stats reset
+cmd arcana awaken fire
+cmd arcana level set 35
+cmd arcana stats spend 14 potency
+cmd arcana stats spend 10 vitality
+cmd arcana stats spend 7 ward
+cmd arcana stats spend 3 focus
+cmd arcana spell elementalarcana:fireball 8 cluster
+cmd arcana tree take fire_burst_1
+cmd arcana tree take fire_ember_1
+cmd arcana tree take fire_spoke
+cmd arcana tree take fire_sprite_1
+cmd arcana tree take fire_burst_2
+cmd arcana tree take fire_ember_2
+cmd arcana tree take core_8
+cmd arcana tree take fire_burst_3
+cmd arcana tree take fire_ember_3
+cmd arcana tree take core_7
+cmd arcana tree take core_9
+cmd arcana tree take fire_burst_4
+cmd arcana tree take fire_kindled_soul
+cmd arcana tree take core_6
+cmd arcana tree take core_10
+cmd arcana tree take core_5
+cmd arcana tree take core_11
+cmd arcana tree take core_4
+cmd arcana tree take core_12
+cmd arcana tree take core_arcane_vigor
+cmd arcana tree take core_3
+cmd arcana tree take core_13
+cmd arcana tree take core_2
+cmd arcana tree take core_14
+cmd arcana tree take core_1
+cmd arcana tree take core_15
+cmd arcana tree take core_0
+cmd item replace entity @s weapon.mainhand with elementalarcana:master_staff[elementalarcana:element="fire"]
+cmd item replace entity @s armor.head with elementalarcana:master_hood
+cmd item replace entity @s armor.chest with elementalarcana:master_robe
+cmd item replace entity @s armor.legs with elementalarcana:master_trousers
+cmd item replace entity @s armor.feet with elementalarcana:master_boots
+cmd arcana mana fill
+cmd arcana cooldowns reset
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd summon elementalarcana:wind_sovereign 0.5 100 12.5
+cmd arcana creaturelevel @e[type=elementalarcana:wind_sovereign] set 30
+cmd arcana creaturelevel @e[type=elementalarcana:wind_sovereign]
+wait 20
+select elementalarcana:fireball
+cmd arcana gauge start
+fight elementalarcana:wind_sovereign 180 20 10
+wait 5
+cmd arcana gauge stop
+wait 10
+
+# the Hollow (60), against a player of 50
+cmd kill @e[type=!player]
+cmd kill @e[type=item]
+cmd fill -21 99 -13 21 99 37 minecraft:stone
+cmd fill -21 100 -13 21 112 37 minecraft:barrier
+cmd fill -20 100 -12 20 112 36 minecraft:air
+cmd tp @s 0.5 100 0.5 0 0
+cmd effect clear @s
+cmd arcana affinity reset
+cmd arcana tree reset
+cmd arcana stats reset
+cmd arcana awaken water
+cmd arcana level set 50
+cmd arcana stats spend 20 potency
+cmd arcana stats spend 15 vitality
+cmd arcana stats spend 10 ward
+cmd arcana stats spend 4 focus
+cmd arcana spell elementalarcana:hydro_jet 10
+cmd arcana tree take water_deep_1
+cmd arcana tree take water_rain_1
+cmd arcana tree take water_spoke
+cmd arcana tree take water_spring_1
+cmd arcana tree take water_deep_2
+cmd arcana tree take water_rain_2
+cmd arcana tree take core_15
+cmd arcana tree take water_spring_2
+cmd arcana tree take water_deep_3
+cmd arcana tree take core_14
+cmd arcana tree take core_16
+cmd arcana tree take water_deep_reserves
+cmd arcana tree take water_deep_4
+cmd arcana tree take core_13
+cmd arcana tree take core_17
+cmd arcana tree take water_deep_5
+cmd arcana tree take core_12
+cmd arcana tree take core_18
+cmd arcana tree take water_deep_6
+cmd arcana tree take core_11
+cmd arcana tree take core_19
+cmd arcana tree take ice_gate
+cmd arcana tree take core_10
+cmd arcana tree take core_arcane_vigor
+cmd arcana tree take core_20
+cmd arcana tree take core_9
+cmd arcana tree take core_21
+cmd arcana tree take core_8
+cmd arcana tree take core_22
+cmd arcana tree take core_7
+cmd arcana tree take fire_spoke
+cmd arcana tree take core_23
+cmd arcana tree take earth_spoke
+cmd arcana tree take core_6
+cmd arcana tree take core_24
+cmd arcana tree take core_5
+cmd arcana tree take core_25
+cmd arcana tree take core_4
+cmd arcana tree take core_26
+cmd arcana tree take core_3
+cmd item replace entity @s weapon.mainhand with elementalarcana:archmage_staff[elementalarcana:element="water"]
+cmd item replace entity @s armor.head with elementalarcana:archmage_hood
+cmd item replace entity @s armor.chest with elementalarcana:archmage_robe
+cmd item replace entity @s armor.legs with elementalarcana:archmage_trousers
+cmd item replace entity @s armor.feet with elementalarcana:archmage_boots
+cmd arcana mana fill
+cmd arcana cooldowns reset
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd summon elementalarcana:the_hollow 0.5 100 12.5
+cmd arcana creaturelevel @e[type=elementalarcana:the_hollow] set 50
+cmd arcana creaturelevel @e[type=elementalarcana:the_hollow]
+wait 20
+select elementalarcana:hydro_jet
+cmd arcana gauge start
+fight elementalarcana:the_hollow 240 30 10
+wait 5
+cmd arcana gauge stop
+wait 10
+
+cmd kill @e[type=!player]
+cmd arcana tree reset
+cmd arcana stats reset
+cmd item replace entity @s weapon.mainhand with minecraft:air
+cmd item replace entity @s armor.head with minecraft:air
+cmd item replace entity @s armor.chest with minecraft:air
+cmd item replace entity @s armor.legs with minecraft:air
+cmd item replace entity @s armor.feet with minecraft:air
+wait 10
+quit

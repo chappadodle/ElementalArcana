@@ -74,7 +74,7 @@ more ideas that will be added.
 | Overworld near spawn | 1 to 5, +1 per about 150 blocks |
 | Deeper biomes, caves, structures | +5 to +15 |
 | Nether | 25 to 50 |
-| End | 60+ |
+| End | 40 on the central island, 65+ on the outer islands (0.12) |
 
 - **Ranks are bonus levels:** Adept +0, Magus +8, Archmage +20. With 9% growth per level, +20 is
   about x5.6 power. Spells known stay 1, 2 and 3. Rarity stays as today.

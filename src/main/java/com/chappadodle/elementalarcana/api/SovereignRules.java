@@ -23,8 +23,8 @@ public final class SovereignRules {
     public static final double LEASH = 16;
     /** How long without anyone to fight before it goes back to its seal and heals. */
     public static final int CALM_TICKS = 400;
-    /** Its own spells' power (a player's Lv 1 spell is 1; creatures cast at 0.6). */
-    public static final float POWER = 1f;
+    /** Its own spells' power (a player's Lv 1 spell is 1; creatures cast at 0.6). 0.8 since the balance pass (was 1). */
+    public static final float POWER = 0.8f;
     /** The share of damage it still takes while its Bulwark stands (Orvald). */
     public static final float BULWARK_DAMAGE = 0.25f;
 

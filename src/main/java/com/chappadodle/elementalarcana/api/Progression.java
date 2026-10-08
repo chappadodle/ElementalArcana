@@ -23,7 +23,19 @@ public final class Progression {
     private static final int CONDENSE_BASE_COST = 8;
     private static final int CONDENSE_COST_STEP = 4;
 
+    /**
+     * The levels a story boss (a crypt's Revenant, a tower's Magister, the Sovereigns, the Hollow)
+     * stands above its place, whatever its rank: its fight is its mechanics, not a wall of levels.
+     * (An Archmage's +20 made each a level-15 player's death in seconds: see the balance pass spec.)
+     */
+    public static final int STORY_BOSS_BONUS_LEVELS = 10;
+
     private Progression() {
+    }
+
+    /** The levels a creature stands above its zone: a story boss's fixed bonus, or its rank's. */
+    public static int bonusLevels(AttunementRank rank, boolean storyBoss) {
+        return storyBoss ? STORY_BOSS_BONUS_LEVELS : rank == null ? 0 : rank.bonusLevels();
     }
 
     /** XP from {@code level} to the next; 0 at the cap. */

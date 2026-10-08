@@ -162,10 +162,14 @@ public final class WaterBeams {
             float size = style.size() * (1f + 0.35f * beam.pressure);
             // Pressure Build and Lv 8+ make the inside glow brighter.
             float glow = (style.glow() + 0.4f * beam.pressure) * (bright ? 1.4f : 1f);
-            cubes(buffers.getBuffer(Sheets.translucentCullBlockSheet()),
-                    glow > 0.05f ? buffers.getBuffer(glowType) : null,
-                    glow > 0.05f && bright && bloomType != null ? buffers.getBuffer(bloomType) : null,
-                    pose, water, start, line, size, style, glow, time, light);
+            // One layer at a time: fetching another unbatched layer's buffer ends the one before.
+            cubes(buffers.getBuffer(Sheets.translucentCullBlockSheet()), Layer.BODY, pose, water, start, line, size, style, glow, time, light);
+            if (glow > 0.05f) {
+                cubes(buffers.getBuffer(glowType), Layer.GLOW, pose, water, start, line, size, style, glow, time, light);
+                if (bright && bloomType != null) {
+                    cubes(buffers.getBuffer(bloomType), Layer.BLOOM, pose, water, start, line, size, style, glow, time, light);
+                }
+            }
         }
         buffers.endBatch(Sheets.translucentCullBlockSheet());
         buffers.endBatch(glowType);
@@ -188,7 +192,9 @@ public final class WaterBeams {
      * stream) as it goes, emerges small at the palm, and drifts a little off the line the further it
      * gets (or spirals round it).
      */
-    private static void cubes(VertexConsumer body, @Nullable VertexConsumer glow, @Nullable VertexConsumer bloom, PoseStack.Pose pose,
+    private enum Layer { BODY, GLOW, BLOOM }
+
+    private static void cubes(VertexConsumer consumer, Layer layer, PoseStack.Pose pose,
                               TextureAtlasSprite water, Vec3 start, Vec3 line, float size, Style style, float glowStrength,
                               float time, int light) {
         double length = line.length();
@@ -236,12 +242,11 @@ public final class WaterBeams {
             float cx = (float) centre.x;
             float cy = (float) centre.y;
             float cz = (float) centre.z;
-            WaterCubes.cube(body, pose, water, cx, cy, cz, tumble, half, uo, vo, style.tint(), 235, light);
-            if (glow != null) {
-                WaterCubes.cube(glow, pose, water, cx, cy, cz, tumble, half * 0.55f, uo, vo, glowColor, 255, LightTexture.FULL_BRIGHT);
-            }
-            if (bloom != null) {
-                WaterCubes.cube(bloom, pose, water, cx, cy, cz, tumble, half * 0.55f, uo, vo, scale(glowColor, 0.7f), 255, LightTexture.FULL_BRIGHT);
+            switch (layer) {
+                case BODY -> WaterCubes.cube(consumer, pose, water, cx, cy, cz, tumble, half, uo, vo, style.tint(), 235, light);
+                case GLOW -> WaterCubes.cube(consumer, pose, water, cx, cy, cz, tumble, half * 0.55f, uo, vo, glowColor, 255, LightTexture.FULL_BRIGHT);
+                case BLOOM -> WaterCubes.cube(consumer, pose, water, cx, cy, cz, tumble, half * 0.55f, uo, vo, scale(glowColor, 0.7f), 255,
+                        LightTexture.FULL_BRIGHT);
             }
         }
     }

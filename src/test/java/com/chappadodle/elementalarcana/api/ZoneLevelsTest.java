@@ -36,8 +36,10 @@ class ZoneLevelsTest {
 
     @Test
     void endIsSixtyAndUp() {
-        assertEquals(60, level(END, 0, 70, false, false, false, 0));
-        assertEquals(74, level(END, 1000, 70, false, false, false, 4));
-        assertEquals(94, level(END, 100_000, 70, false, false, false, 4));
+        // The dragon's island is level 40; the outer islands (1000 blocks out and more) 65 and up.
+        assertEquals(40, level(END, 0, 70, false, false, false, 0));
+        assertEquals(42, level(END, 100, 70, false, false, false, 0));
+        assertEquals(69, level(END, 1000, 70, false, false, false, 4));
+        assertEquals(89, level(END, 100_000, 70, false, false, false, 4));
     }
 }
