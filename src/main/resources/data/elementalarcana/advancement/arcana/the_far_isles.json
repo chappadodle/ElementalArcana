@@ -1,0 +1,25 @@
+{
+  "parent": "elementalarcana:arcana/bound_again",
+  "display": {
+    "icon": {
+      "id": "elementalarcana:astral_chart"
+    },
+    "title": {
+      "translate": "advancement.elementalarcana.the_far_isles.title"
+    },
+    "description": {
+      "translate": "advancement.elementalarcana.the_far_isles.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "far_isles": {
+      "trigger": "elementalarcana:magic",
+      "conditions": {
+        "event": "far_isles"
+      }
+    }
+  }
+}

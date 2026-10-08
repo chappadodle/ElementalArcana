@@ -1,0 +1,30 @@
+# The Far Isles (see their spec), on the dedicated server.
+# 1. The observatories are placed on the End's outer islands: the nearest is located (logged).
+# 2. A Stargazer on the End's central island: its level (the island's, 40-odd) and its magic,
+#    Radiance (logged).
+# 3. An orrery and four lenses set by hand: the orrery's block entity (logged); the lenses keep the
+#    constellation they're set to (logged).
+gamerule doMobSpawning false
+execute in minecraft:the_end run locate structure elementalarcana:observatory
+execute in minecraft:the_end run forceload add -16 -16 16 16
+sleep 2
+execute in minecraft:the_end run summon elementalarcana:stargazer 0.5 80 0.5
+sleep 1
+execute in minecraft:the_end run arcana creaturelevel @e[type=elementalarcana:stargazer]
+execute in minecraft:the_end as @e[type=elementalarcana:stargazer,limit=1] run data get entity @s "neoforge:attachments"."elementalarcana:creature_magic"
+execute in minecraft:the_end run kill @e[type=elementalarcana:stargazer]
+execute in minecraft:the_end run forceload remove all
+forceload add 0 0 15 15
+fill 0 199 0 15 199 15 minecraft:stone
+fill 0 200 0 15 204 15 minecraft:air
+setblock 8 200 8 elementalarcana:astral_orrery
+setblock 8 200 2 elementalarcana:star_lens[facing=south,constellation=2]
+setblock 14 200 8 elementalarcana:star_lens[facing=west,constellation=1]
+setblock 8 200 14 elementalarcana:star_lens[facing=north,constellation=3]
+setblock 2 200 8 elementalarcana:star_lens[facing=east,constellation=0]
+sleep 1
+data get block 8 200 8
+execute if block 8 200 2 elementalarcana:star_lens[constellation=2]
+execute if block 2 200 8 elementalarcana:star_lens[constellation=0]
+fill 0 199 0 15 204 15 minecraft:air
+forceload remove all

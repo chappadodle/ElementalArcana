@@ -1,5 +1,11 @@
 package com.chappadodle.elementalarcana.core;
 
+import com.chappadodle.elementalarcana.content.end.Voidwalking;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Block;
+import com.chappadodle.elementalarcana.api.FarIslesRules;
+import com.chappadodle.elementalarcana.content.end.StarLensBlock;
+import com.chappadodle.elementalarcana.content.end.AstralOrreryBlockEntity;
 import com.chappadodle.elementalarcana.content.circle.ModCircle;
 import com.chappadodle.elementalarcana.content.circle.Commissions;
 import com.chappadodle.elementalarcana.content.circle.Commission;
@@ -156,7 +162,11 @@ public final class ArcanaCommand {
                                     return modify(ctx.getSource(), data -> data.setMana(amount), "commands.elementalarcana.mana_set");
                                 }))))
                 .then(Commands.literal("cooldowns").then(Commands.literal("reset")
-                        .executes(ctx -> modify(ctx.getSource(), MagicData::clearCooldowns, "commands.elementalarcana.cooldowns_reset"))))
+                        .executes(ctx -> {
+                            // The Voidwalker's Charm rests too.
+                            Voidwalking.ready(ctx.getSource().getPlayerOrException());
+                            return modify(ctx.getSource(), MagicData::clearCooldowns, "commands.elementalarcana.cooldowns_reset");
+                        })))
                 .then(Commands.literal("attune").then(attuneTargets()))
                 .then(Commands.literal("creaturelevel").then(Commands.argument("targets", EntityArgument.entities())
                         .executes(ctx -> showLevels(ctx.getSource(), EntityArgument.getEntities(ctx, "targets")))
@@ -178,6 +188,10 @@ public final class ArcanaCommand {
                     return wins;
                 })))
                 .then(golemSpawn())
+                // For testing: the nearest observatory's chart, and its lenses set one turn short of it.
+                .then(Commands.literal("observatory")
+                        .then(Commands.literal("chart").executes(ctx -> observatory(ctx.getSource(), false)))
+                        .then(Commands.literal("solve").executes(ctx -> observatory(ctx.getSource(), true))))
                 // For balance testing: the damage a player deals and takes in a fight (see Gauge).
                 .then(Commands.literal("gauge")
                         .then(Commands.literal("start").executes(ctx -> {
@@ -664,5 +678,44 @@ public final class ArcanaCommand {
         Component report = Gauge.stop(source.getPlayerOrException(), foe instanceof LivingEntity living ? living : null);
         source.sendSuccess(() -> report, false);
         return 1;
+    }
+
+    /** /arcana observatory chart|solve: reads the nearest orrery's chart; solve sets its lenses to it, but the one nearest you a turn short. */
+    private static int observatory(CommandSourceStack source, boolean solve) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        ServerLevel level = player.serverLevel();
+        BlockPos at = player.blockPosition();
+        for (BlockPos pos : BlockPos.betweenClosed(at.offset(-24, -8, -24), at.offset(24, 8, 24))) {
+            if (level.getBlockEntity(pos) instanceof AstralOrreryBlockEntity orrery) {
+                orrery.describe(player);
+                if (solve) {
+                    int[] chart = orrery.chart();
+                    BlockPos nearest = null;
+                    for (int i = 0; i < AstralOrreryBlockEntity.SIDES.size(); i++) {
+                        BlockPos ring = pos.relative(AstralOrreryBlockEntity.SIDES.get(i), FarIslesRules.LENS_DISTANCE);
+                        for (int dy = -2; dy <= 1; dy++) {
+                            BlockState state = level.getBlockState(ring.above(dy));
+                            if (state.getBlock() instanceof StarLensBlock) {
+                                level.setBlock(ring.above(dy), state.setValue(StarLensBlock.CONSTELLATION, chart[i]), Block.UPDATE_ALL);
+                                if (nearest == null || ring.above(dy).distSqr(at) < nearest.distSqr(at)) {
+                                    nearest = ring.above(dy).immutable();
+                                }
+                            }
+                        }
+                    }
+                    if (nearest != null) {
+                        BlockState state = level.getBlockState(nearest);
+                        int behind = Math.floorMod(state.getValue(StarLensBlock.CONSTELLATION) - 1, FarIslesRules.CONSTELLATIONS.size());
+                        level.setBlock(nearest, state.setValue(StarLensBlock.CONSTELLATION, behind), Block.UPDATE_ALL);
+                    }
+                }
+                BlockPos found = pos.immutable();
+                source.sendSuccess(() -> Component.literal("Observatory orrery at " + found.getX() + " " + found.getY() + " " + found.getZ()
+                        + (solve ? ": lenses set, one turn short" : "")), false);
+                return 1;
+            }
+        }
+        source.sendFailure(Component.literal("No observatory within 24 blocks"));
+        return 0;
     }
 }

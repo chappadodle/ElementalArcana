@@ -230,6 +230,10 @@ ADVANCEMENTS = [
     ("into_the_hollow", "prime_key", item("minecraft:ender_eye"), "goal", "Into the Hollow",
      "Turn the Prime Key and go to the Hollow", {
          "entered": {"trigger": "minecraft:changed_dimension", "conditions": {"to": NS + "the_hollow"}}}, None),
+    ("the_far_isles", "bound_again", item("astral_chart"), "challenge", "The Far Isles",
+     "Wake the orrery of a Starfallen Observatory on the End's outer islands", magic("far_isles"), None),
+    ("starstruck", "into_the_wild", item("stardust"), "task", "Starstruck",
+     "Defeat a Stargazer, one of the robed figures of the End's outer islands", killed(NS + "stargazer"), None),
     ("bound_again", "into_the_hollow", item("prime_heart"), "challenge", "Bound Again",
      "Defeat the Hollow and bind it once more", killed(NS + "the_hollow"), None),
 ]

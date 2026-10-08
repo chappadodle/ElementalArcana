@@ -1,0 +1,64 @@
+{
+  "variants": {
+    "constellation=0,facing=north": {
+      "model": "elementalarcana:block/star_lens_flame"
+    },
+    "constellation=0,facing=east": {
+      "model": "elementalarcana:block/star_lens_flame",
+      "y": 90
+    },
+    "constellation=0,facing=south": {
+      "model": "elementalarcana:block/star_lens_flame",
+      "y": 180
+    },
+    "constellation=0,facing=west": {
+      "model": "elementalarcana:block/star_lens_flame",
+      "y": 270
+    },
+    "constellation=1,facing=north": {
+      "model": "elementalarcana:block/star_lens_wave"
+    },
+    "constellation=1,facing=east": {
+      "model": "elementalarcana:block/star_lens_wave",
+      "y": 90
+    },
+    "constellation=1,facing=south": {
+      "model": "elementalarcana:block/star_lens_wave",
+      "y": 180
+    },
+    "constellation=1,facing=west": {
+      "model": "elementalarcana:block/star_lens_wave",
+      "y": 270
+    },
+    "constellation=2,facing=north": {
+      "model": "elementalarcana:block/star_lens_gale"
+    },
+    "constellation=2,facing=east": {
+      "model": "elementalarcana:block/star_lens_gale",
+      "y": 90
+    },
+    "constellation=2,facing=south": {
+      "model": "elementalarcana:block/star_lens_gale",
+      "y": 180
+    },
+    "constellation=2,facing=west": {
+      "model": "elementalarcana:block/star_lens_gale",
+      "y": 270
+    },
+    "constellation=3,facing=north": {
+      "model": "elementalarcana:block/star_lens_stone"
+    },
+    "constellation=3,facing=east": {
+      "model": "elementalarcana:block/star_lens_stone",
+      "y": 90
+    },
+    "constellation=3,facing=south": {
+      "model": "elementalarcana:block/star_lens_stone",
+      "y": 180
+    },
+    "constellation=3,facing=west": {
+      "model": "elementalarcana:block/star_lens_stone",
+      "y": 270
+    }
+  }
+}

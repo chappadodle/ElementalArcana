@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.content;
 
+import com.chappadodle.elementalarcana.content.end.ModEnd;
 import com.chappadodle.elementalarcana.content.forge.ModForge;
 import com.chappadodle.elementalarcana.content.circle.ModCircle;
 import com.chappadodle.elementalarcana.content.world.ModWorld;
@@ -125,6 +126,7 @@ public final class ModTabs {
                 output.accept(ModWorld.LEY_ANCHOR_ITEM.get());
                 ModCircle.items().forEach(item -> output.accept(item.get()));
                 ModForge.items().forEach(item -> output.accept(item.get()));
+                ModEnd.items().forEach(item -> output.accept(item.get()));
             })
             .build());
 

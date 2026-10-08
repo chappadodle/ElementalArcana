@@ -35,13 +35,13 @@ Magic sleeps in everyone. One day, it wakes in you.
 - **Places to find:** elemental shrines joined by ley lines you can walk, ruins with the old story
   in their books, crypts sealed with rune gates where the first mages lie, mage towers and their
   Magisters, the four Sovereigns' sanctums, sky isles floating high over the land, drake nests on the
-  heights, wisp rings where the wisps dance at night, and in the Nether, the Cinder Forges of the
-  first mages' smiths. A Seeker's Compass points the way, and Ley Anchors you make bring the ley
+  heights, wisp rings where the wisps dance at night, in the Nether, the Cinder Forges of the
+  first mages' smiths, and on the End's far isles, the observatories where they read the stars. A Seeker's Compass points the way, and Ley Anchors you make bring the ley
   lines home.
 - **Things to fight:** wisps, golems, Attuned creatures that cast spells of their own, elemental
   rifts that tear open at night, Revenants, Magisters, Sovereigns, Elemental Drakes, and the
   Creatures of the Wild: treants, frost wraiths, salamanders, harpies, crystal crawlers, bog lurkers;
-  in the Nether, the Forgewarden, Ash Wraiths and packs of Cinder Hounds.
+  in the Nether, the Forgewarden, Ash Wraiths and packs of Cinder Hounds; in the End, the Stargazers.
   And the Hollowed, a cult that eats your mana, camped round dark obelisks and out hunting at dusk.
 - **Living world:** stars fall at night and leave fragments to find; mana tides swell every few
   nights; Arcanist villagers trade in magic and post bounties; wandering mages sell rumours; glowmoths

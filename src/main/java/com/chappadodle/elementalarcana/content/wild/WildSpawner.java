@@ -1,5 +1,7 @@
 package com.chappadodle.elementalarcana.content.wild;
 
+import com.chappadodle.elementalarcana.api.FarIslesRules;
+import com.chappadodle.elementalarcana.content.end.ModEnd;
 import com.chappadodle.elementalarcana.api.NetherCreatureRules;
 import com.chappadodle.elementalarcana.core.ArcanaServerConfig;
 import com.chappadodle.elementalarcana.api.ConfigRates;
@@ -36,7 +38,8 @@ import org.jetbrains.annotations.Nullable;
  * each kind, and one that comes up is born 20 to 40 blocks off in its own place, never two of a kind
  * within 48 blocks. Treants stand up among the trees, wraiths drift over the snow at night,
  * salamanders bask in the badlands, deserts and on the Nether's floor, harpies circle high over the
- * peaks by day, crawlers creep on cave floors far underground, and lurkers lie in swamp water.
+ * peaks by day, crawlers creep on cave floors far underground, and lurkers lie in swamp water; the
+ * Nether's wraiths and hounds, and the Stargazers of the End's outer islands.
  */
 @EventBusSubscriber(modid = ElementalArcana.MODID)
 public final class WildSpawner {
@@ -47,6 +50,7 @@ public final class WildSpawner {
     public static final TagKey<Biome> LURKER_LANDS = TagKey.create(Registries.BIOME, ElementalArcana.id("wild/bog_lurker"));
     public static final TagKey<Biome> ASH_WRAITH_LANDS = TagKey.create(Registries.BIOME, ElementalArcana.id("wild/ash_wraith"));
     public static final TagKey<Biome> HOUND_LANDS = TagKey.create(Registries.BIOME, ElementalArcana.id("wild/cinder_hound"));
+    public static final TagKey<Biome> STARGAZER_LANDS = TagKey.create(Registries.BIOME, ElementalArcana.id("wild/stargazer"));
     /** A wild creature's chance at the server's rate for them. */
     private static double wild(float chance) {
         return ConfigRates.scaled(chance, ArcanaServerConfig.WILD_CREATURES.get());
@@ -56,7 +60,7 @@ public final class WildSpawner {
 
     /** Every kind, for the spawner and the test command. */
     public enum Kind {
-        TREANT, WRAITH, SALAMANDER, HARPY, CRAWLER, LURKER, ASH_WRAITH, HOUND
+        TREANT, WRAITH, SALAMANDER, HARPY, CRAWLER, LURKER, ASH_WRAITH, HOUND, STARGAZER
     }
 
     private WildSpawner() {
@@ -98,6 +102,9 @@ public final class WildSpawner {
                 trySpawn(level, Kind.HOUND, player.position(), random, false);
             }
         }
+        if (level.dimension() == Level.END && random.nextFloat() < wild(FarIslesRules.STARGAZER_CHANCE)) {
+            trySpawn(level, Kind.STARGAZER, player.position(), random, false);
+        }
         if ((level.dimension() == Level.OVERWORLD || level.dimension() == Level.NETHER) && random.nextFloat() < wild(WildRules.SALAMANDER_CHANCE)) {
             trySpawn(level, Kind.SALAMANDER, player.position(), random, false);
         }
@@ -129,6 +136,7 @@ public final class WildSpawner {
             BlockPos at = switch (kind) {
                 case WRAITH -> pos.above(3 + random.nextInt(3));
                 case ASH_WRAITH -> pos.above(2 + random.nextInt(2));
+                case STARGAZER -> pos.above(1 + random.nextInt(3));
                 case HARPY -> pos.above(10 + random.nextInt(7));
                 default -> pos;
             };
@@ -164,6 +172,7 @@ public final class WildSpawner {
             case LURKER -> ModWild.LURKER.get();
             case ASH_WRAITH -> ModWild.ASH_WRAITH.get();
             case HOUND -> ModWild.CINDER_HOUND.get();
+            case STARGAZER -> ModEnd.STARGAZER.get();
         };
     }
 
@@ -176,6 +185,7 @@ public final class WildSpawner {
             case LURKER -> level.getBiome(pos).is(LURKER_LANDS);
             case ASH_WRAITH -> level.getBiome(pos).is(ASH_WRAITH_LANDS);
             case HOUND -> level.getBiome(pos).is(HOUND_LANDS);
+            case STARGAZER -> level.getBiome(pos).is(STARGAZER_LANDS);
             // Deep in the dark: under the crawler's height and out of the light.
             case CRAWLER -> pos.getY() < WildRules.CRAWLER_MAX_Y && level.getBrightness(LightLayer.SKY, pos) == 0
                     && level.getBrightness(LightLayer.BLOCK, pos) <= 7;
@@ -221,7 +231,7 @@ public final class WildSpawner {
         int height = switch (kind) {
             case TREANT -> 3;
             case WRAITH, HARPY -> 5;
-            case ASH_WRAITH -> 4;
+            case ASH_WRAITH, STARGAZER -> 4;
             case SALAMANDER, CRAWLER, LURKER, HOUND -> 1;
         };
         for (BlockPos p : BlockPos.betweenClosed(pos.offset(-radius, 0, -radius), pos.offset(radius, height - 1, radius))) {

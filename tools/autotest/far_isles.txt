@@ -1,0 +1,60 @@
+# The Far Isles (see their spec), in the End.
+# 1. An observatory on the outer islands, seen from above its terrace (a shot): the pillars, the
+#    lenses at their feet, the dais and orrery, the chart in the floor.
+# 2. Its puzzle: the test command sets the lenses one turn short of the chart (the north one), the
+#    player turns the north lens: the orrery wakes and the vault rises (a shot; the orrery's word and
+#    the advancement logged).
+# 3. A Stargazer called on the terrace (a shot).
+# 4. The Voidwalker's Charm: carried, a fall into the void brings the player back to the terrace
+#    (their place logged).
+hud on
+cmd gamemode spectator
+cmd time set midnight
+cmd execute in minecraft:the_end run tp @s 1600 140 300
+wait 80
+# (its base is 12 under the terrace's floor)
+goto elementalarcana:observatory 18 26 0
+wait 100
+shot observatory
+cmd gamemode creative
+cmd clear @s
+find elementalarcana:astral_orrery 24 0 -1 -3 180 20
+wait 20
+cmd arcana observatory chart
+cmd arcana observatory solve
+wait 10
+use
+wait 30
+find elementalarcana:astral_orrery 24 0 1 5 180 25
+wait 20
+shot observatory_open
+cmd arcana observatory chart
+cmd execute if entity @s[advancements={elementalarcana:arcana/the_far_isles=true}]
+# 3. A Stargazer.
+cmd kill @e[type=elementalarcana:stargazer]
+cmd execute at @s rotated ~ 0 run summon elementalarcana:stargazer ^ ^ ^7
+wait 20
+cmd tp @s ~ ~ ~ facing entity @e[type=elementalarcana:stargazer,limit=1,sort=nearest] feet
+wait 10
+shot stargazer
+cmd kill @e[type=elementalarcana:stargazer]
+# 4. The Voidwalker's Charm.
+cmd gamemode survival
+cmd effect give @s minecraft:instant_health 1 10 true
+cmd effect give @s minecraft:resistance 30 4 true
+cmd clear @s
+cmd give @s elementalarcana:voidwalker_charm
+cmd arcana cooldowns reset
+find elementalarcana:astral_orrery 24 0 -1 -3 180 20
+wait 40
+cmd data get entity @s Pos
+cmd execute at @s run tp @s ~60 -70 ~
+wait 40
+cmd data get entity @s Pos
+cmd data get entity @s Health
+cmd clear @s
+# Back to the Overworld, where the other tests start.
+cmd gamemode creative
+cmd execute in minecraft:overworld run tp @s 0 100 0
+wait 10
+quit

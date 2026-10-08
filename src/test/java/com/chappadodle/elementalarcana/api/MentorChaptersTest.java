@@ -30,7 +30,7 @@ class MentorChaptersTest {
             }
         }
         assertEquals("voice", MentorChapters.CHAPTERS.get(0).id());
-        assertEquals("bound", MentorChapters.CHAPTERS.get(MentorChapters.CHAPTERS.size() - 1).id());
+        assertEquals("beyond", MentorChapters.CHAPTERS.get(MentorChapters.CHAPTERS.size() - 1).id());
     }
 
     @Test
@@ -53,8 +53,15 @@ class MentorChaptersTest {
         // 0.10's number 9 was the Seals (sanctum); 15 and up, the tale told.
         assertEquals("sanctum", MentorChapters.idOf(MentorChapters.placeOfLegacy(9)));
         assertEquals("hollowed", MentorChapters.idOf(MentorChapters.placeOfLegacy(8)));
-        assertTrue(MentorChapters.finished(MentorChapters.placeOfLegacy(15)));
+        assertEquals("beyond", MentorChapters.idOf(MentorChapters.placeOfLegacy(15)));
         assertEquals(0, MentorChapters.placeOfLegacy(0));
+    }
+
+    @Test
+    void aTaleToldBeforeTheEpilogueFindsIt() {
+        assertEquals("beyond", MentorChapters.idOf(MentorChapters.placeOf("done")));
+        assertEquals("beyond", MentorChapters.idOf(MentorChapters.placeOf("bound") + 1));
+        assertTrue(MentorChapters.finished(MentorChapters.placeOf(MentorChapters.DONE)));
     }
 
     @Test
@@ -68,7 +75,7 @@ class MentorChaptersTest {
     @Test
     void xpIsLevelsWorth() {
         MentorChapters.Chapter shrine = MentorChapters.CHAPTERS.get(1);
-        MentorChapters.Chapter bound = MentorChapters.CHAPTERS.get(MentorChapters.CHAPTERS.size() - 1);
+        MentorChapters.Chapter bound = MentorChapters.CHAPTERS.get(MentorChapters.placeOf("bound"));
         assertEquals(Progression.xpToNextLevel(1), MentorChapters.xp(shrine, 1));
         assertEquals(Progression.xpToNextLevel(30), MentorChapters.xp(shrine, 30));
         assertEquals(3 * Progression.xpToNextLevel(50), MentorChapters.xp(bound, 50), 1);

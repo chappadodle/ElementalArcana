@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "awake=false": {
+      "model": "elementalarcana:block/astral_orrery"
+    },
+    "awake=true": {
+      "model": "elementalarcana:block/astral_orrery_awake"
+    }
+  }
+}

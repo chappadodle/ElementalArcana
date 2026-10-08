@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "S S",
+    " P ",
+    "SCS"
+  ],
+  "key": {
+    "S": {
+      "item": "elementalarcana:stardust"
+    },
+    "P": {
+      "item": "minecraft:ender_pearl"
+    },
+    "C": {
+      "item": "minecraft:chorus_fruit"
+    }
+  },
+  "result": {
+    "id": "elementalarcana:voidwalker_charm",
+    "count": 1
+  }
+}

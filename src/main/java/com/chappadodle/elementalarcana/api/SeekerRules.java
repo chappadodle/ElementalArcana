@@ -9,7 +9,7 @@ import java.util.List;
 public final class SeekerRules {
     /** What it can seek, in the order sneak-use goes through them (each is the structure tag elementalarcana:seekable/<kind>). */
     public static final List<String> KINDS = List.of("shrines", "ruins", "crypts", "mage_towers", "sanctums", "drake_nests", "sky_isles",
-            "hollowed_camps", "wisp_rings", "enclaves", "cinder_forges");
+            "hollowed_camps", "wisp_rings", "enclaves", "cinder_forges", "observatories");
     /** How far it looks: rings of each structure's spread grid, as /locate and explorer maps count them (thousands of blocks). */
     public static final int SEARCH_RINGS = 100;
     /** Within this many blocks of what it found, on the ground (any height), you've arrived. */

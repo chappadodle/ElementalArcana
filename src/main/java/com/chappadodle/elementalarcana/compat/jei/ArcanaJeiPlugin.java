@@ -1,5 +1,6 @@
 package com.chappadodle.elementalarcana.compat.jei;
 
+import com.chappadodle.elementalarcana.content.end.ModEnd;
 import com.chappadodle.elementalarcana.content.forge.ModForge;
 import com.chappadodle.elementalarcana.content.circle.ModCircle;
 import com.chappadodle.elementalarcana.content.world.ModWorld;
@@ -98,6 +99,11 @@ public class ArcanaJeiPlugin implements IModPlugin {
         registration.addIngredientInfo(ModWild.CINDER_FANG.get(), info("cinder_fang"));
         registration.addIngredientInfo(ModWild.ASHEN_SHROUD.get(), info("ashen_shroud"));
         registration.addIngredientInfo(ModWild.HOUNDSTOOTH_CHARM.get(), info("houndstooth_charm"));
+        registration.addIngredientInfo(ModEnd.STARDUST.get(), info("stardust"));
+        registration.addIngredientInfo(ModEnd.VOIDWALKER_CHARM.get(), info("voidwalker_charm"));
+        registration.addIngredientInfo(ModEnd.ASTRAL_CHART.get(), info("astral_chart"));
+        registration.addIngredientInfo(ModEnd.STAR_LENS_ITEM.get(), info("star_lens"));
+        registration.addIngredientInfo(ModEnd.ASTRAL_ORRERY_ITEM.get(), info("astral_orrery"));
     }
 
     @Override

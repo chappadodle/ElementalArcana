@@ -149,6 +149,15 @@ CHAPTERS = {
         "Defeat the Hollow",
         "It's quiet. I'd forgotten quiet.\n\nThank you. The seals will hold now, for a long while. The stone will "
         "go quiet too, but keep it. It remembers my voice."),
+    "beyond": (
+        "Beyond the Last Sky",
+        "One more thing, while the stone still carries me. Before the seals, before the Hollow, we read the stars. "
+        "Out past the End's dragon, on the far isles, we built observatories, and charted the sky that's under all "
+        "skies.\n\nFind one. Wake its orrery: turn its lenses to the chart in its floor. I'd like to know they're "
+        "still there.",
+        "Wake the orrery of an observatory on the End's far isles",
+        "They're still there. The lenses still turn.\n\nThat's all I wanted. Keep the stars for me. Goodbye, and "
+        "thank you, truly."),
 }
 
 SCREEN = {

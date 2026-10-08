@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "elementalarcana:block/star_lens_stone",
+    "side": "minecraft:block/purpur_block",
+    "top": "minecraft:block/purpur_pillar_top"
+  }
+}

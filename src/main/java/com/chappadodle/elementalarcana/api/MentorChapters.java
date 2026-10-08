@@ -38,10 +38,13 @@ public final class MentorChapters {
             new Chapter("hearts", task("four_hearts"), 2, List.of()),
             new Chapter("key", task("prime_key"), 2, List.of(new Reward("minecraft:totem_of_undying", 1))),
             new Chapter("hollow", task("into_the_hollow"), 1, List.of()),
-            new Chapter("bound", task("bound_again"), 3, List.of(new Reward("minecraft:enchanted_golden_apple", 1))));
+            new Chapter("bound", task("bound_again"), 3, List.of(new Reward("minecraft:enchanted_golden_apple", 1))),
+            new Chapter("beyond", task("the_far_isles"), 3, List.of(new Reward("elementalarcana:wishing_star", 1))));
 
     /** Past the last chapter: the tale is told. */
-    public static final String DONE = "done";
+    public static final String DONE = "told";
+    /** How 0.11 saved a told tale, before the epilogue: such a player is at the epilogue now. */
+    static final String DONE_BEFORE_EPILOGUE = "done";
     /** The chapters' order in 0.9 and 0.10, which saved a player's place in the tale by number. */
     static final List<String> LEGACY_ORDER = List.of("voice", "shrine", "wisps", "arcanist", "crypt", "revenant", "tower", "magister",
             "hollowed", "sanctum", "sovereign", "hearts", "key", "hollow", "bound");
@@ -53,6 +56,9 @@ public final class MentorChapters {
     public static int placeOf(String id) {
         if (DONE.equals(id)) {
             return CHAPTERS.size();
+        }
+        if (DONE_BEFORE_EPILOGUE.equals(id)) {
+            return placeOf("beyond");
         }
         for (int i = 0; i < CHAPTERS.size(); i++) {
             if (CHAPTERS.get(i).id().equals(id)) {
@@ -68,9 +74,9 @@ public final class MentorChapters {
         return chapter != null ? chapter.id() : place >= CHAPTERS.size() ? DONE : CHAPTERS.get(0).id();
     }
 
-    /** A place saved by number in 0.9 or 0.10: where that chapter is now. */
+    /** A place saved by number in 0.9 or 0.10: where that chapter is now (a told tale: the epilogue, which came later). */
     public static int placeOfLegacy(int number) {
-        return number >= LEGACY_ORDER.size() ? CHAPTERS.size() : placeOf(LEGACY_ORDER.get(Math.max(0, number)));
+        return number >= LEGACY_ORDER.size() ? placeOf("beyond") : placeOf(LEGACY_ORDER.get(Math.max(0, number)));
     }
 
     private static String task(String advancement) {

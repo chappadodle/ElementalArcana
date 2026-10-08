@@ -1,0 +1,20 @@
+{
+  "structures": [
+    {
+      "structure": "elementalarcana:observatory",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "elementalarcana:spread_away",
+    "spacing": 24,
+    "separation": 8,
+    "salt": 488213,
+    "keep_away": {
+      "sets": [
+        "minecraft:end_cities"
+      ],
+      "chunk_count": 4
+    }
+  }
+}
