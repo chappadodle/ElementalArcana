@@ -1,5 +1,47 @@
 # Changelog
 
+## 1.0.0 — the Far Isles — 2026-10-08
+
+The first full release: the story runs from your first shrine to the End's far isles, and its
+bosses have been measured and tuned.
+
+### The Far Isles
+
+- **Starfallen Observatories** on the End's outer islands, 1000 blocks and more from the centre:
+  a terrace under four pillars, a **Star Lens** at each pillar's foot and an **Astral Orrery** in
+  the middle. The orrery's chart is set in the floor, a line of colour toward each lens: turn the
+  lenses to match and the orrery wakes, and its vault rises. The Seeker's Compass finds them.
+- **Stargazers**, tall robed figures Attuned to Radiance, drift over the outer islands. They leave
+  you be unless you strike them or look them in the face. Their **Stardust** makes the
+  **Voidwalker's Charm**: carried, a fall into the void carries you back to solid ground, once
+  every five minutes.
+- The **Astral Chart** (from the vaults) shows the way home from the far isles.
+- Caelith's tale has an epilogue, **Beyond the Last Sky**, for those who bound the Hollow (and
+  worlds where the tale was already told find it waiting).
+
+### Balance
+
+- Measured with a new gauge (`/arcana gauge start|stop`, for your own play-tests too): the story's
+  bosses were out of reach of a player of the place they stand in, with the Archmage's +20 levels
+  on top of it. Now they stand 10 levels above their place: a crypt's Revenant or a tower's
+  Magister in a level-15 land is level 25 (was 35), the Sovereigns 40 and up (were 50), the Hollow
+  60 (was 70) with about 750 health (was 1020).
+- Sovereigns' own spells hit a fifth softer. The Magister blinks away at most every 8 seconds when
+  hurt (was 4). The Forgewarden's slam, vents and burning are softer.
+- The End's central island, where the dragon waits, is level 40 (was 60); the End rises to 65 on
+  the outer islands and 85 at most.
+
+### Changes
+
+- A held fireball keeps out of its caster's way in first person: smaller, low in the corners of
+  the screen, and Sunfire's sun hangs high ahead. Others see it as before.
+- Phoenix has a bird's cry (a parrot's blaze call and the dragon's wingbeat) instead of the
+  phantom's.
+
+### Fixes
+
+- A crash at Hydro Jet level 8 and up with bloom on.
+
 ## 0.11.0 — the Ember Reaches — 2026-10-07
 
 The Nether gets its own magic.

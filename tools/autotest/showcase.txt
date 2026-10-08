@@ -102,6 +102,12 @@ wait 80
 goto elementalarcana:cinder_forge 9 13 11
 wait 100
 shot gallery_forge
+# The End: a Starfallen Observatory on the outer islands (its base is 12 under the terrace).
+cmd execute in minecraft:the_end run tp @s -2400.5 140 2600.5
+wait 80
+goto elementalarcana:observatory 18 26 0
+wait 100
+shot gallery_observatory
 cmd execute in minecraft:overworld run tp @s 178000.5 102 178000.5
 cmd gamemode creative
 wait 40
